@@ -4,7 +4,7 @@ import {
   SignalStoreFeature,
   SignalStoreFeatureResult,
 } from '@ngrx/signals';
-import { Equal, Expect } from '../../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { Signal } from '@angular/core';
 
 type Scalar = null | boolean | number | string;

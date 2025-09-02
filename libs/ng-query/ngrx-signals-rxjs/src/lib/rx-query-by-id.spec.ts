@@ -8,7 +8,7 @@ import { BehaviorSubject, of, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxQueryById } from './rx-query-by-id';
 import { InternalType } from '../../../ngrx-signals/src/lib/types/util.type';
-import { Equal, Expect } from '../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { signalStore } from '@ngrx/signals';
 import { withQueryById } from '../../../ngrx-signals/src/lib/with-query-by-id';
 import { User } from '../resource-by-group/api.service';

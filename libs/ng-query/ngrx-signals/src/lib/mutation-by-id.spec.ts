@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { lastValueFrom, of } from 'rxjs';
 import { Injector, runInInjectionContext } from '@angular/core';
 import { mutationById } from './mutation-by-id';
-import { Equal, Expect } from 'test-type';
+import { Expect, Equal } from 'test-type';
 
 type User = {
   id: string;

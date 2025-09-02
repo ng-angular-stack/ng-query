@@ -4,12 +4,14 @@ import {
   StateSignals,
   WritableStateSource,
 } from '@ngrx/signals';
-import { InternalType } from '../../../ngrx-signals/src/lib/types/util.type';
-import { QueryByIdRef } from '../../../ngrx-signals/src/lib/with-query-by-id';
 import { Signal, signal } from '@angular/core';
-import { rxResourceById } from '../rx-resource-by-id';
-import { RxResourceByIdConfig } from '../../../ngrx-signals/src/lib/types/rx-resource-by-id-config.type';
-import { __INTERNAL_QueryBrand } from '../../../ngrx-signals/src/lib/types/brand';
+import { rxResourceById } from './rx-resource-by-id';
+import { RxResourceByIdConfig } from './types/rx-resource-by-id-config.type';
+import {
+  __INTERNAL_QueryBrand,
+  InternalType,
+  QueryByIdRef,
+} from '@ng-query/ngrx-signals';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 export function rxQueryById<

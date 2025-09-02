@@ -18,10 +18,9 @@ import {
   withProps,
   WritableStateSource,
 } from '@ngrx/signals';
-import { InternalType } from './types/util.type';
-import { Merge } from '../../../util/types/merge';
+import { InternalType, MergeObject } from './types/util.type';
 import { __InternalSharedMutationConfig } from './with-mutation';
-import { ResourceByIdRef } from '../resource-by-id';
+import { ResourceByIdRef } from './resource-by-id';
 import {
   AssociatedStateMapperFnById,
   BooleanOrMapperFnByPathById,
@@ -29,7 +28,6 @@ import {
 import { nestedEffect } from './types/util';
 import { createNestedStateUpdate } from './core/update-state.util';
 import {
-  ExtendsFactory,
   QueryDeclarativeEffect,
   setOptimisticPatchFromMutationOnQueryValue,
   setOptimisticUpdateFromMutationOnQueryValue,
@@ -56,7 +54,7 @@ type WithQueryByIdOutputStoreConfig<
   ExtendedOutputs extends Record<string, unknown>
 > = {
   state: {};
-  props: Merge<
+  props: MergeObject<
     {
       [key in `${ResourceName & string}QueryById`]: ResourceByIdRef<
         GroupIdentifier,

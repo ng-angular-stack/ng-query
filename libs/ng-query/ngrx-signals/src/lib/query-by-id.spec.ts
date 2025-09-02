@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { lastValueFrom, of } from 'rxjs';
-import { Equal, Expect } from '../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { Injector, runInInjectionContext } from '@angular/core';
 import { queryById } from './query-by-id';
 

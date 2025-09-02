@@ -16,7 +16,6 @@ import {
   withProps,
   WritableStateSource,
 } from '@ngrx/signals';
-import { Merge } from '../../../util/types/merge';
 import { InternalType, MergeObject, MergeObjects } from './types/util.type';
 
 import {
@@ -178,7 +177,7 @@ type MutationStoreOutput<
   MutationArgsParams
 > = {
   state: {};
-  props: Merge<
+  props: MergeObject<
     {
       [key in `${MutationName}Mutation`]: ResourceRef<MutationState>;
     },

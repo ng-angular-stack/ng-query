@@ -1,4 +1,4 @@
-import { Equal, Expect } from '../../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { RxResourceWithParamsOrParamsFn } from './rx-resource-with-params-or-params-fn.type';
 import { of } from 'rxjs';
 

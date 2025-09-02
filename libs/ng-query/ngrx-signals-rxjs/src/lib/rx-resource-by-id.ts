@@ -1,9 +1,7 @@
 import {
   inject,
   signal,
-  ResourceOptions,
   ResourceRef,
-  Signal,
   effect,
   untracked,
   Injector,
@@ -12,7 +10,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { RxResourceOptions } from '@angular/core/rxjs-interop';
-import { preservedRxResource } from './signal-store-with-server-state/preserved-rx-resource';
+import { preservedRxResource } from './preserved-rx-resource';
 
 type Prettify<T> = {
   [K in keyof T]: T[K];

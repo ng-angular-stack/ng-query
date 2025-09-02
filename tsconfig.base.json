@@ -20,6 +20,7 @@
       "@ng-query/ngrx-signals-rxjs": [
         "libs/ng-query/ngrx-signals-rxjs/src/index.ts"
       ],
+      "test-type": ["libs/test-type/src/index.ts"],
       "types-testing": ["test-types.ts"]
     }
   },

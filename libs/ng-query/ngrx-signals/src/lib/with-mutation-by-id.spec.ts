@@ -2,22 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { signalStore, signalStoreFeature, withState } from '@ngrx/signals';
 import { delay, lastValueFrom, of } from 'rxjs';
 import { withQueryById } from './with-query-by-id';
-import { Equal, Expect } from '../../../../../test-type';
-import {
-  ApplicationRef,
-  Injector,
-  ResourceRef,
-  runInInjectionContext,
-} from '@angular/core';
-import { SIGNAL } from '@angular/core/primitives/signals';
-import { ResourceByIdRef } from '../resource-by-id';
+import { Expect, Equal } from 'test-type';
+import { ApplicationRef, ResourceRef } from '@angular/core';
+import { ResourceByIdRef } from './resource-by-id';
 import { queryById } from './query-by-id';
-import { withMutation } from './with-mutation';
 import { vi } from 'vitest';
-import { mutation } from './mutation';
 import { withMutationById } from './with-mutation-by-id';
 import { mutationById } from './mutation-by-id';
-import { rxMutationById } from './rx-mutation-by-id';
 
 type User = {
   id: string;
@@ -316,10 +307,10 @@ describe('withMutationById', () => {
     };
     const Store = signalStore(
       withMutationById('user', () =>
-        rxMutationById({
+        mutationById({
           params$: of('5'),
-          stream: ({ params }) => {
-            return of<User>(returnedUser);
+          loader: async ({ params }) => {
+            return returnedUser as User;
           },
           identifier: (params) => params,
         })

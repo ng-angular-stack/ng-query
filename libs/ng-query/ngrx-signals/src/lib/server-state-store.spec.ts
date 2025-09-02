@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 import { withQuery } from './with-query';
 import { rxQuery } from './rx-query';
 import { TestBed } from '@angular/core/testing';
-import { Equal, Expect } from '../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { ApplicationRef, signal, Signal } from '@angular/core';
 import { IsAny } from './types/util.type';
 import { expectTypeOf } from 'vitest';

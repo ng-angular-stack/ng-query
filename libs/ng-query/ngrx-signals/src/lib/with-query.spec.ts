@@ -1,5 +1,5 @@
 import { delay, lastValueFrom, map, of } from 'rxjs';
-import { Equal, Expect } from '../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import {
   signalStore,
   signalStoreFeature,
@@ -19,8 +19,8 @@ import { withMutation } from './with-mutation';
 import { query } from './query';
 import { mutation } from './mutation';
 import { withMutationById } from './with-mutation-by-id';
-import { rxMutationById } from './rx-mutation-by-id';
 import { expectTypeOf, vi } from 'vitest';
+import { mutationById } from './mutation-by-id';
 
 type User = {
   id: string;
@@ -561,12 +561,13 @@ describe('Declarative server state, withQuery and withMutation', () => {
         lastUserFetched: undefined as User | undefined,
       }),
       withMutationById('user', () =>
-        rxMutationById({
+        mutationById({
           method(user: User) {
             return user;
           },
           identifier: (params) => params.id,
-          stream: ({ params }) => of<User>(params).pipe(delay(1000)),
+          loader: ({ params }) =>
+            lastValueFrom(of<User>(params).pipe(delay(1000))),
         })
       ),
       withQuery(

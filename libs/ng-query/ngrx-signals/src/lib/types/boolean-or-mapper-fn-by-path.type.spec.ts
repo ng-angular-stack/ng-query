@@ -1,5 +1,5 @@
 import { ResourceRef } from '@angular/core';
-import { Equal, Expect } from '../../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { BooleanOrMapperFnByPath } from './boolean-or-mapper-fn-by-path.type';
 
 it('Should map all deep object paths except arrays', () => {

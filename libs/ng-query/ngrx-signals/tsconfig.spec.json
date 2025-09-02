@@ -23,7 +23,9 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "../ngrx-signals-rxjs/src/lib/types/rx-resource-with-params-or-params-fn.type.spec.ts",
+    "../ngrx-signals-rxjs/src/lib/preserved-rx-resource.spec.ts"
   ],
   "files": ["src/test-setup.ts"]
 }

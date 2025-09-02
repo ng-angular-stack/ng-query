@@ -1,7 +1,7 @@
 import { ResourceWithParamsOrParamsFn } from './resource-with-params-or-params-fn.type';
-import { Equal, Expect } from '../../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { ResourceStreamItem, signal } from '@angular/core';
-import { Prettify } from '../../../../util/types/prettify';
+import { Prettify } from '@ngrx/signals';
 
 function test<ResourceState, Params, ParamsArgs>(
   data: ResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs>

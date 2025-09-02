@@ -1,5 +1,5 @@
 import { ResourceRef } from '@angular/core';
-import { Equal, Expect } from '../../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { BooleanOrMapperFnByPathById } from './boolean-or-mapper-fn-by-path-by-id.type';
 import { ResourceByIdRef } from '../resource-by-id-signal-store';
 

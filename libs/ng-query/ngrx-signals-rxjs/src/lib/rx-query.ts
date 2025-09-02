@@ -4,15 +4,15 @@ import {
   StateSignals,
   WritableStateSource,
 } from '@ngrx/signals';
-import { RxResourceWithParamsOrParamsFn } from '../../../ngrx-signals/src/lib/types/rx-resource-with-params-or-params-fn.type';
-import { InternalType } from '../../../ngrx-signals/src/lib/types/util.type';
-import { QueryRef } from '../../../ngrx-signals/src/lib/with-query';
+import { RxResourceWithParamsOrParamsFn } from './types/rx-resource-with-params-or-params-fn.type';
+import { InternalType } from '@ng-query/ngrx-signals';
+import { QueryRef } from '@ng-query/ngrx-signals';
 import { Signal, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
   __INTERNAL_QueryBrand,
   brandQueryFunction,
-} from '../../../ngrx-signals/src/lib/types/brand';
+} from '@ng-query/ngrx-signals';
 
 export function rxQuery<
   QueryState extends object | undefined,

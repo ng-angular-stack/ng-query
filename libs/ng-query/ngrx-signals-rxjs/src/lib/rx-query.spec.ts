@@ -7,10 +7,9 @@ import {
 } from '@ngrx/signals';
 import { ResourceRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { withMutation } from '../../../ngrx-signals/src/lib/with-mutation';
 import { rxQuery } from './rx-query';
-import { withQuery } from '../../../ngrx-signals/src/lib/with-query';
-import { mutation } from '../../../ngrx-signals/src/lib/mutation';
+import { Expect, Equal } from 'test-type';
+import { withQuery, withMutation, mutation } from '@ng-query/ngrx-signals';
 
 type User = {
   id: string;

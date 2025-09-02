@@ -4,11 +4,10 @@ import {
   runInInjectionContext,
   ApplicationRef,
 } from '@angular/core';
-import { BehaviorSubject, of, Subject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxMutationById } from './rx-mutation-by-id';
-import { InternalType } from '../../../ngrx-signals/src/lib/types/util.type';
-import { Equal, Expect } from '../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 
 describe('rxResourceById', () => {
   it('should create a rxResource by id', async () => {

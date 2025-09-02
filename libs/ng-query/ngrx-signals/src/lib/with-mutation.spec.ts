@@ -7,7 +7,7 @@ import {
   withProps,
   withState,
 } from '@ngrx/signals';
-import { Equal, Expect } from '../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { withQuery } from './with-query';
 import { delay, lastValueFrom, of, tap } from 'rxjs';
 import { ApplicationRef, ResourceRef, signal } from '@angular/core';
@@ -18,7 +18,7 @@ import { expectTypeOf, vi } from 'vitest';
 import { query } from './query';
 import { queryById } from './query-by-id';
 import { mutation } from './mutation';
-import { ResourceByIdRef } from '../resource-by-id';
+import { ResourceByIdRef } from './resource-by-id';
 
 type User = {
   id: string;

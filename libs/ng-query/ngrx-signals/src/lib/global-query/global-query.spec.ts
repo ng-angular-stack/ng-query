@@ -1,16 +1,16 @@
 import { signalStore, withState } from '@ngrx/signals';
-import { Equal, Expect } from '../../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { globalQueries } from './global-queries';
 import { of } from 'rxjs';
-import { rxQuery } from '../rx-query';
 import { inject, Injectable, ResourceRef, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { withMutation } from '../with-mutation';
-import { rxMutation } from '../rx-mutation';
 import { SignalProxy } from '../signal-proxy';
 import { vi } from 'vitest';
-import { rxQueryById } from '../rx-query-by-id';
 import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { query } from '../query';
+import { mutation } from '../mutation';
+import { queryById } from '../query-by-id';
 
 // todo queryById
 // todo expose inject funtion
@@ -20,11 +20,11 @@ describe('Global Queries', () => {
       queries: {
         user: {
           query: () =>
-            rxQuery({
+            query({
               params: () => ({
                 id: '1',
               }),
-              stream: () => of({ id: '1', name: 'User 1' }),
+              loader: async () => ({ id: '1', name: 'User 1' }),
             }),
         },
       },
@@ -42,9 +42,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => ({ id: '4', name: params }),
         })
       ),
       withUserQuery((store) => ({
@@ -73,19 +73,29 @@ describe('Global Queries', () => {
       queries: {
         user: {
           query: (source: SignalProxy<{ id: string | undefined }>) =>
-            rxQuery({
+            query({
               params: source.id,
-              stream: ({ params: id }) => of({ id, name: 'User 1' }),
+              loader: async ({ params: id }) => ({ id, name: 'User 1' }),
             }),
         },
         users: {
           query: () =>
-            rxQuery({
-              stream: () => of({ id: '1', name: 'User 1' }),
+            query({
+              loader: async () => ({ id: '1', name: 'User 1' }),
             }),
         },
       },
     });
+    console.log('data', data);
+
+    // 👇 Check du typage
+    type ExpectQueryKeysToBeLiterals = Expect<
+      Equal<'withUserQuery' extends keyof typeof data ? true : false, true>
+    >;
+
+    const { withUserQuery, withUsersQuery } = data;
+
+    expect(typeof withUserQuery).toEqual('function');
     console.log('data', data);
 
     // 👇 Check du typage
@@ -101,9 +111,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => ({ id: '4', name: params }),
         })
       ),
       withUserQuery((store) => ({
@@ -132,9 +142,9 @@ describe('Global Queries', () => {
       queries: {
         user: {
           query: (source: SignalProxy<{ id: string | undefined }>) =>
-            rxQuery({
+            query({
               params: source.id,
-              stream: ({ params: id }) => of({ id, name: 'User 1' }),
+              loader: async ({ params: id }) => ({ id, name: 'User 1' }),
             }),
         },
       },
@@ -144,9 +154,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => ({ id: '4', name: params }),
         })
       ),
       withUserQuery((store) => ({
@@ -164,8 +174,8 @@ describe('Global Queries', () => {
 
     @Injectable({ providedIn: 'root' })
     class ApiService {
-      getUser() {
-        return of({ id: '1', name: 'User 1' });
+      async getUser() {
+        return { id: '1', name: 'User 1' };
       }
     }
 
@@ -176,9 +186,9 @@ describe('Global Queries', () => {
             source: SignalProxy<{ id: string | undefined }>,
             api = inject(ApiService)
           ) =>
-            rxQuery({
+            query({
               params: source.id,
-              stream: ({ params }) => {
+              loader: async ({ params }) => {
                 console.log('stream params', params);
                 return api.getUser();
               },
@@ -197,9 +207,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => ({ id: '4', name: params }),
         })
       ),
       withUserQuery((store) => ({
@@ -247,9 +257,9 @@ describe('Global Queries', () => {
       queries: {
         user: {
           query: (api = inject(ApiService)) =>
-            rxQuery({
+            query({
               params: source,
-              stream: ({ params }) => {
+              loader: async ({ params }) => {
                 console.log('stream params', params);
                 return api.getUser();
               },
@@ -270,9 +280,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => ({ id: '4', name: params }),
         })
       ),
       withUserQuery((store) => ({
@@ -304,9 +314,9 @@ describe('Global Queries', () => {
       queriesById: {
         user: {
           queryById: (source: SignalProxy<{ id: string | undefined }>) =>
-            rxQueryById({
+            queryById({
               params: source.id,
-              stream: () => of({ id: '1', name: 'User 1' }),
+              loader: async () => ({ id: '1', name: 'User 1' }),
               identifier: (params) => params,
             }),
         },
@@ -328,9 +338,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => ({ id: '4', name: params }),
         })
       ),
       withUserQueryById((store) => ({
@@ -362,9 +372,9 @@ describe('Global Queries', () => {
       queriesById: {
         user: {
           queryById: () =>
-            rxQueryById({
+            queryById({
               params: () => '1',
-              stream: ({ params: id }) => of({ id, name: 'User ' + id }),
+              loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
               identifier: (params) => params,
             }),
         },
@@ -386,9 +396,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => ({ id: '4', name: params }),
         })
       ),
       withUserQueryById()
@@ -423,16 +433,17 @@ describe('Global Queries', () => {
       queries: {
         user: {
           query: () =>
-            rxQuery({
+            query({
               params: () => '1',
-              stream: ({ params: id }) => of({ id, name: 'User ' + id }),
+              loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
             }),
         },
         users: {
           query: (source: SignalProxy<{ id: string | undefined }>) =>
-            rxQuery({
+            query({
               params: source.id,
-              stream: ({ params: id }) => of([{ id, name: 'User ' + id }]),
+              loader: async ({ params: id }) =>
+                of([{ id, name: 'User ' + id }]),
             }),
         },
         userDetails: {
@@ -440,16 +451,16 @@ describe('Global Queries', () => {
             source: SignalProxy<{ id: string | undefined }>,
             api = inject(ApiService)
           ) =>
-            rxQuery({
+            query({
               params: source.id,
-              stream: ({ params: id }) => api.getUserDetails(),
+              loader: async ({ params: id }) => api.getUserDetails(),
             }),
         },
         userView: {
           query: (api = inject(ApiService)) =>
-            rxQuery({
+            query({
               params: () => '1',
-              stream: ({ params: id }) => api.getUserDetails(),
+              loader: async ({ params: id }) => api.getUserDetails(),
             }),
         },
       },
@@ -498,9 +509,9 @@ describe('Global Queries', () => {
       queries: {
         user: {
           query: () =>
-            rxQuery({
+            query({
               params: () => '1',
-              stream: ({ params: id }) => of({ id, name: 'User ' + id }),
+              loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
             }),
         },
       },
@@ -509,9 +520,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => of({ id: '4', name: params }),
         })
       ),
       withUserQuery()
@@ -520,9 +531,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => of({ id: '4', name: params }),
         })
       ),
       withUserQuery()
@@ -544,9 +555,9 @@ describe('Global Queries', () => {
       queriesById: {
         user: {
           queryById: () =>
-            rxQueryById({
+            queryById({
               params: () => '1',
-              stream: ({ params: id }) => of({ id, name: 'User ' + id }),
+              loader: async ({ params: id }) => of({ id, name: 'User ' + id }),
               identifier: (params) => params,
             }),
         },
@@ -564,9 +575,9 @@ describe('Global Queries', () => {
       queriesById: {
         user: {
           queryById: () =>
-            rxQueryById({
+            queryById({
               params: () => '1',
-              stream: ({ params: id }) => of({ id, name: 'User ' + id }),
+              loader: async ({ params: id }) => of({ id, name: 'User ' + id }),
               identifier: (params) => params,
             }),
         },
@@ -576,9 +587,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => of({ id: '4', name: params }),
         })
       ),
       withUserQueryById()
@@ -587,9 +598,9 @@ describe('Global Queries', () => {
       { providedIn: 'root' },
       withState({ selected: '1' }),
       withMutation('name', () =>
-        rxMutation({
+        mutation({
           method: (name: string) => name,
-          stream: ({ params }) => of({ id: '4', name: params }),
+          loader: async ({ params }) => of({ id: '4', name: params }),
         })
       ),
       withUserQueryById()

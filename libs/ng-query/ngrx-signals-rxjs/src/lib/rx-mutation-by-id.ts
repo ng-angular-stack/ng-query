@@ -4,12 +4,12 @@ import {
   StateSignals,
   WritableStateSource,
 } from '@ngrx/signals';
-import { InternalType } from '../../../ngrx-signals/src/lib/types/util.type';
-import { MutationByIdRef } from '../../../ngrx-signals/src/lib/with-mutation-by-id';
+import { InternalType } from '@ng-query/ngrx-signals';
+import { MutationByIdRef } from '@ng-query/ngrx-signals';
 import { signal, WritableSignal } from '@angular/core';
-import { rxResourceById } from '../rx-resource-by-id';
-import { RxResourceByIdConfig } from '../../../ngrx-signals/src/lib/types/rx-resource-by-id-config.type';
+import { RxResourceByIdConfig } from './types/rx-resource-by-id-config.type';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { rxResourceById } from './rx-resource-by-id';
 
 export function rxMutationById<
   MutationState extends object | undefined,

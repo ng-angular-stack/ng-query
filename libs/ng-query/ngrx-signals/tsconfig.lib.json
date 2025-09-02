@@ -23,5 +23,12 @@
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx"
   ],
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "../ngrx-signals-rxjs/src/lib/types/rx-resource-by-id-config.type.ts",
+    "../ngrx-signals-rxjs/src/lib/types/rx-resource-with-params-or-params-fn.type.spec.ts",
+    "../ngrx-signals-rxjs/src/lib/types/rx-resource-with-params-or-params-fn.type.ts",
+    "../ngrx-signals-rxjs/src/lib/preserved-rx-resource.spec.ts",
+    "../ngrx-signals-rxjs/src/lib/preserved-rx-resource.ts"
+  ]
 }

@@ -1,11 +1,11 @@
 import { ResourceRef } from '@angular/core';
-import { Prettify } from '../../../../util/types/prettify';
 import {
   HasChild,
   MakeOptionalPropertiesRequired,
   MergeObject,
   UnionToTuple,
 } from './util.type';
+import { Prettify } from '@ngrx/signals';
 
 /**
  * Does not work with number/symbole keys

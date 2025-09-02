@@ -1,7 +1,7 @@
 import { ResourceLoaderParams } from '@angular/core';
 import { RxResourceOptions } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { ResourceMethod } from './shared.type';
+import { ResourceMethod } from '../../../../ngrx-signals/src/lib/types/shared.type';
 
 export type RxResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
   | Omit<

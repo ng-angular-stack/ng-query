@@ -2,7 +2,7 @@
 // Purpose: Signal proxy that exposes read signals per property + write helpers for the underlying source signal.
 
 import { Signal, signal, computed, isSignal } from '@angular/core';
-import { Merge } from '../../../util/types/merge';
+import { MergeObject } from './types/util.type';
 
 type AnyRecord = Record<PropertyKey, unknown>;
 
@@ -19,7 +19,7 @@ export type SignalWrapperParams<T extends object> = {
 export type SignalProxy<
   T extends object,
   Public extends boolean = false
-> = Merge<
+> = MergeObject<
   {
     // For each property, you read it as a Signal of its final value (signals unwrapped).
     readonly [K in keyof T]: T[K] extends Signal<infer U>

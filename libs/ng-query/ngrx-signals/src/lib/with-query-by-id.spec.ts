@@ -8,21 +8,20 @@ import {
 } from '@ngrx/signals';
 import { delay, lastValueFrom, of } from 'rxjs';
 import { withQueryById } from './with-query-by-id';
-import { Equal, Expect } from '../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import {
   ApplicationRef,
   Injector,
   ResourceRef,
   runInInjectionContext,
 } from '@angular/core';
-import { ResourceByIdRef } from '../resource-by-id';
+import { ResourceByIdRef } from './resource-by-id';
 import { queryById } from './query-by-id';
 import { withMutation } from './with-mutation';
 import { vi } from 'vitest';
 import { mutation } from './mutation';
 import { withMutationById } from './with-mutation-by-id';
 import { mutationById } from './mutation-by-id';
-import { rxMutationById } from './rx-mutation-by-id';
 
 type User = {
   id: string;
@@ -398,12 +397,13 @@ describe('withQueryById', () => {
         lastUserFetched: undefined as User | undefined,
       }),
       withMutationById('user', () =>
-        rxMutationById({
+        mutationById({
           method(user: User) {
             return user;
           },
           identifier: (params) => params.id,
-          stream: ({ params }) => of<User>(params).pipe(delay(10)),
+          loader: ({ params }) =>
+            lastValueFrom(of<User>(params).pipe(delay(10))),
         })
       ),
       withQueryById(

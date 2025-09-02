@@ -1,9 +1,8 @@
 import { of } from 'rxjs';
-import { signalStore, SignalStoreFeature } from '@ngrx/signals';
+import { signalStore } from '@ngrx/signals';
 import { TestBed } from '@angular/core/testing';
-import { withMutation } from '../../../ngrx-signals/src/lib/with-mutation';
+import { withMutation } from '@ng-query/ngrx-signals';
 import { rxMutation } from './rx-mutation';
-import { ApplicationRef } from '@angular/core';
 
 type User = {
   id: string;

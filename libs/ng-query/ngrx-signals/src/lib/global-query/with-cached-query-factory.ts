@@ -13,7 +13,6 @@ import {
   QueryByIdRef,
   withQueryById,
 } from '../with-query-by-id';
-import { unknown } from 'arktype/internal/keywords/ts.ts';
 
 export function withCachedQueryToPlugFactory<
   const QueryName extends string,

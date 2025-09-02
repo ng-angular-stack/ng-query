@@ -20,7 +20,6 @@ import {
 } from '@ngrx/signals';
 import { InternalType, MergeObject } from './types/util.type';
 import { createNestedStateUpdate } from './core/update-state.util';
-import { __InternalSharedMutationConfig } from './with-mutation';
 import {
   AssociatedStateMapperFn,
   BooleanOrMapperFnByPath,
@@ -31,7 +30,7 @@ import {
   setOptimisticUpdateFromMutationOnQueryValue,
   triggerQueryReloadOnMutationStatusChange,
 } from './core/query.core';
-import { ResourceByIdRef } from '../resource-by-id';
+import { ResourceByIdRef } from './resource-by-id';
 import { nestedEffect } from './types/util';
 
 export type QueryRef<ResourceState, ResourceParams, ExtendedOutput> = {

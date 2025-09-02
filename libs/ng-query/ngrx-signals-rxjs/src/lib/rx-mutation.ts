@@ -4,11 +4,11 @@ import {
   StateSignals,
   WritableStateSource,
 } from '@ngrx/signals';
-import { RxResourceWithParamsOrParamsFn } from '../../../ngrx-signals/src/lib/types/rx-resource-with-params-or-params-fn.type';
-import { InternalType } from '../../../ngrx-signals/src/lib/types/util.type';
+import { RxResourceWithParamsOrParamsFn } from './types/rx-resource-with-params-or-params-fn.type';
+import { InternalType } from '@ng-query/ngrx-signals';
 import { signal, WritableSignal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { MutationRef } from '../../../ngrx-signals/src/lib/with-mutation';
+import { MutationRef } from '@ng-query/ngrx-signals';
 
 export function rxMutation<
   MutationState extends object | undefined,

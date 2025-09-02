@@ -1,12 +1,11 @@
 import { signalStore, withState } from '@ngrx/signals';
 import { withCachedQueryToPlugFactory } from './with-cached-query-factory';
 import { withMutation } from '../with-mutation';
-import { rxMutation } from '../rx-mutation';
-import { of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
-import { Equal, Expect } from '../../../../../../test-type';
+import { Expect, Equal } from 'test-type';
 import { resource, ResourceRef, signal } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
+import { mutation } from '../mutation';
 
 describe('withCachedQueryFactory', () => {
   it('should create a typed withQuery for the signal store that can be plugged to the store', () => {
@@ -45,9 +44,9 @@ describe('withCachedQueryFactory', () => {
         },
         withState({ selected: { id: 1 } }),
         withMutation('name', () =>
-          rxMutation({
+          mutation({
             method: (name: string) => name,
-            stream: ({ params }) => of({ id: '4', name: params }),
+            loader: async ({ params }) => ({ id: '4', name: params }),
           })
         ),
         withUserQuery((store) => ({

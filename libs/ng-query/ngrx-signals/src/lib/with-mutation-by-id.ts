@@ -17,8 +17,7 @@ import {
   withProps,
   WritableStateSource,
 } from '@ngrx/signals';
-import { InternalType } from './types/util.type';
-import { Merge } from '../../../util/types/merge';
+import { InternalType, MergeObject } from './types/util.type';
 import {
   OptimisticPathMutationQuery,
   ReloadQueriesConfig,
@@ -34,7 +33,7 @@ import {
   setOptimisticPatchQueriesValue,
   setOptimisticQueryValues,
 } from './with-mutation';
-import { ResourceByIdRef } from '../resource-by-id';
+import { ResourceByIdRef } from './resource-by-id';
 import { nestedEffect } from './types/util';
 
 export type MutationByIdRef<
@@ -58,7 +57,7 @@ type WithMutationByIdOutputStoreConfig<
   GroupIdentifier extends string | number
 > = {
   state: {};
-  props: Merge<
+  props: MergeObject<
     {
       [key in `${ResourceName & string}MutationById`]: ResourceByIdRef<
         GroupIdentifier,
