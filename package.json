@@ -2,7 +2,9 @@
   "name": "@ng-query/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "docs:publish": "nx build docs && cd ../query && cd apps/docs/.vitepress/dist && git init && git branch -D gh-pages 2>NUL && git checkout -b gh-pages && git add . && git commit -m \"Deploy docs\" && git remote add origin https://github.com/ng-angular-stack/query.git && git push -f origin gh-pages"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "~20.1.0",
