@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ng-query": ["apps/libs/ng-query/src/index.ts"]
+      "@ng-query": ["apps/libs/ng-query/src/index.ts"],
+      "@ng-query/ngrx-signals": ["libs/ng-query/ngrx-signals/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

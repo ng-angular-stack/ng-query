@@ -1,7 +1,7 @@
 {
-  "name": "query",
+  "name": "ng-query-ngrx-signals",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/libs/ng-query/src",
+  "sourceRoot": "libs/ng-query/ngrx-signals/src",
   "prefix": "lib",
   "projectType": "library",
   "release": {
@@ -17,12 +17,12 @@
       "executor": "@nx/angular:package",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "project": "apps/libs/ng-query/ng-package.json",
-        "tsConfig": "apps/libs/ng-query/tsconfig.lib.json"
+        "project": "libs/ng-query/ngrx-signals/ng-package.json",
+        "tsConfig": "libs/ng-query/ngrx-signals/tsconfig.lib.json"
       },
       "configurations": {
         "production": {
-          "tsConfig": "apps/libs/ng-query/tsconfig.lib.prod.json"
+          "tsConfig": "libs/ng-query/ngrx-signals/tsconfig.lib.prod.json"
         },
         "development": {}
       },
@@ -37,7 +37,7 @@
       "executor": "@nx/vite:test",
       "outputs": ["{options.reportsDirectory}"],
       "options": {
-        "reportsDirectory": "../../../coverage/apps/libs/ng-query"
+        "reportsDirectory": "../../../coverage/libs/ng-query/ngrx-signals"
       }
     },
     "lint": {

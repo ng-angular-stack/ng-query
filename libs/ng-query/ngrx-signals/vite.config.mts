@@ -6,14 +6,14 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
   root: __dirname,
-  cacheDir: '../../../node_modules/.vite/apps/libs/ng-query',
+  cacheDir: '../../../node_modules/.vite/libs/ng-query/ngrx-signals',
   plugins: [angular(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [ nxViteTsPaths() ],
   // },
   test: {
-    name: 'query',
+    name: 'ng-query-ngrx-signals',
     watch: false,
     globals: true,
     environment: 'jsdom',
@@ -21,7 +21,7 @@ export default defineConfig(() => ({
     setupFiles: ['src/test-setup.ts'],
     reporters: ['default'],
     coverage: {
-      reportsDirectory: '../../../coverage/apps/libs/ng-query',
+      reportsDirectory: '../../../coverage/libs/ng-query/ngrx-signals',
       provider: 'v8' as const,
     },
   },

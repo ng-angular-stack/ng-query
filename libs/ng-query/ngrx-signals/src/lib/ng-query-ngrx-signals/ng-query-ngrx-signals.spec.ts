@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Query } from './query';
+import { NgQueryNgrxSignals } from './ng-query-ngrx-signals';
 
-describe('Query', () => {
-  let component: Query;
-  let fixture: ComponentFixture<Query>;
+describe('NgQueryNgrxSignals', () => {
+  let component: NgQueryNgrxSignals;
+  let fixture: ComponentFixture<NgQueryNgrxSignals>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Query],
+      imports: [NgQueryNgrxSignals],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Query);
+    fixture = TestBed.createComponent(NgQueryNgrxSignals);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
