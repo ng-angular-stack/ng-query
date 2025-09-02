@@ -1,55 +1,56 @@
-import { defineConfig } from "vitepress";
+import { defineConfig } from 'vitepress';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "ng-query",
-  description: "ng-query is a server state management tool",
+  title: '@ng-query',
+  base: '/query/',
+  description: '@ng-query is a server state management tool',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: "/assets/favicon.png",
+    logo: '/assets/favicon.png',
     nav: [
-      { text: "Home", link: "/" },
-      { text: "Docs", link: "/markdown-examples" },
+      { text: 'Home', link: '/' },
+      { text: 'Docs', link: '/markdown-examples' },
     ],
 
     sidebar: [
       {
-        text: "Signal Store",
+        text: 'Signal Store',
         items: [
-          { text: "Overview", link: "/signal-store" },
-          { text: "Query - withQuery", link: "/signal-store-query" },
-          { text: "Mutation - withMutation", link: "/signal-store-mutation" },
+          { text: 'Overview', link: '/signal-store' },
+          { text: 'Query - withQuery', link: '/signal-store-query' },
+          { text: 'Mutation - withMutation', link: '/signal-store-mutation' },
           {
-            text: "Optimistic update & other effects",
-            link: "/signal-store-optimistic",
+            text: 'Optimistic update & other effects',
+            link: '/signal-store-optimistic',
           },
           {
-            text: "Global Queries",
+            text: 'Global Queries',
             items: [
-              { text: "Overview", link: "/signal-store-global-query" },
-              { text: "Persister", link: "/signal-store-global-persister" },
+              { text: 'Overview', link: '/signal-store-global-query' },
+              { text: 'Persister', link: '/signal-store-global-persister' },
             ],
           },
           {
-            text: "Parallel Queries & Mutations",
-            link: "/signal-store-parallel",
+            text: 'Parallel Queries & Mutations',
+            link: '/signal-store-parallel',
           },
-          { text: "Paginated Query", link: "/signal-store-paginated" },
-          { text: "Server State Store", link: "/signal-store-server-state" },
+          { text: 'Paginated Query', link: '/signal-store-paginated' },
+          { text: 'Server State Store', link: '/signal-store-server-state' },
         ],
       },
       {
-        text: "Examples",
+        text: 'Examples',
         items: [
-          { text: "Markdown Examples", link: "/markdown-examples" },
-          { text: "Runtime API Examples", link: "/api-examples" },
+          { text: 'Markdown Examples', link: '/markdown-examples' },
+          { text: 'Runtime API Examples', link: '/api-examples' },
         ],
       },
     ],
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/vuejs/vitepress" },
+      { icon: 'github', link: 'https://github.com/vuejs/vitepress' },
     ],
   },
-  head: [["link", { rel: "icon", href: "/assets/favicon.png" }]],
+  head: [['link', { rel: 'icon', href: '/assets/favicon.png' }]],
 });

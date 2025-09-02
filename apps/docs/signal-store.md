@@ -1,4 +1,4 @@
-# ng-query in Signal Store - Overview
+# @ng-query in Signal Store - Overview
 
 If the Angular `resource` are not enough for you, you may appreciate this tool that provide utilities function to handle server state management in declarative and reactive way.
 
@@ -31,8 +31,8 @@ This implementation is built on Angular's `signals` using a state-driven approac
 ### Quick start overview : Handle server state management inside the `signalStore`
 
 ```typescript
-import { signalStore, withQuery } from "@ngrx/signals";
-import { query } from "./query";
+import { signalStore, withQuery } from '@ngrx/signals';
+import { query } from './query';
 
 const Store = signalStore(
   withState({
@@ -40,7 +40,7 @@ const Store = signalStore(
     userSelected: undefined as { id: string } | undefined,
   }),
   withMutation(
-    "userEmail",
+    'userEmail',
     // 👇 access to the store if needed
     (store) =>
       mutation({
@@ -53,7 +53,7 @@ const Store = signalStore(
       })
   ),
   withQuery(
-    "user",
+    'user',
     // 👇 access to the store
     (store) =>
       query({
@@ -93,5 +93,5 @@ const store = inject(Store);
 const user = store.userQuery.value(); // Access the fetched user
 const status = store.userQuery.status(); // 'idle', 'loading', 'resolved', 'error'
 // trigger a mutation
-store.mutateUserEmail({ id: "5", email: "mutated@test.com" });
+store.mutateUserEmail({ id: '5', email: 'mutated@test.com' });
 ```

@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: "ng-query"
-  text: "Server state management tool with Angular DX first"
+  name: '@ng-query'
+  text: 'Server state management tool with Angular DX first'
   tagline: Effortless Angular server state with NgRx Signal, autocompletion, and blazing-fast developer experience
   image:
     src: /assets/ng-query-logo.png
