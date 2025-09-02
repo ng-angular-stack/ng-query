@@ -16,7 +16,11 @@
     "baseUrl": ".",
     "paths": {
       "@ng-query": ["apps/libs/ng-query/src/index.ts"],
-      "@ng-query/ngrx-signals": ["libs/ng-query/ngrx-signals/src/index.ts"]
+      "@ng-query/ngrx-signals": ["libs/ng-query/ngrx-signals/src/index.ts"],
+      "@ng-query/ngrx-signals-rxjs": [
+        "libs/ng-query/ngrx-signals-rxjs/src/index.ts"
+      ],
+      "types-testing": ["test-types.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

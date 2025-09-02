@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "docs:publish": "nx build docs && cd ../query && cd apps/docs/.vitepress/dist",
-    "publish:ng-query-ngrx-signals": "nx build ng-query-ngrx-signals && npm publish dist/libs/ng-query/ngrx-signals --public"
+    "publish:ng-query-ngrx-signals": "nx build ng-query-ngrx-signals && npm publish dist/libs/ng-query/ngrx-signals --public",
+    "publish:ng-query-ngrx-signals-rxjs": "nx build ng-query-ngrx-signals-rxjs && npm publish dist/libs/ng-query/ngrx-signals-rxjs --public"
   },
   "private": true,
   "dependencies": {
@@ -14,6 +15,7 @@
     "@angular/forms": "~20.1.0",
     "@angular/platform-browser": "~20.1.0",
     "@angular/router": "~20.1.0",
+    "@ngrx/signals": "^20.0.1",
     "rxjs": "~7.8.0",
     "zone.js": "~0.15.0"
   },
