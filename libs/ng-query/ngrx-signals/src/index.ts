@@ -11,3 +11,4 @@ export { InternalType } from './lib/types/util.type';
 export * from './lib/types/brand';
 export { ResourceByIdRef } from './lib/resource-by-id';
 export { ResourceMethod } from './lib/types/shared.type';
+export { ExtendsByIdFactory } from './lib/core/query.core';

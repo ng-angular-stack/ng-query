@@ -3,11 +3,12 @@ import {
   SignalStoreFeatureResult,
   StateSignals,
 } from '@ngrx/signals';
-import { Signal, signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { rxResourceById } from './rx-resource-by-id';
 import { RxResourceByIdConfig } from './types/rx-resource-by-id-config.type';
 import {
   __INTERNAL_QueryBrand,
+  ExtendsByIdFactory,
   InternalType,
   QueryByIdRef,
 } from '@ng-query/ngrx-signals';
@@ -21,7 +22,8 @@ export function rxQueryById<
   Input extends SignalStoreFeatureResult,
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  >,
+  ExtendedOutput
 >(
   queryConfig: Omit<
     RxResourceByIdConfig<
@@ -31,6 +33,14 @@ export function rxQueryById<
       QueryGroupIdentifier
     >,
     'method'
+  >,
+  extended?: ExtendsByIdFactory<
+    NoInfer<Input>,
+    NoInfer<StoreInput>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
+    NoInfer<QueryGroupIdentifier>,
+    ExtendedOutput
   >
 ): (
   store: StoreInput,
@@ -39,7 +49,8 @@ export function rxQueryById<
   queryByIdRef: QueryByIdRef<
     NoInfer<QueryGroupIdentifier>,
     NoInfer<QueryState>,
-    NoInfer<QueryParams>
+    NoInfer<QueryParams>,
+    ExtendedOutput
   >;
   /**
    * Only used to help type inference, not used in the actual implementation.
@@ -74,7 +85,18 @@ export function rxQueryById<
   return (store, context) => ({
     queryByIdRef: {
       resourceById: queryResourcesById,
-      resourceParamsSrc: resourceParamsSrc as Signal<QueryParams | undefined>,
+      resourceParamsSrc: resourceParamsSrc as WritableSignal<
+        QueryParams | undefined
+      >,
+      extendedOutputs:
+        extended?.({
+          input: context,
+          store: store,
+          resourceById: queryResourcesById,
+          resourceParamsSrc: resourceParamsSrc as WritableSignal<
+            QueryParams | undefined
+          >,
+        }) ?? ({} as ExtendedOutput),
     },
     __types: {} as InternalType<
       NoInfer<QueryState>,

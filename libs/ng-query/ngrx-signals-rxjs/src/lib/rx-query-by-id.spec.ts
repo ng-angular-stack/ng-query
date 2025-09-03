@@ -1,18 +1,19 @@
-import {
-  signal,
-  Injector,
-  runInInjectionContext,
-  ApplicationRef,
-} from '@angular/core';
+import { ApplicationRef, WritableSignal } from '@angular/core';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxQueryById } from './rx-query-by-id';
-import { InternalType } from '../../../ngrx-signals/src/lib/types/util.type';
 import { Expect, Equal } from 'test-type';
 import { signalStore } from '@ngrx/signals';
-import { withQueryById } from '../../../ngrx-signals/src/lib/with-query-by-id';
-import { User } from '../resource-by-group/api.service';
-
+import {
+  InternalType,
+  ResourceByIdRef,
+  withQueryById,
+} from '@ng-query/ngrx-signals';
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
 describe('rxResourceById', () => {
   it('should create a rxResource by id that accepts param$ observable', async () => {
     await TestBed.runInInjectionContext(async () => {
@@ -78,6 +79,36 @@ describe('rxResourceById', () => {
         >
       >;
     });
+  });
+  it('should accept an extended output, that appear in the store', () => {
+    const result = rxQueryById(
+      {
+        params: () => '5',
+        identifier: (params) => params,
+        stream: ({ params }) => {
+          return of({
+            id: params,
+            name: 'John Doe',
+            email: 'test@a.com',
+          } satisfies User);
+        },
+      },
+      () => ({
+        pagination: 1,
+      })
+    );
+    type ExpectTypeWithExtended = Expect<
+      Equal<
+        ReturnType<typeof result>['queryByIdRef'],
+        {
+          resourceById: ResourceByIdRef<string, User>;
+          resourceParamsSrc: WritableSignal<string | undefined>;
+          extendedOutputs: {
+            pagination: number;
+          };
+        }
+      >
+    >;
   });
 });
 

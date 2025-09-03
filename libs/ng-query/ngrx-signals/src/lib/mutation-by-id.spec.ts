@@ -45,7 +45,7 @@ describe('mutationById', () => {
             }>;
             params: string;
             args: unknown;
-            isGroupedResource: false;
+            isGroupedResource: true;
             groupIdentifier: string;
           }
         >
