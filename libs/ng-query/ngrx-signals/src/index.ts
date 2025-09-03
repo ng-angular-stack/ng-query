@@ -12,3 +12,4 @@ export * from './lib/types/brand';
 export { ResourceByIdRef } from './lib/resource-by-id';
 export { ResourceMethod } from './lib/types/shared.type';
 export { ExtensionsByIdFactory as ExtendsByIdFactory } from './lib/core/query.core';
+export { pagination } from './lib/extensions/pagination';

@@ -40,6 +40,7 @@ describe('extension pagination', () => {
                 }>
               | undefined
             >;
+            isPlaceHolderData: Signal<boolean>;
           };
         }
       >

@@ -1,14 +1,8 @@
-// import { computed } from '@angular/core';
-
-// export const pagination = extensionMaker(({ resourceById }) => ({
-//   data: {
-//     currentPage: computed(() => resourceById()['1']?.value()),
-//   },
-// }));
-
-import { computed, ResourceRef, WritableSignal } from '@angular/core';
+import { computed, WritableSignal } from '@angular/core';
 import { ResourceByIdRef } from '../resource-by-id';
 
+// todo add a complete test
+// todo add an option for prefetching the next page ?
 export const pagination = <
   Input,
   StoreInput,
@@ -17,21 +11,43 @@ export const pagination = <
   ResourceParams
 >({
   resourceById,
+  resourceParamsSrc,
 }: {
   input: Input;
   store: StoreInput;
   resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
 }) => {
+  let previousPage: GroupIdentifier | undefined;
+  const showPlaceHolderData = computed(() => {
+    const page = resourceParamsSrc();
+    const resources = resourceById();
+    const pageKey = page as unknown as GroupIdentifier;
+    const currentResource = resources[pageKey];
+    // true if loading and previousPage is used
+    if (
+      currentResource?.status() === 'loading' &&
+      previousPage !== undefined &&
+      resources[previousPage]
+    ) {
+      return true;
+    }
+    return false;
+  });
   return {
     pagination: {
-      currentPage: computed(() =>
-        resourceById()[
-          '1' as keyof Partial<
-            Record<GroupIdentifier, ResourceRef<ResourceState>>
-          >
-        ]?.value()
-      ),
+      currentPage: computed(() => {
+        const page = resourceParamsSrc();
+        const resources = resourceById();
+        const pageKey = page as unknown as GroupIdentifier;
+        const currentResource = resources[pageKey];
+        if (showPlaceHolderData()) {
+          return resources[previousPage]?.value();
+        }
+        previousPage = page as unknown as GroupIdentifier;
+        return currentResource?.value();
+      }),
+      isPlaceHolderData: showPlaceHolderData,
     },
   };
 };
