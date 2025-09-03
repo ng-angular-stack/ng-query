@@ -80,7 +80,7 @@ describe('rxResourceById', () => {
       >;
     });
   });
-  it('should accept an extended output, that appear in the store', () => {
+  it('should accept an extensions output, that appear in the store', () => {
     const result = rxQueryById(
       {
         params: () => '5',
@@ -97,13 +97,13 @@ describe('rxResourceById', () => {
         pagination: 1,
       })
     );
-    type ExpectTypeWithExtended = Expect<
+    type ExpectTypeWithExtensions = Expect<
       Equal<
         ReturnType<typeof result>['queryByIdRef'],
         {
           resourceById: ResourceByIdRef<string, User>;
           resourceParamsSrc: WritableSignal<string | undefined>;
-          extendedOutputs: {
+          extensionsOutputs: {
             pagination: number;
           };
         }

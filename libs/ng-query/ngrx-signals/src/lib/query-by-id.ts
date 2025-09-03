@@ -7,9 +7,9 @@ import { ResourceByIdConfig } from './types/resource-by-id-config.type';
 import { InternalType } from './types/util.type';
 import { QueryByIdRef } from './with-query-by-id';
 import { signal, WritableSignal } from '@angular/core';
-import { resourceById } from './resource-by-id-signal-store';
+import { resourceById } from './resource-by-id';
 import { __INTERNAL_QueryBrand } from './types/brand';
-import { ExtendsByIdFactory } from './core/query.core';
+import { ExtensionsByIdFactory } from './core/query.core';
 
 export function queryById<
   QueryState extends object | undefined,
@@ -20,7 +20,7 @@ export function queryById<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtendedOutput
+  ExtensionsOutput
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -31,13 +31,13 @@ export function queryById<
     >,
     'method'
   >,
-  extended?: ExtendsByIdFactory<
+  extensions?: ExtensionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    ExtendedOutput
+    ExtensionsOutput
   >
 ): (
   store: StoreInput,
@@ -47,7 +47,7 @@ export function queryById<
     NoInfer<QueryGroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
-    ExtendedOutput
+    ExtensionsOutput
   >;
   /**
    * Only used to help type inference, not used in the actual implementation.
@@ -81,15 +81,15 @@ export function queryById<
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
         QueryParams | undefined
       >,
-      extendedOutputs:
-        extended?.({
+      extensionsOutputs:
+        extensions?.({
           input: context,
           store: store,
           resourceById: queryResourcesById,
           resourceParamsSrc: resourceParamsSrc as WritableSignal<
             QueryParams | undefined
           >,
-        }) ?? ({} as ExtendedOutput),
+        }) ?? ({} as ExtensionsOutput),
     },
     __types: {} as InternalType<
       NoInfer<QueryState>,

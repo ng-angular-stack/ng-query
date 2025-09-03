@@ -23,7 +23,7 @@ export function rxQueryById<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtendedOutput
+  ExtensionsOutput
 >(
   queryConfig: Omit<
     RxResourceByIdConfig<
@@ -34,13 +34,13 @@ export function rxQueryById<
     >,
     'method'
   >,
-  extended?: ExtendsByIdFactory<
+  extensions?: ExtendsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    ExtendedOutput
+    ExtensionsOutput
   >
 ): (
   store: StoreInput,
@@ -50,7 +50,7 @@ export function rxQueryById<
     NoInfer<QueryGroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
-    ExtendedOutput
+    ExtensionsOutput
   >;
   /**
    * Only used to help type inference, not used in the actual implementation.
@@ -88,15 +88,15 @@ export function rxQueryById<
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
         QueryParams | undefined
       >,
-      extendedOutputs:
-        extended?.({
+      extensionsOutputs:
+        extensions?.({
           input: context,
           store: store,
           resourceById: queryResourcesById,
           resourceParamsSrc: resourceParamsSrc as WritableSignal<
             QueryParams | undefined
           >,
-        }) ?? ({} as ExtendedOutput),
+        }) ?? ({} as ExtensionsOutput),
     },
     __types: {} as InternalType<
       NoInfer<QueryState>,

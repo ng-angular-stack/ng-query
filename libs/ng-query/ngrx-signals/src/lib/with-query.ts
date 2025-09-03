@@ -33,10 +33,10 @@ import {
 import { ResourceByIdRef } from './resource-by-id';
 import { nestedEffect } from './types/util';
 
-export type QueryRef<ResourceState, ResourceParams, ExtendedOutput> = {
+export type QueryRef<ResourceState, ResourceParams, ExtensionsOutput> = {
   resource: ResourceRef<ResourceState | undefined>;
   resourceParamsSrc: Signal<ResourceParams | undefined>;
-  extendedOutputs: ExtendedOutput;
+  extensionsOutputs: ExtensionsOutput;
 };
 
 type WithQueryOutputStoreConfig<
@@ -45,13 +45,13 @@ type WithQueryOutputStoreConfig<
   ResourceParams,
   ResourceArgsParams,
   IsGroupedByGroup,
-  ExtendedOutputs
+  ExtensionsOutputs
 > = {
   state: {};
   props: {
     [key in `${ResourceName & string}Query`]: MergeObject<
       ResourceRef<ResourceState>,
-      ExtendedOutputs
+      ExtensionsOutputs
     >;
   } & {
     __query: {
@@ -147,7 +147,7 @@ export function withQuery<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtendedOutputs
+  ExtensionsOutputs
 >(
   resourceName: ResourceName,
   queryFactory: (
@@ -160,7 +160,7 @@ export function withQuery<
     queryRef: QueryRef<
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
-      ExtendedOutputs
+      ExtensionsOutputs
     >;
   } & {
     __types: InternalType<
@@ -186,7 +186,7 @@ export function withQuery<
     ResourceParams,
     ResourceArgsParams,
     false,
-    ExtendedOutputs
+    ExtensionsOutputs
   >
 > {
   return ((context: SignalStoreFeatureResult) => {
@@ -220,12 +220,12 @@ export function withQuery<
           >
         );
 
-        const extendedOutputs = queryConfigData.queryRef.extendedOutputs;
+        const extensionsOutputs = queryConfigData.queryRef.extensionsOutputs;
 
         return {
           [`${resourceName}Query`]: {
             ...queryResource,
-            ...(extendedOutputs ? extendedOutputs : {}),
+            ...(extensionsOutputs ? extensionsOutputs : {}),
           },
 
           ...(associatedClientStates.length && {
@@ -424,7 +424,7 @@ export function withQuery<
       ResourceParams,
       ResourceArgsParams,
       false,
-      ExtendedOutputs
+      ExtensionsOutputs
     >
   >;
 }

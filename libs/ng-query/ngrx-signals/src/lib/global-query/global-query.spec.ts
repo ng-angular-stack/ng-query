@@ -7,7 +7,7 @@ import { TestBed } from '@angular/core/testing';
 import { withMutation } from '../with-mutation';
 import { SignalProxy } from '../signal-proxy';
 import { vi } from 'vitest';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 import { query } from '../query';
 import { mutation } from '../mutation';
 import { queryById } from '../query-by-id';
@@ -608,7 +608,7 @@ describe('Global Queries', () => {
     vi.restoreAllMocks();
   });
 
-  it('should accept an extended output, that appear in the store', () => {
+  it('should accept an extensions output, that appear in the store', () => {
     const {
       injectUserQueryById,
       withUserQueryById,

@@ -1,5 +1,5 @@
 import { ResourceRef, Signal } from '@angular/core';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 
 export interface PersistedQuery {
   key: string;

@@ -5,7 +5,7 @@ import {
   DottedPathPathToTuple,
 } from './access-type-object-property-by-dotted-path.type';
 import { InternalType, MergeObjects } from './util.type';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 
 // todo rename, and rename server state constraints
 export type QueryAndMutationRecordConstraints = {

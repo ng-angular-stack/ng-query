@@ -55,7 +55,7 @@ describe('queryById', () => {
     });
   });
 
-  it('should accept an extended output, that appear in the store', () => {
+  it('should accept an extensions output, that appear in the store', () => {
     const Store = signalStore(
       {
         providedIn: 'root',

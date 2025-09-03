@@ -87,8 +87,8 @@ describe('withQuery using rxQuery', () => {
     expect(store.userQuery).toBeDefined();
   });
 
-  describe('rxQuery extended output', () => {
-    it('should accept an extended output, that appear in the store', () => {
+  describe('rxQuery extensions output', () => {
+    it('should accept an extensions output, that appear in the store', () => {
       const Store = signalStore(
         {
           providedIn: 'root',

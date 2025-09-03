@@ -21,23 +21,27 @@ export function rxQuery<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtendedOutput
+  ExtensionsOutput
 >(
   queryConfig: Omit<
     RxResourceWithParamsOrParamsFn<QueryState, QueryParams, QueryArgsParams>,
     'method'
   >,
-  extended?: (args: {
+  extensions?: (args: {
     input: Input;
     store: StoreInput;
     resource: any;
     resourceParams: any;
-  }) => ExtendedOutput
+  }) => ExtensionsOutput
 ): ((
   store: StoreInput,
   context: Input
 ) => {
-  queryRef: QueryRef<NoInfer<QueryState>, NoInfer<QueryParams>, ExtendedOutput>;
+  queryRef: QueryRef<
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
+    ExtensionsOutput
+  >;
   /**
    * Only used to help type inference, not used in the actual implementation.
    */
@@ -66,13 +70,13 @@ export function rxQuery<
     queryRef: {
       resource: queryResource,
       resourceParamsSrc: resourceParamsSrc as Signal<QueryParams | undefined>,
-      extendedOutputs:
-        extended?.({
+      extensionsOutputs:
+        extensions?.({
           input: context,
           store: store,
           resource: queryResource,
           resourceParams: resourceParamsSrc,
-        }) ?? ({} as ExtendedOutput),
+        }) ?? ({} as ExtensionsOutput),
     },
     __types: {} as InternalType<
       NoInfer<QueryState>,

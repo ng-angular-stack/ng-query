@@ -7,7 +7,7 @@ import { ResourceByIdConfig } from './types/resource-by-id-config.type';
 import { InternalType } from './types/util.type';
 import { MutationByIdRef } from './with-mutation-by-id';
 import { signal, WritableSignal } from '@angular/core';
-import { resourceById } from './resource-by-id-signal-store';
+import { resourceById } from './resource-by-id';
 
 export function mutationById<
   MutationState extends object | undefined,

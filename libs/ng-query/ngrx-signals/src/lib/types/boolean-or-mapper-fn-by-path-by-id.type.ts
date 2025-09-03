@@ -5,7 +5,7 @@ import {
   MergeObject,
   UnionToTuple,
 } from './util.type';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 import { Prettify } from '@ngrx/signals';
 
 /**

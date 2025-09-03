@@ -12,7 +12,7 @@ import {
   QueryAndMutationRecordConstraints,
   ReloadQueriesConfig,
 } from '../types/shared.type';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 import {
   getNestedStateValue,
   createNestedStateUpdate,
@@ -445,29 +445,29 @@ export function setOptimisticUpdateFromMutationOnQueryValue<
     });
 }
 
-export type ExtendsFactory<
+export type ExtensionsFactory<
   Input extends SignalStoreFeatureResult,
   StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
-  ExtendedOutputs
+  ExtensionsOutputs
 > = (context: {
   input: Input;
   store: StoreInput;
   resource: ResourceRef<ResourceState>;
   resourceParams: WritableSignal<ResourceParams>;
-}) => ExtendedOutputs;
+}) => ExtensionsOutputs;
 
-export type ExtendsByIdFactory<
+export type ExtensionsByIdFactory<
   Input extends SignalStoreFeatureResult,
   StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
   GroupIdentifier extends string | number,
-  ExtendedOutputs
+  ExtensionsOutputs
 > = (context: {
   input: Input;
   store: StoreInput;
   resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
-}) => ExtendedOutputs;
+}) => ExtensionsOutputs;

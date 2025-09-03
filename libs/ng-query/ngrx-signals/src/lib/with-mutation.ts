@@ -29,7 +29,7 @@ import {
   FilterQueryById,
   ResourceMethod,
 } from './types/shared.type';
-import { ResourceByIdRef } from './resource-by-id-signal-store';
+import { ResourceByIdRef } from './resource-by-id';
 
 export type MutationRef<ResourceState, ResourceParams, ParamsArgs> = {
   resource: ResourceRef<ResourceState | undefined>;

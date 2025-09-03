@@ -18,7 +18,7 @@ import {
 } from './with-cached-query-factory';
 import { QueriesPersister } from '../persister/persister.type';
 import { QueryByIdRef } from '../with-query-by-id';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 
 // todo expose enable to cache inmemory by default or use a persister or a persister to a specific query
 
@@ -52,7 +52,7 @@ type WithQueryOutputMapper<
       string,
       {},
       true,
-      CachedQuery['query']['queryRef']['extendedOutputs']
+      CachedQuery['query']['queryRef']['extensionsOutputs']
     >
   >;
 } & {
@@ -76,7 +76,7 @@ type WithQueryByIdOutputMapper<
       {},
       string | number,
       boolean,
-      CachedQueryById['query']['queryByIdRef']['extendedOutputs']
+      CachedQueryById['query']['queryByIdRef']['extensionsOutputs']
     >
   >;
 } & {
@@ -102,7 +102,7 @@ type WithQueryOutputMapperTyped<
 > = QueryRecord[k]['query'] extends infer All
   ? All extends (data: infer Data) => (store: any, context: any) => infer R
     ? R extends {
-        queryRef: QueryRef<infer State, infer Params, infer ExtendedOutput>;
+        queryRef: QueryRef<infer State, infer Params, infer ExtensionsOutput>;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
         ? ReturnType<
@@ -112,7 +112,7 @@ type WithQueryOutputMapperTyped<
               Params,
               PluggableParams,
               true,
-              ExtendedOutput
+              ExtensionsOutput
             >
           >
         : ReturnType<
@@ -122,7 +122,7 @@ type WithQueryOutputMapperTyped<
               Params,
               {},
               false,
-              ExtendedOutput
+              ExtensionsOutput
             >
           >
       : 'never2Test'
@@ -139,15 +139,15 @@ type WithInjectQueryOutputMapperTyped<
 > = QueryRecord[k]['query'] extends infer All
   ? All extends (data: infer Data) => (store: any, context: any) => infer R
     ? R extends {
-        queryRef: QueryRef<infer State, infer Params, infer ExtendedOutput>;
+        queryRef: QueryRef<infer State, infer Params, infer ExtensionsOutput>;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
         ? (
             pluggable?: (
               source: SignalProxy<NoInfer<PluggableParams>>
             ) => SignalWrapperParams<NoInfer<PluggableParams>>
-          ) => ResourceRef<State> & ExtendedOutput
-        : () => ResourceRef<State> & ExtendedOutput
+          ) => ResourceRef<State> & ExtensionsOutput
+        : () => ResourceRef<State> & ExtensionsOutput
       : 'never2Test'
     : `Error: Please use rxQuery or query. Eg: { ${k &
         string}: { query: () => rxQuery(...) }}`
@@ -166,7 +166,7 @@ type WithInjectQueryByIdOutputMapperTyped<
           infer GroupIdentifier,
           infer State,
           infer Params,
-          infer ExtendedOutput
+          infer ExtensionsOutput
         >;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
@@ -174,8 +174,8 @@ type WithInjectQueryByIdOutputMapperTyped<
             pluggable?: (
               source: SignalProxy<NoInfer<PluggableParams>>
             ) => SignalWrapperParams<NoInfer<PluggableParams>>
-          ) => ResourceByIdRef<GroupIdentifier, State> & ExtendedOutput
-        : () => ResourceByIdRef<GroupIdentifier, State> & ExtendedOutput
+          ) => ResourceByIdRef<GroupIdentifier, State> & ExtensionsOutput
+        : () => ResourceByIdRef<GroupIdentifier, State> & ExtensionsOutput
       : 'never2'
     : `Error: Please use rxQueryById or queryById. Eg: { ${k &
         string}: { queryById: () => rxQueryById(...) }}`
@@ -194,7 +194,7 @@ type WithQueryByIdOutputMapperTyped<
           infer GroupIdentifier,
           infer State,
           infer Params,
-          infer ExtendedOutput
+          infer ExtensionsOutput
         >;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
@@ -206,7 +206,7 @@ type WithQueryByIdOutputMapperTyped<
               PluggableParams,
               GroupIdentifier,
               true,
-              ExtendedOutput
+              ExtensionsOutput
             >
           >
         : ReturnType<
@@ -217,7 +217,7 @@ type WithQueryByIdOutputMapperTyped<
               {},
               GroupIdentifier,
               false,
-              ExtendedOutput
+              ExtensionsOutput
             >
           >
       : 'never2'

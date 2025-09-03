@@ -10,7 +10,7 @@ import { resource, ResourceRef, signal } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
 import { mutation } from '../mutation';
 import { resourceById } from '../resource-by-id';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 
 describe('withCachedQueryFactory', () => {
   it('should create a typed withQuery for the signal store that can be plugged to the store', () => {
@@ -40,7 +40,7 @@ describe('withCachedQueryFactory', () => {
         queryRef: {
           resource: resourceRef,
           resourceParamsSrc: resourceParamsSrc,
-          extendedOutputs: {
+          extensionsOutputs: {
             pagination: 1,
           },
         },
@@ -112,7 +112,7 @@ describe('withCachedQueryByIdToPlugFactory', () => {
         queryByIdRef: {
           resourceById: resourceRef,
           resourceParamsSrc: resourceParamsSrc,
-          extendedOutputs: {
+          extensionsOutputs: {
             pagination: 1,
           },
         },

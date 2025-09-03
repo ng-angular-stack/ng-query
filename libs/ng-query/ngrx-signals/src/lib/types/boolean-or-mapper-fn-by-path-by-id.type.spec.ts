@@ -1,7 +1,7 @@
 import { ResourceRef } from '@angular/core';
 import { Expect, Equal } from 'test-type';
 import { BooleanOrMapperFnByPathById } from './boolean-or-mapper-fn-by-path-by-id.type';
-import { ResourceByIdRef } from '../resource-by-id-signal-store';
+import { ResourceByIdRef } from '../resource-by-id';
 
 it('Should map all deep object paths except arrays', () => {
   type State = {
