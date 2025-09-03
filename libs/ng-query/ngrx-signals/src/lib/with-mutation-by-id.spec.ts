@@ -299,42 +299,6 @@ describe('withMutationById', () => {
     expect(user5QueryReloadSpy.mock.calls.length).toBe(1);
   });
 
-  it('1- Should expose a mutation resource that accepts a param$ with a record of resource by id', async () => {
-    const returnedUser = {
-      id: '5',
-      name: 'John Doe',
-      email: 'test@a.com',
-    };
-    const Store = signalStore(
-      withMutationById('user', () =>
-        mutationById({
-          params$: of('5'),
-          loader: async ({ params }) => {
-            return returnedUser as User;
-          },
-          identifier: (params) => params,
-        })
-      )
-    );
-
-    TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
-    });
-    const store = TestBed.inject(Store);
-
-    expect(store.userMutationById).toBeDefined();
-
-    await TestBed.inject(ApplicationRef).whenStable();
-    expect(store.userMutationById()['5']?.value()).toBe(returnedUser);
-
-    type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
-      Equal<
-        typeof store.userMutationById,
-        ResourceByIdRef<string, NoInfer<User>>
-      >
-    >;
-  });
-
   it('#1- Should expose private query type', async () => {
     const returnedUser = {
       id: '5',

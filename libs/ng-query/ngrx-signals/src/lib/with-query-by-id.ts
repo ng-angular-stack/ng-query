@@ -19,7 +19,6 @@ import {
   WritableStateSource,
 } from '@ngrx/signals';
 import { InternalType, MergeObject } from './types/util.type';
-import { __InternalSharedMutationConfig } from './with-mutation';
 import { ResourceByIdRef } from './resource-by-id';
 import {
   AssociatedStateMapperFnById,
@@ -81,10 +80,7 @@ type WithQueryByIdOutputStoreConfig<
 
 export type QueryByIdOptions<
   StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
   Input extends SignalStoreFeatureResult,
   ResourceState extends object | undefined,
@@ -177,10 +173,7 @@ export function withQueryById<
   ResourceArgsParams,
   GroupIdentifier extends string | number,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
   ExtendedOutputs extends Record<string, unknown> = {}
 >(

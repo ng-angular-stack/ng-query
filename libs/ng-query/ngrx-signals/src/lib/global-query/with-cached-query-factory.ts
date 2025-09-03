@@ -2,7 +2,6 @@ import {
   SignalStoreFeatureResult,
   Prettify,
   StateSignals,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { InternalType } from '../types/util.type';
 import { QueryRef, QueryOptions, withQuery } from '../with-query';
@@ -20,22 +19,19 @@ export function withCachedQueryToPlugFactory<
   QueryParams,
   PlugData extends object,
   IsPluggableQuery,
-  ExtendedOutputs extends Record<string, unknown> = {}
+  ExtendedOutputs
 >(
   name: QueryName,
   querySourceProxy: SignalProxy<PlugData, true>,
   queryRef: (injector: Injector) => {
-    queryRef: QueryRef<QueryState, QueryParams>;
+    queryRef: QueryRef<QueryState, QueryParams, ExtendedOutputs>;
     __types: InternalType<QueryState, QueryParams, unknown, false>;
   }
 ) {
   return <
     Input extends SignalStoreFeatureResult,
     const StoreInput extends Prettify<
-      StateSignals<Input['state']> &
-        Input['props'] &
-        Input['methods'] &
-        WritableStateSource<Prettify<Input['state']>>
+      StateSignals<Input['state']> & Input['props'] & Input['methods']
     >
   >(
     options?: QueryOptions<
@@ -44,7 +40,6 @@ export function withCachedQueryToPlugFactory<
       QueryState,
       QueryParams,
       unknown,
-      ExtendedOutputs,
       {
         setQuerySource?: IsPluggableQuery extends true
           ? (
@@ -96,10 +91,7 @@ export function withCachedQueryByIdToPlugFactory<
   return <
     Input extends SignalStoreFeatureResult,
     const StoreInput extends Prettify<
-      StateSignals<Input['state']> &
-        Input['props'] &
-        Input['methods'] &
-        WritableStateSource<Prettify<Input['state']>>
+      StateSignals<Input['state']> & Input['props'] & Input['methods']
     >
   >(
     options?: QueryByIdOptions<
@@ -109,7 +101,6 @@ export function withCachedQueryByIdToPlugFactory<
       QueryParams,
       GroupIdentifier,
       unknown,
-      ExtendedOutputs,
       {
         setQuerySource?: IsPluggableQuery extends true
           ? (

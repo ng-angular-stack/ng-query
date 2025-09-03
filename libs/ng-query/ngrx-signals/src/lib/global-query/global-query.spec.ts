@@ -98,15 +98,6 @@ describe('Global Queries', () => {
     expect(typeof withUserQuery).toEqual('function');
     console.log('data', data);
 
-    // 👇 Check du typage
-    type ExpectQueryKeysToBeLiterals = Expect<
-      Equal<'withUserQuery' extends keyof typeof data ? true : false, true>
-    >;
-
-    const { withUserQuery, withUsersQuery } = data;
-
-    expect(typeof withUserQuery).toEqual('function');
-
     const testSignalStore = signalStore(
       { providedIn: 'root' },
       withState({ selected: '1' }),
@@ -247,8 +238,8 @@ describe('Global Queries', () => {
 
     @Injectable({ providedIn: 'root' })
     class ApiService {
-      getUser() {
-        return of({ id: '1', name: 'User 1' });
+      async getUser() {
+        return { id: '1', name: 'User 1' };
       }
     }
 

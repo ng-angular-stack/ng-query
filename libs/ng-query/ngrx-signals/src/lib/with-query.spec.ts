@@ -132,7 +132,6 @@ describe('withQuery', () => {
     });
     const store = TestBed.inject(Store);
 
-    //@ts-ignore
     expect(store.userQuery.value()).toEqual(undefined);
 
     // Wait for the query to resolve

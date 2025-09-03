@@ -71,10 +71,7 @@ type WithQueryOutputStoreConfig<
 
 export type QueryOptions<
   StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
   Input extends SignalStoreFeatureResult,
   ResourceState extends object | undefined,
@@ -148,10 +145,7 @@ export function withQuery<
   ResourceParams,
   ResourceArgsParams,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
   ExtendedOutputs
 >(

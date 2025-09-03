@@ -2,7 +2,6 @@ import {
   SignalStoreFeatureResult,
   Prettify,
   StateSignals,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { ResourceWithParamsOrParamsFn } from './types/resource-with-params-or-params-fn.type';
 import { InternalType } from './types/util.type';
@@ -24,10 +23,7 @@ export function query<
   QueryArgsParams,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
   ExtendedOutput
 >(

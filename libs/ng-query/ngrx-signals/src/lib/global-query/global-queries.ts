@@ -10,7 +10,6 @@ import {
   SignalProxy,
   SignalWrapperParams,
 } from '../signal-proxy';
-import { __INTERNAL_QueryBrand } from '../types/brand';
 import { InternalType, MergeObjects } from '../types/util.type';
 import { QueryRef } from '../with-query';
 import {
@@ -24,7 +23,7 @@ import { ResourceByIdRef } from '../resource-by-id-signal-store';
 // todo expose enable to cache inmemory by default or use a persister or a persister to a specific query
 
 type QueryRefType = {
-  queryRef: QueryRef<unknown, unknown>;
+  queryRef: QueryRef<unknown, unknown, unknown>;
   __types: InternalType<unknown, unknown, unknown, false>;
 };
 
@@ -52,7 +51,8 @@ type WithQueryOutputMapper<
       CachedQuery['query']['queryRef']['resource'],
       string,
       {},
-      true
+      true,
+      CachedQuery['query']['queryRef']['extendedOutputs']
     >
   >;
 } & {
@@ -101,7 +101,7 @@ type WithQueryOutputMapperTyped<
 > = QueryRecord[k]['query'] extends infer All
   ? All extends (data: infer Data) => (store: any, context: any) => infer R
     ? R extends {
-        queryRef: QueryRef<infer State, infer Params>;
+        queryRef: QueryRef<infer State, infer Params, infer ExtendedOutput>;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
         ? ReturnType<
@@ -110,7 +110,8 @@ type WithQueryOutputMapperTyped<
               State extends object | undefined ? State : never,
               Params,
               PluggableParams,
-              true
+              true,
+              ExtendedOutput
             >
           >
         : ReturnType<
@@ -119,7 +120,8 @@ type WithQueryOutputMapperTyped<
               State extends object | undefined ? State : never,
               Params,
               {},
-              false
+              false,
+              ExtendedOutput
             >
           >
       : 'never2Test'
@@ -136,7 +138,7 @@ type WithInjectQueryOutputMapperTyped<
 > = QueryRecord[k]['query'] extends infer All
   ? All extends (data: infer Data) => (store: any, context: any) => infer R
     ? R extends {
-        queryRef: QueryRef<infer State, infer Params>;
+        queryRef: QueryRef<infer State, infer Params, infer ExtendedOutput>;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
         ? (
@@ -445,7 +447,6 @@ export function globalQueries<
   } as CachedQueryFactoryOutput<
     QueryKeys,
     QueryByIdKeys,
-    //@ts-ignore
     QueryRecord,
     CacheTime,
     QueryByIdRecord,

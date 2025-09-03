@@ -8,6 +8,8 @@ import { BehaviorSubject, of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxMutationById } from './rx-mutation-by-id';
 import { Expect, Equal } from 'test-type';
+import { signalStore } from '@ngrx/signals';
+import { ResourceByIdRef, withMutationById } from '@ng-query/ngrx-signals';
 
 describe('rxResourceById', () => {
   it('should create a rxResource by id', async () => {
@@ -29,23 +31,26 @@ describe('rxResourceById', () => {
       expect(mutationConfig).toBeDefined();
       expect(mutationConfig.mutationByIdRef.resourceById()).toEqual({});
       expect(mutationConfig.mutationByIdRef.resourceParamsSrc).toBeDefined();
-
       type ExpectTypeTObeGroupedMutation = Expect<
         Equal<
           typeof mutationConfig.__types,
-          InternalType<
-            | {
-                id: string;
-              }
-            | undefined,
-            | {
-                id: string;
-              }
-            | undefined,
-            unknown,
-            false,
-            string
-          >
+          {
+            state: NoInfer<
+              | {
+                  id: string;
+                }
+              | undefined
+            >;
+            params: NoInfer<
+              | {
+                  id: string;
+                }
+              | undefined
+            >;
+            args: unknown;
+            isGroupedResource: true;
+            groupIdentifier: string;
+          }
         >
       >;
     });
@@ -72,19 +77,62 @@ describe('rxResourceById', () => {
       type ExpectTypeTObeGroupedMutation = Expect<
         Equal<
           typeof mutationConfig.__types,
-          InternalType<
-            NoInfer<{
+          {
+            state: NoInfer<{
               id: string;
-            }>,
-            NoInfer<{
+            }>;
+            params: NoInfer<{
               id: string;
-            }>,
-            unknown,
-            false,
-            string
-          >
+            }>;
+            args: unknown;
+            isGroupedResource: true;
+            groupIdentifier: string;
+          }
         >
       >;
     });
+  });
+
+  it('1- Should expose a mutation resource that accepts a param$ with a record of resource by id', async () => {
+    const returnedUser = {
+      id: '5',
+      name: 'John Doe',
+      email: 'test@a.com',
+    };
+    const Store = signalStore(
+      withMutationById('user', () =>
+        rxMutationById({
+          params$: of('5'),
+          stream: ({ params }) => {
+            return of(returnedUser);
+          },
+          identifier: (params) => params,
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store, ApplicationRef],
+    });
+    const store = TestBed.inject(Store);
+
+    expect(store.userMutationById).toBeDefined();
+
+    await TestBed.inject(ApplicationRef).whenStable();
+    expect(store.userMutationById()['5']?.value()).toBe(returnedUser);
+
+    type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
+      Equal<
+        typeof store.userMutationById,
+        ResourceByIdRef<
+          string,
+          NoInfer<{
+            id: string;
+            name: string;
+            email: string;
+          }>
+        >
+      >
+    >;
   });
 });

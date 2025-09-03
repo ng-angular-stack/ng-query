@@ -14,7 +14,6 @@ import {
   StateSignals,
   withMethods,
   withProps,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { InternalType, MergeObject, MergeObjects } from './types/util.type';
 
@@ -108,10 +107,7 @@ export type QueryImperativeEffect<
 export type QueriesMutation<
   Input extends SignalStoreFeatureResult,
   StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
   MutationState,
   MutationParams,
@@ -203,10 +199,7 @@ type MutationStoreOutput<
 export function withMutation<
   Input extends SignalStoreFeatureResult,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
   const MutationName extends string,
   ResourceState extends object | undefined,

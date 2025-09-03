@@ -2,7 +2,6 @@ import {
   Prettify,
   SignalStoreFeatureResult,
   StateSignals,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { Signal, signal } from '@angular/core';
 import { rxResourceById } from './rx-resource-by-id';
@@ -21,10 +20,7 @@ export function rxQueryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >
 >(
   queryConfig: Omit<

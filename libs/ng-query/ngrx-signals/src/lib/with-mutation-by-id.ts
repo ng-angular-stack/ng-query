@@ -15,7 +15,6 @@ import {
   StateSignals,
   withMethods,
   withProps,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { InternalType, MergeObject } from './types/util.type';
 import {
@@ -26,7 +25,6 @@ import {
   ResourceMethod,
 } from './types/shared.type';
 import {
-  __InternalSharedMutationConfig,
   QueriesMutation,
   QueryImperativeEffect,
   reloadQueriesOnMutationChange,
@@ -141,10 +139,7 @@ export function withMutationById<
   ResourceArgsParams,
   GroupIdentifier extends string | number,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >
 >(
   mutationName: ResourceName,
@@ -163,7 +158,7 @@ export function withMutationById<
       ResourceState,
       ResourceParams,
       ResourceArgsParams,
-      false,
+      true,
       GroupIdentifier
     >;
   },

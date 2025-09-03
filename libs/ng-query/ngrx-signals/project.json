@@ -43,5 +43,13 @@
     "lint": {
       "executor": "@nx/eslint:lint"
     }
+    ,
+    "test:ui": {
+      "executor": "@nx/vite:test",
+      "options": {
+        "ui": true,
+        "reportsDirectory": "../../../coverage/libs/ng-query/ngrx-signals"
+      }
+    }
   }
 }

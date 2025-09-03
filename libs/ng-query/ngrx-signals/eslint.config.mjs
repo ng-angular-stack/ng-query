@@ -38,6 +38,8 @@ export default [
           style: 'kebab-case',
         },
       ],
+      'no-empty-object-type': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
   {

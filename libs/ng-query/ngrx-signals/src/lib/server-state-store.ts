@@ -1,4 +1,4 @@
-import { inject, signal, Signal, Type } from '@angular/core';
+import { inject, signal, Type } from '@angular/core';
 import {
   EmptyFeatureResult,
   Prettify,
@@ -9,7 +9,6 @@ import {
   StateSignals,
   withProps,
   withState,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { InferInjectedType, MergeObject } from './types/util.type';
 import {
@@ -18,12 +17,6 @@ import {
   SignalWrapperParams,
 } from './signal-proxy';
 import { SignalStoreHooks } from './inner-signal-store';
-
-// flat to the host or not - optional
-
-type PluggableConfig<IsPluggable extends boolean> = {
-  isPluggable: IsPluggable;
-};
 
 // todo add more tests with withUserServerState, is global or not, pluggable or not
 

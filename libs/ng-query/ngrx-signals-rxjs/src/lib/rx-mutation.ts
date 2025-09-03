@@ -2,7 +2,6 @@ import {
   SignalStoreFeatureResult,
   Prettify,
   StateSignals,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { RxResourceWithParamsOrParamsFn } from './types/rx-resource-with-params-or-params-fn.type';
 import { InternalType } from '@ng-query/ngrx-signals';
@@ -16,10 +15,7 @@ export function rxMutation<
   MutationArgsParams,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >
 >(
   mutationConfig: RxResourceWithParamsOrParamsFn<

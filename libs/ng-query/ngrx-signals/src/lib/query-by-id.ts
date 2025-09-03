@@ -2,7 +2,6 @@ import {
   Prettify,
   SignalStoreFeatureResult,
   StateSignals,
-  WritableStateSource,
 } from '@ngrx/signals';
 import { ResourceByIdConfig } from './types/resource-by-id-config.type';
 import { InternalType } from './types/util.type';
@@ -18,10 +17,7 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends Prettify<
-    StateSignals<Input['state']> &
-      Input['props'] &
-      Input['methods'] &
-      WritableStateSource<Prettify<Input['state']>>
+    StateSignals<Input['state']> & Input['props'] & Input['methods']
   >
 >(
   queryConfig: Omit<
