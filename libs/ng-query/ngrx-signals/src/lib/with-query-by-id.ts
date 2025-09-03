@@ -7,6 +7,7 @@ import {
   ResourceRef,
   Signal,
   untracked,
+  WritableSignal,
 } from '@angular/core';
 import {
   patchState,
@@ -36,10 +37,12 @@ import {
 export type QueryByIdRef<
   GroupIdentifier extends string | number,
   ResourceState,
-  ResourceParams
+  ResourceParams,
+  ExtendedOutput
 > = {
   resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
-  resourceParamsSrc: Signal<ResourceParams | undefined>;
+  resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
+  extendedOutputs: ExtendedOutput;
 };
 
 // TODO find a way to access to a resourceRef without userQueryById() because it will be updated each time the query is updated
@@ -50,7 +53,7 @@ type WithQueryByIdOutputStoreConfig<
   ResourceParams,
   ResourceArgsParams,
   GroupIdentifier extends string | number,
-  ExtendedOutputs extends Record<string, unknown>
+  ExtendedOutputs
 > = {
   state: {};
   props: MergeObject<
@@ -87,7 +90,7 @@ export type QueryByIdOptions<
   ResourceParams,
   GroupIdentifier extends string | number,
   ResourceArgsParams,
-  OtherProperties extends Record<string, unknown> = {}
+  OtherProperties
 > = (store: StoreInput) => {
   // Exclude path from the MergeObject, it will enable the const type inference, otherwise it will be inferred as string
   /**
@@ -175,7 +178,8 @@ export function withQueryById<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtendedOutputs extends Record<string, unknown> = {}
+  ExtendedOutputs,
+  OtherProperties
 >(
   resourceName: ResourceName,
   queryFactory: (
@@ -188,7 +192,8 @@ export function withQueryById<
     queryByIdRef: QueryByIdRef<
       NoInfer<GroupIdentifier>,
       NoInfer<ResourceState>,
-      NoInfer<ResourceParams>
+      NoInfer<ResourceParams>,
+      ExtendedOutputs
     >;
   } & {
     __types: InternalType<
@@ -206,7 +211,7 @@ export function withQueryById<
     ResourceParams,
     GroupIdentifier,
     ResourceArgsParams,
-    ExtendedOutputs
+    OtherProperties
   >
 ): SignalStoreFeature<
   Input,

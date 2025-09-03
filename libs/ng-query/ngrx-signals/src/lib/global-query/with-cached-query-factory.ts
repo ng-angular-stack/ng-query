@@ -73,12 +73,17 @@ export function withCachedQueryByIdToPlugFactory<
   PlugData extends object,
   GroupIdentifier extends string | number,
   IsPluggableQuery,
-  ExtendedOutputs extends Record<string, unknown> = {}
+  ExtendedOutputs
 >(
   name: QueryName,
   querySourceProxy: SignalProxy<PlugData, true>,
   queryByIdRef: (injector: Injector) => {
-    queryByIdRef: QueryByIdRef<GroupIdentifier, QueryState, QueryParams>;
+    queryByIdRef: QueryByIdRef<
+      GroupIdentifier,
+      QueryState,
+      QueryParams,
+      ExtendedOutputs
+    >;
     __types: InternalType<
       QueryState,
       QueryParams,
@@ -113,7 +118,6 @@ export function withCachedQueryByIdToPlugFactory<
     return withQueryById(
       name,
       (store, injector) => {
-        const opt = options?.(store);
         const setQuerySource = options?.(store)?.setQuerySource;
         if (setQuerySource) {
           const source = options?.(store)?.setQuerySource?.(

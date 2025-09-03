@@ -607,4 +607,79 @@ describe('Global Queries', () => {
     });
     vi.restoreAllMocks();
   });
+
+  it('should accept an extended output, that appear in the store', () => {
+    const {
+      injectUserQueryById,
+      withUserQueryById,
+      injectUserDetailsQuery,
+      withUserDetailsQuery,
+    } = globalQueries({
+      queries: {
+        userDetails: {
+          query: () =>
+            query(
+              {
+                params: () => '1',
+                loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
+              },
+              () => {
+                return {
+                  pagination: {
+                    page: 1,
+                  },
+                };
+              }
+            ),
+        },
+      },
+      queriesById: {
+        user: {
+          queryById: () =>
+            queryById(
+              {
+                params: () => '1',
+                loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
+                identifier: (params) => params,
+              },
+              () => {
+                return {
+                  pagination: {
+                    page: 1,
+                  },
+                };
+              }
+            ),
+        },
+      },
+    });
+    const Store = signalStore(
+      {
+        providedIn: 'root',
+      },
+      withUserQueryById(),
+      withUserDetailsQuery()
+    );
+    TestBed.runInInjectionContext(() => {
+      const store = inject(Store);
+      expectTypeOf(store.userDetailsQuery.pagination).toEqualTypeOf<{
+        page: number;
+      }>();
+      expect(store.userDetailsQuery.pagination).toBeDefined();
+
+      expectTypeOf(store.userQueryById.pagination).toEqualTypeOf<{
+        page: number;
+      }>();
+      expect(store.userQueryById.pagination).toBeDefined();
+
+      const userQuery = injectUserQueryById();
+      expectTypeOf(userQuery.pagination).toEqualTypeOf<{
+        page: number;
+      }>();
+      const userDetailsQuery = injectUserDetailsQuery();
+      expectTypeOf(userDetailsQuery.pagination).toEqualTypeOf<{
+        page: number;
+      }>();
+    });
+  });
 });

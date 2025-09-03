@@ -6,9 +6,10 @@ import {
 import { ResourceByIdConfig } from './types/resource-by-id-config.type';
 import { InternalType } from './types/util.type';
 import { QueryByIdRef } from './with-query-by-id';
-import { Signal, signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { resourceById } from './resource-by-id-signal-store';
 import { __INTERNAL_QueryBrand } from './types/brand';
+import { ExtendsByIdFactory } from './core/query.core';
 
 export function queryById<
   QueryState extends object | undefined,
@@ -18,7 +19,8 @@ export function queryById<
   Input extends SignalStoreFeatureResult,
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  >,
+  ExtendedOutput
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -28,6 +30,14 @@ export function queryById<
       QueryGroupIdentifier
     >,
     'method'
+  >,
+  extended?: ExtendsByIdFactory<
+    NoInfer<Input>,
+    NoInfer<StoreInput>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
+    NoInfer<QueryGroupIdentifier>,
+    ExtendedOutput
   >
 ): (
   store: StoreInput,
@@ -36,7 +46,8 @@ export function queryById<
   queryByIdRef: QueryByIdRef<
     NoInfer<QueryGroupIdentifier>,
     NoInfer<QueryState>,
-    NoInfer<QueryParams>
+    NoInfer<QueryParams>,
+    ExtendedOutput
   >;
   /**
    * Only used to help type inference, not used in the actual implementation.
@@ -67,7 +78,18 @@ export function queryById<
   return (store, context) => ({
     queryByIdRef: {
       resourceById: queryResourcesById,
-      resourceParamsSrc: resourceParamsSrc as Signal<QueryParams | undefined>,
+      resourceParamsSrc: resourceParamsSrc as WritableSignal<
+        QueryParams | undefined
+      >,
+      extendedOutputs:
+        extended?.({
+          input: context,
+          store: store,
+          resourceById: queryResourcesById,
+          resourceParamsSrc: resourceParamsSrc as WritableSignal<
+            QueryParams | undefined
+          >,
+        }) ?? ({} as ExtendedOutput),
     },
     __types: {} as InternalType<
       NoInfer<QueryState>,

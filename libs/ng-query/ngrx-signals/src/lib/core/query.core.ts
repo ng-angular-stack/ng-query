@@ -457,3 +457,17 @@ export type ExtendsFactory<
   resource: ResourceRef<ResourceState>;
   resourceParams: WritableSignal<ResourceParams>;
 }) => ExtendedOutputs;
+
+export type ExtendsByIdFactory<
+  Input extends SignalStoreFeatureResult,
+  StoreInput,
+  ResourceState extends object | undefined,
+  ResourceParams,
+  GroupIdentifier extends string | number,
+  ExtendedOutputs
+> = (context: {
+  input: Input;
+  store: StoreInput;
+  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
+  resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
+}) => ExtendedOutputs;

@@ -28,7 +28,7 @@ type QueryRefType = {
 };
 
 type QueryByIdRefType = {
-  queryByIdRef: QueryByIdRef<string | number, unknown, unknown>;
+  queryByIdRef: QueryByIdRef<string | number, unknown, unknown, unknown>;
   __types: InternalType<unknown, unknown, unknown, true, string | number>;
 };
 
@@ -75,7 +75,8 @@ type WithQueryByIdOutputMapper<
       string,
       {},
       string | number,
-      boolean
+      boolean,
+      CachedQueryById['query']['queryByIdRef']['extendedOutputs']
     >
   >;
 } & {
@@ -145,8 +146,8 @@ type WithInjectQueryOutputMapperTyped<
             pluggable?: (
               source: SignalProxy<NoInfer<PluggableParams>>
             ) => SignalWrapperParams<NoInfer<PluggableParams>>
-          ) => ResourceRef<State>
-        : () => ResourceRef<State>
+          ) => ResourceRef<State> & ExtendedOutput
+        : () => ResourceRef<State> & ExtendedOutput
       : 'never2Test'
     : `Error: Please use rxQuery or query. Eg: { ${k &
         string}: { query: () => rxQuery(...) }}`
@@ -164,7 +165,8 @@ type WithInjectQueryByIdOutputMapperTyped<
         queryByIdRef: QueryByIdRef<
           infer GroupIdentifier,
           infer State,
-          infer Params
+          infer Params,
+          infer ExtendedOutput
         >;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
@@ -172,8 +174,8 @@ type WithInjectQueryByIdOutputMapperTyped<
             pluggable?: (
               source: SignalProxy<NoInfer<PluggableParams>>
             ) => SignalWrapperParams<NoInfer<PluggableParams>>
-          ) => ResourceByIdRef<GroupIdentifier, State>
-        : () => ResourceByIdRef<GroupIdentifier, State>
+          ) => ResourceByIdRef<GroupIdentifier, State> & ExtendedOutput
+        : () => ResourceByIdRef<GroupIdentifier, State> & ExtendedOutput
       : 'never2'
     : `Error: Please use rxQueryById or queryById. Eg: { ${k &
         string}: { queryById: () => rxQueryById(...) }}`
@@ -191,7 +193,8 @@ type WithQueryByIdOutputMapperTyped<
         queryByIdRef: QueryByIdRef<
           infer GroupIdentifier,
           infer State,
-          infer Params
+          infer Params,
+          infer ExtendedOutput
         >;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
@@ -202,7 +205,8 @@ type WithQueryByIdOutputMapperTyped<
               Params,
               PluggableParams,
               GroupIdentifier,
-              true
+              true,
+              ExtendedOutput
             >
           >
         : ReturnType<
@@ -212,7 +216,8 @@ type WithQueryByIdOutputMapperTyped<
               Params,
               {},
               GroupIdentifier,
-              false
+              false,
+              ExtendedOutput
             >
           >
       : 'never2'
@@ -367,9 +372,9 @@ export function globalQueries<
             signalProxy,
             queryData as any
           );
-          //@ts-ignore
+          //@ts-expect-error force type
           acc[withQueryName] = queryEntity;
-          //@ts-ignore
+          //@ts-expect-error force type
           acc[injectQueryName] = (pluggableData) => {
             const _injector = inject(Injector);
             signalProxy.$set(pluggableData?.(signalProxy));
@@ -398,7 +403,6 @@ export function globalQueries<
           }
           return runInInjectionContext(injector, () => {
             const isPluggableQuery = value.queryById.length > 0;
-            console.log('isPluggableQuery', key, isPluggableQuery);
             const queryData = (
               isPluggableQuery
                 ? ((value.queryById as any)(signalProxy) as any)({}, {})
@@ -428,10 +432,10 @@ export function globalQueries<
           signalProxy,
           queryData as any
         );
-        //@ts-ignore
+        //@ts-expect-error force type
         acc[withQueryName] = queryEntity;
         const injectQueryName = `inject${capitalizedKey}QueryById` as const;
-        //@ts-ignore
+        //@ts-expect-error force type
         acc[injectQueryName] = (pluggableData) => {
           const _injector = inject(Injector);
           signalProxy.$set(pluggableData?.(signalProxy));
