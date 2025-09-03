@@ -151,7 +151,7 @@ describe('withQuery', () => {
         query({
           params: () => '5',
           stream: async ({ params }) => {
-            type StreamResponseTypeRetrieved = Expect<
+            type _StreamResponseTypeRetrieved = Expect<
               Equal<typeof params, string>
             >;
             const testSignal = signal<
@@ -187,7 +187,6 @@ describe('withQuery', () => {
     });
     const store = TestBed.inject(Store);
 
-    //@ts-ignore
     expect(store.userQuery.value()).toEqual(undefined);
     expect(store.userQuery.status()).toEqual('loading');
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -229,7 +228,7 @@ describe('withQuery', () => {
           associatedClientState: {
             user: true,
             userSelected: ({ queryResource }) => {
-              type ExpectQueryResourceToBeTyped = Expect<
+              type _ExpectQueryResourceToBeTyped = Expect<
                 Equal<typeof queryResource, ResourceRef<User>>
               >;
               return {
@@ -280,7 +279,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
           query({
             params: () => '5',
             loader: async ({ params }) => {
-              type StreamResponseTypeRetrieved = Expect<
+              type _StreamResponseTypeRetrieved = Expect<
                 Equal<typeof params, string>
               >;
               return {
@@ -354,7 +353,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
           query({
             params: () => '5',
             loader: async ({ params }) => {
-              type StreamResponseTypeRetrieved = Expect<
+              type _StreamResponseTypeRetrieved = Expect<
                 Equal<typeof params, string>
               >;
               await wait(10);
@@ -424,7 +423,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
           query({
             params: () => '5',
             loader: async ({ params }) => {
-              type StreamResponseTypeRetrieved = Expect<
+              type _StreamResponseTypeRetrieved = Expect<
                 Equal<typeof params, string>
               >;
               await wait(10);
@@ -680,15 +679,15 @@ describe('withQuery typing', () => {
     type ResultType = InferSignalStoreFeatureReturnedType<typeof queryByIdTest>;
     type PropsKeys = keyof ResultType['props'];
 
-    type ExpectTheResourceNameAndQueriesTypeRecord = Expect<
+    type _ExpectTheResourceNameAndQueriesTypeRecord = Expect<
       Equal<PropsKeys, 'userQuery' | '__query'>
     >;
 
-    type ExpectThePropsToHaveARecordWithResourceRef = Expect<
+    type _ExpectThePropsToHaveARecordWithResourceRef = Expect<
       Equal<ResultType['props']['userQuery'], ResourceRef<User>>
     >;
 
-    type ExpectThePropsToHaveARecordWithQueryNameAndHisType = Expect<
+    type _ExpectThePropsToHaveARecordWithQueryNameAndHistype = Expect<
       Equal<
         ResultType['props']['__query'],
         {
@@ -718,7 +717,7 @@ describe('withQuery typing', () => {
           query({
             params: store.userSelected,
             loader: ({ params }) => {
-              type ExpectParamsToBeTyped = Expect<
+              type _ExpectParamsToBeTyped = Expect<
                 Equal<
                   typeof params,
                   {
@@ -764,7 +763,7 @@ describe('withQuery typing', () => {
       typeof multiplesWithQuery
     >;
 
-    type ExpectThePropsToHaveARecordWithMultipleQueryNameAndHisType = Expect<
+    type _ExpectThePropsToHaveARecordWithMultipleQueryNameAndHistype = Expect<
       Equal<
         keyof ResultTypeMultiplesQuery['props']['__query'],
         'userDetails' | 'users'
@@ -773,7 +772,7 @@ describe('withQuery typing', () => {
   });
 
   it('clientStatePath option should infer signalStore state path', () => {
-    const queryByIdTest = signalStore(
+    const _queryByIdTest = signalStore(
       withState({
         pagination: {
           page: 1,
@@ -794,7 +793,7 @@ describe('withQuery typing', () => {
             params: () => ({
               id: '5',
             }),
-            loader: ({ params }) => {
+            loader: () => {
               return lastValueFrom(
                 of<Omit<User, 'id'>>({
                   name: 'John Doe',
@@ -806,10 +805,10 @@ describe('withQuery typing', () => {
         () => ({
           associatedClientState: {
             user: ({ queryParams, queryResource }) => {
-              type ExpectQueryParamsToBeTyped = Expect<
+              type _ExpectQueryParamsToBeTyped = Expect<
                 Equal<typeof queryParams, { id: string }>
               >;
-              type ExpectQueryResourceToBeTyped = Expect<
+              type _ExpectQueryResourceToBeTyped = Expect<
                 Equal<typeof queryResource, ResourceRef<Omit<User, 'id'>>>
               >;
               return {
@@ -824,7 +823,7 @@ describe('withQuery typing', () => {
   });
 
   it('Should react to mutation changes', async () => {
-    const Store = signalStore(
+    const _Store = signalStore(
       withMutation('userName', () =>
         mutation({
           method: (id: string) => ({ id }),
@@ -873,17 +872,17 @@ describe('withQuery typing', () => {
             userNameMutation: {
               optimisticUpdate: ({
                 queryResource,
-                mutationResource,
-                mutationParams,
+                mutationResource: _mutationResource,
+                mutationParams: _mutationParams,
               }) => {
-                type ExpectQueryResourceToBeTyped = Expect<
+                type _ExpectQueryResourceToBeTyped = Expect<
                   Equal<typeof queryResource, ResourceRef<User>>
                 >;
-                type ExpectMutationParamsToBeTyped = Expect<
-                  Equal<typeof mutationParams, { id: string }>
+                type _ExpectMutationParamsToBeTyped = Expect<
+                  Equal<typeof _mutationParams, { id: string }>
                 >;
-                type ExpectMutationResourceToBeTyped = Expect<
-                  Equal<typeof mutationResource, ResourceRef<User>>
+                type _ExpectMutationResourceToBeTyped = Expect<
+                  Equal<typeof _mutationResource, ResourceRef<User>>
                 >;
                 return queryResource.value();
               },
@@ -895,13 +894,13 @@ describe('withQuery typing', () => {
                   mutationResource,
                   queryResource,
                 }) => {
-                  type ExpectQueryResourceToBeTyped = Expect<
+                  type _ExpectQueryResourceToBeTyped = Expect<
                     Equal<typeof queryResource, ResourceRef<User>>
                   >;
-                  type ExpectMutationParamsToBeTyped = Expect<
+                  type _ExpectMutationParamsToBeTyped = Expect<
                     Equal<typeof mutationParams, { id: string }>
                   >;
-                  type ExpectMutationResourceToBeTyped = Expect<
+                  type _ExpectMutationResourceToBeTyped = Expect<
                     Equal<typeof mutationResource, ResourceRef<User>>
                   >;
                   return true;
@@ -914,16 +913,16 @@ describe('withQuery typing', () => {
                   queryResource,
                   targetedState,
                 }) => {
-                  type ExpectQueryResourceToBeTyped = Expect<
+                  type _ExpectQueryResourceToBeTyped = Expect<
                     Equal<typeof queryResource, ResourceRef<User>>
                   >;
-                  type ExpectMutationParamsToBeTyped = Expect<
+                  type _ExpectMutationParamsToBeTyped = Expect<
                     Equal<typeof mutationParams, { id: string }>
                   >;
-                  type ExpectMutationResourceToBeTyped = Expect<
+                  type _ExpectMutationResourceToBeTyped = Expect<
                     Equal<typeof mutationResource, ResourceRef<User>>
                   >;
-                  type ExpectTargetedStateToBeTyped = Expect<
+                  type _ExpectTargetedStateToBeTyped = Expect<
                     Equal<typeof targetedState, string | undefined>
                   >;
                   return targetedState ?? '';

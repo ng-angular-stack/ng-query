@@ -297,7 +297,7 @@ export function withQueryById<
                       return;
                     }
                     const queryStatus = queryResource.status();
-                    const queryValue = queryResource.value(); // track also the value
+                    const _queryValue = queryResource.value(); // track also the value
                     untracked(() => {
                       if (!['resolved', 'local'].includes(queryStatus)) {
                         return;
@@ -337,9 +337,10 @@ export function withQueryById<
                           mutationName
                         ].paramsSource as Signal<any>;
                         // use to track the value of the mutation
-                        const mutationValueChanged = mutationResource.hasValue()
-                          ? mutationResource.value()
-                          : undefined;
+                        const _mutationValueChanged =
+                          mutationResource.hasValue()
+                            ? mutationResource.value()
+                            : undefined;
 
                         if (mutationEffectOptions?.optimisticUpdate) {
                           untracked(() => {
@@ -434,7 +435,7 @@ export function withQueryById<
                               '__mutation'
                             ][mutationName].paramsSource as Signal<any>;
                             // use to track the value of the mutation
-                            const mutationValueChanged =
+                            const _mutationValueChanged =
                               mutationResource.hasValue()
                                 ? mutationResource.value()
                                 : undefined;
@@ -492,7 +493,7 @@ export function withQueryById<
             )),
         };
       })
-      //@ts-ignore
+      //@ts-expect-error force the type
     )(context);
   }) as unknown as SignalStoreFeature<
     Input,

@@ -42,13 +42,12 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
-    }
-    ,
+    },
     "test:ui": {
-      "executor": "@nx/vite:test",
+      "executor": "nx:run-commands",
+      "cache": false,
       "options": {
-        "ui": true,
-        "reportsDirectory": "../../../coverage/libs/ng-query/ngrx-signals"
+        "command": "vitest --ui"
       }
     }
   }

@@ -38,8 +38,16 @@ export default [
           style: 'kebab-case',
         },
       ],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
       'no-empty-object-type': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
     },
   },
   {

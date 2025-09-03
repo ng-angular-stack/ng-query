@@ -337,7 +337,7 @@ export function withMutationById<
           },
         };
       })
-      //@ts-ignore
+      //@ts-expect-error force the type
     )(context);
   }) as unknown as SignalStoreFeature<
     Input,

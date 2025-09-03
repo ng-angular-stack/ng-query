@@ -9,6 +9,7 @@ import {
   StateSignals,
   withProps,
   withState,
+  WritableStateSource,
 } from '@ngrx/signals';
 import { InferInjectedType, MergeObject } from './types/util.type';
 import {

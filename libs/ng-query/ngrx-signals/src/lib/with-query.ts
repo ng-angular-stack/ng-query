@@ -357,7 +357,7 @@ export function withQuery<
                               '__mutation'
                             ][mutationName].paramsSource as Signal<any>;
                             // use to track the value of the mutation
-                            const mutationValueChanged =
+                            const _mutationValueChanged =
                               mutationResource.hasValue()
                                 ? mutationResource.value()
                                 : undefined;
@@ -414,7 +414,7 @@ export function withQuery<
             )),
         };
       })
-      //@ts-ignore
+      //@ts-expect-error force the type
     )(context);
   }) as unknown as SignalStoreFeature<
     Input,
@@ -427,31 +427,6 @@ export function withQuery<
       ExtendedOutputs
     >
   >;
-}
-
-function optimisticUpdateQueryStateFromMutation<
-  ResourceState extends object | undefined
->({
-  mutationStatus,
-  mutationEffectOptions,
-  mutationResource,
-  queryResource,
-  mutationParamsSrc,
-}: {
-  mutationStatus: string;
-  mutationEffectOptions: QueryDeclarativeEffect<any>;
-  mutationResource: ResourceRef<any>;
-  queryResource: ResourceRef<ResourceState | undefined>;
-  mutationParamsSrc: Signal<any>;
-}) {
-  if (mutationStatus === 'loading') {
-    const optimisticValue = mutationEffectOptions?.optimisticUpdate?.({
-      mutationResource,
-      queryResource,
-      mutationParams: mutationParamsSrc() as NonNullable<NoInfer<any>>,
-    });
-    queryResource.set(optimisticValue);
-  }
 }
 
 function updateAssociatedClientStates<
