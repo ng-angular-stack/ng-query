@@ -13,6 +13,7 @@ Ajout des tests manquants en même temps
 ## Feature
 
 - faire doc pour llm
+- Pour éviter que ça aille dans tous les sens faire un truc genre: query(..., withOption(...), withExtension(...))
 - préserver les résultats précédents pagintation, ajouter une fonction qui va exposer current page et current résult ? et exposer en plus des resources ? évite de recréer des trucs dédiés
 - gérer les mutations qui se lancent mais on n'a pas le résultat (car on a refresh la page avant)
 - returned source should be an object, it will be easier for improvments

@@ -464,10 +464,14 @@ export type ExtensionsByIdFactory<
   ResourceState extends object | undefined,
   ResourceParams,
   GroupIdentifier extends string | number,
-  ExtensionsOutputs
+  ExtensionsOutputs,
+  PreviousExtensionsOutputs = {}
 > = (context: {
   input: Input;
   store: StoreInput;
   resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
+  extensions: keyof PreviousExtensionsOutputs extends string
+    ? PreviousExtensionsOutputs
+    : never;
 }) => ExtensionsOutputs;
