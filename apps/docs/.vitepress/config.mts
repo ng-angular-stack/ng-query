@@ -36,6 +36,7 @@ export default defineConfig({
             link: '/signal-store-parallel',
           },
           { text: 'Paginated Query', link: '/signal-store-paginated' },
+          { text: 'Insertions', link: '/insertions' },
           { text: 'Server State Store', link: '/signal-store-server-state' },
         ],
       },
