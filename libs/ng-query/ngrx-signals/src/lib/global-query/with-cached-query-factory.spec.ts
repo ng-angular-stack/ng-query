@@ -40,7 +40,7 @@ describe('withCachedQueryFactory', () => {
         queryRef: {
           resource: resourceRef,
           resourceParamsSrc: resourceParamsSrc,
-          extensionsOutputs: {
+          insertionsOutputs: {
             pagination: 1,
           },
         },
@@ -112,7 +112,7 @@ describe('withCachedQueryByIdToPlugFactory', () => {
         queryByIdRef: {
           resourceById: resourceRef,
           resourceParamsSrc: resourceParamsSrc,
-          extensionsOutputs: {
+          insertionsOutputs: {
             pagination: 1,
           },
         },

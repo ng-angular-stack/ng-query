@@ -38,11 +38,11 @@ export type QueryByIdRef<
   GroupIdentifier extends string | number,
   ResourceState,
   ResourceParams,
-  ExtensionsOutput
+  InsertionsOutput
 > = {
   resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
-  extensionsOutputs: ExtensionsOutput;
+  insertionsOutputs: InsertionsOutput;
 };
 
 // TODO find a way to access to a resourceRef without userQueryById() because it will be updated each time the query is updated
@@ -53,7 +53,7 @@ type WithQueryByIdOutputStoreConfig<
   ResourceParams,
   ResourceArgsParams,
   GroupIdentifier extends string | number,
-  ExtensionsOutputs
+  InsertionsOutputs
 > = {
   state: {};
   props: MergeObject<
@@ -62,7 +62,7 @@ type WithQueryByIdOutputStoreConfig<
         GroupIdentifier,
         ResourceState
       > &
-        ExtensionsOutputs;
+        InsertionsOutputs;
     },
     {
       __query: {
@@ -178,7 +178,7 @@ export function withQueryById<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtensionsOutputs,
+  InsertionsOutputs,
   OtherProperties
 >(
   resourceName: ResourceName,
@@ -193,7 +193,7 @@ export function withQueryById<
       NoInfer<GroupIdentifier>,
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
-      ExtensionsOutputs
+      InsertionsOutputs
     >;
   } & {
     __types: InternalType<
@@ -221,7 +221,7 @@ export function withQueryById<
     ResourceParams,
     ResourceArgsParams,
     GroupIdentifier,
-    ExtensionsOutputs
+    InsertionsOutputs
   >
 > {
   return ((context: SignalStoreFeatureResult) => {
@@ -508,7 +508,7 @@ export function withQueryById<
       ResourceParams,
       ResourceArgsParams,
       GroupIdentifier,
-      ExtensionsOutputs
+      InsertionsOutputs
     >
   >;
 }

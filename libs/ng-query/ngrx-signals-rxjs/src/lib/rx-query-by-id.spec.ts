@@ -1,4 +1,4 @@
-import { ApplicationRef, WritableSignal } from '@angular/core';
+import { ApplicationRef, inject, WritableSignal } from '@angular/core';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxQueryById } from './rx-query-by-id';
@@ -80,7 +80,7 @@ describe('rxResourceById', () => {
       >;
     });
   });
-  it('should accept an extensions output, that appear in the store', () => {
+  it('should accept an Insertions output, that appear in the store', () => {
     const result = rxQueryById(
       {
         params: () => '5',
@@ -97,13 +97,13 @@ describe('rxResourceById', () => {
         pagination: 1,
       })
     );
-    type ExpectTypeWithExtensions = Expect<
+    type ExpectTypeWithInsertions = Expect<
       Equal<
         ReturnType<typeof result>['queryByIdRef'],
         {
           resourceById: ResourceByIdRef<string, User>;
           resourceParamsSrc: WritableSignal<string | undefined>;
-          extensionsOutputs: {
+          InsertionsOutputs: {
             pagination: number;
           };
         }
@@ -140,5 +140,59 @@ describe('rxQueryById used with: withQueryById', () => {
 
     await TestBed.inject(ApplicationRef).whenStable();
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
+  });
+
+  it('should accept seven inserts, all outputs appear in the store', () => {
+    const Store = signalStore(
+      {
+        providedIn: 'root',
+      },
+      withQueryById('user', () =>
+        rxQueryById(
+          {
+            params: () => '5',
+            stream: ({ params }) => {
+              return of({
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              } satisfies User);
+            },
+            identifier: (params) => params,
+          },
+          // insert 1
+          () => ({ ext1: 1 }),
+          // insert 2
+          ({ insertions: inserts }) => ({ ext2: inserts.ext1 + 1 }),
+          // insert 3
+          ({ insertions: inserts }) => ({ ext3: inserts.ext2 + 1 }),
+          // insert 4
+          ({ insertions: inserts }) => ({ ext4: inserts.ext3 + 1 }),
+          // insert 5
+          ({ insertions: inserts }) => ({ ext5: inserts.ext4 + 1 }),
+          // insert 6
+          ({ insertions: inserts }) => ({ ext6: inserts.ext5 + 1 }),
+          // insert 7
+          ({ insertions: inserts }) => ({ ext7: inserts.ext6 + 1 })
+        )
+      )
+    );
+    TestBed.runInInjectionContext(() => {
+      const store = inject(Store);
+      expectTypeOf(store.userQueryById.ext1).toEqualTypeOf<number>();
+      expectTypeOf(store.userQueryById.ext2).toEqualTypeOf<number>();
+      expectTypeOf(store.userQueryById.ext3).toEqualTypeOf<number>();
+      expectTypeOf(store.userQueryById.ext4).toEqualTypeOf<number>();
+      expectTypeOf(store.userQueryById.ext5).toEqualTypeOf<number>();
+      expectTypeOf(store.userQueryById.ext6).toEqualTypeOf<number>();
+      expectTypeOf(store.userQueryById.ext7).toEqualTypeOf<number>();
+      expect(store.userQueryById.ext1).toBeDefined();
+      expect(store.userQueryById.ext2).toBeDefined();
+      expect(store.userQueryById.ext3).toBeDefined();
+      expect(store.userQueryById.ext4).toBeDefined();
+      expect(store.userQueryById.ext5).toBeDefined();
+      expect(store.userQueryById.ext6).toBeDefined();
+      expect(store.userQueryById.ext7).toBeDefined();
+    });
   });
 });

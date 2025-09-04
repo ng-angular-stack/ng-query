@@ -52,7 +52,7 @@ type WithQueryOutputMapper<
       string,
       {},
       true,
-      CachedQuery['query']['queryRef']['extensionsOutputs']
+      CachedQuery['query']['queryRef']['insertionsOutputs']
     >
   >;
 } & {
@@ -76,7 +76,7 @@ type WithQueryByIdOutputMapper<
       {},
       string | number,
       boolean,
-      CachedQueryById['query']['queryByIdRef']['extensionsOutputs']
+      CachedQueryById['query']['queryByIdRef']['insertionsOutputs']
     >
   >;
 } & {
@@ -102,7 +102,7 @@ type WithQueryOutputMapperTyped<
 > = QueryRecord[k]['query'] extends infer All
   ? All extends (data: infer Data) => (store: any, context: any) => infer R
     ? R extends {
-        queryRef: QueryRef<infer State, infer Params, infer ExtensionsOutput>;
+        queryRef: QueryRef<infer State, infer Params, infer InsertionsOutput>;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
         ? ReturnType<
@@ -112,7 +112,7 @@ type WithQueryOutputMapperTyped<
               Params,
               PluggableParams,
               true,
-              ExtensionsOutput
+              InsertionsOutput
             >
           >
         : ReturnType<
@@ -122,7 +122,7 @@ type WithQueryOutputMapperTyped<
               Params,
               {},
               false,
-              ExtensionsOutput
+              InsertionsOutput
             >
           >
       : 'never2Test'
@@ -139,15 +139,15 @@ type WithInjectQueryOutputMapperTyped<
 > = QueryRecord[k]['query'] extends infer All
   ? All extends (data: infer Data) => (store: any, context: any) => infer R
     ? R extends {
-        queryRef: QueryRef<infer State, infer Params, infer ExtensionsOutput>;
+        queryRef: QueryRef<infer State, infer Params, infer InsertionsOutput>;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
         ? (
             pluggable?: (
               source: SignalProxy<NoInfer<PluggableParams>>
             ) => SignalWrapperParams<NoInfer<PluggableParams>>
-          ) => ResourceRef<State> & ExtensionsOutput
-        : () => ResourceRef<State> & ExtensionsOutput
+          ) => ResourceRef<State> & InsertionsOutput
+        : () => ResourceRef<State> & InsertionsOutput
       : 'never2Test'
     : `Error: Please use rxQuery or query. Eg: { ${k &
         string}: { query: () => rxQuery(...) }}`
@@ -166,7 +166,7 @@ type WithInjectQueryByIdOutputMapperTyped<
           infer GroupIdentifier,
           infer State,
           infer Params,
-          infer ExtensionsOutput
+          infer InsertionsOutput
         >;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
@@ -174,8 +174,8 @@ type WithInjectQueryByIdOutputMapperTyped<
             pluggable?: (
               source: SignalProxy<NoInfer<PluggableParams>>
             ) => SignalWrapperParams<NoInfer<PluggableParams>>
-          ) => ResourceByIdRef<GroupIdentifier, State> & ExtensionsOutput
-        : () => ResourceByIdRef<GroupIdentifier, State> & ExtensionsOutput
+          ) => ResourceByIdRef<GroupIdentifier, State> & InsertionsOutput
+        : () => ResourceByIdRef<GroupIdentifier, State> & InsertionsOutput
       : 'never2'
     : `Error: Please use rxQueryById or queryById. Eg: { ${k &
         string}: { queryById: () => rxQueryById(...) }}`
@@ -194,7 +194,7 @@ type WithQueryByIdOutputMapperTyped<
           infer GroupIdentifier,
           infer State,
           infer Params,
-          infer ExtensionsOutput
+          infer InsertionsOutput
         >;
       }
       ? Data extends SignalWrapperParams<infer PluggableParams>
@@ -206,7 +206,7 @@ type WithQueryByIdOutputMapperTyped<
               PluggableParams,
               GroupIdentifier,
               true,
-              ExtensionsOutput
+              InsertionsOutput
             >
           >
         : ReturnType<
@@ -217,7 +217,7 @@ type WithQueryByIdOutputMapperTyped<
               {},
               GroupIdentifier,
               false,
-              ExtensionsOutput
+              InsertionsOutput
             >
           >
       : 'never2'

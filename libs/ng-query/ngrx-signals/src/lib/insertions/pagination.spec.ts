@@ -3,7 +3,7 @@ import { queryById } from '../query-by-id';
 import { pagination } from './pagination';
 import { QueryByIdRef } from '../with-query-by-id';
 
-describe('extension pagination', () => {
+describe('Insertion pagination', () => {
   it('should return the data of the currentPage', () => {
     const result = queryById(
       {
@@ -46,7 +46,7 @@ describe('extension pagination', () => {
       >
     >();
     expect(
-      finalResult.queryByIdRef.extensionsOutputs.pagination.currentPage
+      finalResult.queryByIdRef.insertionsOutputs.pagination.currentPage
     ).toBeDefined();
   });
 });

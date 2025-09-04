@@ -585,7 +585,7 @@ export function queryById<
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
         QueryParams | undefined
       >,
-      extensionsOutputs: (
+      insertionsOutputs: (
         insertions as InsertionsByIdFactory<
           NoInfer<Input>,
           NoInfer<StoreInput>,

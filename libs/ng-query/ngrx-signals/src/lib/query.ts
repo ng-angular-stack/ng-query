@@ -15,7 +15,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { __INTERNAL_QueryBrand } from './types/brand';
-import { ExtensionsFactory } from './core/query.core';
+import { InsertionsFactory } from './core/query.core';
 
 export function query<
   QueryState extends object | undefined,
@@ -25,18 +25,18 @@ export function query<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtensionsOutput
+  InsertionsOutput
 >(
   queryConfig: Omit<
     ResourceWithParamsOrParamsFn<QueryState, QueryParams, QueryArgsParams>,
     'method'
   >,
-  extensions?: ExtensionsFactory<
+  Insertions?: InsertionsFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
-    ExtensionsOutput
+    InsertionsOutput
   >
 ): (
   store: StoreInput,
@@ -45,7 +45,7 @@ export function query<
   queryRef: QueryRef<
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
-    ExtensionsOutput
+    InsertionsOutput
   >;
   /**
    * Only used to help type inference, not used in the actual implementation.
@@ -73,13 +73,13 @@ export function query<
     queryRef: {
       resource: queryResource,
       resourceParamsSrc: resourceParamsSrc as Signal<QueryParams | undefined>,
-      extensionsOutputs:
-        extensions?.({
+      insertionsOutputs:
+        Insertions?.({
           input: context,
           store: store,
           resource: queryResource as ResourceRef<NoInfer<QueryState>>,
           resourceParams: resourceParamsSrc as WritableSignal<QueryParams>,
-        }) ?? ({} as ExtensionsOutput),
+        }) ?? ({} as InsertionsOutput),
     },
     __types: {} as InternalType<
       NoInfer<QueryState>,

@@ -19,12 +19,12 @@ export function withCachedQueryToPlugFactory<
   QueryParams,
   PlugData extends object,
   IsPluggableQuery,
-  ExtensionsOutputs
+  InsertionsOutputs
 >(
   name: QueryName,
   querySourceProxy: SignalProxy<PlugData, true>,
   queryRef: (injector: Injector) => {
-    queryRef: QueryRef<QueryState, QueryParams, ExtensionsOutputs>;
+    queryRef: QueryRef<QueryState, QueryParams, InsertionsOutputs>;
     __types: InternalType<QueryState, QueryParams, unknown, false>;
   }
 ) {
@@ -73,7 +73,7 @@ export function withCachedQueryByIdToPlugFactory<
   PlugData extends object,
   GroupIdentifier extends string | number,
   IsPluggableQuery,
-  ExtensionsOutputs
+  InsertionsOutputs
 >(
   name: QueryName,
   querySourceProxy: SignalProxy<PlugData, true>,
@@ -82,7 +82,7 @@ export function withCachedQueryByIdToPlugFactory<
       GroupIdentifier,
       QueryState,
       QueryParams,
-      ExtensionsOutputs
+      InsertionsOutputs
     >;
     __types: InternalType<
       QueryState,

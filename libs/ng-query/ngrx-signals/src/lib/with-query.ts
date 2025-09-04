@@ -33,10 +33,10 @@ import {
 import { ResourceByIdRef } from './resource-by-id';
 import { nestedEffect } from './types/util';
 
-export type QueryRef<ResourceState, ResourceParams, ExtensionsOutput> = {
+export type QueryRef<ResourceState, ResourceParams, InsertionsOutput> = {
   resource: ResourceRef<ResourceState | undefined>;
   resourceParamsSrc: Signal<ResourceParams | undefined>;
-  extensionsOutputs: ExtensionsOutput;
+  insertionsOutputs: InsertionsOutput;
 };
 
 type WithQueryOutputStoreConfig<
@@ -45,13 +45,13 @@ type WithQueryOutputStoreConfig<
   ResourceParams,
   ResourceArgsParams,
   IsGroupedByGroup,
-  ExtensionsOutputs
+  InsertionsOutputs
 > = {
   state: {};
   props: {
     [key in `${ResourceName & string}Query`]: MergeObject<
       ResourceRef<ResourceState>,
-      ExtensionsOutputs
+      InsertionsOutputs
     >;
   } & {
     __query: {
@@ -147,7 +147,7 @@ export function withQuery<
   const StoreInput extends Prettify<
     StateSignals<Input['state']> & Input['props'] & Input['methods']
   >,
-  ExtensionsOutputs
+  InsertionsOutputs
 >(
   resourceName: ResourceName,
   queryFactory: (
@@ -160,7 +160,7 @@ export function withQuery<
     queryRef: QueryRef<
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
-      ExtensionsOutputs
+      InsertionsOutputs
     >;
   } & {
     __types: InternalType<
@@ -186,7 +186,7 @@ export function withQuery<
     ResourceParams,
     ResourceArgsParams,
     false,
-    ExtensionsOutputs
+    InsertionsOutputs
   >
 > {
   return ((context: SignalStoreFeatureResult) => {
@@ -220,12 +220,12 @@ export function withQuery<
           >
         );
 
-        const extensionsOutputs = queryConfigData.queryRef.extensionsOutputs;
+        const insertionsOutputs = queryConfigData.queryRef.insertionsOutputs;
 
         return {
           [`${resourceName}Query`]: {
             ...queryResource,
-            ...(extensionsOutputs ? extensionsOutputs : {}),
+            ...(insertionsOutputs ? insertionsOutputs : {}),
           },
 
           ...(associatedClientStates.length && {
@@ -424,7 +424,7 @@ export function withQuery<
       ResourceParams,
       ResourceArgsParams,
       false,
-      ExtensionsOutputs
+      InsertionsOutputs
     >
   >;
 }
