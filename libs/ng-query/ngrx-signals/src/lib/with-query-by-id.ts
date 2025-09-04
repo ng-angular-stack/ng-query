@@ -284,7 +284,10 @@ export function withQueryById<
         });
 
         return {
-          [`${resourceName}QueryById`]: queryResourcesById,
+          [`${resourceName}QueryById`]: {
+            ...queryResourcesById,
+            ...queryConfigData.queryByIdRef.insertionsOutputs,
+          },
           ...(associatedClientStates.length && {
             [`_${resourceName}EffectById`]: effect(() => {
               // todo add test for nestedEffect !

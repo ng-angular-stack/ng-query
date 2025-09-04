@@ -1,1 +1,1 @@
-export * from './lib/ng-query-rx-insertions/ng-query-rx-insertions';
+export default void 0;

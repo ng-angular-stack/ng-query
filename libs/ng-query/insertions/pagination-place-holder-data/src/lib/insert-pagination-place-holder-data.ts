@@ -1,9 +1,9 @@
 import { computed, WritableSignal } from '@angular/core';
-import { ResourceByIdRef } from '../resource-by-id';
+import { ResourceByIdRef } from '@ng-query/ngrx-signals';
 
 // todo add a complete test
 // todo add an option for prefetching the next page ?
-export const pagination = <
+export const insertPaginationPlaceholderData = <
   Input,
   StoreInput,
   GroupIdentifier extends string | number,

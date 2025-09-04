@@ -37,7 +37,8 @@
       "executor": "@nx/vite:test",
       "outputs": ["{options.reportsDirectory}"],
       "options": {
-        "reportsDirectory": "../../../coverage/libs/ng-query/insertions"
+        "reportsDirectory": "../../../coverage/libs/ng-query/insertions",
+        "config": "libs/ng-query/insertions/vite.config.mts"
       }
     },
     "lint": {

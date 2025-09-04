@@ -16,8 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@ng-query": ["apps/libs/ng-query/src/index.ts"],
-      "@ng-query/ng-query-insertions": [
-        "libs/ng-query/insertions/src/index.ts"
+      "@ng-query/insertions": ["libs/ng-query/insertions/src/index.ts"],
+      "@ng-query/insertions/pagination-place-holder-data": [
+        "libs/ng-query/insertions/pagination-place-holder-data/src/index.ts"
       ],
       "@ng-query/ngrx-signals": ["libs/ng-query/ngrx-signals/src/index.ts"],
       "@ng-query/ngrx-signals-rxjs": [

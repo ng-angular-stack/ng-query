@@ -12,7 +12,9 @@ Ajout des tests manquants en même temps
 
 ## Feature
 
-- Finir d'ajouter les insertions
+- Finir d'ajouter les insertions (les prendres en compte dans les inject & with fonction renvoyées)
+- Ajouter comment & doc sur pagination & au hover fonction
+- Regarder pourquoi globalQueries n'est pas typé quand on créé les query
 - ajouter page pour demander de l'aide dans la doc
 - faire doc pour llm
 - Pour éviter que ça aille dans tous les sens faire un truc genre: query(..., withOption(...), withExtension(...))

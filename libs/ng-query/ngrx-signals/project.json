@@ -42,13 +42,6 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
-    },
-    "test:ui": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "vitest --ui"
-      }
     }
   }
 }
