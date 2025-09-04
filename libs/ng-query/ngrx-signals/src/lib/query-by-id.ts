@@ -9,7 +9,7 @@ import { QueryByIdRef } from './with-query-by-id';
 import { signal, WritableSignal } from '@angular/core';
 import { resourceById } from './resource-by-id';
 import { __INTERNAL_QueryBrand } from './types/brand';
-import { InsertsByIdFactory } from './core/query.core';
+import { InsertionsByIdFactory } from './core/query.core';
 
 type PublicSignalStore<Input extends SignalStoreFeatureResult> = Prettify<
   StateSignals<Input['state']> & Input['props'] & Input['methods']
@@ -21,7 +21,7 @@ type QueryByIdOutput<
   QueryGroupIdentifier extends string | number,
   QueryState extends object | undefined,
   QueryParams,
-  InsertsOutput,
+  InsertionsOutput,
   QueryArgsParams
 > = (
   store: StoreInput,
@@ -31,7 +31,7 @@ type QueryByIdOutput<
     NoInfer<QueryGroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
-    InsertsOutput
+    InsertionsOutput
   >;
   /**
    * Only used to help type inference, not used in the actual implementation.
@@ -53,7 +53,7 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertsOutput
+  InsertionsOutput
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -64,13 +64,13 @@ export function queryById<
     >,
     'method'
   >,
-  inserts?: InsertsByIdFactory<
+  insertions?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput
+    InsertionsOutput
   >
 ): QueryByIdOutput<
   StoreInput,
@@ -78,7 +78,7 @@ export function queryById<
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
-  InsertsOutput,
+  InsertionsOutput,
   QueryArgsParams
 >;
 export function queryById<
@@ -88,8 +88,8 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertsOutput1,
-  InsertsOutput2
+  InsertionsOutput1,
+  InsertionsOutput2
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -100,22 +100,22 @@ export function queryById<
     >,
     'method'
   >,
-  insert1?: InsertsByIdFactory<
+  insert1?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput1
+    InsertionsOutput1
   >,
-  insert2?: InsertsByIdFactory<
+  insert2?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput2,
-    InsertsOutput1
+    InsertionsOutput2,
+    InsertionsOutput1
   >
 ): QueryByIdOutput<
   StoreInput,
@@ -123,7 +123,7 @@ export function queryById<
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
-  InsertsOutput1 & InsertsOutput2,
+  InsertionsOutput1 & InsertionsOutput2,
   QueryArgsParams
 >;
 export function queryById<
@@ -133,9 +133,9 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertsOutput1,
-  InsertsOutput2,
-  InsertsOutput3
+  InsertionsOutput1,
+  InsertionsOutput2,
+  InsertionsOutput3
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -146,31 +146,31 @@ export function queryById<
     >,
     'method'
   >,
-  insert1?: InsertsByIdFactory<
+  insert1?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput1
+    InsertionsOutput1
   >,
-  insert2?: InsertsByIdFactory<
+  insert2?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput2,
-    InsertsOutput1
+    InsertionsOutput2,
+    InsertionsOutput1
   >,
-  insert3?: InsertsByIdFactory<
+  insert3?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput3,
-    InsertsOutput1 & InsertsOutput2
+    InsertionsOutput3,
+    InsertionsOutput1 & InsertionsOutput2
   >
 ): QueryByIdOutput<
   StoreInput,
@@ -178,7 +178,7 @@ export function queryById<
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
-  InsertsOutput1 & InsertsOutput2 & InsertsOutput3,
+  InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3,
   QueryArgsParams
 >;
 export function queryById<
@@ -188,10 +188,10 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertsOutput1,
-  InsertsOutput2,
-  InsertsOutput3,
-  InsertsOutput4
+  InsertionsOutput1,
+  InsertionsOutput2,
+  InsertionsOutput3,
+  InsertionsOutput4
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -202,40 +202,40 @@ export function queryById<
     >,
     'method'
   >,
-  insert1?: InsertsByIdFactory<
+  insert1?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput1
+    InsertionsOutput1
   >,
-  insert2?: InsertsByIdFactory<
+  insert2?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput2,
-    InsertsOutput1
+    InsertionsOutput2,
+    InsertionsOutput1
   >,
-  insert3?: InsertsByIdFactory<
+  insert3?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput3,
-    InsertsOutput1 & InsertsOutput2
+    InsertionsOutput3,
+    InsertionsOutput1 & InsertionsOutput2
   >,
-  insert4?: InsertsByIdFactory<
+  insert4?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput4,
-    InsertsOutput1 & InsertsOutput2 & InsertsOutput3
+    InsertionsOutput4,
+    InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >
 ): QueryByIdOutput<
   StoreInput,
@@ -243,7 +243,7 @@ export function queryById<
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
-  InsertsOutput1 & InsertsOutput2 & InsertsOutput3 & InsertsOutput4,
+  InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3 & InsertionsOutput4,
   QueryArgsParams
 >;
 export function queryById<
@@ -253,11 +253,11 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertsOutput1,
-  InsertsOutput2,
-  InsertsOutput3,
-  InsertsOutput4,
-  InsertsOutput5
+  InsertionsOutput1,
+  InsertionsOutput2,
+  InsertionsOutput3,
+  InsertionsOutput4,
+  InsertionsOutput5
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -268,49 +268,52 @@ export function queryById<
     >,
     'method'
   >,
-  insert1?: InsertsByIdFactory<
+  insert1?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput1
+    InsertionsOutput1
   >,
-  insert2?: InsertsByIdFactory<
+  insert2?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput2,
-    InsertsOutput1
+    InsertionsOutput2,
+    InsertionsOutput1
   >,
-  insert3?: InsertsByIdFactory<
+  insert3?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput3,
-    InsertsOutput1 & InsertsOutput2
+    InsertionsOutput3,
+    InsertionsOutput1 & InsertionsOutput2
   >,
-  insert4?: InsertsByIdFactory<
+  insert4?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput4,
-    InsertsOutput1 & InsertsOutput2 & InsertsOutput3
+    InsertionsOutput4,
+    InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >,
-  insert5?: InsertsByIdFactory<
+  insert5?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput5,
-    InsertsOutput1 & InsertsOutput2 & InsertsOutput3 & InsertsOutput4
+    InsertionsOutput5,
+    InsertionsOutput1 &
+      InsertionsOutput2 &
+      InsertionsOutput3 &
+      InsertionsOutput4
   >
 ): QueryByIdOutput<
   StoreInput,
@@ -318,11 +321,11 @@ export function queryById<
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
-  InsertsOutput1 &
-    InsertsOutput2 &
-    InsertsOutput3 &
-    InsertsOutput4 &
-    InsertsOutput5,
+  InsertionsOutput1 &
+    InsertionsOutput2 &
+    InsertionsOutput3 &
+    InsertionsOutput4 &
+    InsertionsOutput5,
   QueryArgsParams
 >;
 export function queryById<
@@ -332,12 +335,12 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertsOutput1,
-  InsertsOutput2,
-  InsertsOutput3,
-  InsertsOutput4,
-  InsertsOutput5,
-  InsertsOutput6
+  InsertionsOutput1,
+  InsertionsOutput2,
+  InsertionsOutput3,
+  InsertionsOutput4,
+  InsertionsOutput5,
+  InsertionsOutput6
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -348,62 +351,65 @@ export function queryById<
     >,
     'method'
   >,
-  insert1?: InsertsByIdFactory<
+  insert1?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput1
+    InsertionsOutput1
   >,
-  insert2?: InsertsByIdFactory<
+  insert2?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput2,
-    InsertsOutput1
+    InsertionsOutput2,
+    InsertionsOutput1
   >,
-  insert3?: InsertsByIdFactory<
+  insert3?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput3,
-    InsertsOutput1 & InsertsOutput2
+    InsertionsOutput3,
+    InsertionsOutput1 & InsertionsOutput2
   >,
-  insert4?: InsertsByIdFactory<
+  insert4?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput4,
-    InsertsOutput1 & InsertsOutput2 & InsertsOutput3
+    InsertionsOutput4,
+    InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >,
-  insert5?: InsertsByIdFactory<
+  insert5?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput5,
-    InsertsOutput1 & InsertsOutput2 & InsertsOutput3 & InsertsOutput4
+    InsertionsOutput5,
+    InsertionsOutput1 &
+      InsertionsOutput2 &
+      InsertionsOutput3 &
+      InsertionsOutput4
   >,
-  insert6?: InsertsByIdFactory<
+  insert6?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput6,
-    InsertsOutput1 &
-      InsertsOutput2 &
-      InsertsOutput3 &
-      InsertsOutput4 &
-      InsertsOutput5
+    InsertionsOutput6,
+    InsertionsOutput1 &
+      InsertionsOutput2 &
+      InsertionsOutput3 &
+      InsertionsOutput4 &
+      InsertionsOutput5
   >
 ): QueryByIdOutput<
   StoreInput,
@@ -411,12 +417,12 @@ export function queryById<
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
-  InsertsOutput1 &
-    InsertsOutput2 &
-    InsertsOutput3 &
-    InsertsOutput4 &
-    InsertsOutput5 &
-    InsertsOutput6,
+  InsertionsOutput1 &
+    InsertionsOutput2 &
+    InsertionsOutput3 &
+    InsertionsOutput4 &
+    InsertionsOutput5 &
+    InsertionsOutput6,
   QueryArgsParams
 >;
 export function queryById<
@@ -426,13 +432,13 @@ export function queryById<
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertsOutput1,
-  InsertsOutput2,
-  InsertsOutput3,
-  InsertsOutput4,
-  InsertsOutput5,
-  InsertsOutput6,
-  InsertsOutput7
+  InsertionsOutput1,
+  InsertionsOutput2,
+  InsertionsOutput3,
+  InsertionsOutput4,
+  InsertionsOutput5,
+  InsertionsOutput6,
+  InsertionsOutput7
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
@@ -443,76 +449,79 @@ export function queryById<
     >,
     'method'
   >,
-  insert1?: InsertsByIdFactory<
+  insert1?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput1
+    InsertionsOutput1
   >,
-  insert2?: InsertsByIdFactory<
+  insert2?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput2,
-    InsertsOutput1
+    InsertionsOutput2,
+    InsertionsOutput1
   >,
-  insert3?: InsertsByIdFactory<
+  insert3?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput3,
-    InsertsOutput1 & InsertsOutput2
+    InsertionsOutput3,
+    InsertionsOutput1 & InsertionsOutput2
   >,
-  insert4?: InsertsByIdFactory<
+  insert4?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput4,
-    InsertsOutput1 & InsertsOutput2 & InsertsOutput3
+    InsertionsOutput4,
+    InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >,
-  insert5?: InsertsByIdFactory<
+  insert5?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput5,
-    InsertsOutput1 & InsertsOutput2 & InsertsOutput3 & InsertsOutput4
+    InsertionsOutput5,
+    InsertionsOutput1 &
+      InsertionsOutput2 &
+      InsertionsOutput3 &
+      InsertionsOutput4
   >,
-  insert6?: InsertsByIdFactory<
+  insert6?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput6,
-    InsertsOutput1 &
-      InsertsOutput2 &
-      InsertsOutput3 &
-      InsertsOutput4 &
-      InsertsOutput5
+    InsertionsOutput6,
+    InsertionsOutput1 &
+      InsertionsOutput2 &
+      InsertionsOutput3 &
+      InsertionsOutput4 &
+      InsertionsOutput5
   >,
-  insert7?: InsertsByIdFactory<
+  insert7?: InsertionsByIdFactory<
     NoInfer<Input>,
     NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
-    InsertsOutput7,
-    InsertsOutput1 &
-      InsertsOutput2 &
-      InsertsOutput3 &
-      InsertsOutput4 &
-      InsertsOutput5 &
-      InsertsOutput6
+    InsertionsOutput7,
+    InsertionsOutput1 &
+      InsertionsOutput2 &
+      InsertionsOutput3 &
+      InsertionsOutput4 &
+      InsertionsOutput5 &
+      InsertionsOutput6
   >
 ): QueryByIdOutput<
   StoreInput,
@@ -520,13 +529,13 @@ export function queryById<
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
-  InsertsOutput1 &
-    InsertsOutput2 &
-    InsertsOutput3 &
-    InsertsOutput4 &
-    InsertsOutput5 &
-    InsertsOutput6 &
-    InsertsOutput7,
+  InsertionsOutput1 &
+    InsertionsOutput2 &
+    InsertionsOutput3 &
+    InsertionsOutput4 &
+    InsertionsOutput5 &
+    InsertionsOutput6 &
+    InsertionsOutput7,
   QueryArgsParams
 >;
 export function queryById<
@@ -546,7 +555,7 @@ export function queryById<
     >,
     'method'
   >,
-  ...inserts: any[]
+  ...insertions: any[]
 ): QueryByIdOutput<
   StoreInput,
   Input,
@@ -577,7 +586,7 @@ export function queryById<
         QueryParams | undefined
       >,
       extensionsOutputs: (
-        inserts as InsertsByIdFactory<
+        insertions as InsertionsByIdFactory<
           NoInfer<Input>,
           NoInfer<StoreInput>,
           NoInfer<QueryState>,
@@ -595,7 +604,7 @@ export function queryById<
             resourceParamsSrc: resourceParamsSrc as WritableSignal<
               NoInfer<QueryParams> | undefined
             >,
-            inserts: acc as {},
+            insertions: acc as {},
           }),
         };
       }, {} as Record<string, unknown>),

@@ -445,7 +445,7 @@ export function setOptimisticUpdateFromMutationOnQueryValue<
     });
 }
 
-export type InsertsFactory<
+export type InsertionsFactory<
   Input extends SignalStoreFeatureResult,
   StoreInput,
   ResourceState extends object | undefined,
@@ -458,20 +458,20 @@ export type InsertsFactory<
   resourceParams: WritableSignal<ResourceParams>;
 }) => InsertsOutputs;
 
-export type InsertsByIdFactory<
+export type InsertionsByIdFactory<
   Input extends SignalStoreFeatureResult,
   StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
   GroupIdentifier extends string | number,
-  InsertsOutputs,
-  PreviousInsertsOutputs = {}
+  InsertionsOutputs,
+  PreviousInsertionsOutputs = {}
 > = (context: {
   input: Input;
   store: StoreInput;
   resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
-  inserts: keyof PreviousInsertsOutputs extends string
-    ? PreviousInsertsOutputs
+  insertions: keyof PreviousInsertionsOutputs extends string
+    ? PreviousInsertionsOutputs
     : never;
-}) => InsertsOutputs;
+}) => InsertionsOutputs;

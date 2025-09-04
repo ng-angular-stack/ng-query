@@ -123,7 +123,7 @@ describe('queryById', () => {
             };
           },
           // insert 2
-          ({ inserts: inserts }) => {
+          ({ insertions: inserts }) => {
             expectTypeOf(inserts).toEqualTypeOf<{
               pagination: {
                 page: number;
@@ -172,17 +172,17 @@ describe('queryById', () => {
           // insert 1
           () => ({ ext1: 1 }),
           // insert 2
-          ({ inserts: inserts }) => ({ ext2: inserts.ext1 + 1 }),
+          ({ insertions: inserts }) => ({ ext2: inserts.ext1 + 1 }),
           // insert 3
-          ({ inserts: inserts }) => ({ ext3: inserts.ext2 + 1 }),
+          ({ insertions: inserts }) => ({ ext3: inserts.ext2 + 1 }),
           // insert 4
-          ({ inserts: inserts }) => ({ ext4: inserts.ext3 + 1 }),
+          ({ insertions: inserts }) => ({ ext4: inserts.ext3 + 1 }),
           // insert 5
-          ({ inserts: inserts }) => ({ ext5: inserts.ext4 + 1 }),
+          ({ insertions: inserts }) => ({ ext5: inserts.ext4 + 1 }),
           // insert 6
-          ({ inserts: inserts }) => ({ ext6: inserts.ext5 + 1 }),
+          ({ insertions: inserts }) => ({ ext6: inserts.ext5 + 1 }),
           // insert 7
-          ({ inserts: inserts }) => ({ ext7: inserts.ext6 + 1 })
+          ({ insertions: inserts }) => ({ ext7: inserts.ext6 + 1 })
         )
       )
     );

@@ -52,9 +52,9 @@ Both `query` and `rxQuery` are used to fetch server state in Signal Store, but t
 
 - **rxQuery**: Based on `rxResource` is designed for observable-based data streams (RxJS). It expose all `rxResource` functionalities.
 
-## `query` & `rxQuery` Inserts
+## `query` & `rxQuery` Insertions
 
-The `query` & `rxQuery` accepts up to 7 extensions. These inserts can be used to add properties to the query or handle side effects. See the Extensions section in the documentation.
+The `query` & `rxQuery` accepts up to 7 insertions. These insertions can be used to add properties to the query or handle side effects. See the Insertions section in the documentation.
 For example, you may want to insert a custom loading state that only appears if the request takes more than 200 ms, and remains visible for at least 500 ms to avoid flakiness.
 
 ## `rxQuery` options
