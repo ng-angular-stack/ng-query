@@ -11,12 +11,12 @@ To use a query, you define it in your Signal Store using the `withQuery` feature
 ### Example
 
 ```typescript
-import { signalStore, withQuery } from "@ngrx/signals";
-import { query } from "./query";
+import { signalStore, withQuery } from '@ngrx/signals';
+import { query } from './query';
 
 const Store = signalStore(
   withState({ id: 5 }),
-  withQuery("user", (store) =>
+  withQuery('user', (store) =>
     // 👇 use query or rxQuery
     query({
       params: store.id, // signal source
@@ -52,6 +52,11 @@ Both `query` and `rxQuery` are used to fetch server state in Signal Store, but t
 
 - **rxQuery**: Based on `rxResource` is designed for observable-based data streams (RxJS). It expose all `rxResource` functionalities.
 
+## `query` & `rxQuery` Inserts
+
+The `query` & `rxQuery` accepts up to 7 extensions. These inserts can be used to add properties to the query or handle side effects. See the Extensions section in the documentation.
+For example, you may want to insert a custom loading state that only appears if the request takes more than 200 ms, and remains visible for at least 500 ms to avoid flakiness.
+
 ## `rxQuery` options
 
 The `rxQuery` function provides flexible options for configuring how your query receives parameters and streams data:
@@ -65,7 +70,7 @@ The `rxQuery` function provides flexible options for configuring how your query 
 - **params$**: An Observable that emits parameters for the query. Use this if your parameters come from an RxJS stream.
 
   ```typescript
-  params$: of("5");
+  params$: of('5');
   ```
 
 - **stream**: A function that receives the current parameters and returns an Observable of the resource data. This is where you connect to your data source (REST, GraphQL, WebSocket, etc.).
@@ -79,13 +84,13 @@ The `rxQuery` function provides flexible options for configuring how your query 
 // Using params (signal or function)
 rxQuery({
   params: signal(5),
-  stream: ({ params: id }) => of({ id, name: "John Doe" }),
+  stream: ({ params: id }) => of({ id, name: 'John Doe' }),
 });
 
 // Using params$ (observable)
 rxQuery({
-  params$: of("5"),
-  stream: ({ params: id }) => of({ id, name: "John Doe" }),
+  params$: of('5'),
+  stream: ({ params: id }) => of({ id, name: 'John Doe' }),
 });
 ```
 

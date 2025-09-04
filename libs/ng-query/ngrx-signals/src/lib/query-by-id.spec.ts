@@ -55,7 +55,7 @@ describe('queryById', () => {
     });
   });
 
-  it('should accept an extension output, that appear in the store', () => {
+  it('should accept an insert output, that appear in the store', () => {
     const Store = signalStore(
       {
         providedIn: 'root',
@@ -94,7 +94,7 @@ describe('queryById', () => {
       expect(store.userQueryById.pagination).toBeDefined();
     });
   });
-  it('should accept multiple extensions, that appear in the store', () => {
+  it('should accept multiple inserts, that appear in the store', () => {
     const Store = signalStore(
       {
         providedIn: 'root',
@@ -114,7 +114,7 @@ describe('queryById', () => {
             },
             identifier: (params) => params,
           },
-          // extension 1
+          // insert 1
           () => {
             return {
               pagination: {
@@ -122,9 +122,9 @@ describe('queryById', () => {
               },
             };
           },
-          // extension 2
-          ({ extensions }) => {
-            expectTypeOf(extensions).toEqualTypeOf<{
+          // insert 2
+          ({ inserts: inserts }) => {
+            expectTypeOf(inserts).toEqualTypeOf<{
               pagination: {
                 page: number;
               };
@@ -138,18 +138,18 @@ describe('queryById', () => {
     );
     TestBed.runInInjectionContext(() => {
       const store = inject(Store);
-      //extension 1
+      //insert 1
       expectTypeOf(store.userQueryById.pagination).toEqualTypeOf<{
         page: number;
       }>();
       expect(store.userQueryById.pagination).toBeDefined();
 
-      //extension 2
+      //insert 2
       expectTypeOf(store.userQueryById.someOtherInfo).toEqualTypeOf<boolean>();
       expect(store.userQueryById.someOtherInfo).toBeDefined();
     });
   });
-  it('should accept seven extensions, all outputs appear in the store', () => {
+  it('should accept seven inserts, all outputs appear in the store', () => {
     const Store = signalStore(
       {
         providedIn: 'root',
@@ -169,20 +169,20 @@ describe('queryById', () => {
             },
             identifier: (params) => params,
           },
-          // extension 1
+          // insert 1
           () => ({ ext1: 1 }),
-          // extension 2
-          ({ extensions }) => ({ ext2: extensions.ext1 + 1 }),
-          // extension 3
-          ({ extensions }) => ({ ext3: extensions.ext2 + 1 }),
-          // extension 4
-          ({ extensions }) => ({ ext4: extensions.ext3 + 1 }),
-          // extension 5
-          ({ extensions }) => ({ ext5: extensions.ext4 + 1 }),
-          // extension 6
-          ({ extensions }) => ({ ext6: extensions.ext5 + 1 }),
-          // extension 7
-          ({ extensions }) => ({ ext7: extensions.ext6 + 1 })
+          // insert 2
+          ({ inserts: inserts }) => ({ ext2: inserts.ext1 + 1 }),
+          // insert 3
+          ({ inserts: inserts }) => ({ ext3: inserts.ext2 + 1 }),
+          // insert 4
+          ({ inserts: inserts }) => ({ ext4: inserts.ext3 + 1 }),
+          // insert 5
+          ({ inserts: inserts }) => ({ ext5: inserts.ext4 + 1 }),
+          // insert 6
+          ({ inserts: inserts }) => ({ ext6: inserts.ext5 + 1 }),
+          // insert 7
+          ({ inserts: inserts }) => ({ ext7: inserts.ext6 + 1 })
         )
       )
     );
