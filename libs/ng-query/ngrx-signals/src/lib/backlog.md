@@ -12,6 +12,7 @@ Ajout des tests manquants en même temps
 
 ## Feature
 
+- Finir d'ajouter les insertions
 - ajouter page pour demander de l'aide dans la doc
 - faire doc pour llm
 - Pour éviter que ça aille dans tous les sens faire un truc genre: query(..., withOption(...), withExtension(...))

@@ -16,10 +16,14 @@
     "baseUrl": ".",
     "paths": {
       "@ng-query": ["apps/libs/ng-query/src/index.ts"],
+      "@ng-query/ng-query-insertions": [
+        "libs/ng-query/insertions/src/index.ts"
+      ],
       "@ng-query/ngrx-signals": ["libs/ng-query/ngrx-signals/src/index.ts"],
       "@ng-query/ngrx-signals-rxjs": [
         "libs/ng-query/ngrx-signals-rxjs/src/index.ts"
       ],
+      "@ng-query/rx-insertions": ["libs/ng-query/rx-insertions/src/index.ts"],
       "test-type": ["libs/test-type/src/index.ts"],
       "types-testing": ["test-types.ts"]
     }
