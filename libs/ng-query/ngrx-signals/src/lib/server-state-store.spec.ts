@@ -6,38 +6,42 @@ import {
 } from '@ngrx/signals';
 import { ServerStateStore } from './server-state-store';
 import { withMutation } from './with-mutation';
-import { rxMutation } from './rx-mutation';
-import { of } from 'rxjs';
 import { withQuery } from './with-query';
-import { rxQuery } from './rx-query';
 import { TestBed } from '@angular/core/testing';
 import { Expect, Equal } from 'test-type';
-import { ApplicationRef, signal, Signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { IsAny } from './types/util.type';
 import { expectTypeOf } from 'vitest';
 import { SignalProxy } from './signal-proxy';
+import { mutation } from './mutation';
+import { query } from './query';
 
 type User = {
   id: string;
   name: string;
 };
 describe('SignalServerState', () => {
+  beforeEach(() => {
+    vi.useRealTimers();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it('1-should create an instance', () => {
     const serverStateFeature = signalStoreFeature(
       withMutation('updateName', () =>
-        rxMutation({
+        mutation({
           method: (user: User) => user,
-          stream: ({ params: user }) => of(user),
+          loader: async ({ params: user }) => user,
         })
       ),
       withQuery('user', () =>
-        rxQuery({
+        query({
           params: () => '1',
-          stream: ({ params }) =>
-            of({
-              id: params,
-              name: 'Romain',
-            }),
+          loader: async ({ params }) => ({
+            id: params,
+            name: 'Romain',
+          }),
         })
       )
     );
@@ -61,19 +65,18 @@ describe('SignalServerState', () => {
   it('2-should inject a store and expose global server state api', () => {
     const serverStateFeature = signalStoreFeature(
       withMutation('updateName', () =>
-        rxMutation({
+        mutation({
           method: (user: User) => user,
-          stream: ({ params: user }) => of(user),
+          loader: async ({ params: user }) => user,
         })
       ),
       withQuery('user', () =>
-        rxQuery({
+        query({
           params: () => '1',
-          stream: ({ params }) =>
-            of({
-              id: params,
-              name: 'Romain',
-            }),
+          loader: async ({ params }) => ({
+            id: params,
+            name: 'Romain',
+          }),
         })
       )
     );
@@ -111,19 +114,18 @@ describe('SignalServerState', () => {
   it('3-should you the withServerState in signalStore and expose global server state api', () => {
     const serverStateFeature = signalStoreFeature(
       withMutation('updateName', () =>
-        rxMutation({
+        mutation({
           method: (user: User) => user,
-          stream: ({ params: user }) => of(user),
+          loader: async ({ params: user }) => user,
         })
       ),
       withQuery('user', () =>
-        rxQuery({
+        query({
           params: () => '1',
-          stream: ({ params }) =>
-            of({
-              id: params,
-              name: 'Romain',
-            }),
+          loader: async ({ params }) => ({
+            id: params,
+            name: 'Romain',
+          }),
         })
       )
     );
@@ -163,23 +165,22 @@ describe('SignalServerState', () => {
     expect(consumerUserServerStateStore.mutateUpdateName).toBeDefined();
   });
 
-  it('4- should inject a single instance of server state store', () => {
+  it('4- should inject a single instance server state store', () => {
     let instanceCount = 0;
     const serverStateFeature = signalStoreFeature(
       withMutation('updateName', () =>
-        rxMutation({
+        mutation({
           method: (user: User) => user,
-          stream: ({ params: user }) => of(user),
+          loader: async ({ params: user }) => user,
         })
       ),
       withQuery('user', () =>
-        rxQuery({
+        query({
           params: () => '1',
-          stream: ({ params }) =>
-            of({
-              id: params,
-              name: 'Romain',
-            }),
+          loader: async ({ params }) => ({
+            id: params,
+            name: 'Romain',
+          }),
         })
       ),
       withProps(() => {
@@ -225,19 +226,18 @@ describe('SignalServerState', () => {
         (data: SignalProxy<{ selectedId: string | undefined }>) =>
           signalStoreFeature(
             withMutation('updateName', () =>
-              rxMutation({
+              mutation({
                 method: (user: User) => user,
-                stream: ({ params: user }) => of(user),
+                loader: async ({ params: user }) => user,
               })
             ),
             withQuery('user', () => {
-              return rxQuery({
+              return query({
                 params: data.selectedId,
-                stream: ({ params }) =>
-                  of({
-                    id: params,
-                    name: 'Romain',
-                  }),
+                loader: async ({ params }) => ({
+                  id: params,
+                  name: 'Romain',
+                }),
               });
             })
           ),
@@ -251,8 +251,7 @@ describe('SignalServerState', () => {
       const userServerStateStore = injectUserServerState({
         selectedId,
       });
-      await wait(10);
-      await TestBed.inject(ApplicationRef).whenStable();
+      await vi.runAllTimersAsync();
 
       expectTypeOf(
         userServerStateStore.userQuery.value()
@@ -273,6 +272,6 @@ describe('SignalServerState', () => {
   });
 });
 
-function wait(ms: number = 0): Promise<void> {
+function wait(ms = 0): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
