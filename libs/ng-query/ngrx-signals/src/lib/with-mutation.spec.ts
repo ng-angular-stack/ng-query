@@ -1011,6 +1011,6 @@ it('it should expose the mutation params source, that will be reused by query', 
   >;
 });
 
-function wait(ms: number = 0): Promise<void> {
+function wait(ms = 0): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

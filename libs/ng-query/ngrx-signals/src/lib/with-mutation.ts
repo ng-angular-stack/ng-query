@@ -222,7 +222,8 @@ export function withMutation<
     mutationRef: MutationRef<
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
-      NoInfer<ResourceArgsParams>
+      NoInfer<ResourceArgsParams>,
+      InsertionsOutputs
     >;
   } & {
     __types: InternalType<
@@ -249,7 +250,8 @@ export function withMutation<
     MutationName,
     ResourceState,
     ResourceParams,
-    ResourceArgsParams
+    ResourceArgsParams,
+    InsertionsOutputs
   >
 > {
   return ((context: SignalStoreFeatureResult) => {
@@ -376,7 +378,8 @@ export function withMutation<
       MutationName,
       ResourceState,
       ResourceParams,
-      ResourceArgsParams
+      ResourceArgsParams,
+      InsertionsOutputs
     >
   >;
 }

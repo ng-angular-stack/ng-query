@@ -450,12 +450,16 @@ export type InsertionsFactory<
   StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
-  InsertsOutputs
+  InsertsOutputs,
+  PreviousInsertionsOutputs = {}
 > = (context: {
   input: Input;
   store: StoreInput;
   resource: ResourceRef<ResourceState>;
   resourceParams: WritableSignal<ResourceParams>;
+  insertions: keyof PreviousInsertionsOutputs extends string
+    ? PreviousInsertionsOutputs
+    : never;
 }) => InsertsOutputs;
 
 export type InsertionsByIdFactory<

@@ -293,8 +293,6 @@ describe('Declarative server state, withQuery and withMutation', () => {
           on: {
             userEmailMutation: {
               optimisticUpdate: ({ queryResource, mutationParams }) => {
-                console.log('queryResource.value()', queryResource.value());
-                console.log('mutationParams', mutationParams);
                 return {
                   ...queryResource.value(),
                   email: mutationParams.email,
@@ -578,7 +576,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
               return lastValueFrom(of<User>(returnedUser(params)));
             },
           }),
-        (store) => ({
+        () => ({
           on: {
             userMutationById: {
               filter: ({ mutationIdentifier, queryResource }) =>

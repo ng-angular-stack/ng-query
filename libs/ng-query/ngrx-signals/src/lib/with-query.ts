@@ -3,6 +3,7 @@ import {
   Injector,
   ResourceRef,
   Signal,
+  WritableSignal,
   effect,
   inject,
   linkedSignal,
@@ -35,7 +36,7 @@ import { PublicSignalStore } from './types/shared.type';
 
 export type QueryRef<ResourceState, ResourceParams, InsertionsOutput> = {
   resource: ResourceRef<ResourceState | undefined>;
-  resourceParamsSrc: Signal<ResourceParams | undefined>;
+  resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
   insertionsOutputs: InsertionsOutput;
 };
 
@@ -166,13 +167,12 @@ export function withQuery<
       false
     >;
   },
-
   optionsFactory?: QueryOptions<
     StoreInput,
     Input,
-    ResourceState,
-    ResourceParams,
-    ResourceArgsParams
+    NoInfer<ResourceState>,
+    NoInfer<ResourceParams>,
+    NoInfer<ResourceArgsParams>
   >
 ): SignalStoreFeature<
   Input,
