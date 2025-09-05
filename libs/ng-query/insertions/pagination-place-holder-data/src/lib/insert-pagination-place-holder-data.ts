@@ -5,6 +5,7 @@ import { SignalStoreFeatureResult } from '@ngrx/signals';
 // todo create an insertion to preserve the value when the resource is loading
 // todo add a function to the signature to add has Next page / previous page state ?
 // todo add an insertion or a function to add the method to go nextpage / previous page ?
+// todo add comment on how to use it and what it does
 export const insertPaginationPlaceholderData = <
   Input extends SignalStoreFeatureResult,
   StoreInput,

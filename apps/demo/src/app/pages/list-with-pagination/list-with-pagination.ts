@@ -36,7 +36,7 @@ const UserListServerStateStore = signalStore(
       insertPaginationPlaceholderData
       // insertPaginationActions
       // insertPaginationActionsStatus
-      // insertQueryPreservePreviousValueWhenLoading
+      // insertResourcePreservePreviousValueWhenLoading
     )
   ),
   withMethods((store) => ({
