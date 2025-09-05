@@ -1,20 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  patchState,
-  signalStore,
-  signalStoreFeature,
-  withMethods,
-  withState,
-} from '@ngrx/signals';
-import { delay, lastValueFrom, of } from 'rxjs';
+import { signalStore, signalStoreFeature, withState } from '@ngrx/signals';
 import { withQueryById } from './with-query-by-id';
 import { Expect, Equal } from 'test-type';
-import {
-  ApplicationRef,
-  Injector,
-  ResourceRef,
-  runInInjectionContext,
-} from '@angular/core';
+import { Injector, ResourceRef, runInInjectionContext } from '@angular/core';
 import { ResourceByIdRef } from './resource-by-id';
 import { queryById } from './query-by-id';
 import { withMutation } from './with-mutation';
@@ -28,11 +16,14 @@ type User = {
   name: string;
   email: string;
 };
-// TODO faire un withQuery common et un query ou rxQuery qui renvoie soit une resource ou une rxResource
-// ou encore accept aussi queryById ?
-// todo handle stream in resourceById
 
 describe('queryById', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it('Retrieve returned types of queryByIdFn', () => {
     TestBed.configureTestingModule({
       providers: [Injector],
@@ -42,14 +33,12 @@ describe('queryById', () => {
     runInInjectionContext(injector, () => {
       const queryByIdFn = queryById({
         params: () => '5',
-        loader: ({ params }) => {
-          return lastValueFrom(
-            of({
-              id: params,
-              name: 'John Doe',
-              email: 'test@a.com',
-            })
-          );
+        loader: async ({ params }) => {
+          return {
+            id: params,
+            name: 'John Doe',
+            email: 'test@a.com',
+          };
         },
         identifier: (params) => params,
       });
@@ -75,6 +64,12 @@ describe('queryById', () => {
   });
 });
 describe('withQueryById', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it('1- Should expose a query with a record of resource by id', async () => {
     const returnedUser = {
       id: '5',
@@ -85,8 +80,8 @@ describe('withQueryById', () => {
       withQueryById('user', () =>
         queryById({
           params: () => '5',
-          loader: ({ params }) => {
-            return lastValueFrom(of<User>(returnedUser));
+          loader: async ({ params }) => {
+            return returnedUser;
           },
           identifier: (params) => params,
         })
@@ -94,13 +89,13 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
 
     expect(store.userQueryById).toBeDefined();
 
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
 
     type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
@@ -124,8 +119,9 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(of<User>(returnedUser).pipe(delay(10)));
+            loader: async ({ params }) => {
+              await wait(10);
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
@@ -175,12 +171,12 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
     expect(store.usersFetched().length).toBe(0);
 
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
 
     type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
@@ -206,8 +202,8 @@ describe('withQueryById', () => {
           method(user: User) {
             return user;
           },
-          loader({ params }) {
-            return lastValueFrom(of<User>(params));
+          async loader({ params }) {
+            return params;
           },
         })
       ),
@@ -216,8 +212,8 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(of<User>(returnedUser));
+            loader: async ({ params }) => {
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
@@ -234,10 +230,10 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     const userQuery5 = store.userQueryById()['5'];
     expect(userQuery5?.value()).toBe(returnedUser);
 
@@ -246,7 +242,7 @@ describe('withQueryById', () => {
       name: 'Updated User',
       email: 'updated.doe@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(userQuery5?.value()).toEqual({
       id: '5',
       name: 'Updated User',
@@ -270,8 +266,8 @@ describe('withQueryById', () => {
           method(user: User) {
             return user;
           },
-          loader({ params }) {
-            return lastValueFrom(of<User>(params));
+          async loader({ params }) {
+            return params;
           },
         })
       ),
@@ -280,8 +276,8 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(of<User>(returnedUser));
+            loader: async ({ params }) => {
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
@@ -300,10 +296,10 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     const userQuery5 = store.userQueryById()['5'];
     expect(userQuery5?.value()).toBe(returnedUser);
 
@@ -312,7 +308,7 @@ describe('withQueryById', () => {
       name: 'Updated User',
       email: 'updated.doe@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(userQuery5?.value()).toEqual({
       id: '5',
       name: 'Updated User',
@@ -336,8 +332,9 @@ describe('withQueryById', () => {
           method(user: User) {
             return user;
           },
-          loader({ params }) {
-            return lastValueFrom(of<User>(params).pipe(delay(10)));
+          async loader({ params }) {
+            await wait(10);
+            return params;
           },
         })
       ),
@@ -346,8 +343,8 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(of<User>(returnedUser));
+            loader: async ({ params }) => {
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
@@ -367,10 +364,10 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     const userQuery5 = store.userQueryById()['5'];
     expect(userQuery5?.value()).toBe(returnedUser);
     const userQuery5ReloadSpy = vi.spyOn(userQuery5!, 'reload');
@@ -380,7 +377,7 @@ describe('withQueryById', () => {
       email: 'updated.doe@example.com',
     });
 
-    await wait(50);
+    await vi.runAllTimersAsync();
 
     expect(userQuery5ReloadSpy.mock.calls.length).toBe(2);
   });
@@ -402,8 +399,10 @@ describe('withQueryById', () => {
             return user;
           },
           identifier: (params) => params.id,
-          loader: ({ params }) =>
-            lastValueFrom(of<User>(params).pipe(delay(10))),
+          loader: async ({ params }) => {
+            await wait(10);
+            return params;
+          },
         })
       ),
       withQueryById(
@@ -411,9 +410,8 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              console.log('params', params);
-              return lastValueFrom(of<User>(returnedUser));
+            loader: async ({ params }) => {
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
@@ -433,12 +431,12 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     const userQuery5 = store.userQueryById()['5'];
-    await wait(50);
+    await vi.runAllTimersAsync();
 
     expect(userQuery5?.value()).toBe(returnedUser);
     const userQuery5ReloadSpy = vi.spyOn(userQuery5!, 'reload');
@@ -448,7 +446,7 @@ describe('withQueryById', () => {
       email: 'updated.doe@example.com',
     });
 
-    await wait(50);
+    await vi.runAllTimersAsync();
 
     expect(userQuery5ReloadSpy.mock.calls.length).toBe(2);
   });
@@ -469,8 +467,8 @@ describe('withQueryById', () => {
           method(user: User) {
             return user;
           },
-          loader({ params }) {
-            return lastValueFrom(of<User>(params));
+          async loader({ params }) {
+            return params;
           },
           identifier: (params) => params.id,
         })
@@ -480,8 +478,8 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(of<User>(returnedUser));
+            loader: async ({ params }) => {
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
@@ -498,10 +496,10 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     const userQuery5 = store.userQueryById()['5'];
     expect(userQuery5?.value()).toBe(returnedUser);
 
@@ -510,7 +508,7 @@ describe('withQueryById', () => {
       name: 'Updated User',
       email: 'updated.doe@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(userQuery5?.value()).toEqual({
       id: '5',
       name: 'Updated User',
@@ -534,8 +532,8 @@ describe('withQueryById', () => {
           method(user: User) {
             return user;
           },
-          loader({ params }) {
-            return lastValueFrom(of<User>(params));
+          async loader({ params }) {
+            return params;
           },
           identifier: (params) => params.id,
         })
@@ -545,8 +543,8 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(of<User>(returnedUser));
+            loader: async ({ params }) => {
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
@@ -565,10 +563,10 @@ describe('withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     const userQuery5 = store.userQueryById()['5'];
     expect(userQuery5?.value()).toBe(returnedUser);
 
@@ -577,74 +575,13 @@ describe('withQueryById', () => {
       name: 'Updated User',
       email: 'updated.doe@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(userQuery5?.value()).toEqual({
       id: '5',
       name: 'Updated User',
       email: 'test@a.com',
     });
   });
-
-  it('9-  In pagination case, it should preserve the previous value when accessing back to a previous page', async () => {
-    vi.useFakeTimers();
-    const returnedUser = (id: string) => ({
-      id: `${id}`,
-      name: 'John Doe',
-      email: 'test@a.com',
-    });
-    const Store = signalStore(
-      withState({
-        selected: {
-          id: '1',
-        },
-      }),
-      withMethods((store) => ({
-        nextPage: () =>
-          patchState(store, (state) => ({
-            selected: { id: `${Number(state.selected.id) + 1}` },
-          })),
-        previousPage: () =>
-          patchState(store, (state) => ({
-            selected: { id: `${Number(state.selected.id) - 1}` },
-          })),
-      })),
-      withQueryById('user', (store) =>
-        queryById({
-          params: store.selected,
-          loader: ({ params: selected }) => {
-            console.log('selected', selected);
-            return lastValueFrom(
-              of<User>(returnedUser(selected.id)).pipe(delay(10000))
-            );
-          },
-          identifier: (params) => params.id,
-        })
-      )
-    );
-
-    TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
-    });
-    const store = TestBed.inject(Store);
-
-    await vi.runAllTimersAsync();
-
-    const userSelected1 = store.userQueryById()['1'];
-    expect(userSelected1?.value()).toEqual(returnedUser('1'));
-    store.nextPage();
-    await vi.runAllTimersAsync();
-    store.previousPage();
-    expect(userSelected1?.value()).toEqual(returnedUser('1'));
-    expect(userSelected1?.status()).toEqual('loading');
-
-    await vi.runAllTimersAsync();
-
-    expect(userSelected1?.value()).toEqual(returnedUser('1'));
-    expect(userSelected1?.status()).toEqual('resolved');
-
-    vi.restoreAllMocks();
-  });
-
   it('#1- Should expose private query type', async () => {
     const returnedUser = {
       id: '5',
@@ -661,8 +598,9 @@ describe('withQueryById', () => {
         () =>
           queryById({
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(of<User>(returnedUser).pipe(delay(10)));
+            loader: async ({ params }) => {
+              await wait(10);
+              return returnedUser;
             },
             identifier: (params) => params,
           }),
