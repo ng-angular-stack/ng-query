@@ -1,0 +1,117 @@
+<!-- <div>
+  testResource {{ testResource.value() | json }}
+  <button (click)="nextPage()">Next</button>
+  <button (click)="previousPage()">Previous</button>
+</div> -->
+<div class="container">
+  <aside class="sidebar">
+    <div class="status-card">
+      <div>
+        <h3>Status</h3>
+        <div style="margin-top: 12px">
+          <b>GET Request</b>
+          <ng-container
+            *ngTemplateOutlet="statusTemplate; context: { status: userListServerStateStore.usersQueryById.currentPageStatus()}"
+          ></ng-container>
+        </div>
+      </div>
+      <!-- <div class="checkbox-wrapper">
+        <input
+          id="updateError"
+          type="checkbox"
+          [checked]="updateError()"
+          (change)="toggleUpdateError()"
+        />
+        <label for="updateError"> Simulate update error </label>
+      </div> -->
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="content-wrapper">
+      <div class="card">
+        <h2 class="card-title">User Management</h2>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(user of
+              userListServerStateStore.usersQueryById.currentPageData(); track
+              user.id) {
+              <tr>
+                <td>{{ user.id }}</td>
+
+                <td>{{user.name }}</td>
+              </tr>
+              } @if
+              (!userListServerStateStore.usersQueryById.currentPageData()?.length)
+              {
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 32px">
+                  No users found
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <button class="btn" (click)="userListServerStateStore.previousPage()">
+            Previous
+          </button>
+          <button class="btn" (click)="userListServerStateStore.nextPage()">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<ng-template #statusTemplate let-status="status">
+  @switch(status) { @case ('idle') {
+  <span class="badge-container">
+    <span class="status-emoji">🛌</span>
+    <span class="badge badge-gray">Idle</span>
+  </span>
+  } @case ('error') {
+  <span class="badge-container">
+    <span class="status-emoji error">❌</span>
+    <span class="badge badge-red">Error</span>
+  </span>
+  } @case ('loading') {
+  <span class="badge-container">
+    <span class="status-emoji loading">⏳</span>
+    <span class="badge badge-orange">Loading</span>
+  </span>
+  } @case ('reloading') {
+  <span class="badge-container">
+    <span class="status-emoji loading">🔄</span>
+    <span class="badge badge-orange">Reloading</span>
+  </span>
+  } @case ('resolved') {
+  <span class="badge-container">
+    <span class="status-emoji success">✅</span>
+    <span class="badge badge-green">Loaded</span>
+  </span>
+  } @case ('local') {
+  <span class="badge-container">
+    <span class="status-emoji">📦</span>
+    <span class="badge badge-blue">Local</span>
+  </span>
+  } @default {
+  <span class="badge-container">
+    <span class="status-emoji">-</span>
+    <span class="badge badge-darkgray">-</span>
+  </span>
+  } }
+</ng-template>

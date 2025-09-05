@@ -1,1 +1,1 @@
-export * from './lib/insert-pagination-place-holder-data';
+export { insertPaginationPlaceholderData } from './lib/insert-pagination-place-holder-data';

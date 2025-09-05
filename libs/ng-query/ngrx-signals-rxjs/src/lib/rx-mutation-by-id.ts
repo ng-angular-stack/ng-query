@@ -582,6 +582,7 @@ export function rxMutationById<
               NoInfer<MutationParams> | undefined
             >,
             insertions: acc as {},
+            identifier: mutationConfig.identifier,
           }),
         };
       }, {} as Record<string, unknown>),

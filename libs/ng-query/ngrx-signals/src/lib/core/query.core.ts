@@ -462,6 +462,24 @@ export type InsertionsFactory<
     : never;
 }) => InsertsOutputs;
 
+export type InsertionByIdParams<
+  Input extends SignalStoreFeatureResult,
+  StoreInput,
+  GroupIdentifier extends string | number,
+  ResourceState extends object | undefined,
+  ResourceParams,
+  PreviousInsertionsOutputs
+> = {
+  input: Input;
+  store: StoreInput;
+  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
+  resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
+  identifier: (params: NonNullable<ResourceParams>) => GroupIdentifier;
+  insertions: keyof PreviousInsertionsOutputs extends string
+    ? PreviousInsertionsOutputs
+    : never;
+};
+
 export type InsertionsByIdFactory<
   Input extends SignalStoreFeatureResult,
   StoreInput,
@@ -470,12 +488,13 @@ export type InsertionsByIdFactory<
   GroupIdentifier extends string | number,
   InsertionsOutputs,
   PreviousInsertionsOutputs = {}
-> = (context: {
-  input: Input;
-  store: StoreInput;
-  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
-  resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
-  insertions: keyof PreviousInsertionsOutputs extends string
-    ? PreviousInsertionsOutputs
-    : never;
-}) => InsertionsOutputs;
+> = (
+  context: InsertionByIdParams<
+    Input,
+    StoreInput,
+    GroupIdentifier,
+    ResourceState,
+    ResourceParams,
+    PreviousInsertionsOutputs
+  >
+) => InsertionsOutputs;

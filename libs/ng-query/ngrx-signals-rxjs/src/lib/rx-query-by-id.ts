@@ -584,6 +584,7 @@ export function rxQueryById<
               NoInfer<QueryParams> | undefined
             >,
             insertions: acc as {},
+            identifier: queryConfig.identifier,
           }),
         };
       }, {} as Record<string, unknown>),

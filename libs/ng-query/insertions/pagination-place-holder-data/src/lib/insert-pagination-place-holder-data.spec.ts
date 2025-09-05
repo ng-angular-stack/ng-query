@@ -1,4 +1,4 @@
-import { signal, Signal } from '@angular/core';
+import { ResourceStatus, signal, Signal } from '@angular/core';
 import { queryById, QueryByIdRef, globalQueries } from '@ng-query/ngrx-signals';
 import { insertPaginationPlaceholderData } from './insert-pagination-place-holder-data';
 import { TestBed } from '@angular/core/testing';
@@ -33,21 +33,20 @@ describe('insertPaginationPlaceholderData', () => {
             id: string;
           }>,
           {
-            pagination: {
-              currentPage: Signal<
-                | NoInfer<{
-                    id: string;
-                    name: string;
-                  }>
-                | undefined
-              >;
-              isPlaceHolderData: Signal<boolean>;
-            };
+            currentPageData: Signal<
+              | NoInfer<{
+                  id: string;
+                  name: string;
+                }>
+              | undefined
+            >;
+            currentPageStatus: Signal<ResourceStatus | undefined>;
+            isPlaceHolderData: Signal<boolean>;
           }
         >
       >();
       expect(
-        finalResult.queryByIdRef.insertionsOutputs.pagination.currentPage
+        finalResult.queryByIdRef.insertionsOutputs.currentPageData
       ).toBeDefined();
     });
   });
@@ -80,14 +79,17 @@ describe('insertPaginationPlaceholderData', () => {
       });
       const userQuery = injectUsersQueryById();
 
-      expect(userQuery.pagination.currentPage()).toEqual(undefined);
+      expect(userQuery.currentPageData()).toEqual(undefined);
       await vi.advanceTimersByTimeAsync(15000);
-      expect(userQuery.pagination.currentPage()).toEqual([{ name: 'User1' }]);
+      expect(userQuery.currentPageData()).toEqual([{ name: 'User1' }]);
       pagination.set(2);
       await vi.advanceTimersByTimeAsync(5000);
-      expect(userQuery.pagination.currentPage()).toEqual([{ name: 'User1' }]);
+      expect(userQuery.currentPageData()).toEqual([{ name: 'User1' }]);
+      expect(userQuery.currentPageStatus()).toEqual('loading');
       await vi.advanceTimersByTimeAsync(7000);
-      expect(userQuery.pagination.currentPage()).toEqual([{ name: 'User2' }]);
+      expect(userQuery.currentPageData()).toEqual([{ name: 'User2' }]);
+      expect(userQuery.currentPageStatus()).toEqual('resolved');
+
       vi.restoreAllMocks();
     });
   });

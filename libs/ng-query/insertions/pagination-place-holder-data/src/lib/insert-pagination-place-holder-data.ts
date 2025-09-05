@@ -1,53 +1,77 @@
 import { computed, WritableSignal } from '@angular/core';
-import { ResourceByIdRef } from '@ng-query/ngrx-signals';
+import {
+  InsertionByIdParams,
+  InsertionsByIdFactory,
+  ResourceByIdRef,
+} from '@ng-query/ngrx-signals';
+import { SignalStoreFeatureResult } from '@ngrx/signals';
 
-// todo add a complete test
-// todo add an option for prefetching the next page ?
 export const insertPaginationPlaceholderData = <
-  Input,
+  Input extends SignalStoreFeatureResult,
   StoreInput,
   GroupIdentifier extends string | number,
-  ResourceState,
-  ResourceParams
+  ResourceState extends object | undefined,
+  ResourceParams,
+  PreviousInsertionsOutputs
 >({
   resourceById,
   resourceParamsSrc,
-}: {
-  input: Input;
-  store: StoreInput;
-  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
-  resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
-}) => {
-  let previousPage: GroupIdentifier | undefined;
+  identifier,
+}: InsertionByIdParams<
+  Input,
+  StoreInput,
+  GroupIdentifier,
+  ResourceState,
+  ResourceParams,
+  PreviousInsertionsOutputs
+>) => {
+  let previousPageKey: GroupIdentifier | undefined;
   const showPlaceHolderData = computed(() => {
     const page = resourceParamsSrc();
     const resources = resourceById();
-    const pageKey = page as unknown as GroupIdentifier;
+    const pageKey = page ? identifier(page) : undefined;
+    if (!pageKey) {
+      return false;
+    }
     const currentResource = resources[pageKey];
     // true if loading and previousPage is used
     if (
       currentResource?.status() === 'loading' &&
-      previousPage !== undefined &&
-      resources[previousPage]
+      previousPageKey !== undefined &&
+      resources[previousPageKey]
     ) {
       return true;
     }
     return false;
   });
   return {
-    pagination: {
-      currentPage: computed(() => {
-        const page = resourceParamsSrc();
-        const resources = resourceById();
-        const pageKey = page as unknown as GroupIdentifier;
-        const currentResource = resources[pageKey];
-        if (showPlaceHolderData()) {
-          return resources[previousPage]?.value();
-        }
-        previousPage = page as unknown as GroupIdentifier;
-        return currentResource?.value();
-      }),
-      isPlaceHolderData: showPlaceHolderData,
-    },
+    currentPageData: computed(() => {
+      const page = resourceParamsSrc();
+      const resources = resourceById();
+      const pageKey = page ? identifier(page) : undefined;
+      if (!pageKey) {
+        return;
+      }
+      const currentResource = resources[pageKey];
+
+      if (showPlaceHolderData()) {
+        return resources[previousPageKey]?.hasValue()
+          ? resources[previousPageKey]?.value()
+          : undefined;
+      }
+      previousPageKey = pageKey;
+      return currentResource?.value();
+    }),
+    currentPageStatus: computed(() => {
+      const page = resourceParamsSrc();
+      const resources = resourceById();
+      if (!page) {
+        return;
+      }
+      const pageKey = identifier(page);
+      const currentResource = resources[pageKey];
+      return currentResource?.status();
+    }),
+    isPlaceHolderData: showPlaceHolderData,
   };
 };

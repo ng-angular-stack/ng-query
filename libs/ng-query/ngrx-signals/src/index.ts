@@ -1,18 +1,27 @@
-export { withQuery, QueryRef } from './lib/with-query';
+export { withQuery } from './lib/with-query';
+export type { QueryRef } from './lib/with-query';
 export { query } from './lib/query';
-export { MutationByIdRef, withMutationById } from './lib/with-mutation-by-id';
-export { QueryByIdRef, withQueryById } from './lib/with-query-by-id';
+export type { MutationByIdRef } from './lib/with-mutation-by-id';
+export { withMutationById } from './lib/with-mutation-by-id';
+export type { QueryByIdRef } from './lib/with-query-by-id';
+export { withQueryById } from './lib/with-query-by-id';
 export { queryById } from './lib/query-by-id';
-export { withMutation, MutationRef } from './lib/with-mutation';
+export type { MutationRef } from './lib/with-mutation';
+export { withMutation } from './lib/with-mutation';
 export { mutation } from './lib/mutation';
 export { mutationById } from './lib/mutation-by-id';
-export { SignalProxy } from './lib/signal-proxy';
-export { InternalType } from './lib/types/util.type';
+export type { SignalProxy } from './lib/signal-proxy';
+export type { InternalType } from './lib/types/util.type';
 export * from './lib/types/brand';
-export { ResourceMethod, PublicSignalStore } from './lib/types/shared.type';
-export {
+export type {
+  ResourceMethod,
+  PublicSignalStore,
+} from './lib/types/shared.type';
+export type {
   InsertionsByIdFactory,
   InsertionsFactory,
+  InsertionByIdParams,
 } from './lib/core/query.core';
-export { resourceById, ResourceByIdRef } from './lib/resource-by-id';
+export { resourceById } from './lib/resource-by-id';
+export type { ResourceByIdRef } from './lib/resource-by-id';
 export { globalQueries } from './lib/global-query/global-queries';
