@@ -221,11 +221,10 @@ export function withQuery<
         const insertionsOutputs = queryConfigData.queryRef.insertionsOutputs;
 
         return {
-          [`${resourceName}Query`]: {
-            ...queryResource,
-            ...(insertionsOutputs ? insertionsOutputs : {}),
-          },
-
+          [`${resourceName}Query`]: Object.assign(
+            queryResource,
+            insertionsOutputs ?? {}
+          ),
           ...(associatedClientStates.length && {
             [`_${resourceName}Effect`]: effect(() => {
               if (!['resolved', 'local'].includes(queryResource.status())) {

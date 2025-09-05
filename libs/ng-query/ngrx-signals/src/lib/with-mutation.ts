@@ -7,11 +7,9 @@ import {
   untracked,
 } from '@angular/core';
 import {
-  Prettify,
   SignalStoreFeature,
   signalStoreFeature,
   SignalStoreFeatureResult,
-  StateSignals,
   withMethods,
   withProps,
 } from '@ngrx/signals';
@@ -238,9 +236,9 @@ export function withMutation<
   ) => QueriesMutation<
     Input,
     StoreInput,
-    NoInfer<ResourceState>,
-    NoInfer<ResourceParams>,
-    NoInfer<ResourceArgsParams>,
+    ResourceState,
+    ResourceParams,
+    ResourceArgsParams,
     false,
     unknown
   >
@@ -291,8 +289,10 @@ export function withMutation<
           queriesWithReload.length;
 
         return {
-          // todo name it mutationName Mutation (same for query)
-          [`${mutationName}Mutation`]: mutationResource,
+          [`${mutationName}Mutation`]: Object.assign(
+            mutationResource,
+            mutationConfigData.mutationRef.insertionsOutputs ?? {}
+          ),
           ...(hasQueriesEffects && {
             [`_${mutationName}Effect`]: effect(() => {
               const mutationStatus = mutationResource.status();

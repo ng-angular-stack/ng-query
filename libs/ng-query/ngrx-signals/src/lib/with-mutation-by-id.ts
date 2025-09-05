@@ -249,13 +249,12 @@ export function withMutationById<
           },
         });
         const insertionsOutputs =
-          mutationConfigData.mutationByIdRef.insertionsOutputs;
-
+          mutationConfigData.mutationByIdRef.insertionsOutputs ?? {};
         return {
-          [`${mutationName}MutationById`]: {
-            ...mutationResourcesById,
-            ...insertionsOutputs,
-          },
+          [`${mutationName}MutationById`]: Object.assign(
+            mutationResourcesById,
+            insertionsOutputs
+          ),
           ...(hasQueriesEffects && {
             [`_${mutationName}EffectById`]: effect(() => {
               // todo add test for nestedEffect !

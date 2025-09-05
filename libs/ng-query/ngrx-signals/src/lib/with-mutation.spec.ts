@@ -9,7 +9,6 @@ import {
 } from '@ngrx/signals';
 import { Expect, Equal } from 'test-type';
 import { withQuery } from './with-query';
-import { delay, lastValueFrom, of, tap } from 'rxjs';
 import { ApplicationRef, ResourceRef, signal } from '@angular/core';
 import { withMutation } from './with-mutation';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
@@ -39,14 +38,12 @@ describe('withMutation', () => {
       withMutation('updateUser', () =>
         mutation({
           method: (id: string) => ({ id }),
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated User',
-                email: 'er@d',
-              } satisfies User)
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated User',
+              email: 'er@d',
+            } satisfies User;
           },
         })
       )
@@ -68,14 +65,13 @@ describe('withMutation', () => {
       withQuery('user', (store) =>
         query({
           params: store.userSelected,
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params?.id,
-                name: 'John Doe',
-                email: 'john.doe@example.com',
-              } satisfies User).pipe(delay(2000))
-            );
+          loader: async ({ params }) => {
+            await wait(2000);
+            return {
+              id: params?.id,
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            } satisfies User;
           },
         })
       ),
@@ -84,8 +80,8 @@ describe('withMutation', () => {
         () =>
           mutation({
             method: (user: User) => user,
-            loader: ({ params: user }) => {
-              return lastValueFrom(of(user satisfies User));
+            loader: async ({ params: user }) => {
+              return user satisfies User;
             },
           }),
         () => ({
@@ -127,14 +123,13 @@ describe('withMutation', () => {
       withQuery('user', (store) =>
         query({
           params: store.userSelected,
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params?.id,
-                name: 'John Doe',
-                email: 'john.doe@example.com',
-              } satisfies User).pipe(delay(5000))
-            );
+          loader: async ({ params }) => {
+            await wait(5000);
+            return {
+              id: params?.id,
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            } satisfies User;
           },
         })
       ),
@@ -143,13 +138,9 @@ describe('withMutation', () => {
         () =>
           mutation({
             method: (user: User) => user,
-            loader: ({ params: user }) => {
-              return lastValueFrom(
-                of(user satisfies User).pipe(
-                  delay(10000),
-                  tap((data) => console.log('mutation resolved', data))
-                )
-              );
+            loader: async ({ params: user }) => {
+              await wait(10000);
+              return user satisfies User;
             },
           }),
         () => ({
@@ -194,6 +185,7 @@ describe('withMutation', () => {
   });
 
   it('#4 Should optimistic update the targeted queryById', async () => {
+    vi.useFakeTimers();
     const MutationStore = signalStore(
       withState({
         userSelected: undefined as { id: string } | undefined,
@@ -208,15 +200,13 @@ describe('withMutation', () => {
       withQueryById('user', (store) =>
         queryById({
           params: store.userSelected,
-          loader: ({ params }) => {
-            // todo wait with promise
-            return lastValueFrom(
-              of({
-                id: params?.id,
-                name: 'John Doe',
-                email: 'john.doe@example.com',
-              } satisfies User).pipe(delay(2000))
-            );
+          loader: async ({ params }) => {
+            await wait(2000);
+            return {
+              id: params?.id,
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            } satisfies User;
           },
           identifier: (params) => params.id,
         })
@@ -226,8 +216,8 @@ describe('withMutation', () => {
         (store) =>
           mutation({
             method: (user: User) => user,
-            loader: ({ params: user }) => {
-              return lastValueFrom(of(user satisfies User));
+            loader: async ({ params: user }) => {
+              return user satisfies User;
             },
           }),
         () => ({
@@ -287,9 +277,11 @@ describe('withMutation', () => {
     });
     const store = TestBed.inject(MutationStore);
     store.selectUser('1');
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
+
     const user1Query = store.userQueryById()['1'];
     expect(user1Query?.status()).toBe('resolved');
+
     expect(user1Query?.value()).toEqual({
       id: '1',
       name: 'John Doe',
@@ -300,15 +292,17 @@ describe('withMutation', () => {
       name: 'Updated User',
       email: 'updated.user@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(user1Query?.status()).toBe('local');
     expect(user1Query?.value()).toEqual({
       id: '1',
       name: 'Updated User',
       email: 'updated.user@example.com',
     });
+    vi.resetAllMocks();
   });
   it('#5 Should optimistic update multiples targeted queryById with id > 5', async () => {
+    vi.useFakeTimers();
     const MutationStore = signalStore(
       withState({
         userSelected: undefined as { id: string } | undefined,
@@ -323,14 +317,13 @@ describe('withMutation', () => {
       withQueryById('user', (store) =>
         queryById({
           params: store.userSelected,
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params?.id,
-                name: 'John Doe',
-                email: 'john.doe@example.com',
-              } satisfies User).pipe(delay(2000))
-            );
+          loader: async ({ params }) => {
+            await wait(2000);
+            return {
+              id: params?.id,
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            } satisfies User;
           },
           identifier: (params) => params.id,
         })
@@ -340,8 +333,8 @@ describe('withMutation', () => {
         (store) =>
           mutation({
             method: (user: User) => user,
-            loader: ({ params: user }) => {
-              return lastValueFrom(of(user satisfies User));
+            loader: async ({ params: user }) => {
+              return user satisfies User;
             },
           }),
         () => ({
@@ -364,19 +357,19 @@ describe('withMutation', () => {
       )
     );
     TestBed.configureTestingModule({
-      providers: [MutationStore, ApplicationRef],
+      providers: [MutationStore],
     });
     const store = TestBed.inject(MutationStore);
     store.selectUser('1');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('2');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('6');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('7');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('8');
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
 
     const user1Query = store.userQueryById()['1'];
     expect(user1Query?.status()).toBe('resolved');
@@ -394,7 +387,7 @@ describe('withMutation', () => {
       name: 'Updated User',
       email: 'updated.user@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     // not changed
     expect(user1Query?.status()).toBe('resolved');
     expect(user2Query?.status()).toBe('resolved');
@@ -420,8 +413,10 @@ describe('withMutation', () => {
       name: 'Updated User',
       email: 'updated.user@example.com',
     });
+    vi.resetAllMocks();
   });
   it('#6 Should reload multiples targeted queryById with id > 5', async () => {
+    vi.useFakeTimers();
     const MutationStore = signalStore(
       withState({
         userSelected: undefined as { id: string } | undefined,
@@ -436,14 +431,13 @@ describe('withMutation', () => {
       withQueryById('user', (store) =>
         queryById({
           params: store.userSelected,
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params?.id,
-                name: 'John Doe',
-                email: 'john.doe@example.com',
-              } satisfies User).pipe(delay(2000))
-            );
+          loader: async ({ params }) => {
+            await wait(2000);
+            return {
+              id: params?.id,
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            } satisfies User;
           },
           identifier: (params) => params.id,
         })
@@ -453,8 +447,8 @@ describe('withMutation', () => {
         (store) =>
           mutation({
             method: (user: User) => user,
-            loader: ({ params: user }) => {
-              return lastValueFrom(of(user satisfies User));
+            loader: async ({ params: user }) => {
+              return user satisfies User;
             },
           }),
         () => ({
@@ -473,19 +467,19 @@ describe('withMutation', () => {
       )
     );
     TestBed.configureTestingModule({
-      providers: [MutationStore, ApplicationRef],
+      providers: [MutationStore],
     });
     const store = TestBed.inject(MutationStore);
     store.selectUser('1');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('2');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('6');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('7');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('8');
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
 
     const user1Query = store.userQueryById()['1'];
     expect(user1Query?.status()).toBe('resolved');
@@ -509,7 +503,7 @@ describe('withMutation', () => {
       name: 'Updated User',
       email: 'updated.user@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     // not changed
     expect(user1QueryReloadSpy.mock.calls.length).toBe(0);
     expect(user2QueryReloadSpy.mock.calls.length).toBe(0);
@@ -518,9 +512,11 @@ describe('withMutation', () => {
     expect(user6QueryReloadSpy.mock.calls.length).toBe(1);
     expect(user7QueryReloadSpy.mock.calls.length).toBe(1);
     expect(user8QueryReloadSpy.mock.calls.length).toBe(1);
+    vi.resetAllMocks();
   });
 
   it('#7 Should optimistic patch multiples targeted queryById with id > 5', async () => {
+    vi.useFakeTimers();
     const MutationStore = signalStore(
       withState({
         userSelected: undefined as { id: string } | undefined,
@@ -535,14 +531,13 @@ describe('withMutation', () => {
       withQueryById('user', (store) =>
         queryById({
           params: store.userSelected,
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params?.id,
-                name: 'John Doe',
-                email: 'john.doe@example.com',
-              } satisfies User).pipe(delay(2000))
-            );
+          loader: async ({ params }) => {
+            await wait(2000);
+            return {
+              id: params?.id,
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+            } satisfies User;
           },
           identifier: (params) => params.id,
         })
@@ -552,8 +547,8 @@ describe('withMutation', () => {
         (store) =>
           mutation({
             method: (user: User) => user,
-            loader: ({ params: user }) => {
-              return lastValueFrom(of(user satisfies User));
+            loader: async ({ params: user }) => {
+              return user satisfies User;
             },
           }),
         () => ({
@@ -613,19 +608,19 @@ describe('withMutation', () => {
       )
     );
     TestBed.configureTestingModule({
-      providers: [MutationStore, ApplicationRef],
+      providers: [MutationStore],
     });
     const store = TestBed.inject(MutationStore);
     store.selectUser('1');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('2');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('6');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('7');
-    await wait();
+    await vi.runAllTimersAsync();
     store.selectUser('8');
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
 
     const user1Query = store.userQueryById()['1'];
     expect(user1Query?.status()).toBe('resolved');
@@ -643,7 +638,7 @@ describe('withMutation', () => {
       name: 'Updated User',
       email: 'updated.user@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     // not changed
     expect(user1Query?.status()).toBe('resolved');
     expect(user2Query?.status()).toBe('resolved');
@@ -682,44 +677,39 @@ it('Should be well typed', () => {
     withQuery('user', () =>
       query({
         params: () => '5',
-        loader: ({ params }) => {
-          return lastValueFrom(
-            of({
-              id: params,
-              name: 'John Doe',
-              email: 'test@a.com',
-            } satisfies User as User)
-          );
+        loader: async ({ params }) => {
+          return {
+            id: params,
+            name: 'John Doe',
+            email: 'test@a.com',
+          } satisfies User as User;
         },
       })
     ),
     withQuery('users', () =>
       query({
         params: () => '5',
-        loader: ({ params }) => {
-          return lastValueFrom(
-            of([
-              {
-                id: params,
-                name: 'John Doe',
-                email: 'test@a.com',
-              },
-            ] satisfies User[])
-          );
+        loader: async ({ params }) => {
+          return [
+            {
+              id: params,
+              name: 'John Doe',
+              email: 'test@a.com',
+            },
+          ] satisfies User[];
         },
       })
     ),
     withMutation('updateUserAddress', (store) =>
       mutation({
         params: store.userSelected,
-        loader: ({ params }) => {
-          return lastValueFrom(
-            of({
-              id: params.id,
-              name: 'Updated User',
-              email: 'er@d',
-            } satisfies User).pipe(delay(2000))
-          );
+        loader: async ({ params }) => {
+          await wait(2000);
+          return {
+            id: params.id,
+            name: 'Updated User',
+            email: 'er@d',
+          } satisfies User;
         },
       })
     ),
@@ -728,14 +718,12 @@ it('Should be well typed', () => {
       (store) =>
         mutation({
           params: store.userSelected,
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated Name',
-                email: 'er@d',
-              } satisfies User)
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: 'er@d',
+            } satisfies User;
           },
         }),
       (store) => {
@@ -827,14 +815,12 @@ it('Should expose a method', () => {
     withMutation('user', () =>
       mutation({
         method: (data: { page: string }) => data.page,
-        loader: ({ params }) => {
-          return lastValueFrom(
-            of({
-              id: params,
-              name: 'Updated User',
-              email: 'er@d',
-            } satisfies User)
-          );
+        loader: async ({ params }) => {
+          return {
+            id: params,
+            name: 'Updated User',
+            email: 'er@d',
+          } satisfies User;
         },
       })
     )
@@ -900,17 +886,15 @@ it('Should accept the store without loosing typing', () => {
     withMutation('updateUser', (store) =>
       mutation({
         params: store.sourceId,
-        loader: ({ params }) => {
+        loader: async ({ params }) => {
           type ExpectParamsToBeAnObjectWithStringId = Expect<
             Equal<typeof params, { id: string }>
           >;
-          return lastValueFrom(
-            of({
-              id: params.id,
-              name: 'Updated User',
-              email: 'er@d',
-            } satisfies User)
-          );
+          return {
+            id: params.id,
+            name: 'Updated User',
+            email: 'er@d',
+          } satisfies User;
         },
       })
     )
@@ -927,17 +911,15 @@ it('Should expose the mutation resource and mutation method', () => {
     withMutation('user', (store) =>
       mutation({
         params: store.sourceId,
-        loader: ({ params }) => {
+        loader: async ({ params }) => {
           type ExpectParamsToBeAnObjectWithStringId = Expect<
             Equal<typeof params, { id: string }>
           >;
-          return lastValueFrom(
-            of({
-              id: params.id,
-              name: 'Updated User',
-              email: 'er@d',
-            } satisfies User)
-          );
+          return {
+            id: params.id,
+            name: 'Updated User',
+            email: 'er@d',
+          } satisfies User;
         },
       })
     ),
@@ -946,17 +928,15 @@ it('Should expose the mutation resource and mutation method', () => {
         method: ({ id }: { id: string }) => ({
           id,
         }),
-        loader: ({ params }) => {
+        loader: async ({ params }) => {
           type ExpectParamsToBeAnObjectWithStringId = Expect<
             Equal<typeof params, { id: string }>
           >;
-          return lastValueFrom(
-            of({
-              id: params.id,
-              name: 'Updated User',
-              email: 'er@d',
-            } satisfies User)
-          );
+          return {
+            id: params.id,
+            name: 'Updated User',
+            email: 'er@d',
+          } satisfies User;
         },
       })
     )
@@ -989,13 +969,9 @@ it('it should expose the mutation params source, that will be reused by query', 
     withMutation('updateUser', () =>
       mutation({
         method: (user: User) => user,
-        loader: ({ params: user }) => {
-          return lastValueFrom(
-            of(user satisfies User).pipe(
-              delay(10),
-              tap((data) => console.log('mutation resolved', data))
-            )
-          );
+        loader: async ({ params: user }) => {
+          await wait(10);
+          return user satisfies User;
         },
       })
     )

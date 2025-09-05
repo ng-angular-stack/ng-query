@@ -12,8 +12,6 @@ import { query } from '../query';
 import { mutation } from '../mutation';
 import { queryById } from '../query-by-id';
 
-// todo queryById
-// todo expose inject funtion
 describe('Global Queries', () => {
   it('should create a cached query and return a withFeatureQuery that can be used in signalStore', async () => {
     const data = globalQueries({

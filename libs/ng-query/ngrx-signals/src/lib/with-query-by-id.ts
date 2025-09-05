@@ -280,10 +280,10 @@ export function withQueryById<
         });
 
         return {
-          [`${resourceName}QueryById`]: {
-            ...queryResourcesById,
-            ...queryConfigData.queryByIdRef.insertionsOutputs,
-          },
+          [`${resourceName}QueryById`]: Object.assign(
+            queryResourcesById,
+            queryConfigData.queryByIdRef.insertionsOutputs ?? {}
+          ),
           ...(associatedClientStates.length && {
             [`_${resourceName}EffectById`]: effect(() => {
               // todo add test for nestedEffect !
