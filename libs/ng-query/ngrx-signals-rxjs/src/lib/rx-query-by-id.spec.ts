@@ -6,6 +6,7 @@ import { Expect, Equal } from 'test-type';
 import { signalStore } from '@ngrx/signals';
 import {
   InternalType,
+  QueryByIdRef,
   ResourceByIdRef,
   withQueryById,
 } from '@ng-query/ngrx-signals';
@@ -99,13 +100,9 @@ describe('rxResourceById', () => {
     );
     type ExpectTypeWithInsertions = Expect<
       Equal<
-        ReturnType<typeof result>['queryByIdRef'],
+        ReturnType<typeof result>['queryByIdRef']['insertionsOutputs'],
         {
-          resourceById: ResourceByIdRef<string, User>;
-          resourceParamsSrc: WritableSignal<string | undefined>;
-          InsertionsOutputs: {
-            pagination: number;
-          };
+          pagination: number;
         }
       >
     >;

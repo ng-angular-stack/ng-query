@@ -39,11 +39,13 @@ export type MutationByIdRef<
   GroupIdentifier extends string | number,
   ResourceState,
   ResourceParams,
-  ParamsArgs
+  ParamsArgs,
+  InsertionsOutput
 > = {
   resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
   method: ResourceMethod<ParamsArgs, ResourceParams> | undefined;
+  insertionsOutputs: InsertionsOutput;
 };
 
 // TODO find a way to access to a resourceRef without userQueryById() because it will be updated each time the query is updated
@@ -53,14 +55,15 @@ type WithMutationByIdOutputStoreConfig<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  GroupIdentifier extends string | number
+  GroupIdentifier extends string | number,
+  InsertionsOutput
 > = {
   state: {};
   props: MergeObject<
     {
-      [key in `${ResourceName & string}MutationById`]: ResourceByIdRef<
-        GroupIdentifier,
-        ResourceState
+      [key in `${ResourceName & string}MutationById`]: MergeObject<
+        ResourceByIdRef<GroupIdentifier, ResourceState>,
+        InsertionsOutput
       >;
     },
     {
@@ -139,7 +142,8 @@ export function withMutationById<
   ResourceParams,
   ResourceArgsParams,
   GroupIdentifier extends string | number,
-  const StoreInput extends PublicSignalStore<Input>
+  const StoreInput extends PublicSignalStore<Input>,
+  InsertionsOutput
 >(
   mutationName: ResourceName,
   mutationFactory: (store: StoreInput) => (
@@ -150,7 +154,8 @@ export function withMutationById<
       NoInfer<GroupIdentifier>,
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
-      NoInfer<ResourceArgsParams>
+      NoInfer<ResourceArgsParams>,
+      InsertionsOutput
     >;
   } & {
     __types: InternalType<
@@ -179,7 +184,8 @@ export function withMutationById<
     ResourceState,
     ResourceParams,
     ResourceArgsParams,
-    GroupIdentifier
+    GroupIdentifier,
+    InsertionsOutput
   >
 > {
   return ((context: SignalStoreFeatureResult) => {
@@ -243,9 +249,14 @@ export function withMutationById<
             return newKeys.length > 0 ? { newKeys } : previous?.value;
           },
         });
+        const insertionsOutputs =
+          mutationConfigData.mutationByIdRef.insertionsOutputs;
 
         return {
-          [`${mutationName}MutationById`]: mutationResourcesById,
+          [`${mutationName}MutationById`]: {
+            ...mutationResourcesById,
+            ...insertionsOutputs,
+          },
           ...(hasQueriesEffects && {
             [`_${mutationName}EffectById`]: effect(() => {
               // todo add test for nestedEffect !
@@ -345,7 +356,8 @@ export function withMutationById<
       ResourceState,
       ResourceParams,
       ResourceArgsParams,
-      GroupIdentifier
+      GroupIdentifier,
+      InsertionsOutput
     >
   >;
 }

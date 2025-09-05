@@ -14,7 +14,6 @@ import {
   SignalStoreFeature,
   signalStoreFeature,
   SignalStoreFeatureResult,
-  StateSignals,
   withProps,
   WritableStateSource,
 } from '@ngrx/signals';

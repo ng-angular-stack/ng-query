@@ -32,10 +32,16 @@ import {
 } from './types/shared.type';
 import { ResourceByIdRef } from './resource-by-id';
 
-export type MutationRef<ResourceState, ResourceParams, ParamsArgs> = {
+export type MutationRef<
+  ResourceState,
+  ResourceParams,
+  ParamsArgs,
+  InsertionsOutput
+> = {
   resource: ResourceRef<ResourceState | undefined>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
   method: ResourceMethod<ParamsArgs, ResourceParams> | undefined;
+  insertionsOutputs: InsertionsOutput;
 };
 type OptimisticMutationQuery<
   QueryAndMutationRecord extends QueryAndMutationRecordConstraints
@@ -169,12 +175,16 @@ type MutationStoreOutput<
   MutationName extends string,
   MutationState,
   MutationParams,
-  MutationArgsParams
+  MutationArgsParams,
+  InsertionsOutputs
 > = {
   state: {};
   props: MergeObject<
     {
-      [key in `${MutationName}Mutation`]: ResourceRef<MutationState>;
+      [key in `${MutationName}Mutation`]: MergeObject<
+        ResourceRef<MutationState>,
+        InsertionsOutputs
+      >;
     },
     {
       /**
@@ -201,7 +211,8 @@ export function withMutation<
   const MutationName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
-  ResourceArgsParams
+  ResourceArgsParams,
+  InsertionsOutputs
 >(
   mutationName: MutationName,
   mutationFactory: (store: StoreInput) => (

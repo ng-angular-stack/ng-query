@@ -3,6 +3,7 @@ import {
   Injector,
   runInInjectionContext,
   ApplicationRef,
+  inject,
 } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
@@ -134,5 +135,59 @@ describe('rxResourceById', () => {
         >
       >
     >;
+  });
+
+  it('should accept seven inserts, all outputs appear in the store', () => {
+    const Store = signalStore(
+      {
+        providedIn: 'root',
+      },
+      withMutationById('user', () =>
+        rxMutationById(
+          {
+            params: () => '5',
+            stream: ({ params }) => {
+              return of({
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              });
+            },
+            identifier: (params) => params,
+          },
+          // insert 1
+          () => ({ ext1: 1 }),
+          // insert 2
+          ({ insertions: inserts }) => ({ ext2: inserts.ext1 + 1 }),
+          // insert 3
+          ({ insertions: inserts }) => ({ ext3: inserts.ext2 + 1 }),
+          // insert 4
+          ({ insertions: inserts }) => ({ ext4: inserts.ext3 + 1 }),
+          // insert 5
+          ({ insertions: inserts }) => ({ ext5: inserts.ext4 + 1 }),
+          // insert 6
+          ({ insertions: inserts }) => ({ ext6: inserts.ext5 + 1 }),
+          // insert 7
+          ({ insertions: inserts }) => ({ ext7: inserts.ext6 + 1 })
+        )
+      )
+    );
+    TestBed.runInInjectionContext(() => {
+      const store = inject(Store);
+      expectTypeOf(store.userMutationById.ext1).toEqualTypeOf<number>();
+      expectTypeOf(store.userMutationById.ext2).toEqualTypeOf<number>();
+      expectTypeOf(store.userMutationById.ext3).toEqualTypeOf<number>();
+      expectTypeOf(store.userMutationById.ext4).toEqualTypeOf<number>();
+      expectTypeOf(store.userMutationById.ext5).toEqualTypeOf<number>();
+      expectTypeOf(store.userMutationById.ext6).toEqualTypeOf<number>();
+      expectTypeOf(store.userMutationById.ext7).toEqualTypeOf<number>();
+      expect(store.userMutationById.ext1).toBeDefined();
+      expect(store.userMutationById.ext2).toBeDefined();
+      expect(store.userMutationById.ext3).toBeDefined();
+      expect(store.userMutationById.ext4).toBeDefined();
+      expect(store.userMutationById.ext5).toBeDefined();
+      expect(store.userMutationById.ext6).toBeDefined();
+      expect(store.userMutationById.ext7).toBeDefined();
+    });
   });
 });

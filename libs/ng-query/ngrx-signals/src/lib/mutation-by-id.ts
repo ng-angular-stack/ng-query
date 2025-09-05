@@ -1,14 +1,40 @@
-import {
-  Prettify,
-  SignalStoreFeatureResult,
-  StateSignals,
-} from '@ngrx/signals';
+import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { ResourceByIdConfig } from './types/resource-by-id-config.type';
 import { InternalType } from './types/util.type';
 import { MutationByIdRef } from './with-mutation-by-id';
 import { signal, WritableSignal } from '@angular/core';
 import { resourceById } from './resource-by-id';
 import { PublicSignalStore } from './types/shared.type';
+
+type MutationByIdOutput<
+  StoreInput extends PublicSignalStore<Input>,
+  Input extends SignalStoreFeatureResult,
+  MutationGroupIdentifier extends string | number,
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams
+> = (
+  store: StoreInput,
+  context: Input
+) => {
+  mutationByIdRef: MutationByIdRef<
+    NoInfer<MutationGroupIdentifier>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
+    NoInfer<MutationArgsParams>,
+    {}
+  >;
+  /**
+   * Only used to help type inference, not used in the actual implementation.
+   */
+  __types: InternalType<
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
+    NoInfer<MutationArgsParams>,
+    true,
+    NoInfer<MutationGroupIdentifier>
+  >;
+};
 
 export function mutationById<
   MutationState extends object | undefined,
@@ -24,27 +50,14 @@ export function mutationById<
     MutationArgsParams,
     MutationGroupIdentifier
   >
-): (
-  store: StoreInput,
-  context: Input
-) => {
-  mutationByIdRef: MutationByIdRef<
-    NoInfer<MutationGroupIdentifier>,
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
-    NoInfer<MutationArgsParams>
-  >;
-  /**
-   * Only used to help type inference, not used in the actual implementation.
-   */
-  __types: InternalType<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
-    NoInfer<MutationArgsParams>,
-    true,
-    NoInfer<MutationGroupIdentifier>
-  >;
-} {
+): MutationByIdOutput<
+  StoreInput,
+  Input,
+  MutationGroupIdentifier,
+  MutationState,
+  MutationParams,
+  MutationArgsParams
+> {
   const mutationResourceParamsFnSignal = signal<MutationParams | undefined>(
     undefined
   );
