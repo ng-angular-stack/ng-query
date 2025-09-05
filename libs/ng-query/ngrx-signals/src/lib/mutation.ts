@@ -68,13 +68,10 @@ export function mutation<
   const StoreInput extends PublicSignalStore<Input>,
   Insertion1
 >(
-  mutationConfig: Omit<
-    ResourceWithParamsOrParamsFn<
-      MutationState,
-      MutationParams,
-      MutationArgsParams
-    >,
-    'method'
+  mutationConfig: ResourceWithParamsOrParamsFn<
+    MutationState,
+    MutationParams,
+    MutationArgsParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<Input>,
@@ -100,13 +97,10 @@ export function mutation<
   Insertion1,
   Insertion2
 >(
-  mutationConfig: Omit<
-    ResourceWithParamsOrParamsFn<
-      MutationState,
-      MutationParams,
-      MutationArgsParams
-    >,
-    'method'
+  mutationConfig: ResourceWithParamsOrParamsFn<
+    MutationState,
+    MutationParams,
+    MutationArgsParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<Input>,
@@ -141,13 +135,10 @@ export function mutation<
   Insertion2,
   Insertion3
 >(
-  mutationConfig: Omit<
-    ResourceWithParamsOrParamsFn<
-      MutationState,
-      MutationParams,
-      MutationArgsParams
-    >,
-    'method'
+  mutationConfig: ResourceWithParamsOrParamsFn<
+    MutationState,
+    MutationParams,
+    MutationArgsParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<Input>,
@@ -191,13 +182,10 @@ export function mutation<
   Insertion3,
   Insertion4
 >(
-  mutationConfig: Omit<
-    ResourceWithParamsOrParamsFn<
-      MutationState,
-      MutationParams,
-      MutationArgsParams
-    >,
-    'method'
+  mutationConfig: ResourceWithParamsOrParamsFn<
+    MutationState,
+    MutationParams,
+    MutationArgsParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<Input>,
@@ -250,13 +238,10 @@ export function mutation<
   Insertion4,
   Insertion5
 >(
-  mutationConfig: Omit<
-    ResourceWithParamsOrParamsFn<
-      MutationState,
-      MutationParams,
-      MutationArgsParams
-    >,
-    'method'
+  mutationConfig: ResourceWithParamsOrParamsFn<
+    MutationState,
+    MutationParams,
+    MutationArgsParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<Input>,
@@ -318,13 +303,10 @@ export function mutation<
   Insertion5,
   Insertion6
 >(
-  mutationConfig: Omit<
-    ResourceWithParamsOrParamsFn<
-      MutationState,
-      MutationParams,
-      MutationArgsParams
-    >,
-    'method'
+  mutationConfig: ResourceWithParamsOrParamsFn<
+    MutationState,
+    MutationParams,
+    MutationArgsParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<Input>,
@@ -395,13 +377,10 @@ export function mutation<
   Insertion6,
   Insertion7
 >(
-  mutationConfig: Omit<
-    ResourceWithParamsOrParamsFn<
-      MutationState,
-      MutationParams,
-      MutationArgsParams
-    >,
-    'method'
+  mutationConfig: ResourceWithParamsOrParamsFn<
+    MutationState,
+    MutationParams,
+    MutationArgsParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<Input>,
