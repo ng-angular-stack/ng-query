@@ -338,6 +338,7 @@ describe('Declarative server state, withQuery using rxQuery and withMutation', (
   });
 
   it('2- withQuery should reload on mutation error', async () => {
+    vi.useFakeTimers();
     const Store = signalStore(
       withMutation('userEmail', () =>
         mutation({
@@ -394,19 +395,20 @@ describe('Declarative server state, withQuery using rxQuery and withMutation', (
     });
     const store = TestBed.inject(Store);
 
-    await wait(20);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
 
     store.mutateUserEmail({
       id: '5',
       email: 'mutated@test.com',
     });
-    await wait(1);
+    await vi.advanceTimersByTimeAsync(1);
     expect(store.userEmailMutation.status()).toBe('error');
-    await wait(1);
     expect(store.userQuery.status()).toBe('reloading');
+    vi.resetAllMocks();
   });
   it('3- withQuery should reload on mutation error if mutation params id is "error"', async () => {
+    vi.useFakeTimers();
     const Store = signalStore(
       withMutation('userEmail', () =>
         mutation({
@@ -464,31 +466,32 @@ describe('Declarative server state, withQuery using rxQuery and withMutation', (
     });
     const store = TestBed.inject(Store);
 
-    await wait(30);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
 
     store.mutateUserEmail({
       id: '5',
       email: 'mutated@test.com',
     });
-    await wait(1);
+    await vi.runAllTimersAsync();
     expect(store.userEmailMutation.status()).toBe('error');
-    await wait(1);
     expect(store.userQuery.status()).toBe('resolved');
 
     store.mutateUserEmail({
       id: 'error',
       email: 'mutated@test.com',
     });
-    await wait(1);
+    await vi.advanceTimersByTimeAsync(5);
     expect(store.userEmailMutation.status()).toBe('error');
-    await wait(1);
     expect(store.userQuery.status()).toBe('reloading');
-    await wait(100);
+    await vi.runAllTimersAsync();
+
     expect(store.userQuery.status()).toBe('resolved');
+    vi.resetAllMocks();
   });
 
   it('4- withQuery should handle optimisticPatch', async () => {
+    vi.useFakeTimers();
     const Store = signalStore(
       withMutation('userEmail', () =>
         mutation({
@@ -540,7 +543,7 @@ describe('Declarative server state, withQuery using rxQuery and withMutation', (
     });
     const store = TestBed.inject(Store);
 
-    await wait(30);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
     console.log('will mutate');
     store.mutateUserEmail({
@@ -549,11 +552,10 @@ describe('Declarative server state, withQuery using rxQuery and withMutation', (
     });
     console.log('mutated');
 
-    await wait(3);
-    console.log('store.userQuery.status()', store.userQuery.status());
+    await vi.advanceTimersByTimeAsync(5);
     expect(store.userQuery.status()).toBe('local');
-    console.log('store.userQuery.value().email', store.userQuery.value().email);
     expect(store.userQuery.value().email).toBe('mutated@test.com');
+    vi.resetAllMocks();
   });
 });
 

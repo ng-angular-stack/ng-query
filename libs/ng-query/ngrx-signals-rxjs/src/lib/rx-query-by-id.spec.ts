@@ -1,15 +1,10 @@
-import { ApplicationRef, inject, WritableSignal } from '@angular/core';
+import { ApplicationRef, inject } from '@angular/core';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxQueryById } from './rx-query-by-id';
 import { Expect, Equal } from 'test-type';
 import { signalStore } from '@ngrx/signals';
-import {
-  InternalType,
-  QueryByIdRef,
-  ResourceByIdRef,
-  withQueryById,
-} from '@ng-query/ngrx-signals';
+import { InternalType, withQueryById } from '@ng-query/ngrx-signals';
 type User = {
   id: string;
   name: string;
@@ -82,30 +77,32 @@ describe('rxResourceById', () => {
     });
   });
   it('should accept an Insertions output, that appear in the store', () => {
-    const result = rxQueryById(
-      {
-        params: () => '5',
-        identifier: (params) => params,
-        stream: ({ params }) => {
-          return of({
-            id: params,
-            name: 'John Doe',
-            email: 'test@a.com',
-          } satisfies User);
-        },
-      },
-      () => ({
-        pagination: 1,
-      })
-    );
-    type ExpectTypeWithInsertions = Expect<
-      Equal<
-        ReturnType<typeof result>['queryByIdRef']['insertionsOutputs'],
+    TestBed.runInInjectionContext(() => {
+      const result = rxQueryById(
         {
-          pagination: number;
-        }
-      >
-    >;
+          params: () => '5',
+          identifier: (params) => params,
+          stream: ({ params }) => {
+            return of({
+              id: params,
+              name: 'John Doe',
+              email: 'test@a.com',
+            } satisfies User);
+          },
+        },
+        () => ({
+          pagination: 1,
+        })
+      );
+      type ExpectTypeWithInsertions = Expect<
+        Equal<
+          ReturnType<typeof result>['queryByIdRef']['insertionsOutputs'],
+          {
+            pagination: number;
+          }
+        >
+      >;
+    });
   });
 });
 
