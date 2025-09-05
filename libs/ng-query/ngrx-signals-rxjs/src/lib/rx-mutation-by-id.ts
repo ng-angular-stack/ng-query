@@ -40,6 +40,7 @@ type RxMutationByIdOutput<
     NoInfer<MutationGroupIdentifier>
   >;
 };
+
 export function rxMutationById<
   MutationState extends object | undefined,
   MutationParams,

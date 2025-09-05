@@ -60,8 +60,8 @@ describe('mutationById', () => {
       {
         providedIn: 'root',
       },
-      withQueryById('user', () =>
-        queryById(
+      withMutationById('user', () =>
+        mutationById(
           {
             params: () => '5',
             loader: ({ params }) => {
@@ -88,10 +88,10 @@ describe('mutationById', () => {
     );
     TestBed.runInInjectionContext(() => {
       const store = inject(Store);
-      expectTypeOf(store.userQueryById.pagination).toEqualTypeOf<{
+      expectTypeOf(store.userMutationById.pagination).toEqualTypeOf<{
         page: number;
       }>();
-      expect(store.userQueryById.pagination).toBeDefined();
+      expect(store.userMutationById.pagination).toBeDefined();
     });
   });
   it('should accept multiple insertions, that appear in the store', () => {
