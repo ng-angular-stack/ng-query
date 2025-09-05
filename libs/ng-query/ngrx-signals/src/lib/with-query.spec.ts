@@ -1,4 +1,3 @@
-import { delay, lastValueFrom, map, of } from 'rxjs';
 import { Expect, Equal } from 'test-type';
 import {
   signalStore,
@@ -29,19 +28,23 @@ type User = {
 };
 
 describe('withQuery', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it('1- Should expose a query resource', () => {
     const Store = signalStore(
       withQuery('user', () =>
         query({
           params: () => '5',
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params,
-                name: 'John Doe',
-                email: 'test@a.com',
-              })
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params,
+              name: 'John Doe',
+              email: 'test@a.com',
+            };
           },
         })
       )
@@ -60,14 +63,12 @@ describe('withQuery', () => {
       withQuery('user', () =>
         query({
           params: () => undefined,
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params,
-                name: 'John Doe',
-                email: 'test@a.com',
-              })
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params,
+              name: 'John Doe',
+              email: 'test@a.com',
+            };
           },
         })
       )
@@ -86,14 +87,13 @@ describe('withQuery', () => {
       withQuery('user', () =>
         query({
           params: () => '5',
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params,
-                name: 'John Doe',
-                email: 'test@a.com',
-              }).pipe(delay(100))
-            );
+          loader: async ({ params }) => {
+            await wait(10);
+            return {
+              id: params,
+              name: 'John Doe',
+              email: 'test@a.com',
+            };
           },
         })
       )
@@ -107,21 +107,18 @@ describe('withQuery', () => {
     expect(store.userQuery.status()).toBe('loading');
   });
 
-  // todo tester avec fakeAsync et withRxQuery
-
   it('4 should have resolved status when loader completes successfully', async () => {
     const Store = signalStore(
       withQuery('user', () =>
         query({
           params: () => '5',
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params,
-                name: 'John Doe',
-                email: 'test@a.com',
-              }).pipe(delay(1))
-            );
+          loader: async ({ params }) => {
+            await wait(1000);
+            return {
+              id: params,
+              name: 'John Doe',
+              email: 'test@a.com',
+            };
           },
         })
       )
@@ -135,7 +132,7 @@ describe('withQuery', () => {
     expect(store.userQuery.value()).toEqual(undefined);
 
     // Wait for the query to resolve
-    await wait(40);
+    await vi.runAllTimersAsync();
 
     expect(store.userQuery.status()).toBe('resolved');
     expect(store.userQuery.value()).toEqual({
@@ -164,8 +161,7 @@ describe('withQuery', () => {
               },
             });
 
-            // Add a delay of 200ms before returning the response
-            await new Promise((resolve) => setTimeout(resolve, 50));
+            await wait(50);
 
             // Update the value after 300ms
             setTimeout(() => {
@@ -189,14 +185,15 @@ describe('withQuery', () => {
 
     expect(store.userQuery.value()).toEqual(undefined);
     expect(store.userQuery.status()).toEqual('loading');
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await vi.advanceTimersByTimeAsync(100);
 
     expect(store.userQuery.status()).toEqual('resolved');
     expect(store.userQuery.value()).toEqual({
       count: 5,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await vi.advanceTimersByTimeAsync(100);
+
     expect(store.userQuery.value()).toEqual({
       count: 6,
     });
@@ -219,7 +216,7 @@ describe('withQuery', () => {
           query({
             params: () => '5',
             loader: async ({ params }) => {
-              await new Promise((resolve) => setTimeout(resolve, 10));
+              await wait(10000);
               console.log('newUser', newUser);
               return newUser;
             },
@@ -244,7 +241,7 @@ describe('withQuery', () => {
     });
     const store = TestBed.inject(Store);
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toEqual('resolved');
     expect(store.user()).toEqual(newUser);
     expect(store.userSelected()).toEqual({
@@ -254,6 +251,12 @@ describe('withQuery', () => {
 });
 
 describe('Declarative server state, withQuery and withMutation', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it('1- withQuery should handle optimistic updates', async () => {
     const Store = signalStore(
       withMutation('userEmail', () =>
@@ -262,14 +265,12 @@ describe('Declarative server state, withQuery and withMutation', () => {
             id,
             email,
           }),
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated Name',
-                email: params.email,
-              } satisfies User)
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: params.email,
+            } satisfies User;
           },
         })
       ),
@@ -309,14 +310,14 @@ describe('Declarative server state, withQuery and withMutation', () => {
     });
     const store = TestBed.inject(Store);
 
-    await wait(30);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
 
     store.mutateUserEmail({
       id: '5',
       email: 'mutated@test.com',
     });
-    await wait(30);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('local');
     expect(store.userQuery.value().email).toBe('mutated@test.com');
   });
@@ -329,19 +330,13 @@ describe('Declarative server state, withQuery and withMutation', () => {
             id,
             email,
           }),
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated Name',
-                email: params.email,
-              } satisfies User).pipe(
-                map((data) => {
-                  throw new Error('Error during mutation');
-                  return data;
-                })
-              )
-            );
+          loader: async ({ params }) => {
+            throw new Error('Error during mutation');
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: params.email,
+            } satisfies User;
           },
         })
       ),
@@ -354,7 +349,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
               type _StreamResponseTypeRetrieved = Expect<
                 Equal<typeof params, string>
               >;
-              await wait(10);
+              await wait(10000);
               return {
                 id: params,
                 name: 'John Doe',
@@ -379,16 +374,15 @@ describe('Declarative server state, withQuery and withMutation', () => {
     });
     const store = TestBed.inject(Store);
 
-    await wait(20);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
 
     store.mutateUserEmail({
       id: '5',
       email: 'mutated@test.com',
     });
-    await wait(1);
+    await vi.advanceTimersByTimeAsync(2000);
     expect(store.userEmailMutation.status()).toBe('error');
-    await wait(1);
     expect(store.userQuery.status()).toBe('reloading');
   });
   it('3- withQuery should reload on mutation error if mutation params id is "error"', async () => {
@@ -399,19 +393,17 @@ describe('Declarative server state, withQuery and withMutation', () => {
             id,
             email,
           }),
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated Name',
-                email: params.email,
-              } satisfies User).pipe(
-                map((data) => {
-                  throw new Error('Error during mutation');
-                  return data;
-                })
-              )
-            );
+          loader: async ({ params }) => {
+            await wait(1000);
+            console.log('b reject');
+            await Promise.reject(new Error('Error during mutation'));
+            console.log('a reject');
+
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: params.email,
+            } satisfies User;
           },
         })
       ),
@@ -424,7 +416,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
               type _StreamResponseTypeRetrieved = Expect<
                 Equal<typeof params, string>
               >;
-              await wait(10);
+              await wait(10000);
               return {
                 id: params,
                 name: 'John Doe',
@@ -450,27 +442,27 @@ describe('Declarative server state, withQuery and withMutation', () => {
     });
     const store = TestBed.inject(Store);
 
-    await wait(30);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
 
     store.mutateUserEmail({
       id: '5',
       email: 'mutated@test.com',
     });
-    await wait(1);
+    await vi.advanceTimersByTimeAsync(5000);
     expect(store.userEmailMutation.status()).toBe('error');
-    await wait(1);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
 
     store.mutateUserEmail({
       id: 'error',
       email: 'mutated@test.com',
     });
-    await wait(1);
+    await vi.advanceTimersByTimeAsync(2000);
     expect(store.userEmailMutation.status()).toBe('error');
-    await wait(1);
+    await vi.advanceTimersByTimeAsync(2000);
     expect(store.userQuery.status()).toBe('reloading');
-    await wait(100);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
   });
 
@@ -482,14 +474,12 @@ describe('Declarative server state, withQuery and withMutation', () => {
             id,
             email,
           }),
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated Name',
-                email: params.email,
-              } satisfies User)
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: params.email,
+            } satisfies User;
           },
         })
       ),
@@ -499,7 +489,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
           query({
             params: () => '5',
             loader: async ({ params }) => {
-              await wait(10);
+              await wait(10000);
               return {
                 id: params,
                 name: 'John Doe',
@@ -527,25 +517,20 @@ describe('Declarative server state, withQuery and withMutation', () => {
     });
     const store = TestBed.inject(Store);
 
-    await wait(30);
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
     console.log('will mutate');
     store.mutateUserEmail({
       id: '5',
       email: 'mutated@test.com',
     });
-    console.log('mutated');
 
-    await wait(3);
-    console.log('store.userQuery.status()', store.userQuery.status());
+    await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('local');
-    console.log('store.userQuery.value().email', store.userQuery.value().email);
     expect(store.userQuery.value().email).toBe('mutated@test.com');
   });
 
   it('5- Should handle withMutationById reactions effect', async () => {
-    vi.useFakeTimers();
-
     const returnedUser = (id: string) => ({
       id: `${id}`,
       name: 'John Doe',
@@ -562,8 +547,10 @@ describe('Declarative server state, withQuery and withMutation', () => {
             return user;
           },
           identifier: (params) => params.id,
-          loader: ({ params }) =>
-            lastValueFrom(of<User>(params).pipe(delay(1000))),
+          loader: async ({ params }) => {
+            await wait(1000);
+            return params;
+          },
         })
       ),
       withQuery(
@@ -573,7 +560,7 @@ describe('Declarative server state, withQuery and withMutation', () => {
             params: () => '5',
             loader: async ({ params }) => {
               await wait(10000);
-              return lastValueFrom(of<User>(returnedUser(params)));
+              return returnedUser(params);
             },
           }),
         () => ({
@@ -621,14 +608,12 @@ describe('Declarative server state, withQuery and withMutation', () => {
         query(
           {
             params: () => '5',
-            loader: ({ params }) => {
-              return lastValueFrom(
-                of({
-                  id: params,
-                  name: 'John Doe',
-                  email: 'test@a.com',
-                } satisfies User)
-              );
+            loader: async ({ params }) => {
+              return {
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              } satisfies User;
             },
           },
           (data) => {
@@ -663,14 +648,12 @@ describe('withQuery typing', () => {
     const queryByIdTest = withQuery('user', () =>
       query({
         params: () => '5',
-        loader: ({ params }) => {
-          return lastValueFrom(
-            of({
-              id: params,
-              name: 'John Doe',
-              email: 'test@a.com',
-            } satisfies User)
-          );
+        loader: async ({ params }) => {
+          return {
+            id: params,
+            name: 'John Doe',
+            email: 'test@a.com',
+          } satisfies User;
         },
       })
     );
@@ -714,7 +697,7 @@ describe('withQuery typing', () => {
         (store) =>
           query({
             params: store.userSelected,
-            loader: ({ params }) => {
+            loader: async ({ params }) => {
               type _ExpectParamsToBeTyped = Expect<
                 Equal<
                   typeof params,
@@ -723,13 +706,11 @@ describe('withQuery typing', () => {
                   }
                 >
               >;
-              return lastValueFrom(
-                of<User>({
-                  id: 'params.id',
-                  name: 'John Doe',
-                  email: 'test@a.com',
-                })
-              );
+              return <User>{
+                id: 'params.id',
+                name: 'John Doe',
+                email: 'test@a.com',
+              };
             },
           }),
         () => ({
@@ -742,16 +723,14 @@ describe('withQuery typing', () => {
       withQuery('users', (store) =>
         query({
           params: () => '5',
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of([
-                {
-                  id: params,
-                  name: 'John Doe',
-                  email: 'test@a.com',
-                },
-              ] satisfies User[])
-            );
+          loader: async ({ params }) => {
+            return [
+              {
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              },
+            ] satisfies User[];
           },
         })
       )
@@ -791,13 +770,11 @@ describe('withQuery typing', () => {
             params: () => ({
               id: '5',
             }),
-            loader: () => {
-              return lastValueFrom(
-                of<Omit<User, 'id'>>({
-                  name: 'John Doe',
-                  email: 'test@a.com',
-                })
-              );
+            loader: async () => {
+              return <Omit<User, 'id'>>{
+                name: 'John Doe',
+                email: 'test@a.com',
+              };
             },
           }),
         () => ({
@@ -825,28 +802,24 @@ describe('withQuery typing', () => {
       withMutation('userName', () =>
         mutation({
           method: (id: string) => ({ id }),
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated Name',
-                email: 'er@d',
-              } satisfies User)
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: 'er@d',
+            } satisfies User;
           },
         })
       ),
       withMutation('userEmail', () =>
         mutation({
           method: (id: string) => ({ id }),
-          loader: ({ params }) => {
-            return lastValueFrom(
-              of({
-                id: params.id,
-                name: 'Updated Name',
-                email: 'er@d',
-              } satisfies User)
-            );
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: 'er@d',
+            } satisfies User;
           },
         })
       ),
@@ -855,14 +828,12 @@ describe('withQuery typing', () => {
         () =>
           query({
             params: () => ({ id: '5' }),
-            loader: ({ params }) => {
-              return lastValueFrom(
-                of({
-                  id: params.id,
-                  name: 'John Doe',
-                  email: '',
-                } satisfies User)
-              );
+            loader: async ({ params }) => {
+              return {
+                id: params.id,
+                name: 'John Doe',
+                email: '',
+              } satisfies User;
             },
           }),
         () => ({
