@@ -25,19 +25,25 @@ export function withCachedQueryToPlugFactory<
   name: QueryName,
   querySourceProxy: SignalProxy<PlugData, true>,
   queryRef: (injector: Injector) => {
-    queryRef: QueryRef<QueryState, QueryParams, InsertionsOutputs>;
+    queryRef: QueryRef<
+      NoInfer<QueryState>,
+      NoInfer<QueryParams>,
+      InsertionsOutputs
+    >;
     __types: InternalType<QueryState, QueryParams, unknown, false>;
   }
 ) {
   return <
     Input extends SignalStoreFeatureResult,
-    const StoreInput extends PublicSignalStore<Input>
+    const StoreInput extends Prettify<
+      StateSignals<Input['state']> & Input['props'] & Input['methods']
+    >
   >(
     options?: QueryOptions<
       StoreInput,
       Input,
-      QueryState,
-      QueryParams,
+      NoInfer<QueryState>,
+      NoInfer<QueryParams>,
       unknown,
       {
         setQuerySource?: IsPluggableQuery extends true

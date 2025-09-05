@@ -12,6 +12,8 @@ Ajout des tests manquants en même temps
 
 ## Feature
 
+- hide internal type from the props store
+- Revoir la doc globalqueries pour expliquer le plug
 - Finir d'ajouter les insertions (les prendres en compte dans les inject & with fonction renvoyées)
 - Ajouter comment & doc sur pagination & au hover fonction
 - Regarder pourquoi globalQueries n'est pas typé quand on créé les query

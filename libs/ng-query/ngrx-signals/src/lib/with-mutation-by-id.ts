@@ -12,7 +12,6 @@ import {
   SignalStoreFeature,
   signalStoreFeature,
   SignalStoreFeatureResult,
-  StateSignals,
   withMethods,
   withProps,
 } from '@ngrx/signals';

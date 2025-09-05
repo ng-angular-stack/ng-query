@@ -76,8 +76,8 @@ export type QueryOptions<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  OtherProperties extends Record<string, unknown> = {}
-> = (store: NoInfer<StoreInput>) => {
+  OtherProperties
+> = (store: StoreInput) => {
   /**
    * Will update the state at the given path with the resource data.
    * If the type of targeted state does not match the type of the resource,
@@ -144,14 +144,15 @@ export function withQuery<
   ResourceParams,
   ResourceArgsParams,
   const StoreInput extends PublicSignalStore<Input>,
-  InsertionsOutputs
+  InsertionsOutputs,
+  OtherProperties
 >(
   resourceName: ResourceName,
   queryFactory: (
-    store: NoInfer<StoreInput>,
+    store: StoreInput,
     injector: Injector
   ) => (
-    store: NoInfer<StoreInput>,
+    store: StoreInput,
     context: Input
   ) => {
     queryRef: QueryRef<
@@ -170,9 +171,10 @@ export function withQuery<
   optionsFactory?: QueryOptions<
     StoreInput,
     Input,
-    NoInfer<ResourceState>,
-    NoInfer<ResourceParams>,
-    NoInfer<ResourceArgsParams>
+    ResourceState,
+    ResourceParams,
+    ResourceArgsParams,
+    OtherProperties
   >
 ): SignalStoreFeature<
   Input,
