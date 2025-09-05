@@ -33,6 +33,7 @@ import {
   setOptimisticUpdateFromMutationOnQueryValue,
   triggerQueryReloadOnMutationStatusChange,
 } from './core/query.core';
+import { PublicSignalStore } from './types/shared.type';
 
 export type QueryByIdRef<
   GroupIdentifier extends string | number,
@@ -82,9 +83,7 @@ type WithQueryByIdOutputStoreConfig<
 };
 
 export type QueryByIdOptions<
-  StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  StoreInput extends PublicSignalStore<Input>,
   Input extends SignalStoreFeatureResult,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -175,9 +174,7 @@ export function withQueryById<
   ResourceParams,
   ResourceArgsParams,
   GroupIdentifier extends string | number,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutputs,
   OtherProperties
 >(

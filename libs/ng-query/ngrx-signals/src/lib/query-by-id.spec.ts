@@ -55,7 +55,7 @@ describe('queryById', () => {
     });
   });
 
-  it('should accept an insert output, that appear in the store', () => {
+  it('should accept an insertion output, that appear in the store', () => {
     const Store = signalStore(
       {
         providedIn: 'root',
@@ -94,7 +94,7 @@ describe('queryById', () => {
       expect(store.userQueryById.pagination).toBeDefined();
     });
   });
-  it('should accept multiple inserts, that appear in the store', () => {
+  it('should accept multiple insertions, that appear in the store', () => {
     const Store = signalStore(
       {
         providedIn: 'root',
@@ -149,7 +149,7 @@ describe('queryById', () => {
       expect(store.userQueryById.someOtherInfo).toBeDefined();
     });
   });
-  it('should accept seven inserts, all outputs appear in the store', () => {
+  it('should accept seven insertions, all outputs appear in the store', () => {
     const Store = signalStore(
       {
         providedIn: 'root',

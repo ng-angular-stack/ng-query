@@ -6,6 +6,11 @@ import {
 } from './access-type-object-property-by-dotted-path.type';
 import { InternalType, MergeObjects } from './util.type';
 import { ResourceByIdRef } from '../resource-by-id';
+import {
+  Prettify,
+  SignalStoreFeatureResult,
+  StateSignals,
+} from '@ngrx/signals';
 
 // todo rename, and rename server state constraints
 export type QueryAndMutationRecordConstraints = {
@@ -163,3 +168,6 @@ export type FilterQueryById<
 export type ResourceMethod<ParamsArgs, ResourceParams> = (
   args: ParamsArgs
 ) => ResourceParams;
+
+export type PublicSignalStore<Input extends SignalStoreFeatureResult> =
+  Prettify<StateSignals<Input['state']> & Input['props'] & Input['methods']>;

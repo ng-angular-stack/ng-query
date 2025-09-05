@@ -1,8 +1,4 @@
-import {
-  Prettify,
-  SignalStoreFeatureResult,
-  StateSignals,
-} from '@ngrx/signals';
+import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { ResourceByIdConfig } from './types/resource-by-id-config.type';
 import { InternalType } from './types/util.type';
 import { QueryByIdRef } from './with-query-by-id';
@@ -10,10 +6,7 @@ import { signal, WritableSignal } from '@angular/core';
 import { resourceById } from './resource-by-id';
 import { __INTERNAL_QueryBrand } from './types/brand';
 import { InsertionsByIdFactory } from './core/query.core';
-
-type PublicSignalStore<Input extends SignalStoreFeatureResult> = Prettify<
-  StateSignals<Input['state']> & Input['props'] & Input['methods']
->;
+import { PublicSignalStore } from './types/shared.type';
 
 type QueryByIdOutput<
   StoreInput extends PublicSignalStore<Input>,

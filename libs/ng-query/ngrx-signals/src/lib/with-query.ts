@@ -32,6 +32,7 @@ import {
 } from './core/query.core';
 import { ResourceByIdRef } from './resource-by-id';
 import { nestedEffect } from './types/util';
+import { PublicSignalStore } from './types/shared.type';
 
 export type QueryRef<ResourceState, ResourceParams, InsertionsOutput> = {
   resource: ResourceRef<ResourceState | undefined>;
@@ -70,9 +71,7 @@ type WithQueryOutputStoreConfig<
 };
 
 export type QueryOptions<
-  StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  StoreInput extends PublicSignalStore<Input>,
   Input extends SignalStoreFeatureResult,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -144,9 +143,7 @@ export function withQuery<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutputs
 >(
   resourceName: ResourceName,

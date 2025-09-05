@@ -12,15 +12,14 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { MutationRef } from './with-mutation';
+import { PublicSignalStore } from './types/shared.type';
 
 export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  const StoreInput extends PublicSignalStore<Input>
 >(
   mutationConfig: ResourceWithParamsOrParamsFn<
     MutationState,

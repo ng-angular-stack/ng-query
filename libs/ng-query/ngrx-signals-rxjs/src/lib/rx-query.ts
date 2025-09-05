@@ -4,7 +4,7 @@ import {
   StateSignals,
 } from '@ngrx/signals';
 import { RxResourceWithParamsOrParamsFn } from './types/rx-resource-with-params-or-params-fn.type';
-import { InternalType } from '@ng-query/ngrx-signals';
+import { InternalType, PublicSignalStore } from '@ng-query/ngrx-signals';
 import { QueryRef } from '@ng-query/ngrx-signals';
 import { Signal, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
@@ -18,9 +18,7 @@ export function rxQuery<
   QueryParams,
   QueryArgsParams,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput
 >(
   queryConfig: Omit<

@@ -16,15 +16,14 @@ import {
 } from '@angular/core';
 import { __INTERNAL_QueryBrand } from './types/brand';
 import { InsertionsFactory } from './core/query.core';
+import { PublicSignalStore } from './types/shared.type';
 
 export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput
 >(
   queryConfig: Omit<

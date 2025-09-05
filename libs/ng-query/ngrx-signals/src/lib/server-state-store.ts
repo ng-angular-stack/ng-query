@@ -18,6 +18,7 @@ import {
   SignalWrapperParams,
 } from './signal-proxy';
 import { SignalStoreHooks } from './inner-signal-store';
+import { PublicSignalStore } from './types/shared.type';
 
 // todo add more tests with withUserServerState, is global or not, pluggable or not
 
@@ -92,11 +93,7 @@ export function ServerStateStore<
     PluggableConfigInner
   >(
     config?: PluggableConfigInner extends {}
-      ? (
-          store: Prettify<
-            StateSignals<Input['state']> & Input['props'] & Input['methods']
-          >
-        ) => PluggableConfigInner
+      ? (store: PublicSignalStore<Input>) => PluggableConfigInner
       : never
   ): SignalStoreFeature<Input, SignalStoreFeatureResultInfer> => {
     if (isGlobalStore) {

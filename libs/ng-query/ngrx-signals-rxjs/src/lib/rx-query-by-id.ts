@@ -10,16 +10,13 @@ import {
   __INTERNAL_QueryBrand,
   InsertionsByIdFactory,
   InternalType,
+  PublicSignalStore,
   QueryByIdRef,
 } from '@ng-query/ngrx-signals';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-type PublicStore<Input extends SignalStoreFeatureResult> = Prettify<
-  StateSignals<Input['state']> & Input['props'] & Input['methods']
->;
-
 type RxQueryByIdOutput<
-  StoreInput extends PublicStore<Input>,
+  StoreInput extends PublicSignalStore<Input>,
   Input extends SignalStoreFeatureResult,
   QueryGroupIdentifier extends string | number,
   QueryState extends object | undefined,
@@ -52,9 +49,7 @@ export function rxQueryById<
   QueryArgsParams,
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2
 >(
@@ -99,9 +94,7 @@ export function rxQueryById<
   QueryArgsParams,
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3
@@ -156,9 +149,7 @@ export function rxQueryById<
   QueryArgsParams,
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -223,9 +214,7 @@ export function rxQueryById<
   QueryArgsParams,
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -307,9 +296,7 @@ export function rxQueryById<
   QueryArgsParams,
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -406,9 +393,7 @@ export function rxQueryById<
   QueryArgsParams,
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -521,9 +506,7 @@ export function rxQueryById<
   QueryArgsParams,
   QueryGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  const StoreInput extends PublicSignalStore<Input>
 >(
   queryConfig: Omit<
     RxResourceByIdConfig<

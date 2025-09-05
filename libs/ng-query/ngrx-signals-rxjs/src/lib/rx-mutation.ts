@@ -4,7 +4,7 @@ import {
   StateSignals,
 } from '@ngrx/signals';
 import { RxResourceWithParamsOrParamsFn } from './types/rx-resource-with-params-or-params-fn.type';
-import { InternalType } from '@ng-query/ngrx-signals';
+import { InternalType, PublicSignalStore } from '@ng-query/ngrx-signals';
 import { signal, WritableSignal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { MutationRef } from '@ng-query/ngrx-signals';
@@ -14,9 +14,7 @@ export function rxMutation<
   MutationParams,
   MutationArgsParams,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  const StoreInput extends PublicSignalStore<Input>
 >(
   mutationConfig: RxResourceWithParamsOrParamsFn<
     MutationState,

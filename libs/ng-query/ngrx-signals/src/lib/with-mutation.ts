@@ -28,6 +28,7 @@ import {
   QueryAndMutationRecordConstraints,
   FilterQueryById,
   ResourceMethod,
+  PublicSignalStore,
 } from './types/shared.type';
 import { ResourceByIdRef } from './resource-by-id';
 
@@ -106,9 +107,7 @@ export type QueryImperativeEffect<
 
 export type QueriesMutation<
   Input extends SignalStoreFeatureResult,
-  StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  StoreInput extends PublicSignalStore<Input>,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -198,9 +197,7 @@ type MutationStoreOutput<
 };
 export function withMutation<
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >,
+  const StoreInput extends PublicSignalStore<Input>,
   const MutationName extends string,
   ResourceState extends object | undefined,
   ResourceParams,

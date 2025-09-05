@@ -23,6 +23,7 @@ import {
   QueryAndMutationRecordConstraints,
   FilterQueryById,
   ResourceMethod,
+  PublicSignalStore,
 } from './types/shared.type';
 import {
   QueriesMutation,
@@ -138,9 +139,7 @@ export function withMutationById<
   ResourceParams,
   ResourceArgsParams,
   GroupIdentifier extends string | number,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  const StoreInput extends PublicSignalStore<Input>
 >(
   mutationName: ResourceName,
   mutationFactory: (store: StoreInput) => (

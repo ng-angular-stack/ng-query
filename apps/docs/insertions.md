@@ -8,6 +8,7 @@ Insertions are a powerful mechanism to extend the behavior and shape of your que
 - **Custom Side Effects:** Insertions can be used to add custom side effects to the query. For example, you can implement features like `preservePreviousValue` to keep showing the previous value while a new value is loading.
 - **Composable:** Insertions are composable. Each insertion can access the results of previous insertions, allowing you to build up complex behaviors from simple, reusable functions.
 - **Reusable:** Insertion functions can be easily reused across different queries, promoting DRY and maintainable code.
+- **Runs in Injection Context:** Insertions are executed within Angular's injection context, allowing you to use dependency injection and access Angular services seamlessly.
 
 ## Example: Adding Two Insertions
 

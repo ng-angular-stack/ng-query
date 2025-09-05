@@ -3,7 +3,7 @@ import {
   SignalStoreFeatureResult,
   StateSignals,
 } from '@ngrx/signals';
-import { InternalType } from '@ng-query/ngrx-signals';
+import { InternalType, PublicSignalStore } from '@ng-query/ngrx-signals';
 import { MutationByIdRef } from '@ng-query/ngrx-signals';
 import { signal, WritableSignal } from '@angular/core';
 import { RxResourceByIdConfig } from './types/rx-resource-by-id-config.type';
@@ -16,9 +16,7 @@ export function rxMutationById<
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  const StoreInput extends PublicSignalStore<Input>
 >(
   mutationConfig: RxResourceByIdConfig<
     MutationState,

@@ -8,6 +8,7 @@ import { InternalType } from './types/util.type';
 import { MutationByIdRef } from './with-mutation-by-id';
 import { signal, WritableSignal } from '@angular/core';
 import { resourceById } from './resource-by-id';
+import { PublicSignalStore } from './types/shared.type';
 
 export function mutationById<
   MutationState extends object | undefined,
@@ -15,9 +16,7 @@ export function mutationById<
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
   Input extends SignalStoreFeatureResult,
-  const StoreInput extends Prettify<
-    StateSignals<Input['state']> & Input['props'] & Input['methods']
-  >
+  const StoreInput extends PublicSignalStore<Input>
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,

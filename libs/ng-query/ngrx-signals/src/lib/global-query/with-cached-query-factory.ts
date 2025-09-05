@@ -12,6 +12,7 @@ import {
   QueryByIdRef,
   withQueryById,
 } from '../with-query-by-id';
+import { PublicSignalStore } from '../types/shared.type';
 
 export function withCachedQueryToPlugFactory<
   const QueryName extends string,
@@ -30,9 +31,7 @@ export function withCachedQueryToPlugFactory<
 ) {
   return <
     Input extends SignalStoreFeatureResult,
-    const StoreInput extends Prettify<
-      StateSignals<Input['state']> & Input['props'] & Input['methods']
-    >
+    const StoreInput extends PublicSignalStore<Input>
   >(
     options?: QueryOptions<
       StoreInput,
@@ -95,9 +94,7 @@ export function withCachedQueryByIdToPlugFactory<
 ) {
   return <
     Input extends SignalStoreFeatureResult,
-    const StoreInput extends Prettify<
-      StateSignals<Input['state']> & Input['props'] & Input['methods']
-    >
+    const StoreInput extends PublicSignalStore<Input>
   >(
     options?: QueryByIdOptions<
       StoreInput,
