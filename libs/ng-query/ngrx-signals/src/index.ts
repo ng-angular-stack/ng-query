@@ -10,6 +10,9 @@ export { SignalProxy } from './lib/signal-proxy';
 export { InternalType } from './lib/types/util.type';
 export * from './lib/types/brand';
 export { ResourceMethod, PublicSignalStore } from './lib/types/shared.type';
-export { InsertionsByIdFactory } from './lib/core/query.core';
+export {
+  InsertionsByIdFactory,
+  InsertionsFactory,
+} from './lib/core/query.core';
 export { resourceById, ResourceByIdRef } from './lib/resource-by-id';
 export { globalQueries } from './lib/global-query/global-queries';
