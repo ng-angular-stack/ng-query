@@ -8,6 +8,7 @@ import {
   InjectionToken,
   linkedSignal,
   WritableSignal,
+  computed,
 } from '@angular/core';
 import { RxResourceOptions } from '@angular/core/rxjs-interop';
 import { preservedRxResource } from './preserved-rx-resource';
@@ -27,9 +28,14 @@ export function rxResourceById<T, R, GroupIdentifier extends string | number>({
   identifier,
   params,
   stream,
+  equalParams,
 }: Omit<RxResourceOptions<T, R>, 'params'> & {
   params: () => R; // must be a mandatory field
   identifier: (request: NonNullable<NoInfer<R>>) => GroupIdentifier;
+  equalParams?:
+    | 'default'
+    | 'useIdentifier'
+    | ((a: R, b: R, identifierFn: (params: R) => GroupIdentifier) => boolean);
 }): RxResourceByIdRef<GroupIdentifier, T> {
   const injector = inject(Injector);
 
@@ -37,6 +43,12 @@ export function rxResourceById<T, R, GroupIdentifier extends string | number>({
   const resourceByGroup = signal<
     Partial<Record<GroupIdentifier, ResourceRef<T>>>
   >({});
+
+  const resourceEqualParams =
+    equalParams === 'useIdentifier'
+      ? (a: NonNullable<R>, b: NonNullable<R>) =>
+          identifier(a) === identifier(b)
+      : equalParams;
 
   // this effect is used to create a mapped ResourceRef instance
   effect(() => {
@@ -68,13 +80,15 @@ export function rxResourceById<T, R, GroupIdentifier extends string | number>({
         return incomingRequestValue;
       },
     });
-
+    //@ts-expect-error TypeScript misinterpreting
+    const paramsWithEqualRule = computed(() => filteredRequestByGroup(), {
+      ...(equalParams !== 'default' && { equal: resourceEqualParams }),
+    });
     const resourceRef = createDynamicRxResource(injector, {
       group,
       resourceOptions: {
         stream,
-        //@ts-ignore
-        params: filteredRequestByGroup,
+        params: paramsWithEqualRule,
       },
     });
 

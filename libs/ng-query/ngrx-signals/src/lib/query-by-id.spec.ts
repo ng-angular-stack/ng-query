@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { lastValueFrom, of } from 'rxjs';
 import { Expect, Equal } from 'test-type';
-import { inject, Injector, runInInjectionContext } from '@angular/core';
+import { inject, Injector, runInInjectionContext, signal } from '@angular/core';
 import { queryById } from './query-by-id';
 import { signalStore } from '@ngrx/signals';
 import { withQueryById } from './with-query-by-id';
@@ -204,4 +204,49 @@ describe('queryById', () => {
       expect(store.userQueryById.ext7).toBeDefined();
     });
   });
+
+  it('should be adapted for pagination, not reload the resource when coming back to an existing resource generated (the source can change but it should preserve the result).', async () => {
+    vi.useFakeTimers();
+
+    await TestBed.runInInjectionContext(async () => {
+      const source = signal({ page: 1, pageSize: 10 });
+      const result = queryById({
+        params: source,
+        identifier: (params) => params.page,
+        loader: async ({ params }) => {
+          await wait(2000);
+          return {
+            id: '' + params.page,
+            name: 'John Doe',
+            email: 'test@a.com',
+          } satisfies User;
+        },
+      })({} as any, {} as any);
+      expect(result.queryByIdRef).toBeDefined();
+
+      await vi.runAllTimersAsync();
+
+      source.set({ page: 2, pageSize: 10 });
+
+      await vi.runAllTimersAsync();
+
+      const resource1 = result.queryByIdRef.resourceById()[1];
+      const resource2 = result.queryByIdRef.resourceById()[2];
+
+      await vi.runAllTimersAsync();
+      expect(resource1?.status()).toEqual('resolved');
+      expect(resource2?.status()).toEqual('resolved');
+
+      source.set({ page: 1, pageSize: 10 });
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(resource1?.status()).toEqual('resolved');
+
+      vi.resetAllMocks();
+    });
+  });
 });
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

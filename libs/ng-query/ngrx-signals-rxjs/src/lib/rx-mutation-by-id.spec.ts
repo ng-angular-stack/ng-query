@@ -5,7 +5,7 @@ import {
   ApplicationRef,
   inject,
 } from '@angular/core';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, delay, of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxMutationById } from './rx-mutation-by-id';
 import { Expect, Equal } from 'test-type';
@@ -188,6 +188,43 @@ describe('rxResourceById', () => {
       expect(store.userMutationById.ext5).toBeDefined();
       expect(store.userMutationById.ext6).toBeDefined();
       expect(store.userMutationById.ext7).toBeDefined();
+    });
+  });
+
+  it('it should trigger again the stream of an existing resource, when the params are coming back to an existing resource (the source can change and it should trigger the stream).', async () => {
+    vi.useFakeTimers();
+
+    await TestBed.runInInjectionContext(async () => {
+      const source = signal({ page: 1, pageSize: 10 });
+      const result = rxMutationById({
+        params: source,
+        identifier: (params) => params.page,
+        stream: ({ params }) => {
+          return of({
+            id: '' + params.page,
+            name: 'John Doe',
+            email: 'test@a.com',
+          }).pipe(delay(2000));
+        },
+      })({} as any, {} as any);
+      expect(result.mutationByIdRef).toBeDefined();
+
+      await vi.runAllTimersAsync();
+      source.set({ page: 2, pageSize: 10 });
+      await vi.runAllTimersAsync();
+
+      const resource1 = result.mutationByIdRef.resourceById()[1];
+      const resource2 = result.mutationByIdRef.resourceById()[2];
+
+      expect(resource1?.status()).toEqual('resolved');
+      expect(resource2?.status()).toEqual('resolved');
+
+      source.set({ page: 1, pageSize: 10 });
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(resource1?.status()).toEqual('loading');
+
+      vi.resetAllMocks();
     });
   });
 });

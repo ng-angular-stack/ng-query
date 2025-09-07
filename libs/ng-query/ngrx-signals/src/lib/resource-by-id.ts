@@ -10,7 +10,9 @@ import {
   InjectionToken,
   linkedSignal,
   WritableSignal,
+  computed,
 } from '@angular/core';
+import { preservedResource } from './preserved-resource';
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -27,9 +29,15 @@ export function resourceById<T, R, GroupIdentifier extends string | number>({
   identifier,
   params,
   loader,
+  stream,
+  equalParams,
 }: Omit<ResourceOptions<T, R>, 'params'> & {
   params: () => R; // must be a mandatory field
   identifier: (request: NonNullable<NoInfer<R>>) => GroupIdentifier;
+  equalParams?:
+    | 'default'
+    | 'useIdentifier'
+    | ((a: R, b: R, identifierFn: (params: R) => GroupIdentifier) => boolean);
 }): ResourceByIdRef<GroupIdentifier, T> {
   const injector = inject(Injector);
 
@@ -37,6 +45,12 @@ export function resourceById<T, R, GroupIdentifier extends string | number>({
   const resourceByGroup = signal<
     Partial<Record<GroupIdentifier, ResourceRef<T>>>
   >({});
+
+  const resourceEqualParams =
+    equalParams === 'useIdentifier'
+      ? (a: NonNullable<R>, b: NonNullable<R>) =>
+          identifier(a) === identifier(b)
+      : equalParams;
 
   // this effect is used to create a mapped ResourceRef instance
   effect(() => {
@@ -69,12 +83,18 @@ export function resourceById<T, R, GroupIdentifier extends string | number>({
       },
     });
 
+    //@ts-expect-error TypeScript misinterpreting
+    const paramsWithEqualRule = computed(() => filteredRequestByGroup(), {
+      ...(equalParams !== 'default' && { equal: resourceEqualParams }),
+    });
+
     const resourceRef = createDynamicResource(injector, {
       group,
+      //@ts-expect-error stream and loader conflict
       resourceOptions: {
         loader,
-        //@ts-ignore
-        params: filteredRequestByGroup,
+        params: paramsWithEqualRule,
+        stream,
       },
     });
 
@@ -114,7 +134,7 @@ function createDynamicResource<T, R, GroupIdentifier extends string | number>(
     providers: [
       {
         provide: RESOURCE_INSTANCE_TOKEN,
-        useFactory: () => resource(resourceConfig.resourceOptions),
+        useFactory: () => preservedResource(resourceConfig.resourceOptions),
       },
     ],
     parent: parentInjector,

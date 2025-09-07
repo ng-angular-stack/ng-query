@@ -1,5 +1,5 @@
-import { ApplicationRef, inject } from '@angular/core';
-import { BehaviorSubject, of, Subject } from 'rxjs';
+import { inject, signal } from '@angular/core';
+import { BehaviorSubject, delay, of, Subject, tap } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { rxQueryById } from './rx-query-by-id';
 import { Expect, Equal } from 'test-type';
@@ -104,10 +104,51 @@ describe('rxResourceById', () => {
       >;
     });
   });
+
+  it('should be adapted for pagination, not reload the resource when coming back to an existing resource generated (the source can change but it should preserve the result).', async () => {
+    vi.useFakeTimers();
+
+    await TestBed.runInInjectionContext(async () => {
+      const source = signal({ page: 1, pageSize: 10 });
+      const result = rxQueryById({
+        params: source,
+        identifier: (params) => params.page,
+        stream: ({ params }) => {
+          return of({
+            id: '' + params.page,
+            name: 'John Doe',
+            email: 'test@a.com',
+          } satisfies User).pipe(delay(2000));
+        },
+      })({} as any, {} as any);
+      expect(result.queryByIdRef).toBeDefined();
+
+      await vi.runAllTimersAsync();
+
+      source.set({ page: 2, pageSize: 10 });
+
+      await vi.runAllTimersAsync();
+
+      const resource1 = result.queryByIdRef.resourceById()[1];
+      const resource2 = result.queryByIdRef.resourceById()[2];
+
+      await vi.runAllTimersAsync();
+      expect(resource1?.status()).toEqual('resolved');
+      expect(resource2?.status()).toEqual('resolved');
+
+      source.set({ page: 1, pageSize: 10 });
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(resource1?.status()).toEqual('resolved');
+
+      vi.resetAllMocks();
+    });
+  });
 });
 
 describe('rxQueryById used with: withQueryById', () => {
   it('1- Should expose a query with a record of resource by id', async () => {
+    vi.useFakeTimers();
     const returnedUser = {
       id: '5',
       name: 'John Doe',
@@ -126,13 +167,13 @@ describe('rxQueryById used with: withQueryById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
 
     expect(store.userQueryById).toBeDefined();
 
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
   });
 

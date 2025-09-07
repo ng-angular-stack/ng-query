@@ -113,7 +113,7 @@ describe('RxResourceWithParamsOrParamsFn Type', () => {
       Equal<typeof argsReturned, { id: string; name: string; email: string }>
     >;
 
-    //@ts-expect-error
+    //@ts-expect-error not allowed to have both
     const noBoth = test({
       params: () => 'test' as const,
       method: () => 'test' as const,
@@ -140,7 +140,7 @@ describe('RxResourceWithParamsOrParamsFn Type', () => {
   });
 
   it('should not accept params$ and method together', () => {
-    //@ts-expect-error
+    //@ts-expect-error not allowed to have both
     const noBoth = test({
       method: () => 'test' as const,
       params$: of('test' as const),

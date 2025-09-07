@@ -570,8 +570,10 @@ export function queryById<
     QueryGroupIdentifier
   >({
     ...queryConfig,
+    //@ts-expect-error TS type error
     params: resourceParamsSrc,
-  } as any);
+    equalParams: queryConfig.equalParams ?? 'useIdentifier',
+  });
   return (store, context) => ({
     queryByIdRef: {
       resourceById: queryResourcesById,

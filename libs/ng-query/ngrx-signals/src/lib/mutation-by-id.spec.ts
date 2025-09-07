@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { lastValueFrom, of } from 'rxjs';
-import { inject, Injector, runInInjectionContext } from '@angular/core';
+import { inject, Injector, runInInjectionContext, signal } from '@angular/core';
 import { mutationById } from './mutation-by-id';
 import { Expect, Equal } from 'test-type';
 import { signalStore } from '@ngrx/signals';
@@ -206,4 +206,46 @@ describe('mutationById', () => {
       expect(store.userMutationById.ext7).toBeDefined();
     });
   });
+
+  it('it should trigger again the stream of an existing resource, when the params are coming back to an existing resource (the source can change and it should trigger the stream).', async () => {
+    vi.useFakeTimers();
+
+    await TestBed.runInInjectionContext(async () => {
+      const source = signal({ page: 1, pageSize: 10 });
+      const result = mutationById({
+        params: source,
+        identifier: (params) => params.page,
+        loader: async ({ params }) => {
+          await wait(2000);
+          return {
+            id: '' + params.page,
+            name: 'John Doe',
+            email: 'test@a.com',
+          };
+        },
+      })({} as any, {} as any);
+      expect(result.mutationByIdRef).toBeDefined();
+
+      await vi.runAllTimersAsync();
+      source.set({ page: 2, pageSize: 10 });
+      await vi.runAllTimersAsync();
+
+      const resource1 = result.mutationByIdRef.resourceById()[1];
+      const resource2 = result.mutationByIdRef.resourceById()[2];
+
+      expect(resource1?.status()).toEqual('resolved');
+      expect(resource2?.status()).toEqual('resolved');
+
+      source.set({ page: 1, pageSize: 10 });
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(resource1?.status()).toEqual('loading');
+
+      vi.resetAllMocks();
+    });
+  });
 });
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

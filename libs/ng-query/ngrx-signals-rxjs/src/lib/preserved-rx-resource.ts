@@ -1,7 +1,4 @@
-import {
-  linkedSignal,
-  ResourceRef,
-} from '@angular/core';
+import { linkedSignal, ResourceRef } from '@angular/core';
 import { rxResource, RxResourceOptions } from '@angular/core/rxjs-interop';
 
 export function preservedRxResource<T, R>(

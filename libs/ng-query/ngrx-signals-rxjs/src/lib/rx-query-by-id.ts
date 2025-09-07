@@ -1,8 +1,4 @@
-import {
-  Prettify,
-  SignalStoreFeatureResult,
-  StateSignals,
-} from '@ngrx/signals';
+import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { signal, WritableSignal } from '@angular/core';
 import { rxResourceById } from './rx-resource-by-id';
 import { RxResourceByIdConfig } from './types/rx-resource-by-id-config.type';
@@ -556,8 +552,10 @@ export function rxQueryById<
     QueryGroupIdentifier
   >({
     ...queryConfig,
+    //@ts-expect-error TS type error
     params: resourceParamsSrc,
-  } as any);
+    equalParams: queryConfig.equalParams ?? 'useIdentifier',
+  });
   return (store, context) => ({
     queryByIdRef: {
       resourceById: queryResourcesById,

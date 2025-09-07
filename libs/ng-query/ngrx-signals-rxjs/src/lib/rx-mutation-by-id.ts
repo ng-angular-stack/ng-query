@@ -553,8 +553,10 @@ export function rxMutationById<
     MutationGroupIdentifier
   >({
     ...mutationConfig,
+    //@ts-expect-error TS wrong infer
     params: resourceParamsSrc,
-  } as any);
+    equalParams: mutationConfig.equalParams ?? 'default',
+  });
   return (store, context) => ({
     mutationByIdRef: {
       resourceById: mutationResourcesById,
