@@ -45,7 +45,11 @@ export default defineConfig({
               },
               {
                 text: 'Pagination Placeholder Data',
-                link: '/insertions/insert-pagination-place-holder-data.md',
+                link: '/insertions/insert-pagination-place-holder-data',
+              },
+              {
+                text: 'UX Loader',
+                link: '/insertions/insert-ux-loader.md',
               },
             ],
           },
@@ -60,9 +64,8 @@ export default defineConfig({
         ],
       },
     ],
-
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' },
+      { icon: 'github', link: 'https://github.com/ng-angular-stack/ng-query' },
     ],
   },
   head: [['link', { rel: 'icon', href: '/assets/favicon.png' }]],
