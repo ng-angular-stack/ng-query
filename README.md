@@ -1,3 +1,3 @@
-##Deploy doc
+# Ng-query
 
-Run `docs:publish`, then from the VSCode editor, add a commit with all the changes and push into the gh-pages branches.
+[Check the documentation.](https://ng-angular-stack.github.io/query/)
