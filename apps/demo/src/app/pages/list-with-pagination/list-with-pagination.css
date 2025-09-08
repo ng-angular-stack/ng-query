@@ -1,6 +1,6 @@
 :host {
-  background: #f5f7fa;
   display: block;
+  background: #f5f7fa;
 }
 
 .container {
@@ -9,7 +9,6 @@
   gap: 24px;
   padding: 24px;
   min-height: 100vh;
-  width: 100vw;
   margin: auto;
 }
 
@@ -85,7 +84,7 @@
 
 .badge-container {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 6px;
   margin-left: 8px;
   animation: fadeIn 0.3s ease-in-out;
@@ -204,6 +203,23 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 20px;
+}
+
+.pagination select {
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 6px;
+  color: #4a5568;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.pagination select:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 2px #bee3f8;
 }
 
 .pagination .btn {

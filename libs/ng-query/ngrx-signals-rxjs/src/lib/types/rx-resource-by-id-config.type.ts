@@ -17,7 +17,7 @@ export type RxResourceByIdConfig<
    * To avoid this, you can use this option to tell how to compare the incoming params with the existing params of the resource.
    * - 'useIdentifier': will use the identifier function to compare the previous params and the incoming params. This very useful when using pagination.
    * - 'default' (default value): will use a strict equality check (===) between the previous params and the incoming params.
-   * - (a: Params, b: Params) => boolean: you can provide your own comparison function to compare the previous params and the incoming params. This is useful when you want to compare specific fields of the params.
+   * - (a: Params, b: Params, identifierFn: (params: Params) => GroupIdentifier) => boolean: you can provide your own comparison function to compare the previous params and the incoming params. This is useful when you want to compare specific fields of the params.
    *
    * Note: if your params is a primitive (string, number, boolean, etc.), you don't need to use this option since the strict equality check will work as expected.
    *

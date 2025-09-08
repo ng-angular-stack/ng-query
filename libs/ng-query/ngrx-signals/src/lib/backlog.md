@@ -12,7 +12,9 @@ Ajout des tests manquants en même temps
 
 ## Feature
 
+- // Todo backlog: add reset pagination that remove all the other page ?
 - hide internal type from the props store
+- Pagination, reset des pages quand sort/pageSize change
 - Revoir la doc globalqueries pour expliquer le plug
 - Finir d'ajouter les insertions (les prendres en compte dans les inject & with fonction renvoyées)
 - Ajouter comment & doc sur pagination & au hover fonction

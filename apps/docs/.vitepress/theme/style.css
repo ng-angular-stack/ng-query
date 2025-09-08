@@ -91,6 +91,9 @@
   --vp-c-danger-3: var(--vp-c-red-3);
   --vp-c-danger-soft: var(--vp-c-red-soft);
 }
+html.dark {
+  --vp-code-color: #bab2eb;
+}
 
 .vp-doc .brand,
 .text-gradient,

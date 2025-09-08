@@ -1,36 +1,13 @@
-<!-- <div>
-  testResource {{ testResource.value() | json }}
-  <button (click)="nextPage()">Next</button>
-  <button (click)="previousPage()">Previous</button>
-</div> -->
 <div class="container">
-  <aside class="sidebar">
-    <div class="status-card">
-      <div>
-        <h3>Status</h3>
-        <div style="margin-top: 12px">
-          <b>GET Request</b>
-          <ng-container
-            *ngTemplateOutlet="statusTemplate; context: { status: userListServerStateStore.usersQueryById.currentPageStatus()}"
-          ></ng-container>
-        </div>
-      </div>
-      <!-- <div class="checkbox-wrapper">
-        <input
-          id="updateError"
-          type="checkbox"
-          [checked]="updateError()"
-          (change)="toggleUpdateError()"
-        />
-        <label for="updateError"> Simulate update error </label>
-      </div> -->
-    </div>
-  </aside>
-
   <main class="content">
     <div class="content-wrapper">
       <div class="card">
-        <h2 class="card-title">User Management</h2>
+        <h2 class="card-title">
+          User Management:
+          <ng-container
+            *ngTemplateOutlet="statusTemplate; context: { status: userListServerStateStore.usersQueryById.currentPageStatus()}"
+          ></ng-container>
+        </h2>
 
         <div class="table-container">
           <table class="table">
@@ -65,6 +42,16 @@
         </div>
 
         <div class="pagination">
+          <select
+            [value]="userListServerStateStore.pagination.pageSize()"
+            (change)="updatePageSize($event)"
+            style="margin-right: 8px"
+          >
+            <option [value]="2">2</option>
+            <option [value]="4">4</option>
+            <option [value]="8">8</option>
+            <option [value]="16">16</option>
+          </select>
           <button class="btn" (click)="userListServerStateStore.previousPage()">
             Previous
           </button>

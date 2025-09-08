@@ -26,7 +26,7 @@ const UserListServerStateStore = signalStore(
     rxQueryById(
       {
         params: store.pagination,
-        identifier: (params) => params.page,
+        identifier: (params) => `${params.page}-${params.pageSize}`,
         stream: ({ params }) =>
           store.api.getDataList$({
             page: params.page,
@@ -34,9 +34,6 @@ const UserListServerStateStore = signalStore(
           }),
       },
       insertPaginationPlaceholderData
-      // insertPaginationActions
-      // insertPaginationActionsStatus
-      // insertResourcePreservePreviousValueWhenLoading
     )
   ),
   withMethods((store) => ({
@@ -52,6 +49,13 @@ const UserListServerStateStore = signalStore(
         pagination: {
           ...state.pagination,
           page: state.pagination.page - 1,
+        },
+      })),
+    updatePageSize: (pageSize: number) =>
+      patchState(store, () => ({
+        pagination: {
+          page: 1,
+          pageSize: pageSize,
         },
       })),
   }))
@@ -70,4 +74,9 @@ export default class ListWithPagination {
   protected readonly userListServerStateStore = inject(
     UserListServerStateStore
   );
+
+  updatePageSize(event: Event) {
+    const value = Number((event.target as HTMLSelectElement).value);
+    this.userListServerStateStore.updatePageSize(value);
+  }
 }
