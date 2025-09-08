@@ -36,7 +36,19 @@ export default defineConfig({
             link: '/signal-store-parallel',
           },
           { text: 'Paginated Query', link: '/signal-store-paginated' },
-          { text: 'Insertions (states & effects)', link: '/insertions' },
+          {
+            text: 'Insertions (states & effects)',
+            items: [
+              {
+                text: 'Overview',
+                link: '/insertions',
+              },
+              {
+                text: 'Pagination Placeholder Data',
+                link: '/insertions/insert-pagination-place-holder-data.md',
+              },
+            ],
+          },
           { text: 'Server State Store', link: '/signal-store-server-state' },
         ],
       },
