@@ -15,6 +15,10 @@ export default defineConfig({
 
     sidebar: [
       {
+        text: 'Get Started',
+        link: '/get-started',
+      },
+      {
         text: 'Signal Store',
         items: [
           { text: 'Overview', link: '/signal-store' },

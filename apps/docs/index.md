@@ -13,7 +13,7 @@ hero:
   actions:
     - theme: brand
       text: Get started
-      link: /signal-store
+      link: /get-started
     - theme: alt
       text: API Examples
       link: /api-examples
