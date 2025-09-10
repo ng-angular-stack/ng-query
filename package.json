@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "docs:publish": "nx build docs && cd ../query && cd apps/docs/.vitepress/dist",
+    "publish:ng-query-core": "nx build ng-query-core && npm publish dist/libs/ng-query/core --public",
     "publish:ng-query-ngrx-signals": "nx build ng-query-ngrx-signals && npm publish dist/libs/ng-query/ngrx-signals --public",
     "publish:ng-query-ngrx-signals-rxjs": "nx build ng-query-ngrx-signals-rxjs && npm publish dist/libs/ng-query/ngrx-signals-rxjs --public",
     "publish:libs": "npm version patch && npm run publish:ng-query-ngrx-signals && npm run publish:ng-query-ngrx-signals-rxjs"
