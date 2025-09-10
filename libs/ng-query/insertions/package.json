@@ -1,6 +1,6 @@
 {
   "name": "@ng-query/insertions",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "peerDependencies": {
     "@angular/common": "^20.1.0",
     "@angular/core": "^20.1.0"

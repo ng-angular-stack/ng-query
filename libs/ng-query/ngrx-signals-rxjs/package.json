@@ -1,6 +1,6 @@
 {
   "name": "@ng-query/ngrx-signals-rxjs",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "peerDependencies": {
     "@angular/common": "^20.1.0",
     "@angular/core": "^20.1.0",
@@ -10,5 +10,13 @@
   "sideEffects": false,
   "publishConfig": {
     "access": "public"
+  },
+  "release": {
+    "version": {
+      "conventionalCommits": true,
+      "manifestRootsToUpdate": [
+        "dist/packages/{projectName}"
+      ]
+    }
   }
 }
