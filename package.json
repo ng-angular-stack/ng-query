@@ -1,6 +1,6 @@
 {
   "name": "@ng-query/source",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "license": "MIT",
   "scripts": {
     "docs:publish": "nx build docs && cd ../query && cd apps/docs/.vitepress/dist",
