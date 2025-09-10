@@ -3,7 +3,7 @@
   "schematics": {
     "ng-add": {
       "description": "Add and install @ng-query/ngrx-signals and optionally @ng-query/ngrx-signals-rxjs.",
-      "factory": "./ng-add/index#default",
+      "factory": "./ng-add",
       "schema": "./ng-add/schema.json"
     }
   }

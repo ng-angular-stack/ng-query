@@ -72,6 +72,7 @@
     }
   },
   "release": {
+    "projects": ["libs/ng-query/*"],
     "version": {
       "preVersionCommand": "npx nx run-many -t build"
     }
