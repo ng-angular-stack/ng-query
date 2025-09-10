@@ -6,7 +6,7 @@
   "properties": {
     "useRxjs": {
       "type": "boolean",
-      "description": "Do you use RxJS Observables for your API calls?",
+      "description": "Do you use RxJS Observables for your API calls? (If yes, RxJS support will be installed)",
       "default": true
     }
   },

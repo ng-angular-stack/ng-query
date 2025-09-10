@@ -9,5 +9,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "schematics": "./schematics/collection.json"
+  "schematics": "./schematics/collection.json",
+  "files": [
+    "schematics",
+    "src",
+    "ng-package.json",
+    "README.md"
+  ]
 }
