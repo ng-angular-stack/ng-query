@@ -5,7 +5,7 @@ export interface Schema {
   useRxjs?: boolean;
 }
 
-export default function (options: Schema): Rule {
+export default function ngAdd(options: Schema): Rule {
   return (tree: Tree, context: SchematicContext) => {
     context.addTask(
       new NodePackageInstallTask({

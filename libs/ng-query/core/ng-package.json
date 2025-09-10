@@ -3,6 +3,5 @@
   "dest": "../../../dist/libs/ng-query/core",
   "lib": {
     "entryFile": "src/index.ts"
-  },
-  "assets": ["schematics/**/*"]
+  }
 }

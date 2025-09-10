@@ -10,10 +10,11 @@
     "access": "public"
   },
   "schematics": "./schematics/collection.json",
-  "files": [
-    "schematics",
-    "src",
-    "ng-package.json",
-    "README.md"
-  ]
+  "devDependencies": {
+    "copyfiles": "file:../../../node_modules/copyfiles",
+    "typescript": "file:../../../node_modules/typescript"
+  },
+  "ng-add": {
+    "save": "dependencies"
+  }
 }

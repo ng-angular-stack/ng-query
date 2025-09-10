@@ -13,7 +13,7 @@
   },
   "tags": [],
   "targets": {
-    "build": {
+    "buildLib": {
       "executor": "@nx/angular:package",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
@@ -27,6 +27,22 @@
         "development": {}
       },
       "defaultConfiguration": "production"
+    },
+    "buildSchematics": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p libs/ng-query/core/tsconfig.schematics.json && copyfiles -u 3 libs/ng-query/core/schematics/*/schema.json libs/ng-query/core/schematics/*/files/** libs/ng-query/core/schematics/collection.json dist/libs/ng-query/core/"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          { "command": "nx buildLib ng-query-core" },
+          { "command": "nx buildSchematics ng-query-core" }
+        ],
+        "parallel": false
+      }
     },
     "nx-release-publish": {
       "options": {
