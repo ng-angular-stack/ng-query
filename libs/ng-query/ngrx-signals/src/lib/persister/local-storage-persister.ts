@@ -255,20 +255,13 @@ export function localStoragePersister(prefix: string): QueriesPersister {
             localStorage.removeItem(storageKey);
           } else {
             if (queryByIdValue && typeof queryByIdValue === 'object') {
-              console.log('queryByIdValue', queryByIdValue);
-              debugger;
-              const queryByIdReconstructed = Object.entries(
-                queryByIdValue
-              ).reduce<Record<string | number, ResourceRef<any>>>(
-                (acc, [resourceKey, resourceValue]) => {
-                  // todo check if it is a resource or a rxResource ? Maybe a method from the resourceById to deal with that !
-                  // todo passer tous ce qui est equalParams...
-                  acc[resourceKey] = resource();
-                },
-                {}
+              Object.entries(queryByIdValue).forEach(
+                ([resourceKey, resourceValue]) => {
+                  queryByIdResource.add(() => resourceKey, {
+                    defaultValue: resourceValue,
+                  });
+                }
               );
-              // todo deserialise the resource, create resource for each value
-              queryByIdResource.set(queryByIdValue);
             }
           }
         } catch (e) {

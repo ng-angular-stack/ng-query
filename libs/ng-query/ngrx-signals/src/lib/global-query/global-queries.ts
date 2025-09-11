@@ -174,8 +174,10 @@ type WithInjectQueryByIdOutputMapperTyped<
             pluggable?: (
               source: SignalProxy<NoInfer<PluggableParams>>
             ) => SignalWrapperParams<NoInfer<PluggableParams>>
-          ) => ResourceByIdRef<GroupIdentifier, State> & InsertionsOutput
-        : () => ResourceByIdRef<GroupIdentifier, State> & InsertionsOutput
+          ) => ResourceByIdRef<GroupIdentifier, State, Params> &
+            InsertionsOutput
+        : () => ResourceByIdRef<GroupIdentifier, State, Params> &
+            InsertionsOutput
       : 'never2'
     : `Error: Please use rxQueryById or queryById. Eg: { ${k &
         string}: { queryById: () => rxQueryById(...) }}`

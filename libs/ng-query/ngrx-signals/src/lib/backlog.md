@@ -13,6 +13,7 @@ Ajout des tests manquants en même temps
 ## Feature
 
 - // Todo backlog: add reset pagination that remove all the other page ?
+- Mettre les libs insertions directement dans les autres libs en tant que second entry point
 - hide internal type from the props store
 - Pagination, reset des pages quand sort/pageSize change
 - Revoir la doc globalqueries pour expliquer le plug

@@ -14,7 +14,11 @@ export function preservedRxResource<T, R>(
     }),
     computation: (current, previous) => {
       if (current.isLoading) {
-        return previous?.value;
+        if (previous) {
+          return previous.value;
+        } else {
+          return config.defaultValue;
+        }
       }
       return current.value;
     },
@@ -22,5 +26,8 @@ export function preservedRxResource<T, R>(
   Object.assign(original, {
     value: preserved,
   });
+  if (config.defaultValue) {
+    original.set(config.defaultValue);
+  }
   return original;
 }

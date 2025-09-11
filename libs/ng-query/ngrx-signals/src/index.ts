@@ -26,6 +26,7 @@ export { resourceById } from './lib/resource-by-id';
 export type {
   ResourceByIdRef,
   ResourceByIdHandler,
+  Identifier,
 } from './lib/resource-by-id';
 export { globalQueries } from './lib/global-query/global-queries';
 export { localStoragePersister } from './lib/persister/local-storage-persister';

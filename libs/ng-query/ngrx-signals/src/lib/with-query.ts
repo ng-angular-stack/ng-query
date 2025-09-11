@@ -245,7 +245,7 @@ export function withQuery<
               (acc, [mutationName, mutationEffectOptions]) => {
                 const mutationTargeted = (store as any)[mutationName] as
                   | ResourceRef<any>
-                  | ResourceByIdRef<string | number, any>;
+                  | ResourceByIdRef<string | number, any, ResourceParams>;
                 if ('hasValue' in mutationTargeted) {
                   const mutationResource = mutationTargeted as ResourceRef<any>;
                   return {
@@ -307,7 +307,11 @@ export function withQuery<
                   };
                 }
                 const newMutationResourceRefForNestedEffect = linkedSignal<
-                  ResourceByIdRef<string | number, ResourceState>,
+                  ResourceByIdRef<
+                    string | number,
+                    ResourceState,
+                    ResourceParams
+                  >,
                   { newKeys: (string | number)[] } | undefined
                 >({
                   source: mutationTargeted as any,

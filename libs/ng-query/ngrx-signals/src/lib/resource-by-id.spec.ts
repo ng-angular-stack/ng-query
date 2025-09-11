@@ -1,9 +1,8 @@
 import { signal } from '@angular/core';
-import { rxResourceById } from './rx-resource-by-id';
-import { of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
+import { resourceById } from './resource-by-id';
 
-describe('rxResourceById', () => {
+describe('resourceById', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -13,12 +12,12 @@ describe('rxResourceById', () => {
   it('should create a resource by id', async () => {
     await TestBed.runInInjectionContext(async () => {
       const sourceParams = signal<{ id: string } | undefined>(undefined);
-      const rxResourceByIdRef = rxResourceById({
+      const rxResourceByIdRef = resourceById({
         identifier: (request) => request.id,
         params: sourceParams,
-        stream: ({ params }) => {
+        loader: async ({ params }) => {
           // Simulate a stream
-          return of(params);
+          return params;
         },
       });
       expect(rxResourceByIdRef).toBeDefined();
@@ -42,50 +41,50 @@ describe('rxResourceById', () => {
   it('should expose add/reset/restResource function', async () => {
     await TestBed.runInInjectionContext(async () => {
       const sourceParams = signal<{ id: string } | undefined>(undefined);
-      const rxResourceByIdRef = rxResourceById({
+      const resourceByIdRef = resourceById({
         identifier: (request) => request.id,
         params: sourceParams,
-        stream: ({ params }) => {
+        loader: async ({ params }) => {
           // Simulate a stream
-          return of(params);
+          return params;
         },
       });
-      expect(rxResourceByIdRef).toBeDefined();
-      expect(rxResourceByIdRef()).toEqual({});
+      expect(resourceByIdRef).toBeDefined();
+      expect(resourceByIdRef()).toEqual({});
 
-      rxResourceByIdRef.add(() => '123', {
+      resourceByIdRef.add(() => '123', {
         defaultValue: { id: '123' },
       });
-      const resourceRef123 = rxResourceByIdRef()['123'];
+      const resourceRef123 = resourceByIdRef()['123'];
 
       await vi.runAllTimersAsync();
       expect(resourceRef123).toBeDefined();
       expect(resourceRef123?.value()).toEqual({ id: '123' });
 
-      rxResourceByIdRef.add(() => '1234', {
+      resourceByIdRef.add(() => '1234', {
         defaultValue: { id: '1234' },
       });
-      rxResourceByIdRef.add(() => '12345', {
+      resourceByIdRef.add(() => '12345', {
         defaultValue: { id: '12345' },
       });
       await vi.runAllTimersAsync();
 
-      const resourceRef1234 = rxResourceByIdRef()['1234'];
+      const resourceRef1234 = resourceByIdRef()['1234'];
       expect(resourceRef1234).toBeDefined();
       expect(resourceRef1234?.value()).toEqual({ id: '1234' });
 
-      const resourceRef12345 = rxResourceByIdRef()['12345'];
+      const resourceRef12345 = resourceByIdRef()['12345'];
       expect(resourceRef12345).toBeDefined();
       expect(resourceRef12345?.value()).toEqual({ id: '12345' });
 
-      rxResourceByIdRef.resetResource('123');
-      expect(rxResourceByIdRef()['123']).toBeUndefined();
-      expect(rxResourceByIdRef()['1234']).toBeDefined();
-      expect(rxResourceByIdRef()['12345']).toBeDefined();
+      resourceByIdRef.resetResource('123');
+      expect(resourceByIdRef()['123']).toBeUndefined();
+      expect(resourceByIdRef()['1234']).toBeDefined();
+      expect(resourceByIdRef()['12345']).toBeDefined();
 
-      rxResourceByIdRef.reset();
-      expect(rxResourceByIdRef()['1234']).toBeUndefined();
-      expect(rxResourceByIdRef()['12345']).toBeUndefined();
+      resourceByIdRef.reset();
+      expect(resourceByIdRef()['1234']).toBeUndefined();
+      expect(resourceByIdRef()['12345']).toBeUndefined();
     });
   });
 });

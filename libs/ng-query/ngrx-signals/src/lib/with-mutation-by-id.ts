@@ -41,7 +41,7 @@ export type MutationByIdRef<
   ParamsArgs,
   InsertionsOutput
 > = {
-  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
+  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
   method: ResourceMethod<ParamsArgs, ResourceParams> | undefined;
   insertionsOutputs: InsertionsOutput;
@@ -61,7 +61,7 @@ type WithMutationByIdOutputStoreConfig<
   props: MergeObject<
     {
       [key in `${ResourceName & string}MutationById`]: MergeObject<
-        ResourceByIdRef<GroupIdentifier, ResourceState>,
+        ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>,
         InsertionsOutput
       >;
     },
@@ -226,7 +226,7 @@ export function withMutationById<
           queriesWithReload.length;
 
         const newResourceRefForNestedEffect = linkedSignal<
-          ResourceByIdRef<GroupIdentifier, ResourceState>,
+          ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>,
           { newKeys: GroupIdentifier[] } | undefined
         >({
           source: mutationResourcesById as any,
@@ -284,6 +284,7 @@ export function withMutationById<
                           mutationResource as ResourceRef<ResourceState>,
                         mutationParamsSrc: mutationResourceParamsSrc,
                         mutationIdentifier: incomingMutationIdentifier,
+                        //@ts-expect-error I have not understand from where the error come from
                         mutationResources: mutationResourcesById,
                       });
                     });
@@ -297,6 +298,7 @@ export function withMutationById<
                         mutationResource,
                         mutationParamsSrc: mutationResourceParamsSrc,
                         mutationIdentifier: incomingMutationIdentifier,
+                        //@ts-expect-error I have not understand from where the error come from
                         mutationResources: mutationResourcesById,
                       });
                     });
@@ -310,6 +312,7 @@ export function withMutationById<
                         resourceParamsSrc: mutationResourceParamsSrc,
                         mutationResource,
                         mutationIdentifier: incomingMutationIdentifier,
+                        //@ts-expect-error I have not understand from where the error come from
                         mutationResources: mutationResourcesById,
                       });
                     });

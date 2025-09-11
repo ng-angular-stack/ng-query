@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { RxResourceOptions } from '@angular/core/rxjs-interop';
 import { preservedRxResource } from './preserved-rx-resource';
-import { ResourceByIdHandler } from '@ng-query/ngrx-signals';
+import { Identifier, ResourceByIdHandler } from '@ng-query/ngrx-signals';
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -20,36 +20,45 @@ type Prettify<T> = {
 
 export type RxResourceByIdRef<
   GroupIdentifier extends string | number,
-  State
+  State,
+  ResourceParams
 > = WritableSignal<
   Prettify<Partial<Record<GroupIdentifier, ResourceRef<State>>>>
 > &
-  ResourceByIdHandler<GroupIdentifier, State>;
+  ResourceByIdHandler<GroupIdentifier, State, ResourceParams>;
 
-export function rxResourceById<T, R, GroupIdentifier extends string | number>({
+export function rxResourceById<
+  State,
+  ResourceParams,
+  GroupIdentifier extends string | number
+>({
   identifier,
   params,
   stream,
   equalParams,
-}: Omit<RxResourceOptions<T, R>, 'params'> & {
-  params: () => R; // must be a mandatory field
-  identifier: (request: NonNullable<NoInfer<R>>) => GroupIdentifier;
+}: Omit<RxResourceOptions<State, ResourceParams>, 'params'> & {
+  params: () => ResourceParams; // must be a mandatory field
+  identifier: Identifier<ResourceParams, GroupIdentifier>;
   equalParams?:
     | 'default'
     | 'useIdentifier'
-    | ((a: R, b: R, identifierFn: (params: R) => GroupIdentifier) => boolean);
-}): RxResourceByIdRef<GroupIdentifier, T> {
+    | ((
+        a: ResourceParams,
+        b: ResourceParams,
+        identifierFn: (params: ResourceParams) => GroupIdentifier
+      ) => boolean);
+}): RxResourceByIdRef<GroupIdentifier, State, ResourceParams> {
   const injector = inject(Injector);
 
   // maybe create a linkedSignal to enable to reset
   const resourceByGroup = signal<
-    Partial<Record<GroupIdentifier, ResourceRef<T>>>
+    Partial<Record<GroupIdentifier, ResourceRef<State>>>
   >({});
 
   const resourceEqualParams =
     equalParams === 'useIdentifier'
-      ? (a: NonNullable<R>, b: NonNullable<R>) =>
-          identifier(a) === identifier(b)
+      ? (a: NonNullable<ResourceParams>, b: NonNullable<ResourceParams>) =>
+          a && b && identifier(a) === identifier(b)
       : equalParams;
 
   // this effect is used to create a mapped ResourceRef instance
@@ -100,8 +109,43 @@ export function rxResourceById<T, R, GroupIdentifier extends string | number>({
       [group]: resourceRef,
     }));
   });
+  const resourcesHandler: ResourceByIdHandler<
+    GroupIdentifier,
+    State,
+    ResourceParams
+  > = {
+    reset: () => {
+      Object.values(resourceByGroup()).forEach((resource) =>
+        (resource as ResourceRef<State>).destroy()
+      );
+      resourceByGroup.set({});
+    },
+    resetResource: (id: GroupIdentifier) => {
+      resourceByGroup.update((state) => {
+        const newState = { ...state };
+        newState[id]?.destroy();
+        delete newState[id];
+        return newState;
+      });
+    },
+    add: (id, options?: { defaultValue?: State }) => {
+      const group = id({ identifier });
+      const resourceRef = createDynamicRxResource(injector, {
+        group,
+        resourceOptions: {
+          params: resourceEqualParams,
+          stream,
+          defaultValue: options?.defaultValue,
+        } as RxResourceOptions<unknown, unknown>,
+      });
+      resourceByGroup.update((state) => ({
+        ...state,
+        [group]: resourceRef,
+      }));
+    },
+  };
 
-  return resourceByGroup;
+  return Object.assign(resourceByGroup, resourcesHandler);
 }
 
 const RESOURCE_INSTANCE_TOKEN = new InjectionToken<ResourceRef<unknown>>(

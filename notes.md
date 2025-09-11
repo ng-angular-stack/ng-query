@@ -10,4 +10,4 @@ nx release publish # publie sur npm (selon "packageRoot" de chaque projet)
 
 ## Tests with UI
 
-npx nx run ng-query-insertions:test --watch
+npx nx run ng-query-insertions:test --watch --ui

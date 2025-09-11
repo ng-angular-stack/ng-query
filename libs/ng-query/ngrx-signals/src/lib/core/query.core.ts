@@ -44,7 +44,8 @@ export type QueryDeclarativeEffect<
                   queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
                   queryResources: ResourceByIdRef<
                     string,
-                    QueryAndMutationRecord['query']['state']
+                    QueryAndMutationRecord['query']['state'],
+                    QueryAndMutationRecord['query']['params']
                   >;
                 }
               : {},
@@ -55,7 +56,8 @@ export type QueryDeclarativeEffect<
                   mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
                   mutationResources: ResourceByIdRef<
                     string,
-                    QueryAndMutationRecord['mutation']['state']
+                    QueryAndMutationRecord['mutation']['state'],
+                    QueryAndMutationRecord['mutation']['params']
                   >;
                 }
               : {}
@@ -100,7 +102,11 @@ export function triggerQueryReloadFromMutationChange<
   mutationStatus: string;
   queryResource: ResourceRef<QueryAndMutationRecord['query']['state']>;
   queryResources:
-    | ResourceByIdRef<string | number, QueryAndMutationRecord['query']['state']>
+    | ResourceByIdRef<
+        string | number,
+        QueryAndMutationRecord['query']['state'],
+        QueryAndMutationRecord['query']['params']
+      >
     | undefined;
   mutationResource: ResourceRef<QueryAndMutationRecord['mutation']['state']>;
   mutationParamsSrc: Signal<
@@ -111,7 +117,8 @@ export function triggerQueryReloadFromMutationChange<
   mutationResources:
     | ResourceByIdRef<
         string | number,
-        QueryAndMutationRecord['mutation']['state']
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
       >
     | undefined;
 }) {
@@ -161,7 +168,11 @@ export function triggerQueryReloadOnMutationStatusChange<
 }: {
   mutationStatus: string;
   queryResourceTarget:
-    | ResourceByIdRef<string | number, QueryAndMutationRecord['query']['state']>
+    | ResourceByIdRef<
+        string | number,
+        QueryAndMutationRecord['query']['state'],
+        QueryAndMutationRecord['query']['params']
+      >
     | ResourceRef<QueryAndMutationRecord['query']['state']>;
   mutationEffectOptions: QueryDeclarativeEffect<QueryAndMutationRecord>;
   mutationResource: ResourceRef<QueryAndMutationRecord['mutation']['state']>;
@@ -183,7 +194,8 @@ export function triggerQueryReloadOnMutationStatusChange<
   mutationResources:
     | ResourceByIdRef<
         string | number,
-        QueryAndMutationRecord['mutation']['state']
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
       >
     | undefined;
 }) {
@@ -209,7 +221,8 @@ export function triggerQueryReloadOnMutationStatusChange<
     }
     const queryResourcesById = queryResourceTarget as ResourceByIdRef<
       string | number,
-      QueryAndMutationRecord['query']['state']
+      QueryAndMutationRecord['query']['state'],
+      QueryAndMutationRecord['query']['params']
     >;
     Object.entries(
       queryResourcesById() as Record<string | number, ResourceRef<any>>
@@ -258,7 +271,11 @@ export function setOptimisticPatchFromMutationOnQueryValue<
 }: {
   mutationStatus: string;
   queryResourceTarget:
-    | ResourceByIdRef<string | number, QueryAndMutationRecord['query']['state']>
+    | ResourceByIdRef<
+        string | number,
+        QueryAndMutationRecord['query']['state'],
+        QueryAndMutationRecord['query']['params']
+      >
     | ResourceRef<QueryAndMutationRecord['query']['state']>;
   mutationEffectOptions: QueryDeclarativeEffect<QueryAndMutationRecord>;
   mutationResource: ResourceRef<QueryAndMutationRecord['mutation']['state']>;
@@ -269,7 +286,8 @@ export function setOptimisticPatchFromMutationOnQueryValue<
   mutationResources:
     | ResourceByIdRef<
         string | number,
-        QueryAndMutationRecord['mutation']['state']
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
       >
     | undefined;
 }) {
@@ -309,7 +327,8 @@ export function setOptimisticPatchFromMutationOnQueryValue<
     }
     const queryResourcesById = queryResourceTarget as ResourceByIdRef<
       string | number,
-      QueryAndMutationRecord['query']['state']
+      QueryAndMutationRecord['query']['state'],
+      QueryAndMutationRecord['query']['params']
     >;
     Object.entries(
       queryResourcesById() as Record<string | number, ResourceRef<any>>
@@ -376,7 +395,11 @@ export function setOptimisticUpdateFromMutationOnQueryValue<
 }: {
   mutationStatus: string;
   queryResourceTarget:
-    | ResourceByIdRef<string | number, QueryAndMutationRecord['query']['state']>
+    | ResourceByIdRef<
+        string | number,
+        QueryAndMutationRecord['query']['state'],
+        QueryAndMutationRecord['query']['params']
+      >
     | ResourceRef<QueryAndMutationRecord['query']['state']>;
   mutationEffectOptions: QueryDeclarativeEffect<QueryAndMutationRecord>;
   mutationResource: ResourceRef<QueryAndMutationRecord['mutation']['state']>;
@@ -387,7 +410,8 @@ export function setOptimisticUpdateFromMutationOnQueryValue<
   mutationResources:
     | ResourceByIdRef<
         string | number,
-        QueryAndMutationRecord['mutation']['state']
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
       >
     | undefined;
 }) {
@@ -411,7 +435,8 @@ export function setOptimisticUpdateFromMutationOnQueryValue<
   }
   const queryResourceById = queryResourceTarget as ResourceByIdRef<
     string | number,
-    QueryAndMutationRecord['query']['state']
+    QueryAndMutationRecord['query']['state'],
+    QueryAndMutationRecord['query']['params']
   >;
   Object.entries(
     queryResourceById() as Record<string | number, ResourceRef<any>>
@@ -472,7 +497,7 @@ export type InsertionByIdParams<
 > = {
   input: Input;
   store: StoreInput;
-  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
+  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
   identifier: (params: NonNullable<ResourceParams>) => GroupIdentifier;
   insertions: keyof PreviousInsertionsOutputs extends string

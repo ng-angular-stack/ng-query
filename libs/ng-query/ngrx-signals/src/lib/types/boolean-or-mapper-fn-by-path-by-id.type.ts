@@ -173,5 +173,5 @@ export type AssociatedStateMapperFnById<
   queryResource: ResourceRef<QueryState>;
   queryParams: QueryParams;
   queryIdentifier: QueryIdentifier;
-  queryResources: ResourceByIdRef<QueryIdentifier, QueryState>;
+  queryResources: ResourceByIdRef<QueryIdentifier, QueryState, QueryParams>;
 }) => ResultState;

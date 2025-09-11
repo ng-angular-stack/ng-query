@@ -20,7 +20,8 @@ type Prettify<T> = {
 
 export type ResourceByIdHandler<
   GroupIdentifier extends string | number,
-  State
+  State,
+  ResourceParams
 > = {
   /**
    * Reset all the ResourceRef instance stored in the ResourceByIdRef
@@ -34,46 +35,63 @@ export type ResourceByIdHandler<
    * Add a new ResourceRef instance
    */
   add: (
-    id: GroupIdentifier,
+    id: ({
+      identifier,
+    }: {
+      identifier: Identifier<ResourceParams, GroupIdentifier>;
+    }) => GroupIdentifier,
     options?: {
       defaultValue?: State;
     }
   ) => void;
 };
 
+export type Identifier<ResourceParams, GroupIdentifier> = (
+  request: NonNullable<NoInfer<ResourceParams>>
+) => GroupIdentifier;
+
 export type ResourceByIdRef<
   GroupIdentifier extends string | number,
-  State
+  State,
+  ResourceParams
 > = WritableSignal<
   Prettify<Partial<Record<GroupIdentifier, ResourceRef<State>>>>
 > &
-  ResourceByIdHandler<GroupIdentifier, State>;
+  ResourceByIdHandler<GroupIdentifier, State, ResourceParams>;
 
-export function resourceById<T, R, GroupIdentifier extends string | number>({
+export function resourceById<
+  State,
+  ResourceParams,
+  GroupIdentifier extends string | number
+>({
   identifier,
   params,
   loader,
   stream,
   equalParams,
-}: Omit<ResourceOptions<T, R>, 'params'> & {
-  params: () => R; // must be a mandatory field
-  identifier: (request: NonNullable<NoInfer<R>>) => GroupIdentifier;
+}: Omit<ResourceOptions<State, ResourceParams>, 'params'> & {
+  params: () => ResourceParams; // must be a mandatory field
+  identifier: Identifier<NoInfer<ResourceParams>, GroupIdentifier>;
   equalParams?:
     | 'default'
     | 'useIdentifier'
-    | ((a: R, b: R, identifierFn: (params: R) => GroupIdentifier) => boolean);
-}): ResourceByIdRef<GroupIdentifier, T> {
+    | ((
+        a: ResourceParams,
+        b: ResourceParams,
+        identifierFn: (params: ResourceParams) => GroupIdentifier
+      ) => boolean);
+}): ResourceByIdRef<GroupIdentifier, State, ResourceParams> {
   const injector = inject(Injector);
 
   // maybe create a linkedSignal to enable to reset
   const resourceByGroup = signal<
-    Partial<Record<GroupIdentifier, ResourceRef<T>>>
+    Partial<Record<GroupIdentifier, ResourceRef<State>>>
   >({});
 
   const resourceEqualParams =
     equalParams === 'useIdentifier'
-      ? (a: NonNullable<R>, b: NonNullable<R>) =>
-          identifier(a) === identifier(b)
+      ? (a: NonNullable<ResourceParams>, b: NonNullable<ResourceParams>) =>
+          a && b && identifier(a) === identifier(b)
       : equalParams;
 
   // this effect is used to create a mapped ResourceRef instance
@@ -129,21 +147,29 @@ export function resourceById<T, R, GroupIdentifier extends string | number>({
     }));
   });
 
-  const resourcesHandler: ResourceByIdHandler<GroupIdentifier, T> = {
+  const resourcesHandler: ResourceByIdHandler<
+    GroupIdentifier,
+    State,
+    ResourceParams
+  > = {
     reset: () => {
-      // todo check if all the resourceRef need to be destroyed before reseting the map (to avoid memory leaks)
+      Object.values(resourceByGroup()).forEach((resource) =>
+        (resource as ResourceRef<State>).destroy()
+      );
       resourceByGroup.set({});
     },
     resetResource: (id: GroupIdentifier) => {
       resourceByGroup.update((state) => {
         const newState = { ...state };
+        newState[id]?.destroy();
         delete newState[id];
         return newState;
       });
     },
-    add: (id: GroupIdentifier, options?: { defaultValue?: T }) => {
+    add: (id, options?: { defaultValue?: State }) => {
+      const group = id({ identifier });
       const resourceRef = createDynamicResource(injector, {
-        group: id,
+        group,
         resourceOptions: {
           loader,
           params: resourceEqualParams,
@@ -151,10 +177,9 @@ export function resourceById<T, R, GroupIdentifier extends string | number>({
           defaultValue: options?.defaultValue,
         } as ResourceOptions<unknown, unknown>,
       });
-
       resourceByGroup.update((state) => ({
         ...state,
-        [id]: resourceRef,
+        [group]: resourceRef,
       }));
     },
   };

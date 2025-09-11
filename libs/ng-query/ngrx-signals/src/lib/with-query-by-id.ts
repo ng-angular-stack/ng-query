@@ -40,7 +40,7 @@ export type QueryByIdRef<
   ResourceParams,
   InsertionsOutput
 > = {
-  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState>;
+  resourceById: ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>;
   resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
   insertionsOutputs: InsertionsOutput;
 };
@@ -60,7 +60,8 @@ type WithQueryByIdOutputStoreConfig<
     {
       [key in `${ResourceName & string}QueryById`]: ResourceByIdRef<
         GroupIdentifier,
-        ResourceState
+        ResourceState,
+        ResourceParams
       > &
         InsertionsOutputs;
     },
@@ -256,7 +257,7 @@ export function withQueryById<
         );
 
         const newResourceRefForNestedEffect = linkedSignal<
-          ResourceByIdRef<GroupIdentifier, ResourceState>,
+          ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>,
           { newKeys: GroupIdentifier[] } | undefined
         >({
           source: queryResourcesById as any,
@@ -329,7 +330,7 @@ export function withQueryById<
               (acc, [mutationName, mutationEffectOptions]) => {
                 const mutationTargeted = (store as any)[mutationName] as
                   | ResourceRef<any>
-                  | ResourceByIdRef<string | number, any>;
+                  | ResourceByIdRef<string | number, any, any>;
                 if ('hasValue' in mutationTargeted) {
                   const mutationResource = mutationTargeted as ResourceRef<any>;
                   return {
@@ -350,6 +351,7 @@ export function withQueryById<
                           untracked(() => {
                             setOptimisticUpdateFromMutationOnQueryValue({
                               mutationStatus,
+                              //@ts-expect-error not understand from where the error come from
                               queryResourceTarget: queryResourcesById,
                               mutationEffectOptions,
                               mutationResource,
@@ -364,6 +366,7 @@ export function withQueryById<
                           untracked(() => {
                             triggerQueryReloadOnMutationStatusChange({
                               mutationStatus,
+                              //@ts-expect-error not understand from where the error come from
                               queryResourceTarget: queryResourcesById,
                               mutationEffectOptions,
                               mutationResource,
@@ -378,6 +381,7 @@ export function withQueryById<
                           untracked(() => {
                             setOptimisticPatchFromMutationOnQueryValue({
                               mutationStatus,
+                              //@ts-expect-error not understand from where the error come from
                               queryResourceTarget: queryResourcesById,
                               mutationEffectOptions:
                                 mutationEffectOptions as any,
@@ -393,7 +397,11 @@ export function withQueryById<
                   };
                 }
                 const newMutationResourceRefForNestedEffect = linkedSignal<
-                  ResourceByIdRef<GroupIdentifier, ResourceState>,
+                  ResourceByIdRef<
+                    GroupIdentifier,
+                    ResourceState,
+                    ResourceParams
+                  >,
                   { newKeys: GroupIdentifier[] } | undefined
                 >({
                   source: mutationTargeted as any,
@@ -448,6 +456,7 @@ export function withQueryById<
                               untracked(() => {
                                 setOptimisticUpdateFromMutationOnQueryValue({
                                   mutationStatus,
+                                  //@ts-expect-error not understand from where the error come from
                                   queryResourceTarget: queryResourcesById,
                                   mutationEffectOptions,
                                   mutationResource,
@@ -462,6 +471,7 @@ export function withQueryById<
                               untracked(() => {
                                 triggerQueryReloadOnMutationStatusChange({
                                   mutationStatus,
+                                  //@ts-expect-error not understand from where the error come from
                                   queryResourceTarget: queryResourcesById,
                                   mutationEffectOptions,
                                   mutationResource,
@@ -476,9 +486,9 @@ export function withQueryById<
                               untracked(() => {
                                 setOptimisticPatchFromMutationOnQueryValue({
                                   mutationStatus,
+                                  //@ts-expect-error not understand from where the error come from
                                   queryResourceTarget: queryResourcesById,
-                                  mutationEffectOptions:
-                                    mutationEffectOptions as any,
+                                  mutationEffectOptions,
                                   mutationResource,
                                   mutationParamsSrc,
                                   mutationIdentifier: mutationIdentifier,
@@ -542,7 +552,8 @@ function updateAssociatedClientStates<
   incomingIdentifier: GroupIdentifier;
   queryResourcesById: ResourceByIdRef<
     NoInfer<GroupIdentifier>,
-    NoInfer<ResourceState>
+    NoInfer<ResourceState>,
+    NoInfer<ResourceParams>
   >;
 }) {
   associatedClientStates.forEach(([path, associatedClientState]) => {

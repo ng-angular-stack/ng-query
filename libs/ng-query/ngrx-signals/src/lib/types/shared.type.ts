@@ -37,7 +37,8 @@ export type CustomReloadOnSpecificMutationStatus<
             queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
             queryResources: ResourceByIdRef<
               string | number,
-              QueryAndMutationRecord['query']['state']
+              QueryAndMutationRecord['query']['state'],
+              QueryAndMutationRecord['query']['params']
             >;
           }
         : {},
@@ -46,7 +47,8 @@ export type CustomReloadOnSpecificMutationStatus<
             mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
             mutationResources: ResourceByIdRef<
               string | number,
-              QueryAndMutationRecord['mutation']['state']
+              QueryAndMutationRecord['mutation']['state'],
+              QueryAndMutationRecord['mutation']['params']
             >;
           }
         : {}
@@ -108,7 +110,8 @@ export type OptimisticPatchQueryFn<
             queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
             queryResources: ResourceByIdRef<
               QueryAndMutationRecord['query']['groupIdentifier'],
-              QueryAndMutationRecord['query']['state']
+              QueryAndMutationRecord['query']['state'],
+              QueryAndMutationRecord['query']['params']
             >;
           }
         : {},
@@ -119,7 +122,8 @@ export type OptimisticPatchQueryFn<
             mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
             mutationResources: ResourceByIdRef<
               QueryAndMutationRecord['mutation']['groupIdentifier'],
-              QueryAndMutationRecord['mutation']['state']
+              QueryAndMutationRecord['mutation']['state'],
+              QueryAndMutationRecord['mutation']['params']
             >;
           }
         : {}
@@ -146,7 +150,8 @@ export type FilterQueryById<
             queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
             queryResources: ResourceByIdRef<
               QueryAndMutationRecord['query']['groupIdentifier'],
-              QueryAndMutationRecord['query']['state']
+              QueryAndMutationRecord['query']['state'],
+              QueryAndMutationRecord['query']['params']
             >;
           }
         : {},
@@ -157,7 +162,8 @@ export type FilterQueryById<
             mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
             mutationResources: ResourceByIdRef<
               QueryAndMutationRecord['mutation']['groupIdentifier'],
-              QueryAndMutationRecord['mutation']['state']
+              QueryAndMutationRecord['mutation']['state'],
+              QueryAndMutationRecord['mutation']['params']
             >;
           }
         : {}

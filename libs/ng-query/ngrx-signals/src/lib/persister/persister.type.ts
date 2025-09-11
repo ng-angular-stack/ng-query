@@ -11,7 +11,7 @@ export interface PersistedQuery {
 
 export interface PersistedQueryById {
   key: string;
-  queryByIdResource: ResourceByIdRef<string | number, unknown>;
+  queryByIdResource: ResourceByIdRef<string | number, unknown, unknown>;
   queryResourceParamsSrc: Signal<unknown>;
   cacheTime: number;
 }

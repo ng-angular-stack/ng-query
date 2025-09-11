@@ -59,8 +59,9 @@ type OptimisticMutationQuery<
         ? {
             queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
             queryResources: ResourceByIdRef<
-              string,
-              QueryAndMutationRecord['query']['state']
+              string | number,
+              QueryAndMutationRecord['query']['state'],
+              QueryAndMutationRecord['query']['params']
             >;
           }
         : {},
@@ -70,8 +71,9 @@ type OptimisticMutationQuery<
         ? {
             mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
             mutationResources: ResourceByIdRef<
-              string,
-              QueryAndMutationRecord['mutation']['state']
+              string | number,
+              QueryAndMutationRecord['mutation']['state'],
+              QueryAndMutationRecord['mutation']['params']
             >;
           }
         : {}
@@ -403,7 +405,11 @@ export function reloadQueriesOnMutationChange<
     | QueryAndMutationRecord['mutation']['groupIdentifier']
     | undefined;
   mutationResources:
-    | ResourceByIdRef<string, QueryAndMutationRecord['mutation']['state']>
+    | ResourceByIdRef<
+        string,
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
+      >
     | undefined;
 }) {
   queriesWithReload.forEach(([queryName, queryMutationConfig]) => {
@@ -411,7 +417,8 @@ export function reloadQueriesOnMutationChange<
       | ResourceRef<QueryAndMutationRecord['query']['state']>
       | ResourceByIdRef<
           string | number,
-          QueryAndMutationRecord['query']['state']
+          QueryAndMutationRecord['query']['state'],
+          QueryAndMutationRecord['query']['params']
         >;
     if ('hasValue' in queryTargeted) {
       const queryResource = queryTargeted;
@@ -454,7 +461,9 @@ export function reloadQueriesOnMutationChange<
         );
       }
     } else {
-      Object.entries((queryTargeted as ResourceByIdRef<string | number, any>)())
+      Object.entries(
+        (queryTargeted as ResourceByIdRef<string | number, any, any>)()
+      )
         .filter(([queryIdentifier, queryResource]) => {
           if (!('filter' in queryMutationConfig)) {
             return true;
@@ -533,7 +542,8 @@ export function setOptimisticPatchQueriesValue<
   mutationResources:
     | ResourceByIdRef<
         string | number,
-        QueryAndMutationRecord['mutation']['state']
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
       >
     | undefined;
 }) {
@@ -543,7 +553,8 @@ export function setOptimisticPatchQueriesValue<
         | ResourceRef<QueryAndMutationRecord['query']['state']>
         | ResourceByIdRef<
             string | number,
-            QueryAndMutationRecord['query']['state']
+            QueryAndMutationRecord['query']['state'],
+            QueryAndMutationRecord['query']['params']
           >;
       if ('hasValue' in queryTargeted) {
         const queryResource = queryTargeted;
@@ -564,7 +575,8 @@ export function setOptimisticPatchQueriesValue<
           (
             queryTargeted as ResourceByIdRef<
               string | number,
-              ResourceRef<QueryAndMutationRecord['query']['state']>
+              QueryAndMutationRecord['query']['state'],
+              QueryAndMutationRecord['query']['params']
             >
           )()
         )
@@ -623,7 +635,8 @@ export function setOptimisticQueryValues<
   mutationResources:
     | ResourceByIdRef<
         string | number,
-        QueryAndMutationRecord['mutation']['state']
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
       >
     | undefined;
 }) {
@@ -632,7 +645,7 @@ export function setOptimisticQueryValues<
       ([queryName, queryMutationConfig]) => {
         const queryTargeted = (store as any)[queryName] as
           | ResourceRef<QueryAndMutationRecord['query']['state']>
-          | ResourceByIdRef<string | number, any>;
+          | ResourceByIdRef<string | number, any, any>;
         if ('hasValue' in queryTargeted) {
           const queryResource = queryTargeted;
           const optimisticValue = queryMutationConfig?.optimistic?.({
@@ -649,7 +662,8 @@ export function setOptimisticQueryValues<
             (
               queryTargeted as ResourceByIdRef<
                 string | number,
-                QueryAndMutationRecord['query']['state']
+                QueryAndMutationRecord['query']['state'],
+                QueryAndMutationRecord['query']['params']
               >
             )()
           )
@@ -713,13 +727,18 @@ function optimisticPatchQueryResource<
     | QueryAndMutationRecord['query']['groupIdentifier']
     | undefined;
   queryResources:
-    | ResourceByIdRef<string | number, QueryAndMutationRecord['query']['state']>
+    | ResourceByIdRef<
+        string | number,
+        QueryAndMutationRecord['query']['state'],
+        QueryAndMutationRecord['query']['params']
+      >
     | undefined;
   mutationIdentifier?: QueryAndMutationRecord['mutation']['groupIdentifier'];
   mutationResources:
     | ResourceByIdRef<
         string | number,
-        QueryAndMutationRecord['mutation']['state']
+        QueryAndMutationRecord['mutation']['state'],
+        QueryAndMutationRecord['mutation']['params']
       >
     | undefined;
 }) {
