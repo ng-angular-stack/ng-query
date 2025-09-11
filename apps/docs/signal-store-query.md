@@ -1,5 +1,11 @@
 # Query - `withQuery`
 
+## Import:
+
+`import { query } from '@ng-query/ngrx-signals';`
+
+`import { rxQuery } from '@ng-query/ngrx-signals-rxjs';`
+
 ## What is a Query?
 
 A query in Signal Store is used to fetch and manage server state in your Angular application. Based on Angular `Resource`, it provides a reactive and declarative way to retrieve data, track its status (`idle, loading, resolved, error`), and keep your UI in sync with remote resources. Queries are the foundation for building robust, user-friendly interfaces that respond to server data changes automatically.
@@ -39,8 +45,9 @@ const status = store.userQuery.status(); // 'idle', 'loading', 'resolved', 'erro
 - Easy integration with mutations and optimistic updates
 - Type-safe and autocompleted in Angular
 
-::: danger
-Both `query` and `rxQuery` relies on signal source, only the last value emitted in very short period of time is considered. (A possible evolution is creating a `withRxQuery` utility function based on observables).
+::: warning
+Both `query` and `rxQuery` relies on signal source, only the last value emitted in very short period of time is considered.
+(A possible evolution is to works internally with observable when `params$` from `rxQuery` is used, but it is not really useful in this case).
 [info](https://dev.to/lcsga/les-signals-angular-ne-remplacent-pas-les-observables-push-vs-pull-4jk1https://dev.to/lcsga/les-signals-angular-ne-remplacent-pas-les-observables-push-vs-pull-4jk1)
 :::
 

@@ -1,6 +1,10 @@
 # Mutation
 
-// todo import link
+## Import:
+
+`import { mutation } from '@ng-query/ngrx-signals';`
+
+`import { rxMutation } from '@ng-query/ngrx-signals-rxjs';`
 
 ## What is a Mutation?
 
@@ -18,11 +22,11 @@ For more [info](https://dev.to/lcsga/les-signals-angular-ne-remplacent-pas-les-o
 ### Example
 
 ```typescript
-import { signalStore, withMutation } from "@ngrx/signals";
-import { mutation } from "./mutation";
+import { signalStore, withMutation } from '@ngrx/signals';
+import { mutation } from './mutation';
 
 const Store = signalStore(
-  withMutation("updateUser", () =>
+  withMutation('updateUser', () =>
     mutation({
       method: (id: string) => ({ id }),
       loader: ({ params }) => updateUserOnServer(params),
@@ -32,7 +36,7 @@ const Store = signalStore(
 
 // Inject the store and use the mutation
 const store = inject(Store);
-store.mutateUpdateUser("5"); // Triggers the mutation
+store.mutateUpdateUser('5'); // Triggers the mutation
 const status = store.updateUserMutation.status(); // 'idle', 'loading', 'resolved', 'error'
 ```
 
@@ -57,13 +61,13 @@ The `rxMutation` function provides flexible options for configuring how your mut
 - **params$**: An Observable that emits parameters for the mutation. Use this if your parameters come from an RxJS stream.
 
   ```typescript
-  params$: of({ id: "5" });
+  params$: of({ id: '5' });
   ```
 
 - **param**: A function that returns the mutation parameters. This is typically. This function is exposed into the store
 
   ```typescript
-  param: signal({ id: "5" });
+  param: signal({ id: '5' });
   ```
 
 - **stream**: A function that receives the current parameters and returns an Observable of the mutation result. This is where you connect to your mutation source (REST, GraphQL, WebSocket, etc.).
@@ -82,7 +86,7 @@ rxMutation({
 
 // Using params$ (observable)
 rxMutation({
-  params$: of({ id: "5" }),
+  params$: of({ id: '5' }),
   stream: ({ params }) => updateUserStream$(params), // returns Observable<User>
 });
 ```

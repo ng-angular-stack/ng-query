@@ -11,16 +11,31 @@ This tool evolves continuously based on community feedback and needs. The initia
 Signal Store for Server State simplifies complex data operations with features like:
 
 - Declarative optimistic updates for responsive UIs
-- Automatic query reloading
 - Seamless integration between client and server state
 - Centralized management of loading, error, and success states
 - Easy to use with CRUD or BFF (backend for frontend)
+- React easily to mutation
+- Use (`Insertions` for better comfort based on reusable composition pattern
 
 ## Why Signal Store for Server State?
 
 Integrating server state management directly within `signalStore` provides a seamless approach to handling queries and mutations. This integration offers a declarative and reactive pattern that simplifies complex server interactions.
 
 For more advanced scenarios, you can associate client state with query state, leveraging the full power of Signal Store for a unified state management solution that handles both client and server concerns elegantly.
+
+## Server state management tool - philosophy
+
+It is not a client state management tool, the idea:
+
+- The query state represent the resource in your backend
+- In this way, it should only be updated by using mutation reactions, reloads, or by the cache manager (called `persister`)
+- But, you can derived a client state by using `withLinkedSignal` or update an existing state from your store (see Queries section)
+- Client state should be local as possible (only share client state globally if you really need it), otherwise prefer to expose globally server state.
+- Make the queries and mutations declarative (it abstracts a lot of imperative code and avoid some boilerplate)
+
+> From my experience, most of client state tools suggests indirectly to work with the fetched state.
+> In my opinion, it is a bad practice.
+> If a server state is used in multiples component, a change that may not be commit (saved in the backend) will result by displaying a wrong data to the user.
 
 ## Current Implementation Details
 

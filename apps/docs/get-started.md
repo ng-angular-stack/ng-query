@@ -1,5 +1,14 @@
 # Get started
 
+:::warning
+This project is experimental.
+
+- Their is missing functionalities (that you can request ;D)
+- Some of exposed API can change until a stable version is find
+- If you like it, add github star.
+- But you should try it, it already helps a lot !
+  :::
+
 ## Using npm
 
 Do you use RxJS Observables for your API calls? (RxJs is Optional)

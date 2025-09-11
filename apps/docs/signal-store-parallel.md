@@ -1,10 +1,16 @@
 # Parallel Queries & Mutations
 
+## Import
+
+`import { queryById, mutationById } from '@ng-query/ngrx-signals-rxjs';`
+
+`import { rxQueryById, rxMutationById } from '@ng-query/ngrx-signals-rxjs';`
+
 ## Overview
 
 `withQueryById` and `withMutationById` are specialized versions of `withQuery` and `withMutation` designed for handling collections of resources identified by a unique key (such as an ID). They work with `queryById`/`rxQueryById` and `mutationById`/`rxMutationById` respectively.
 
-## Specific Options `queryById` / `rxQueryById` / `mutationById` / `mutationById`
+## Specific Options `queryById` / `rxQueryById` / `mutationById` / `rxMutationById`
 
 - **identifier:** (mandatory)
 
