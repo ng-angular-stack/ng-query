@@ -35,9 +35,7 @@ export function withCachedQueryToPlugFactory<
 ) {
   return <
     Input extends SignalStoreFeatureResult,
-    const StoreInput extends Prettify<
-      StateSignals<Input['state']> & Input['props'] & Input['methods']
-    >
+    const StoreInput extends PublicSignalStore<Input>
   >(
     options?: QueryOptions<
       StoreInput,

@@ -56,7 +56,7 @@ It works pretty well like that, but I will surely deprecated this API, and handl
 It may looks like that:
 
 ```ts
-const { withUserQuery, injectUserQuery, withUserMutation } = serverStateStore(
+const { withUserQuery, injectUserQuery, withUserMutation, injectUserMutation } = serverStateStore(
   {
     providedIn: 'root',
     persister: localStoragePersister,

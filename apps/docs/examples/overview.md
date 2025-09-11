@@ -1,6 +1,6 @@
 # Examples
 
-## Query & Mutation inside signal store
+## Query & Mutation inside signal store (local)
 
 - Display a user
 - Mutate the user data
@@ -29,3 +29,8 @@
 - Display a paginated list of user (previous page, next page, page size)
 - Using a cached (from localStorage) global query, that is plugged inside a signalStore
 - Edit user name concurrently
+
+## Display X independents resources to display and granular mutations
+
+- Display a dynamic list of selected user
+- Apply granular mutation on selected user

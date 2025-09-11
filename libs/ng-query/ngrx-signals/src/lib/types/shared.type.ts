@@ -10,6 +10,7 @@ import {
   Prettify,
   SignalStoreFeatureResult,
   StateSignals,
+  WritableStateSource,
 } from '@ngrx/signals';
 
 // todo rename, and rename server state constraints
@@ -176,4 +177,9 @@ export type ResourceMethod<ParamsArgs, ResourceParams> = (
 ) => ResourceParams;
 
 export type PublicSignalStore<Input extends SignalStoreFeatureResult> =
-  Prettify<StateSignals<Input['state']> & Input['props'] & Input['methods']>;
+  Prettify<
+    StateSignals<Input['state']> &
+      Input['props'] &
+      Input['methods'] &
+      WritableStateSource<Input['state']>
+  >;

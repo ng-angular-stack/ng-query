@@ -6,4 +6,9 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./pages/list-with-pagination/list-with-pagination'),
   },
+  {
+    path: 'query-and-mutation-local',
+    loadComponent: () =>
+      import('./pages/query-and-mutation-local/query-and-mutation-local'),
+  },
 ];
