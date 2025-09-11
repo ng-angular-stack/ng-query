@@ -12,20 +12,11 @@ export default function (options: Schema): Rule {
         packageName: '@ng-query/ngrx-signals',
       })
     );
-    context.addTask(
-      new NodePackageInstallTask({
-        packageName: '@ng-query/insertions',
-      })
-    );
+
     if (options.useRxjs) {
       context.addTask(
         new NodePackageInstallTask({
           packageName: '@ng-query/ngrx-signals-rxjs',
-        })
-      );
-      context.addTask(
-        new NodePackageInstallTask({
-          packageName: '@ng-query/rx-insertions',
         })
       );
     }

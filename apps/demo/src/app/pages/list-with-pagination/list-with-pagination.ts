@@ -9,7 +9,7 @@ import {
   SignalProxy,
 } from '@ng-query/ngrx-signals';
 import { rxQueryById } from '@ng-query/ngrx-signals-rxjs';
-import { insertPaginationPlaceholderData } from '@ng-query/insertions/pagination-place-holder-data';
+import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
 export type User = {
   id: string;
   name: string;

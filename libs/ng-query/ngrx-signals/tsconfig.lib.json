@@ -8,23 +8,23 @@
     "types": []
   },
   "exclude": [
-    "src/**/*.spec.ts",
-    "src/test-setup.ts",
+    "**/*.spec.ts",
+    "test-setup.ts",
     "jest.config.ts",
-    "src/**/*.test.ts",
+    "**/*.test.ts",
     "vite.config.ts",
     "vite.config.mts",
     "vitest.config.ts",
     "vitest.config.mts",
-    "src/**/*.test.tsx",
-    "src/**/*.spec.tsx",
-    "src/**/*.test.js",
-    "src/**/*.spec.js",
-    "src/**/*.test.jsx",
-    "src/**/*.spec.jsx"
+    "**/*.test.tsx",
+    "**/*.spec.tsx",
+    "**/*.test.js",
+    "**/*.spec.js",
+    "**/*.test.jsx",
+    "**/*.spec.jsx"
   ],
   "include": [
-    "src/**/*.ts",
+    "**/*.ts",
     "../ngrx-signals-rxjs/src/lib/types/rx-resource-by-id-config.type.ts",
     "../ngrx-signals-rxjs/src/lib/types/rx-resource-with-params-or-params-fn.type.spec.ts",
     "../ngrx-signals-rxjs/src/lib/types/rx-resource-with-params-or-params-fn.type.ts",
