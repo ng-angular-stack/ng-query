@@ -210,7 +210,9 @@ export function withMutationById<
 
         const queriesWithOptimisticMutation = Object.entries(
           queriesMutation
-        ).filter(([, queryMutationConfig]) => queryMutationConfig.optimistic);
+        ).filter(
+          ([, queryMutationConfig]) => queryMutationConfig.optimisticUpdate
+        );
         const queriesWithOptimisticPatch = Object.entries(
           queriesMutation
         ).filter(

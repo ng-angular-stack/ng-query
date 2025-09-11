@@ -89,7 +89,7 @@ export type QueryImperativeEffect<
      * Will update the query state with the mutation data.
      * Be careful! If the mutation is already in a loading state, trigger the mutation again will cancelled the previous mutation loader and will patch with the new value.
      */
-    optimistic?: OptimisticMutationQuery<QueryAndMutationRecord>;
+    optimisticUpdate?: OptimisticMutationQuery<QueryAndMutationRecord>;
     /**
      * Will reload the query when the mutation is in a specific state.
      * If not provided, it will reload the query onMutationResolved and onMutationError.
@@ -275,7 +275,9 @@ export function withMutation<
 
         const queriesWithOptimisticMutation = Object.entries(
           queriesMutation
-        ).filter(([, queryMutationConfig]) => queryMutationConfig.optimistic);
+        ).filter(
+          ([, queryMutationConfig]) => queryMutationConfig.optimisticUpdate
+        );
         const queriesWithOptimisticPatch = Object.entries(
           queriesMutation
         ).filter(
@@ -648,7 +650,7 @@ export function setOptimisticQueryValues<
           | ResourceByIdRef<string | number, any, any>;
         if ('hasValue' in queryTargeted) {
           const queryResource = queryTargeted;
-          const optimisticValue = queryMutationConfig?.optimistic?.({
+          const optimisticValue = queryMutationConfig?.optimisticUpdate?.({
             mutationResource,
             queryResource,
             mutationParams: mutationParamsSrc() as NonNullable<
@@ -686,7 +688,7 @@ export function setOptimisticQueryValues<
               });
             })
             .forEach(([queryIdentifier, queryResource]) => {
-              const optimisticValue = queryMutationConfig.optimistic?.({
+              const optimisticValue = queryMutationConfig.optimisticUpdate?.({
                 queryResource: queryResource as NonNullable<
                   typeof queryResource
                 >,

@@ -185,7 +185,7 @@ export const TestStore = signalStore(
     (store) => ({
       queriesEffects: {
         userQueryWithAssociatedClientStateQuery: {
-          optimistic: ({ mutationParams, queryResource }) => {
+          optimisticUpdate: ({ mutationParams, queryResource }) => {
             const queryValue = queryResource.value();
             if (!queryValue) {
               throw new Error('Query resource is not available');
