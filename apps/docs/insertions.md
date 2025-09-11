@@ -52,7 +52,9 @@ userQuery.total(); // number
 
 ## Bundle Size Consideration
 
-The dedicated library for insertions is entirely made up of Secondary Entry Points. This means you only import what you use, helping to keep your bundle size small.
+The insertions are inside Secondary Entry Points libs. This means you only import what you use, helping to keep your bundle size small.
+
+Like: `import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';`
 
 ::: info
 If you have an idea for a useful insertion (such as a new side effect or property), please consider opening a PR or feature request! Community contributions help make this library more powerful and flexible for everyone.
