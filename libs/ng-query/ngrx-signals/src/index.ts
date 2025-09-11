@@ -23,5 +23,10 @@ export type {
   InsertionByIdParams,
 } from './lib/core/query.core';
 export { resourceById } from './lib/resource-by-id';
-export type { ResourceByIdRef } from './lib/resource-by-id';
+export type {
+  ResourceByIdRef,
+  ResourceByIdHandler,
+} from './lib/resource-by-id';
 export { globalQueries } from './lib/global-query/global-queries';
+export { localStoragePersister } from './lib/persister/local-storage-persister';
+export * from './lib/persister/persister.type';

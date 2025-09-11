@@ -3,6 +3,8 @@ import {
   inject,
   Injector,
   linkedSignal,
+  resource,
+  ResourceRef,
   signal,
   untracked,
 } from '@angular/core';
@@ -63,7 +65,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         }
         const { queryResource, queryResourceParamsSrc, storageKey } = data;
         const queryStatus = queryResource.status();
-        if (queryStatus !== 'resolved') {
+        if (queryStatus !== 'resolved' && queryStatus !== 'local') {
           return;
         }
         untracked(() => {
@@ -129,6 +131,65 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     });
   });
 
+  const newQueryByIdKeysForNestedEffect = linkedSignal<
+    any,
+    { newKeys: string[] } | undefined
+  >({
+    source: queriesByIdMap,
+    computation: (currentSource, previous) => {
+      if (!currentSource || !Array.from(currentSource.keys()).length) {
+        return undefined;
+      }
+
+      const currentKeys = Array.from(currentSource.keys());
+      const previousKeys = Array.from(previous?.source?.keys() || []);
+      const newKeys = currentKeys.filter(
+        (key) => !previousKeys.includes(key)
+      ) as string[];
+      return newKeys.length > 0 ? { newKeys } : previous?.value;
+    },
+  });
+
+  effect(() => {
+    if (!newQueryByIdKeysForNestedEffect()?.newKeys) {
+      return;
+    }
+
+    // Each time their is a status change in the queryById resource it will save the query with only the resource that are 'resolved' or 'local' (it may be improved)
+    newQueryByIdKeysForNestedEffect()?.newKeys.forEach((newKey) => {
+      const data = untracked(() => queriesByIdMap().get(newKey));
+      nestedEffect(_injector, () => {
+        if (!data) {
+          return;
+        }
+
+        const { queryByIdResource, queryResourceParamsSrc, storageKey } = data;
+        const queryByIdValue = Object.entries(queryByIdResource() ?? {}).reduce<
+          Record<string, any>
+        >((acc, [resourceKey, resource]) => {
+          const queryStatus = resource?.status();
+          if (queryStatus !== 'resolved' && queryStatus !== 'local') {
+            return acc;
+          }
+          acc[resourceKey] = resource?.value();
+          return acc;
+        }, {});
+
+        untracked(() => {
+          const queryParams = queryResourceParamsSrc();
+          localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+              queryParams,
+              queryByIdValue,
+              timestamp: Date.now(),
+            })
+          );
+        });
+      });
+    });
+  });
+
   function isValueExpired(timestamp: number, cacheTime: number): boolean {
     return Date.now() - timestamp > cacheTime;
   }
@@ -145,6 +206,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
       const storageKey = `${prefix}${key}`;
       const storedValue = localStorage.getItem(storageKey);
+
       if (storedValue && !waitForParamsSrcToBeEqualToPreviousValue) {
         try {
           const { queryValue, timestamp } = JSON.parse(storedValue);
@@ -176,19 +238,15 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     },
 
     addQueryByIdToPersist(data: PersistedQueryById): void {
-      const {
-        key,
-        queryByIdResource,
-        queryResourceParamsSrc,
-        waitForParamsSrcToBeEqualToPreviousValue,
-        cacheTime,
-      } = data;
+      const { key, queryByIdResource, queryResourceParamsSrc, cacheTime } =
+        data;
 
       const storageKey = `${prefix}${key}`;
       const storedValue = localStorage.getItem(storageKey);
-      if (storedValue && !waitForParamsSrcToBeEqualToPreviousValue) {
+
+      if (storedValue) {
         try {
-          const { queryValue, timestamp } = JSON.parse(storedValue);
+          const { queryByIdValue, timestamp } = JSON.parse(storedValue);
           if (
             timestamp &&
             cacheTime > 0 &&
@@ -196,7 +254,22 @@ export function localStoragePersister(prefix: string): QueriesPersister {
           ) {
             localStorage.removeItem(storageKey);
           } else {
-            queryByIdResource.set(queryValue);
+            if (queryByIdValue && typeof queryByIdValue === 'object') {
+              console.log('queryByIdValue', queryByIdValue);
+              debugger;
+              const queryByIdReconstructed = Object.entries(
+                queryByIdValue
+              ).reduce<Record<string | number, ResourceRef<any>>>(
+                (acc, [resourceKey, resourceValue]) => {
+                  // todo check if it is a resource or a rxResource ? Maybe a method from the resourceById to deal with that !
+                  // todo passer tous ce qui est equalParams...
+                  acc[resourceKey] = resource();
+                },
+                {}
+              );
+              // todo deserialise the resource, create resource for each value
+              queryByIdResource.set(queryByIdValue);
+            }
           }
         } catch (e) {
           console.error('Error parsing stored value from localStorage', e);
@@ -208,7 +281,6 @@ export function localStoragePersister(prefix: string): QueriesPersister {
           queryByIdResource,
           queryResourceParamsSrc,
           storageKey,
-          waitForParamsSrcToBeEqualToPreviousValue,
           cacheTime,
           key,
         });

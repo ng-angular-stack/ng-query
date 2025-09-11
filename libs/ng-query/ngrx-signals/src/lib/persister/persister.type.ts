@@ -13,14 +13,12 @@ export interface PersistedQueryById {
   key: string;
   queryByIdResource: ResourceByIdRef<string | number, unknown>;
   queryResourceParamsSrc: Signal<unknown>;
-  waitForParamsSrcToBeEqualToPreviousValue: boolean;
   cacheTime: number;
 }
 
 export interface QueriesPersister {
   addQueryToPersist(data: PersistedQuery): void;
   addQueryByIdToPersist(data: PersistedQueryById): void;
-
   clearQuery(queryKey: string): void;
   clearQueryBy(queryKey: string): void;
   clearAllQueries(): void;

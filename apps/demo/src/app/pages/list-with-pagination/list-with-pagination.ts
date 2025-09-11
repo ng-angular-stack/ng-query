@@ -3,14 +3,48 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { withServices } from './util';
 import { ApiService } from './api.service';
-import { withQueryById } from '@ng-query/ngrx-signals';
+import {
+  globalQueries,
+  localStoragePersister,
+  SignalProxy,
+} from '@ng-query/ngrx-signals';
 import { rxQueryById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/insertions/pagination-place-holder-data';
-
 export type User = {
   id: string;
   name: string;
 };
+
+const { withUsersQueryById } = globalQueries(
+  {
+    queriesById: {
+      users: {
+        queryById: (
+          {
+            pagination,
+          }: SignalProxy<{ pagination: { page: number; pageSize: number } }>,
+          api = inject(ApiService)
+        ) =>
+          rxQueryById(
+            {
+              params: pagination,
+              identifier: (params) => `${params.page}-${params.pageSize}`,
+              stream: ({ params }) =>
+                api.getDataList$({
+                  page: params.page,
+                  pageSize: params.pageSize,
+                }),
+            },
+            insertPaginationPlaceholderData
+          ),
+      },
+    },
+  },
+  {
+    featureName: 'list-with-pagination-global',
+    persister: localStoragePersister,
+  }
+);
 
 const UserListServerStateStore = signalStore(
   withServices(() => ({
@@ -22,20 +56,9 @@ const UserListServerStateStore = signalStore(
       pageSize: 4,
     },
   }),
-  withQueryById('users', (store) =>
-    rxQueryById(
-      {
-        params: store.pagination,
-        identifier: (params) => `${params.page}-${params.pageSize}`,
-        stream: ({ params }) =>
-          store.api.getDataList$({
-            page: params.page,
-            pageSize: params.pageSize,
-          }),
-      },
-      insertPaginationPlaceholderData
-    )
-  ),
+  withUsersQueryById((store) => ({
+    setQuerySource: () => ({ pagination: store.pagination }),
+  })),
   withMethods((store) => ({
     nextPage: () =>
       patchState(store, (state) => ({

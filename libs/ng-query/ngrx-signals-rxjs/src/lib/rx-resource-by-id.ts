@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { RxResourceOptions } from '@angular/core/rxjs-interop';
 import { preservedRxResource } from './preserved-rx-resource';
+import { ResourceByIdHandler } from '@ng-query/ngrx-signals';
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -22,7 +23,8 @@ export type RxResourceByIdRef<
   State
 > = WritableSignal<
   Prettify<Partial<Record<GroupIdentifier, ResourceRef<State>>>>
->;
+> &
+  ResourceByIdHandler<GroupIdentifier, State>;
 
 export function rxResourceById<T, R, GroupIdentifier extends string | number>({
   identifier,

@@ -315,7 +315,7 @@ export function globalQueries<
      * If not specified, the default is 5 minutes (300000 ms).
      */
     cacheTime?: CacheTime;
-    persister?: QueriesPersister;
+    persister?: (featureName: string) => QueriesPersister;
     featureName?: string;
   }
 ): CachedQueryFactoryOutput<
@@ -351,16 +351,18 @@ export function globalQueries<
               const queryRef = queryData.queryRef;
               const queryResource = queryRef.resource;
               const queryResourceParamsSrc = queryRef.resourceParamsSrc;
-              cacheGlobalConfig?.persister?.addQueryToPersist({
-                key,
-                queryResource,
-                queryResourceParamsSrc,
-                waitForParamsSrcToBeEqualToPreviousValue: false,
-                cacheTime:
-                  value?.config?.cacheTime ??
-                  (cacheGlobalConfig?.cacheTime as number | undefined) ??
-                  300000,
-              });
+              cacheGlobalConfig
+                ?.persister?.(cacheGlobalConfig?.featureName ?? '')
+                ?.addQueryToPersist({
+                  key,
+                  queryResource,
+                  queryResourceParamsSrc,
+                  waitForParamsSrcToBeEqualToPreviousValue: false,
+                  cacheTime:
+                    value?.config?.cacheTime ??
+                    (cacheGlobalConfig?.cacheTime as number | undefined) ??
+                    300000,
+                });
               queriesMap.set(key, queryData);
               return queryData;
             });
@@ -411,16 +413,17 @@ export function globalQueries<
             const queryByRef = queryData.queryByIdRef;
             const queryByIdResource = queryByRef.resourceById;
             const queryResourceParamsSrc = queryByRef.resourceParamsSrc;
-            cacheGlobalConfig?.persister?.addQueryByIdToPersist({
-              key,
-              queryByIdResource,
-              queryResourceParamsSrc,
-              waitForParamsSrcToBeEqualToPreviousValue: false,
-              cacheTime:
-                value?.config?.cacheTime ??
-                (cacheGlobalConfig?.cacheTime as number | undefined) ??
-                300000,
-            });
+            cacheGlobalConfig
+              ?.persister?.(cacheGlobalConfig?.featureName ?? '')
+              ?.addQueryByIdToPersist({
+                key,
+                queryByIdResource,
+                queryResourceParamsSrc,
+                cacheTime:
+                  value?.config?.cacheTime ??
+                  (cacheGlobalConfig?.cacheTime as number | undefined) ??
+                  300000,
+              });
             queriesByIdMap.set(key, queryData);
             return queryData;
           });

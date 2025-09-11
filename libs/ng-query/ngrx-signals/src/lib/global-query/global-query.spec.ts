@@ -11,6 +11,7 @@ import { ResourceByIdRef } from '../resource-by-id';
 import { query } from '../query';
 import { mutation } from '../mutation';
 import { queryById } from '../query-by-id';
+import { localStoragePersister } from '../persister/local-storage-persister';
 
 describe('Global Queries', () => {
   it('should create a cached query and return a withFeatureQuery that can be used in signalStore', async () => {
@@ -679,5 +680,31 @@ describe('Global Queries', () => {
         page: number;
       }>();
     });
+  });
+});
+
+describe('Global queries with persister', () => {
+  it('Should enable persisted queries', () => {
+    const { injectUserQuery } = globalQueries(
+      {
+        queries: {
+          user: {
+            query: () =>
+              query({
+                params: () => '1',
+                loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
+              }),
+          },
+        },
+      },
+      {
+        persister: localStoragePersister,
+      }
+    );
+  });
+
+  TestBed.runInInjectionContext(() => {
+    const injectedQuery = injectUserQuery();
+    expect(injectedQuery).toBeDefined();
   });
 });

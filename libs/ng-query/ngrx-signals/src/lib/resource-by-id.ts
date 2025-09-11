@@ -18,12 +18,36 @@ type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+export type ResourceByIdHandler<
+  GroupIdentifier extends string | number,
+  State
+> = {
+  /**
+   * Reset all the ResourceRef instance stored in the ResourceByIdRef
+   */
+  reset: () => void;
+  /**
+   * Reset the ResourceRef instance associated with the provided id
+   */
+  resetResource: (id: GroupIdentifier) => void;
+  /**
+   * Add a new ResourceRef instance
+   */
+  add: (
+    id: GroupIdentifier,
+    options?: {
+      defaultValue?: State;
+    }
+  ) => void;
+};
+
 export type ResourceByIdRef<
   GroupIdentifier extends string | number,
   State
 > = WritableSignal<
   Prettify<Partial<Record<GroupIdentifier, ResourceRef<State>>>>
->;
+> &
+  ResourceByIdHandler<GroupIdentifier, State>;
 
 export function resourceById<T, R, GroupIdentifier extends string | number>({
   identifier,
@@ -105,7 +129,37 @@ export function resourceById<T, R, GroupIdentifier extends string | number>({
     }));
   });
 
-  return resourceByGroup;
+  const resourcesHandler: ResourceByIdHandler<GroupIdentifier, T> = {
+    reset: () => {
+      // todo check if all the resourceRef need to be destroyed before reseting the map (to avoid memory leaks)
+      resourceByGroup.set({});
+    },
+    resetResource: (id: GroupIdentifier) => {
+      resourceByGroup.update((state) => {
+        const newState = { ...state };
+        delete newState[id];
+        return newState;
+      });
+    },
+    add: (id: GroupIdentifier, options?: { defaultValue?: T }) => {
+      const resourceRef = createDynamicResource(injector, {
+        group: id,
+        resourceOptions: {
+          loader,
+          params: resourceEqualParams,
+          stream,
+          defaultValue: options?.defaultValue,
+        } as ResourceOptions<unknown, unknown>,
+      });
+
+      resourceByGroup.update((state) => ({
+        ...state,
+        [id]: resourceRef,
+      }));
+    },
+  };
+
+  return Object.assign(resourceByGroup, resourcesHandler);
 }
 
 const RESOURCE_INSTANCE_TOKEN = new InjectionToken<ResourceRef<unknown>>(

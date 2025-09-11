@@ -21,6 +21,7 @@ Ajout des tests manquants en même temps
 - Regarder pourquoi globalQueries n'est pas typé quand on créé les query
 - ajouter page pour demander de l'aide dans la doc
 - faire doc pour llm
+- faire un globalQueriesStore qui permet de gérer le cache, et de partager aussi les mutations de façon global et d'y réagir depuis les queries
 - Pour éviter que ça aille dans tous les sens faire un truc genre: query(..., withOption(...), withExtension(...))
 - préserver les résultats précédents pagintation, ajouter une fonction qui va exposer current page et current résult ? et exposer en plus des resources ? évite de recréer des trucs dédiés
 - gérer les mutations qui se lancent mais on n'a pas le résultat (car on a refresh la page avant)
