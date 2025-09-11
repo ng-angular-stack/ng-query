@@ -34,10 +34,15 @@ withMutation(
 
 **Supported Effects:**
 
-- `optimistic`: Replace the query value with the mutation params.
-- `optimisticPatch`: Patch specific fields in the query value.
-- `reload`: Reload the query when the mutation is loading or resolved.
-- `filter`: Target specific queries by identifier. (Mandatory when working with a `queryById` or `mutationById`)
+- `optimisticUpdate`: Perform an optimistic update of the query value - when the mutation start.
+- `update`: (Available soon) Perform an update of the query value - when mutation is resolved
+- `optimisticPatch`: Optimistic patch specific fields in the query value - when the mutation start
+- `patch`: (Available soon) Patch specific fields in the query value - when mutation is resolved
+- `reload`: Reload the query - when the mutation is loading or resolved or error
+
+**Required field**
+
+- `filter`: Target specific queries by identifier (return `true` to apply the effect). (Mandatory when working with a `queryById` or `mutationById`)
 
 ## Declarative Effects (Recommended)
 
@@ -68,10 +73,15 @@ withQuery(
 
 **Supported Effects:**
 
-- `optimistic`: Replace the query value with the mutation params.
-- `optimisticPatch`: Patch specific fields in the query value.
-- `reload`: Reload the query when the mutation is loading or resolved.
-- `filter`: Target specific queries by identifier. (Mandatory when working with a `queryById` or `mutationById`)
+- `optimisticUpdate`: Perform an optimistic update of the query value - when the mutation start.
+- `update`: (Available soon) Perform an update of the query value - when mutation is resolved
+- `optimisticPatch`: Optimistic patch specific fields in the query value - when the mutation start
+- `patch`: Patch specific fields in the query value - when mutation is resolved
+- `reload`: Reload the query - when the mutation is loading or resolved or error
+
+**Required field**
+
+- `filter`: Target specific queries by identifier (return `true` to apply the effect). (Mandatory when working with a `queryById` or `mutationById`)
 
 ## Data Flow Principle - Best Practices
 
