@@ -55,6 +55,10 @@ export default defineConfig({
                 text: 'UX Loader',
                 link: '/insertions/insert-ux-loader.md',
               },
+              {
+                text: 'Last successful value',
+                link: '/insertions/insert-last-successful-value.md',
+              },
             ],
           },
           { text: 'Server State Store', link: '/signal-store-server-state' },

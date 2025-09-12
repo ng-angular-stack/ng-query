@@ -3,7 +3,10 @@
 ## Query & Mutation inside signal store (local)
 
 - Display a user
+- Toggle Api error via a checkbox
 - Mutate the user data
+  - Optimistic update the query state on mutate
+  - Reload if the API return an error
 
 ## A cached global query and mutation
 
@@ -34,3 +37,4 @@
 
 - Display a dynamic list of selected user
 - Apply granular mutation on selected user
+- Pokemon
