@@ -10,6 +10,18 @@
 
 `withQueryById` and `withMutationById` are specialized versions of `withQuery` and `withMutation` designed for handling collections of resources identified by a unique key (such as an ID). They work with `queryById`/`rxQueryById` and `mutationById`/`rxMutationById` respectively.
 
+## Common use cases
+
+### Pagination
+
+- `queryById` can be used to cache multiples pages
+- `mutationById` can be used for parallel granular mutation (target a specific item of a page)
+
+### Cache multiples page data
+
+- by using `queryById` instead of `query` enable to cache all the data made by the same query (eg: A user details page that use the userId from the url to query the user. When using `queryById` it will saved all the visited user data in cache (in-memory by default))
+- In this scenario you should use `mutationById` to target a specific user query and enable parallel mutation
+
 ## Specific Options `queryById` / `rxQueryById` / `mutationById` / `rxMutationById`
 
 - **identifier:** (mandatory)

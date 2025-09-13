@@ -12,6 +12,10 @@ export const appRoutes: Route[] = [
       import('./pages/global-query-and-mutation/global-query-and-mutation'),
   },
   {
+    path: 'no-store/:userId',
+    loadComponent: () => import('./pages/no-store/no-store'),
+  },
+  {
     path: 'list-with-pagination',
     loadComponent: () =>
       import('./pages/list-with-pagination/list-with-pagination'),
