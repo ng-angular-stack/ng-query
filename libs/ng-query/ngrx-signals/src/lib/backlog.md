@@ -12,6 +12,7 @@ Ajout des tests manquants en même temps
 
 ## Feature
 
+- example pokemon
 - // Todo backlog: add reset pagination that remove all the other page ?
 - Mettre les libs insertions directement dans les autres libs en tant que second entry point
 - hide internal type from the props store

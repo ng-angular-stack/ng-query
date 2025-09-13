@@ -50,6 +50,7 @@
 
 ## Display X independents resources to display and granular mutations
 
+- Available soon
 - Display a dynamic list of selected user
 - Apply granular mutation on selected user
 - Pokemon
