@@ -67,11 +67,11 @@ export const insertPaginationPlaceholderData = <
       const page = resourceParamsSrc();
       const resources = resourceById();
       if (!page) {
-        return;
+        return 'idle' as const; // avoid to handle the undefined check
       }
       const pageKey = identifier(page);
       const currentResource = resources[pageKey];
-      return currentResource?.status();
+      return currentResource?.status() ?? ('idle' as const);
     }),
     isPlaceHolderData: showPlaceHolderData,
   };

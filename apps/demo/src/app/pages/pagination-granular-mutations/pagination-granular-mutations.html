@@ -1,0 +1,69 @@
+<div class="container">
+  <main class="content">
+    <div class="content-wrapper">
+      <div class="card">
+        <h2 class="card-title">
+          User Management:
+
+          <app-status
+            [status]="store.usersQueryById.currentPageStatus()"
+          ></app-status>
+        </h2>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(user of store.usersQueryById.currentPageData(); track
+              user.id) {
+              <tr>
+                <td>{{ user.id }}</td>
+
+                <td>{{user.name }}</td>
+
+                <td>
+                  @if(store.userMutationById()[user.id]; as userMutation) {
+                  <app-status [status]="userMutation.status()"></app-status>}
+                </td>
+                <td>
+                  <button class="btn" (click)="mutateUserName(user)">
+                    Update
+                  </button>
+                </td>
+              </tr>
+              } @if (!store.usersQueryById.currentPageData()?.length) {
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 32px">
+                  No users found
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <select
+            [value]="store.pagination.pageSize()"
+            (change)="updatePageSize($event)"
+            style="margin-right: 8px"
+          >
+            <option [value]="2">2</option>
+            <option [value]="4">4</option>
+            <option [value]="8">8</option>
+            <option [value]="16">16</option>
+          </select>
+          <button class="btn" (click)="store.previousPage()">Previous</button>
+          <button class="btn" (click)="store.nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -29,4 +29,11 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./pages/list-with-pagination-global/list-with-pagination'),
   },
+  {
+    path: 'pagination-granular-mutations',
+    loadComponent: () =>
+      import(
+        './pages/pagination-granular-mutations/pagination-granular-mutations'
+      ),
+  },
 ];
