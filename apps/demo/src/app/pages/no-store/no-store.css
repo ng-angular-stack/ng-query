@@ -72,3 +72,7 @@
   margin: 1.2rem 0;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
+
+:host button {
+  margin-right: 1rem;
+}

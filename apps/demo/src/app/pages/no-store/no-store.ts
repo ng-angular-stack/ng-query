@@ -10,7 +10,7 @@ import { ApiService } from './api.service';
 import { StatusComponent } from '../../ui/status.component';
 import { Router } from '@angular/router';
 
-export const { withUserQuery, injectUserQuery } = globalQueries(
+const { injectUserQuery } = globalQueries(
   {
     queries: {
       user: {
@@ -21,7 +21,14 @@ export const { withUserQuery, injectUserQuery } = globalQueries(
           query({
             params: source.id,
             loader: ({ params: id }) => api.getItemById(id),
+            preservePreviousValue: () => true, // keep the previous user display while the new one fetching
           }),
+        config: {
+          // 👇wait for the userId from the component to be set before retrieve the cached data
+          // It is useful when the last cached user (with id: 2), and when accessing to the page for the user with id 3
+          // It avoids to display wrong data
+          waitForParamsSrcToBeEqualToPreviousValue: true,
+        },
       },
     },
   },
