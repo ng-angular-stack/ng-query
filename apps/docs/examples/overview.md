@@ -12,6 +12,10 @@
 
 - Display a user by using a cached global query
 - Plug the userId from the signal store to the global query
+- Toggle Api error via a checkbox
+- Mutate the user data
+  - Optimistic update the query state on mutate
+  - Reload if the API return an error
 
 ## A cached global query used without store
 

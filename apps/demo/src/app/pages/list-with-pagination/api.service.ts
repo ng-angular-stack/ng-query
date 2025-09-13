@@ -89,7 +89,7 @@ export class ApiService {
     console.log('updatedItem', updatedItem);
     if (this.updateError()) {
       return firstValueFrom(
-        timer(5000).pipe(
+        timer(3000).pipe(
           map(() => {
             throw new Error('Api error during update');
           })

@@ -2,13 +2,21 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import {
   globalQueries,
+  localStoragePersister,
   mutation,
   query,
   SignalProxy,
   withMutation,
 } from '@ng-query/ngrx-signals';
-import { signalStore, withMethods, withProps, withState } from '@ngrx/signals';
+import {
+  signalStore,
+  withComputed,
+  withMethods,
+  withProps,
+  withState,
+} from '@ngrx/signals';
 import { ApiService, User } from './api.service';
+import { StatusComponent } from '../../ui/status.component';
 
 const { withUserQuery } = globalQueries(
   {
@@ -27,16 +35,19 @@ const { withUserQuery } = globalQueries(
   },
   {
     featureName: 'globalQueryAndMutationDemo',
+    persister: localStoragePersister,
   }
 );
 
 const Store = signalStore(
   withState({
-    id: '1',
+    id: '1' as string | undefined,
   }),
   withProps(() => ({
     _api: inject(ApiService),
-    apiReturnError: inject(ApiService).updateError.asReadonly(),
+  })),
+  withComputed(({ _api }) => ({
+    apiReturnError: _api.updateError.asReadonly(),
   })),
   withMutation('user', ({ _api }) =>
     mutation({
@@ -46,7 +57,7 @@ const Store = signalStore(
       },
     })
   ),
-  withUserQuery(() => ({
+  withUserQuery((store) => ({
     on: {
       userMutation: {
         optimisticUpdate: ({ mutationParams }) => mutationParams,
@@ -55,6 +66,9 @@ const Store = signalStore(
         },
       },
     },
+    setQuerySource: () => ({
+      id: store.id,
+    }),
   })),
   withMethods(({ _api }) => ({
     toggleApiError: () => _api.updateError.set(!_api.updateError()),
@@ -64,30 +78,21 @@ const Store = signalStore(
 @Component({
   selector: 'app-global-query-and-mutation',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StatusComponent],
   providers: [Store],
   styleUrls: ['global-query-and-mutation.css'],
   template: `
     <div>
       User
-      <ng-container
-        *ngTemplateOutlet="
-          statusTemplate;
-          context: { status: store.userQuery.status() }
-        "
-      ></ng-container>
+      <app-status [status]="store.userQuery.status()" />
+
       : @if( store.userQuery.hasValue()) {
       <pre>{{ store.userQuery.value() | json }}</pre>
       }
     </div>
     <button (click)="mutateUserName(store.userQuery.value())">
       Mutate user name
-      <ng-container
-        *ngTemplateOutlet="
-          statusTemplate;
-          context: { status: store.userMutation.status() }
-        "
-      ></ng-container>
+      <app-status [status]="store.userMutation.status()" />
     </button>
 
     <div>
@@ -100,44 +105,11 @@ const Store = signalStore(
       />
     </div>
 
-    <ng-template #statusTemplate let-status="status">
-      @switch(status) { @case ('idle') {
-      <span class="badge-container">
-        <span class="status-emoji">🛌</span>
-        <span class="badge badge-gray">Idle</span>
-      </span>
-      } @case ('error') {
-      <span class="badge-container">
-        <span class="status-emoji error">❌</span>
-        <span class="badge badge-red">Error</span>
-      </span>
-      } @case ('loading') {
-      <span class="badge-container">
-        <span class="status-emoji loading">⏳</span>
-        <span class="badge badge-orange">Loading</span>
-      </span>
-      } @case ('reloading') {
-      <span class="badge-container">
-        <span class="status-emoji loading">🔄</span>
-        <span class="badge badge-orange">Reloading</span>
-      </span>
-      } @case ('resolved') {
-      <span class="badge-container">
-        <span class="status-emoji success">✅</span>
-        <span class="badge badge-green">Loaded</span>
-      </span>
-      } @case ('local') {
-      <span class="badge-container">
-        <span class="status-emoji">📦</span>
-        <span class="badge badge-blue">Local</span>
-      </span>
-      } @default {
-      <span class="badge-container">
-        <span class="status-emoji">-</span>
-        <span class="badge badge-darkgray">-</span>
-      </span>
-      } }
-    </ng-template>
+    <div>
+      <p>
+        > Reload the page to see the query result to be retrieved from the cache
+      </p>
+    </div>
   `,
 })
 export default class GlobalQueryAndMutation {

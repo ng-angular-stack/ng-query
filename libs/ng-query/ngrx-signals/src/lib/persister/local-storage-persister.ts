@@ -3,8 +3,6 @@ import {
   inject,
   Injector,
   linkedSignal,
-  resource,
-  ResourceRef,
   signal,
   untracked,
 } from '@angular/core';
@@ -65,16 +63,18 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         }
         const { queryResource, queryResourceParamsSrc, storageKey } = data;
         const queryStatus = queryResource.status();
+        const queryValue = queryResource.value(); // also track the query value, because the status can stayed local but the value may change
         if (queryStatus !== 'resolved' && queryStatus !== 'local') {
           return;
         }
         untracked(() => {
           const queryParams = queryResourceParamsSrc();
+          console.log('queryResource.value()', queryResource.value());
           localStorage.setItem(
             storageKey,
             JSON.stringify({
               queryParams,
-              queryValue: queryResource.value(),
+              queryValue,
               timestamp: Date.now(),
             })
           );

@@ -150,7 +150,7 @@ describe('Global Queries', () => {
         })
       ),
       withUserQuery((store) => ({
-        setQuerySource: (source) => ({ id: store.selected }),
+        setQuerySource: () => ({ id: store.selected }),
       }))
     );
 
