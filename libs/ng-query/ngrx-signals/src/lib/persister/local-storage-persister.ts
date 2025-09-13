@@ -205,7 +205,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         cacheTime,
       } = data;
 
-      const storageKey = `${prefix}${key}`;
+      const storageKey = `${prefix}-${key}`;
       const storedValue = localStorage.getItem(storageKey);
       if (storedValue && !waitForParamsSrcToBeEqualToPreviousValue) {
         try {

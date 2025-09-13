@@ -21,6 +21,8 @@
 
 - Display a user by using a cached global query without injecting a store (`injectUserQuery`)
 - Plug the userId from the component input to the global query
+- Use `preservePreviousValue` to preserve the previous user data during the new one to being fetch (may avoid flickering data)
+- Use `waitForParamsSrcToBeEqualToPreviousValue` to wait for the userId to be retrieved from the url before retrieve the data from cache (eg: if the cached user has id 2, and now the page userId is 3)
 
 ## A cached global query (byId) used without store
 

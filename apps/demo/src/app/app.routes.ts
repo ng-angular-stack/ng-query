@@ -16,6 +16,10 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('./pages/no-store/no-store'),
   },
   {
+    path: 'no-store-by-id/:userId',
+    loadComponent: () => import('./pages/no-store-by-id/no-store-by-id'),
+  },
+  {
     path: 'list-with-pagination',
     loadComponent: () =>
       import('./pages/list-with-pagination/list-with-pagination'),
