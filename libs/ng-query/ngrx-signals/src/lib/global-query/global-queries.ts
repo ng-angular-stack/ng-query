@@ -91,6 +91,7 @@ type WithQueryByIdOutputMapper<
 
 type QueryCacheCustomConfig = {
   cacheTime: number;
+  waitForParamsSrcToBeEqualToPreviousValue: boolean;
 };
 
 type WithQueryOutputMapperTyped<
@@ -359,7 +360,9 @@ export function globalQueries<
                   key,
                   queryResource,
                   queryResourceParamsSrc,
-                  waitForParamsSrcToBeEqualToPreviousValue: false,
+                  waitForParamsSrcToBeEqualToPreviousValue:
+                    value?.config?.waitForParamsSrcToBeEqualToPreviousValue ??
+                    false,
                   cacheTime:
                     value?.config?.cacheTime ??
                     (cacheGlobalConfig?.cacheTime as number | undefined) ??

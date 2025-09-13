@@ -17,6 +17,12 @@ export type RxResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
             stream: (
               params: ResourceLoaderParams<NoInfer<Params>>
             ) => Observable<ResourceState>;
+            /**
+             * Each the query load, the value will return undefined.
+             * To avoid flickering display and also enable to the data to be retrieved from cache, use () => true
+             * default value: false
+             */
+            preservePreviousValue?: () => boolean;
           }
         | {
             method: ResourceMethod<ParamsArgs, Params>;
@@ -26,6 +32,12 @@ export type RxResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
             stream: (
               params: ResourceLoaderParams<NoInfer<Params>>
             ) => Observable<ResourceState>;
+            /**
+             * Each the query load, the value will return undefined.
+             * To avoid flickering display and also enable to the data to be retrieved from cache, use () => true
+             * default value: false
+             */
+            preservePreviousValue?: () => boolean;
           }
         | {
             method?: never;
@@ -38,5 +50,11 @@ export type RxResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
             stream: (
               params: ResourceLoaderParams<NoInfer<Params>>
             ) => Observable<ResourceState>;
+            /**
+             * Each the query load, the value will return undefined.
+             * To avoid flickering display and also enable to the data to be retrieved from cache, use () => true
+             * default value: false
+             */
+            preservePreviousValue?: () => boolean;
           }
       );

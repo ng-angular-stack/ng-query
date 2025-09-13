@@ -10,6 +10,7 @@ import { QueryRef } from '@ng-query/ngrx-signals';
 import { ResourceRef, signal, WritableSignal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { __INTERNAL_QueryBrand } from '@ng-query/ngrx-signals';
+import { preservedRxResource } from './preserved-rx-resource';
 
 type RxQueryOutput<
   StoreInput extends PublicSignalStore<Input>,
@@ -472,7 +473,12 @@ export function rxQuery<
   const resourceParamsSrc =
     src$ToSignal ?? queryConfig.params ?? queryResourceParamsFnSignal;
 
-  const queryResource = rxResource<QueryState, QueryParams>({
+  const rxResourceTarget =
+    queryConfig.preservePreviousValue?.() ?? false
+      ? preservedRxResource<QueryState, QueryParams>
+      : rxResource<QueryState, QueryParams>;
+
+  const queryResource = rxResourceTarget({
     ...queryConfig,
     params: resourceParamsSrc,
   } as any);

@@ -12,6 +12,7 @@ import {
 import { __INTERNAL_QueryBrand } from './types/brand';
 import { InsertionsFactory } from './core/query.core';
 import { PublicSignalStore } from './types/shared.type';
+import { preservedResource } from './preserved-resource';
 //todo handle logic of insertion inside with-query and globalqueries
 type QueryOutput<
   StoreInput extends PublicSignalStore<Input>,
@@ -463,7 +464,11 @@ export function query<
 
   const resourceParamsSrc = queryConfig.params ?? queryResourceParamsFnSignal;
 
-  const queryResource = resource<QueryState, QueryParams>({
+  const resourceTarget =
+    queryConfig.preservePreviousValue?.() ?? false
+      ? preservedResource<QueryState, QueryParams>
+      : resource<QueryState, QueryParams>;
+  const queryResource = resourceTarget({
     ...queryConfig,
     params: resourceParamsSrc,
   } as ResourceOptions<any, any>);

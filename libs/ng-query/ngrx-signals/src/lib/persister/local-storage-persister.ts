@@ -64,6 +64,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         const { queryResource, queryResourceParamsSrc, storageKey } = data;
         const queryStatus = queryResource.status();
         const queryValue = queryResource.value(); // also track the query value, because the status can stayed local but the value may change
+
         if (queryStatus !== 'resolved' && queryStatus !== 'local') {
           return;
         }
@@ -206,7 +207,6 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
       const storageKey = `${prefix}${key}`;
       const storedValue = localStorage.getItem(storageKey);
-
       if (storedValue && !waitForParamsSrcToBeEqualToPreviousValue) {
         try {
           const { queryValue, timestamp } = JSON.parse(storedValue);

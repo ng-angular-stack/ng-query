@@ -117,7 +117,7 @@ it('Should accept params or paramsFn, but not both', () => {
     Equal<typeof argsReturned, { id: string; name: string; email: string }>
   >;
 
-  //@ts-expect-error
+  //@ts-expect-error do not use params and method in the same declaration
   const noBoth = test({
     params: () => 'test' as const,
     method: () => 'test' as const,

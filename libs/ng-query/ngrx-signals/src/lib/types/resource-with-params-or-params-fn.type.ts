@@ -21,6 +21,12 @@ export type ResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
             ) => Promise<ResourceState>;
             method?: never;
             stream?: never;
+            /**
+             * Each the query load, the value will return undefined.
+             * To avoid flickering display and also enable to the data to be retrieved from cache, use () => true
+             * default value: false
+             */
+            preservePreviousValue?: () => boolean;
           }
         | {
             /**
@@ -32,6 +38,7 @@ export type ResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
             ) => Promise<ResourceState>;
             params?: never;
             stream?: never;
+            preservePreviousValue?: () => boolean;
           }
         | {
             method?: never;
@@ -42,6 +49,7 @@ export type ResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
              * request, which can change over time as new values are received from a stream.
              */
             stream: ResourceStreamingLoader<ResourceState, Params>;
+            preservePreviousValue?: () => boolean;
           }
         | {
             method: ResourceMethod<ParamsArgs, Params>;
@@ -52,5 +60,6 @@ export type ResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
              * request, which can change over time as new values are received from a stream.
              */
             stream: ResourceStreamingLoader<ResourceState, Params>;
+            preservePreviousValue?: () => boolean;
           }
       );
