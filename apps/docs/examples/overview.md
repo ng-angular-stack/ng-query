@@ -27,8 +27,9 @@
 ## A cached global query (byId) used without store
 
 - Display a user by using a cached global query without injecting a store (`injectUserQueryById`)
+  - Compare to a simple `query` This enable to cache all visited user page (instead of the last user visited when using `query`)
 - Plug the userId from the component input to the global query
-- This enable to cache all visited user page (instead of the last user visited when using `query`)
+- Use `insertPlaceholderData` to display the data from the previous visited page while the new user data load
 
 ## List with pagination (Local query)
 

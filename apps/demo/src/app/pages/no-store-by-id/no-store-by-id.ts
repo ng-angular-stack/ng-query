@@ -9,6 +9,7 @@ import {
 import { ApiService } from './api.service';
 import { StatusComponent } from '../../ui/status.component';
 import { Router } from '@angular/router';
+import { insertPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
 
 const { injectUserQueryById } = globalQueries(
   {
@@ -18,11 +19,14 @@ const { injectUserQueryById } = globalQueries(
           source: SignalProxy<{ id: string | undefined }>,
           api = inject(ApiService)
         ) =>
-          queryById({
-            params: source.id,
-            identifier: (params) => params,
-            loader: ({ params: id }) => api.getItemById(id),
-          }),
+          queryById(
+            {
+              params: source.id,
+              identifier: (params) => params,
+              loader: ({ params: id }) => api.getItemById(id),
+            },
+            insertPlaceholderData
+          ),
       },
     },
   },
@@ -39,11 +43,10 @@ const { injectUserQueryById } = globalQueries(
   styleUrls: ['no-store-by-id.css'],
   template: `
     <div>
-      User @if(userQuery(); as userQueryData) {
-      <app-status [status]="userQueryData.status()" />
-      } : @if( userQuery()?.hasValue()) {
-      <pre>{{ userQuery()?.value() | json }}</pre>
-      }
+      User
+      <app-status [status]="userQueryById.currentPageStatus() ?? 'idle'" />
+      :
+      <pre>{{ userQueryById.currentPageData() | json }}</pre>
     </div>
 
     <div>
@@ -58,21 +61,23 @@ const { injectUserQueryById } = globalQueries(
 })
 export default class GlobalQueryAndMutation {
   public readonly userId = input<string>();
-  private readonly userQueryById = injectUserQueryById(() => ({
+  protected readonly userQueryById = injectUserQueryById(() => ({
     id: this.userId,
   }));
-
-  protected readonly userQuery = computed(
-    () => this.userQueryById()[this.userId() ?? '']
-  );
 
   private readonly router = inject(Router);
 
   protected nextPage() {
-    this.router.navigate(['no-store', parseInt(this.userId() ?? '0') + 1]);
+    this.router.navigate([
+      'no-store-by-id',
+      parseInt(this.userId() ?? '0') + 1,
+    ]);
   }
 
   protected previousPage() {
-    this.router.navigate(['no-store', parseInt(this.userId() ?? '10') - 1]);
+    this.router.navigate([
+      'no-store-by-id',
+      parseInt(this.userId() ?? '10') - 1,
+    ]);
   }
 }

@@ -1,1 +1,4 @@
-export { insertPaginationPlaceholderData } from './insert-pagination-place-holder-data';
+export {
+  insertPaginationPlaceholderData,
+  insertPaginationPlaceholderData as insertPlaceholderData,
+} from './insert-pagination-place-holder-data';

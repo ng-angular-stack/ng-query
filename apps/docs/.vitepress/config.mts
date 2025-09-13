@@ -52,6 +52,10 @@ export default defineConfig({
                 link: '/insertions/insert-pagination-place-holder-data',
               },
               {
+                text: 'Placeholder Data',
+                link: '/insertions/insert-place-holder-data',
+              },
+              {
                 text: 'UX Loader',
                 link: '/insertions/insert-ux-loader.md',
               },
