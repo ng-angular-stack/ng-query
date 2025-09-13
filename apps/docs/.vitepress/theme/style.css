@@ -93,6 +93,7 @@
 }
 html.dark {
   --vp-code-color: #bab2eb;
+  --vp-c-brand-1: #bab2eb;
 }
 
 .vp-doc .brand,

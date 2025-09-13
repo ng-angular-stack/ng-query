@@ -15,7 +15,7 @@ Signal Store for Server State simplifies complex data operations with features l
 - Centralized management of loading, error, and success states
 - Easy to use with CRUD or BFF (backend for frontend)
 - React easily to mutation
-- Use (`Insertions` for better comfort based on reusable composition pattern
+- Use `Insertions` for better comfort based on reusable composition pattern
 
 ## Why Signal Store for Server State?
 

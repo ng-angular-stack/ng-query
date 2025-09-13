@@ -2,6 +2,10 @@
 
 Global queries provide a way to define, cache, and reuse query logic across multiple signal stores and components. The goal is to centralize query definitions, enable shared caching, and simplify integration of common data sources throughout your application.
 
+:::info
+This api may be changed (check the last part for more info)
+:::
+
 ## Aim
 
 - **Centralization:** Define queries in one place, making them easy to maintain and update.
@@ -47,7 +51,7 @@ Global queries provide a way to define, cache, and reuse query logic across mult
 
    ```typescript
    const store = signalStore(
-     withState({ selected: "1" }),
+     withState({ selected: '1' }),
      withUserQuery((store) => ({ setQuerySource: (source) => ({ id: store.selected }) })),
      withUsersQuery(),
      withUserQueryById()
@@ -172,3 +176,45 @@ globalQueries({ queries: { ... } }, { featureName: 'user' });
 ```
 
 This helps modularize queries and avoid key collisions.
+
+## Syntax improvement idea
+
+It works pretty well like that, but I will surely deprecated this API, and handle all this functionalities in the incoming `ServerStateStore`
+
+It may looks like that:
+
+```ts
+const { withUserQuery, injectUserQuery, withUserMutation, injectUserMutation } = serverStateStore(
+  {
+    providedIn: 'root',
+    persister: localStoragePersister, // optional
+    cacheTime: 60000, // optional 1 minute cache
+  },
+  withMutation('user', () =>
+    mutation({
+      method: (user: User) => user,
+      loader: async ({ params: user }) => user,
+    })
+  ),
+  ({ id }: SignalProxy<{ id: string | undefined }>) =>
+    withQuery(
+      'user',
+      () =>
+        query({
+          params: id,
+          loader: async ({ params: id }) => ({
+            id,
+            name: 'Romain',
+          }),
+        }),
+      () => ({
+        // ... react on the user mutation
+      })
+    ),
+  withUsersServerState()
+);
+```
+
+- While the current pattern enforce to create one globalQueries for the app, that avoids cached key collision (when used with a persister), it does not share easily mutation. And also, split the query declaration in multiples files (when reacting to mutation).
+- This new pattern will enable to create fully declarative and reactive queries, that will help to create more advanced UX pattern.
+- It will enable local ServerStateStore and server state composition.
