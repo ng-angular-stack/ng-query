@@ -445,13 +445,19 @@ export function withQueryById<
                             const mutationStatus = mutationResource.status();
                             const mutationParamsSrc = (store as any)[
                               '__mutation'
-                            ][mutationName].paramsSource as Signal<any>;
+                            ][mutationName].paramsSource;
                             // use to track the value of the mutation
                             const _mutationValueChanged =
                               mutationResource.hasValue()
                                 ? mutationResource.value()
                                 : undefined;
 
+                            if (
+                              typeof mutationParamsSrc === 'function' &&
+                              mutationParamsSrc()
+                            ) {
+                              // ! keep this check, it is used to track mutationParamsSrc, otherwise it does not works
+                            }
                             if (mutationEffectOptions?.optimisticUpdate) {
                               untracked(() => {
                                 setOptimisticUpdateFromMutationOnQueryValue({
