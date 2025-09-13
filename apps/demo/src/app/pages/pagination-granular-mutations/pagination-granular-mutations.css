@@ -222,7 +222,8 @@
   box-shadow: 0 0 0 2px #bee3f8;
 }
 
-.pagination .btn {
+.pagination .btn,
+.action-btn {
   padding: 8px 16px;
   border: 1px solid #e2e8f0;
   background: white;

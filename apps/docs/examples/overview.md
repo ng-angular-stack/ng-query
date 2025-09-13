@@ -46,7 +46,7 @@
 
 - Display a paginated list of user (previous page, next page, page size)
 - Using a cached (from localStorage) global query, that is plugged inside a signalStore
-- Edit user name concurrently
+- Edit user name concurrently (click on the `Update` button of multiples items)
 
 ## Display X independents resources to display and granular mutations
 
