@@ -1,0 +1,104 @@
+<div class="container">
+  <main class="content">
+    <div class="content-wrapper">
+      <div class="card">
+        <h2 class="card-title">
+          User Management:
+          <ng-container
+            *ngTemplateOutlet="statusTemplate; context: { status: userListServerStateStore.usersQueryById.currentPageStatus()}"
+          ></ng-container>
+        </h2>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(user of
+              userListServerStateStore.usersQueryById.currentPageData(); track
+              user.id) {
+              <tr>
+                <td>{{ user.id }}</td>
+
+                <td>{{user.name }}</td>
+              </tr>
+              } @if
+              (!userListServerStateStore.usersQueryById.currentPageData()?.length)
+              {
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 32px">
+                  No users found
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <select
+            [value]="userListServerStateStore.pagination.pageSize()"
+            (change)="updatePageSize($event)"
+            style="margin-right: 8px"
+          >
+            <option [value]="2">2</option>
+            <option [value]="4">4</option>
+            <option [value]="8">8</option>
+            <option [value]="16">16</option>
+          </select>
+          <button class="btn" (click)="userListServerStateStore.previousPage()">
+            Previous
+          </button>
+          <button class="btn" (click)="userListServerStateStore.nextPage()">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<ng-template #statusTemplate let-status="status">
+  @switch(status) { @case ('idle') {
+  <span class="badge-container">
+    <span class="status-emoji">🛌</span>
+    <span class="badge badge-gray">Idle</span>
+  </span>
+  } @case ('error') {
+  <span class="badge-container">
+    <span class="status-emoji error">❌</span>
+    <span class="badge badge-red">Error</span>
+  </span>
+  } @case ('loading') {
+  <span class="badge-container">
+    <span class="status-emoji loading">⏳</span>
+    <span class="badge badge-orange">Loading</span>
+  </span>
+  } @case ('reloading') {
+  <span class="badge-container">
+    <span class="status-emoji loading">🔄</span>
+    <span class="badge badge-orange">Reloading</span>
+  </span>
+  } @case ('resolved') {
+  <span class="badge-container">
+    <span class="status-emoji success">✅</span>
+    <span class="badge badge-green">Loaded</span>
+  </span>
+  } @case ('local') {
+  <span class="badge-container">
+    <span class="status-emoji">📦</span>
+    <span class="badge badge-blue">Local</span>
+  </span>
+  } @default {
+  <span class="badge-container">
+    <span class="status-emoji">-</span>
+    <span class="badge badge-darkgray">-</span>
+  </span>
+  } }
+</ng-template>

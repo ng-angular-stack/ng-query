@@ -24,4 +24,9 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./pages/list-with-pagination/list-with-pagination'),
   },
+  {
+    path: 'list-with-pagination-global',
+    loadComponent: () =>
+      import('./pages/list-with-pagination-global/list-with-pagination'),
+  },
 ];
