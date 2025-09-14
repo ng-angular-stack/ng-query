@@ -59,3 +59,7 @@ Like: `import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/i
 ::: info
 If you have an idea for a useful insertion (such as a new side effect or property), please consider opening a PR or feature request! Community contributions help make this library more powerful and flexible for everyone.
 :::
+
+::: info
+I may rename the `insertXxxx` by `useXxxx`
+:::
