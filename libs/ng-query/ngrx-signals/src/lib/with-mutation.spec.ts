@@ -87,7 +87,7 @@ describe('withMutation', () => {
         () => ({
           queriesEffects: {
             userQuery: {
-              optimistic: ({ mutationParams, queryResource }) => ({
+              optimisticUpdate: ({ mutationParams, queryResource }) => ({
                 ...(queryResource.hasValue() ? queryResource.value() : {}),
                 ...mutationParams,
               }),
@@ -223,7 +223,7 @@ describe('withMutation', () => {
         () => ({
           queriesEffects: {
             userQueryById: {
-              optimistic: ({
+              optimisticUpdate: ({
                 mutationParams,
                 queryResource,
                 queryIdentifier,
@@ -340,7 +340,7 @@ describe('withMutation', () => {
         () => ({
           queriesEffects: {
             userQueryById: {
-              optimistic: ({ mutationParams, queryResource }) => {
+              optimisticUpdate: ({ mutationParams, queryResource }) => {
                 return {
                   ...(queryResource.hasValue() ? queryResource.value() : {}),
                   ...mutationParams,
@@ -587,7 +587,13 @@ describe('withMutation', () => {
                         id: string;
                         name: string;
                         email: string;
-                      }
+                      },
+                      NoInfer<
+                        | {
+                            id: string;
+                          }
+                        | undefined
+                      >
                     >
                   >();
                   expectTypeOf(targetedState).toEqualTypeOf<
@@ -766,7 +772,7 @@ it('Should be well typed', () => {
                   );
                 },
               },
-              optimistic: ({
+              optimisticUpdate: ({
                 mutationParams,
                 mutationResource,
                 queryResource,

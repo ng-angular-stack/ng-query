@@ -3,7 +3,7 @@ import { signalStore, signalStoreFeature, withState } from '@ngrx/signals';
 import { delay, lastValueFrom, of } from 'rxjs';
 import { withQueryById } from './with-query-by-id';
 import { Expect, Equal } from 'test-type';
-import { ApplicationRef, ResourceRef } from '@angular/core';
+import { ResourceRef } from '@angular/core';
 import { ResourceByIdRef } from './resource-by-id';
 import { queryById } from './query-by-id';
 import { vi } from 'vitest';
@@ -17,6 +17,12 @@ type User = {
 };
 
 describe('withMutationById', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
   it('1- Should expose a mutation resource with a record of resource by id', async () => {
     const returnedUser = {
       id: '5',
@@ -36,19 +42,19 @@ describe('withMutationById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
 
     expect(store.userMutationById).toBeDefined();
 
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(store.userMutationById()['5']?.value()).toBe(returnedUser);
 
     type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
       Equal<
         typeof store.userMutationById,
-        ResourceByIdRef<string, NoInfer<User>>
+        ResourceByIdRef<string, NoInfer<User>, string>
       >
     >;
   });
@@ -86,7 +92,7 @@ describe('withMutationById', () => {
         () => ({
           queriesEffects: {
             userQueryById: {
-              optimistic: ({
+              optimisticUpdate: ({
                 mutationParams,
                 queryResource,
                 queryIdentifier,
@@ -138,23 +144,26 @@ describe('withMutationById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
     expect(store.usersFetched().length).toBe(0);
 
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
 
     type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
-      Equal<typeof store.userQueryById, ResourceByIdRef<string, NoInfer<User>>>
+      Equal<
+        typeof store.userQueryById,
+        ResourceByIdRef<string, NoInfer<User>, string>
+      >
     >;
     store.mutateUser({
       id: '5',
       name: 'Updated User',
       email: 'updated.doe@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
 
     expect(store.userQueryById()['5']?.value()).toEqual({
       id: '5',
@@ -209,23 +218,26 @@ describe('withMutationById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
     expect(store.usersFetched().length).toBe(0);
 
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
 
     type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
-      Equal<typeof store.userQueryById, ResourceByIdRef<string, NoInfer<User>>>
+      Equal<
+        typeof store.userQueryById,
+        ResourceByIdRef<string, NoInfer<User>, string>
+      >
     >;
     store.mutateUser({
       id: '5',
       name: 'Updated User',
       email: 'updated.doe@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
 
     expect(store.userQueryById()['5']?.value()).toEqual({
       id: '5',
@@ -280,12 +292,12 @@ describe('withMutationById', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [Store],
     });
     const store = TestBed.inject(Store);
     expect(store.usersFetched().length).toBe(0);
 
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     const user5QueryResource = store.userQueryById()['5'];
     expect(user5QueryResource?.value()).toBe(returnedUser);
     const user5QueryReloadSpy = vi.spyOn(user5QueryResource!, 'reload');
@@ -295,7 +307,7 @@ describe('withMutationById', () => {
       name: 'Updated User',
       email: 'updated.doe@example.com',
     });
-    await TestBed.inject(ApplicationRef).whenStable();
+    await vi.runAllTimersAsync();
     expect(user5QueryReloadSpy.mock.calls.length).toBe(1);
   });
 
@@ -346,7 +358,7 @@ describe('withMutationById', () => {
               type ExpectLastResolvedResourceToBeTyped = Expect<
                 Equal<
                   typeof queryResources,
-                  ResourceByIdRef<string, NoInfer<User>>
+                  ResourceByIdRef<string, NoInfer<User>, string>
                 >
               >;
               expect(Object.entries(queryResources()).length).toEqual(1);
@@ -383,7 +395,3 @@ describe('withMutationById', () => {
     >;
   });
 });
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

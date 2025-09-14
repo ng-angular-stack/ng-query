@@ -99,7 +99,10 @@ describe('withQueryById', () => {
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
 
     type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
-      Equal<typeof store.userQueryById, ResourceByIdRef<string, NoInfer<User>>>
+      Equal<
+        typeof store.userQueryById,
+        ResourceByIdRef<string, NoInfer<User>, string>
+      >
     >;
   });
 
@@ -151,7 +154,7 @@ describe('withQueryById', () => {
               type ExpectLastResolvedResourceToBeTyped = Expect<
                 Equal<
                   typeof queryResources,
-                  ResourceByIdRef<string, NoInfer<User>>
+                  ResourceByIdRef<string, NoInfer<User>, string>
                 >
               >;
               expect(Object.entries(queryResources()).length).toEqual(1);
@@ -180,7 +183,10 @@ describe('withQueryById', () => {
     expect(store.userQueryById()['5']?.value()).toBe(returnedUser);
 
     type ExpectUserQueryToBeAnObjectWithResourceByIdentifier = Expect<
-      Equal<typeof store.userQueryById, ResourceByIdRef<string, NoInfer<User>>>
+      Equal<
+        typeof store.userQueryById,
+        ResourceByIdRef<string, NoInfer<User>, string>
+      >
     >;
     expect(store.usersFetched().length).toBe(1);
     expect(store.usersFetched()[0]).toBe(returnedUser);
@@ -630,7 +636,7 @@ describe('withQueryById', () => {
               type ExpectLastResolvedResourceToBeTyped = Expect<
                 Equal<
                   typeof queryResources,
-                  ResourceByIdRef<string, NoInfer<User>>
+                  ResourceByIdRef<string, NoInfer<User>, string>
                 >
               >;
               expect(Object.entries(queryResources()).length).toEqual(1);
