@@ -347,7 +347,10 @@ export function withQueryById<
                             ? mutationResource.value()
                             : undefined;
 
-                        if (mutationEffectOptions?.optimisticUpdate) {
+                        if (
+                          mutationEffectOptions?.optimisticUpdate ||
+                          mutationEffectOptions.update
+                        ) {
                           untracked(() => {
                             setAllUpdatesFromMutationOnQueryValue({
                               mutationStatus,
@@ -377,7 +380,10 @@ export function withQueryById<
                             });
                           });
                         }
-                        if (mutationEffectOptions.optimisticPatch) {
+                        if (
+                          mutationEffectOptions.optimisticPatch ||
+                          mutationEffectOptions.patch
+                        ) {
                           untracked(() => {
                             setAllPatchFromMutationOnQueryValue({
                               mutationStatus,
@@ -458,7 +464,10 @@ export function withQueryById<
                             ) {
                               // ! keep this check, it is used to track mutationParamsSrc, otherwise it does not works
                             }
-                            if (mutationEffectOptions?.optimisticUpdate) {
+                            if (
+                              mutationEffectOptions?.optimisticUpdate ||
+                              mutationEffectOptions.update
+                            ) {
                               untracked(() => {
                                 setAllUpdatesFromMutationOnQueryValue({
                                   mutationStatus,
@@ -488,7 +497,10 @@ export function withQueryById<
                                 });
                               });
                             }
-                            if (mutationEffectOptions.optimisticPatch) {
+                            if (
+                              mutationEffectOptions.optimisticPatch ||
+                              mutationEffectOptions.patch
+                            ) {
                               untracked(() => {
                                 setAllPatchFromMutationOnQueryValue({
                                   mutationStatus,

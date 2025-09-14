@@ -588,6 +588,267 @@ describe('withQueryById', () => {
       email: 'test@a.com',
     });
   });
+  it('9- Declarative: should handle patch on query value (from mutation by id)', async () => {
+    const returnedUser = {
+      id: '5',
+      name: 'John Doe',
+      email: 'test@a.com',
+    };
+    const Store = signalStore(
+      withState({
+        usersFetched: [] as User[],
+        lastUserFetched: undefined as User | undefined,
+      }),
+      withMutationById('user', () =>
+        mutationById({
+          method(user: User) {
+            return user;
+          },
+          async loader({ params }) {
+            return params;
+          },
+          identifier: (params) => params.id,
+        })
+      ),
+      withQueryById(
+        'user',
+        () =>
+          queryById({
+            params: () => '5',
+            loader: async ({ params }) => {
+              return returnedUser;
+            },
+            identifier: (params) => params,
+          }),
+        (store) => ({
+          on: {
+            userMutationById: {
+              patch: {
+                name: ({ mutationParams }) => mutationParams.name,
+              },
+              filter: ({ mutationParams, queryIdentifier }) =>
+                mutationParams.id === queryIdentifier,
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store],
+    });
+    const store = TestBed.inject(Store);
+    await vi.runAllTimersAsync();
+    const userQuery5 = store.userQueryById()['5'];
+    expect(userQuery5?.value()).toBe(returnedUser);
+
+    store.mutateUser({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    await vi.runAllTimersAsync();
+    expect(userQuery5?.value()).toEqual({
+      id: '5',
+      name: 'Updated User',
+      email: 'test@a.com',
+    });
+  });
+  it('10- Declarative: should handle updates (from mutation by id) on query value', async () => {
+    const returnedUser = {
+      id: '5',
+      name: 'John Doe',
+      email: 'test@a.com',
+    };
+    const Store = signalStore(
+      withState({
+        usersFetched: [] as User[],
+        lastUserFetched: undefined as User | undefined,
+      }),
+      withMutationById('user', () =>
+        mutationById({
+          method(user: User) {
+            return user;
+          },
+          async loader({ params }) {
+            return params;
+          },
+          identifier: (params) => params.id,
+        })
+      ),
+      withQueryById(
+        'user',
+        () =>
+          queryById({
+            params: () => '5',
+            loader: async ({ params }) => {
+              return returnedUser;
+            },
+            identifier: (params) => params,
+          }),
+        (store) => ({
+          on: {
+            userMutationById: {
+              update: ({ mutationParams }) => mutationParams,
+              filter: ({ mutationParams, queryIdentifier }) =>
+                mutationParams.id === queryIdentifier,
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store],
+    });
+    const store = TestBed.inject(Store);
+    await vi.runAllTimersAsync();
+    const userQuery5 = store.userQueryById()['5'];
+    expect(userQuery5?.value()).toBe(returnedUser);
+
+    store.mutateUser({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    await vi.runAllTimersAsync();
+    expect(userQuery5?.value()).toEqual({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+  });
+
+  it('11- Declarative: should handle updates on query value', async () => {
+    const returnedUser = {
+      id: '5',
+      name: 'John Doe',
+      email: 'test@a.com',
+    };
+    const Store = signalStore(
+      withState({
+        usersFetched: [] as User[],
+        lastUserFetched: undefined as User | undefined,
+      }),
+      withMutation('user', () =>
+        mutation({
+          method(user: User) {
+            return user;
+          },
+          async loader({ params }) {
+            return params;
+          },
+        })
+      ),
+      withQueryById(
+        'user',
+        () =>
+          queryById({
+            params: () => '5',
+            loader: async ({ params }) => {
+              return returnedUser;
+            },
+            identifier: (params) => params,
+          }),
+        (store) => ({
+          on: {
+            userMutation: {
+              update: ({ mutationParams }) => mutationParams,
+              filter: ({ mutationParams, queryIdentifier }) =>
+                mutationParams.id === queryIdentifier,
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store],
+    });
+    const store = TestBed.inject(Store);
+    await vi.runAllTimersAsync();
+    const userQuery5 = store.userQueryById()['5'];
+    expect(userQuery5?.value()).toBe(returnedUser);
+
+    store.mutateUser({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    await vi.runAllTimersAsync();
+    expect(userQuery5?.value()).toEqual({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+  });
+
+  it('12- Declarative: should handle patch on query value', async () => {
+    const returnedUser = {
+      id: '5',
+      name: 'John Doe',
+      email: 'test@a.com',
+    };
+    const Store = signalStore(
+      withState({
+        usersFetched: [] as User[],
+        lastUserFetched: undefined as User | undefined,
+      }),
+      withMutation('user', () =>
+        mutation({
+          method(user: User) {
+            return user;
+          },
+          async loader({ params }) {
+            return params;
+          },
+        })
+      ),
+      withQueryById(
+        'user',
+        () =>
+          queryById({
+            params: () => '5',
+            loader: async ({ params }) => {
+              return returnedUser;
+            },
+            identifier: (params) => params,
+          }),
+        (store) => ({
+          on: {
+            userMutation: {
+              patch: {
+                name: ({ mutationParams }) => mutationParams.name,
+              },
+              filter: ({ mutationParams, queryIdentifier }) =>
+                mutationParams.id === queryIdentifier,
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store],
+    });
+    const store = TestBed.inject(Store);
+    await vi.runAllTimersAsync();
+    const userQuery5 = store.userQueryById()['5'];
+    expect(userQuery5?.value()).toBe(returnedUser);
+
+    store.mutateUser({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    await vi.runAllTimersAsync();
+    expect(userQuery5?.value()).toEqual({
+      id: '5',
+      name: 'Updated User',
+      email: 'test@a.com',
+    });
+  });
+
   it('#1- Should expose private query type', async () => {
     const returnedUser = {
       id: '5',
