@@ -32,7 +32,7 @@ This api may be changed (check the last part for more info)
     } = globalQueries({
    	 queries: {
    		 user: {
-   			 query: () => rxQuery({ ... }),
+   			 query: (source: SignalProxy<{ id: string | undefined }>) => rxQuery({ ... }),
    		 },
    		 users: {
    			 query: () => rxQuery({ ... }),

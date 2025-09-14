@@ -10,7 +10,7 @@ export default defineConfig({
     logo: '/assets/favicon.png',
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Docs', link: '/markdown-examples' },
+      { text: 'Docs', link: '/get-started' },
     ],
 
     sidebar: [
@@ -70,11 +70,7 @@ export default defineConfig({
       },
       {
         text: 'Examples',
-        items: [
-          { text: 'Examples', link: '/examples/overview' },
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' },
-        ],
+        items: [{ text: 'Examples', link: '/examples/overview' }],
       },
     ],
     socialLinks: [
