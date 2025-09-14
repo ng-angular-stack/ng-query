@@ -48,6 +48,10 @@ export default defineConfig({
                 link: '/insertions',
               },
               {
+                text: 'Insert Factory',
+                link: '/insertions/insert-factory',
+              },
+              {
                 text: 'Pagination Placeholder Data',
                 link: '/insertions/insert-pagination-place-holder-data',
               },

@@ -1,11 +1,7 @@
 import { computed } from '@angular/core';
 import { InsertionByIdParams } from '@ng-query/ngrx-signals';
 import { SignalStoreFeatureResult } from '@ngrx/signals';
-// todo create a Insertionconstraint to simplify the generics
-// todo create an insertion to avoid to featch the same page is the params does not change ? (Each we go on the same page it reloads the page)
-// todo add a function to the signature to add has Next page / previous page state ?
-// todo add an insertion or a function to add the method to go nextpage / previous page ?
-// todo add comment on how to use it and what it does
+
 export const insertPaginationPlaceholderData = <
   Input extends SignalStoreFeatureResult,
   StoreInput,

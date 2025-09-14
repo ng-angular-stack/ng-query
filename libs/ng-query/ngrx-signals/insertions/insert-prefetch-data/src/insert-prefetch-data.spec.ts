@@ -1,7 +1,7 @@
 import { ResourceStatus, signal, Signal } from '@angular/core';
-import { insertPaginationPlaceholderData } from './insert-pagination-place-holder-data';
+import { queryById, QueryByIdRef, globalQueries } from '@ng-query/ngrx-signals';
+import { insertPaginationPlaceholderData } from './insert-prefetch-data';
 import { TestBed } from '@angular/core/testing';
-import { queryById } from '../../../src';
 
 describe('insertPaginationPlaceholderData', () => {
   it('should return the data of the currentPage', () => {

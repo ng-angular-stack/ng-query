@@ -24,6 +24,15 @@
       "@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data": [
         "libs/ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data/src/index.ts"
       ],
+      "@ng-query/ngrx-signals/insertions/insert-prefect-data": [
+        "libs/ng-query/ngrx-signals/insertions/insert-prefect-data/src/index.ts"
+      ],
+      "@ng-query/ngrx-signals/insertions/insert-prefetch-data": [
+        "libs/ng-query/ngrx-signals/insertions/insert-prefetch-data/src/index.ts"
+      ],
+      "@ng-query/ngrx-signals/insertions/insertionFactory": [
+        "libs/ng-query/ngrx-signals/insertions/insertion-factory/src/index.ts"
+      ],
       "test-type": ["libs/test-type/src/index.ts"],
       "types-testing": ["test-types.ts"]
     }

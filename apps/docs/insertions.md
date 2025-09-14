@@ -49,6 +49,7 @@ userQuery.total(); // number
 ## Best Practices
 
 - **Do not use insertions to interact with other queries or mutations.** Insertions are designed to extend the current query or mutation only.
+- Use [insertFactory](insertions/insert-factory) to help you create custom insertions (see dedicated page).
 
 ## Bundle Size Consideration
 
