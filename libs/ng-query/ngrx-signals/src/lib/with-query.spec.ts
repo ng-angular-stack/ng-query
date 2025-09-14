@@ -599,6 +599,277 @@ describe('Declarative server state, withQuery and withMutation', () => {
     vi.restoreAllMocks();
   });
 
+  it('6- withQuery should handle updates', async () => {
+    const Store = signalStore(
+      withMutation('userEmail', () =>
+        mutation({
+          method: ({ id, email }: { id: string; email: string }) => ({
+            id,
+            email,
+          }),
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: params.email,
+            } satisfies User;
+          },
+        })
+      ),
+      withQuery(
+        'user',
+        () =>
+          query({
+            params: () => '5',
+            loader: async ({ params }) => {
+              type _StreamResponseTypeRetrieved = Expect<
+                Equal<typeof params, string>
+              >;
+              return {
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              };
+            },
+          }),
+        () => ({
+          on: {
+            userEmailMutation: {
+              update: ({ queryResource, mutationParams }) => {
+                console.log('update queryResource', !!queryResource);
+                return {
+                  ...queryResource.value(),
+                  email: mutationParams.email,
+                };
+              },
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store],
+    });
+    const store = TestBed.inject(Store);
+
+    await vi.runAllTimersAsync();
+    expect(store.userQuery.status()).toBe('resolved');
+    console.log('mutateUserEmail');
+    store.mutateUserEmail({
+      id: '5',
+      email: 'mutated@test.com',
+    });
+    await vi.runAllTimersAsync();
+    expect(store.userQuery.status()).toBe('local');
+    expect(store.userQuery.value().email).toBe('mutated@test.com');
+  });
+  it('7- withQuery should handle patch', async () => {
+    const Store = signalStore(
+      withMutation('userEmail', () =>
+        mutation({
+          method: ({ id, email }: { id: string; email: string }) => ({
+            id,
+            email,
+          }),
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: params.email,
+            } satisfies User;
+          },
+        })
+      ),
+      withQuery(
+        'user',
+        () =>
+          query({
+            params: () => '5',
+            loader: async ({ params }) => {
+              await wait(10000);
+              return {
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              };
+            },
+          }),
+        () => ({
+          on: {
+            userEmailMutation: {
+              patch: {
+                email: ({ mutationParams }) => {
+                  console.log('mutationParams', mutationParams);
+                  return mutationParams?.email;
+                },
+              },
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store],
+    });
+    const store = TestBed.inject(Store);
+
+    await vi.runAllTimersAsync();
+    expect(store.userQuery.status()).toBe('resolved');
+    store.mutateUserEmail({
+      id: '5',
+      email: 'mutated@test.com',
+    });
+
+    await vi.runAllTimersAsync();
+    expect(store.userQuery.status()).toBe('local');
+    expect(store.userQuery.value().email).toBe('mutated@test.com');
+  });
+  it('8- Should handle withMutationById update', async () => {
+    const returnedUser = (id: string) => ({
+      id: `${id}`,
+      name: 'John Doe',
+      email: 'test@a.com',
+    });
+    const Store = signalStore(
+      withState({
+        usersFetched: [] as User[],
+        lastUserFetched: undefined as User | undefined,
+      }),
+      withMutationById('user', () =>
+        mutationById({
+          method(user: User) {
+            return user;
+          },
+          identifier: (params) => params.id,
+          loader: async ({ params }) => {
+            await wait(1000);
+            return params;
+          },
+        })
+      ),
+      withQuery(
+        'user',
+        () =>
+          query({
+            params: () => '5',
+            loader: async ({ params }) => {
+              await wait(10000);
+              return returnedUser(params);
+            },
+          }),
+        () => ({
+          on: {
+            userMutationById: {
+              filter: ({ mutationIdentifier, queryResource }) =>
+                queryResource.hasValue()
+                  ? queryResource.value().id === mutationIdentifier
+                  : false,
+              update: ({ queryResource, mutationResource }) => {
+                return {
+                  ...queryResource.value(),
+                  ...mutationResource.value(),
+                };
+              },
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store, ApplicationRef],
+    });
+    const store = TestBed.inject(Store);
+    const userQuery = store.userQuery;
+    await vi.runAllTimersAsync();
+    expect(userQuery?.value()).toEqual(returnedUser('5'));
+    store.mutateUser({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+
+    await vi.runAllTimersAsync();
+    expect(userQuery?.value()).toEqual({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    vi.restoreAllMocks();
+  });
+  it('9- Should handle withMutationById patch', async () => {
+    const returnedUser = (id: string) => ({
+      id: `${id}`,
+      name: 'John Doe',
+      email: 'test@a.com',
+    });
+    const Store = signalStore(
+      withState({
+        usersFetched: [] as User[],
+        lastUserFetched: undefined as User | undefined,
+      }),
+      withMutationById('user', () =>
+        mutationById({
+          method(user: User) {
+            return user;
+          },
+          identifier: (params) => params.id,
+          loader: async ({ params }) => {
+            await wait(1000);
+            return params;
+          },
+        })
+      ),
+      withQuery(
+        'user',
+        () =>
+          query({
+            params: () => '5',
+            loader: async ({ params }) => {
+              await wait(10000);
+              return returnedUser(params);
+            },
+          }),
+        () => ({
+          on: {
+            userMutationById: {
+              filter: ({ mutationIdentifier, queryResource }) =>
+                queryResource.hasValue()
+                  ? queryResource.value().id === mutationIdentifier
+                  : false,
+              patch: {
+                email: ({ mutationResource }) => mutationResource.value().email,
+              },
+            },
+          },
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store, ApplicationRef],
+    });
+    const store = TestBed.inject(Store);
+    const userQuery = store.userQuery;
+    await vi.runAllTimersAsync();
+    expect(userQuery?.value()).toEqual(returnedUser('5'));
+    store.mutateUser({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+
+    await vi.runAllTimersAsync();
+    expect(userQuery?.value()).toEqual({
+      id: '5',
+      name: 'John Doe',
+      email: 'updated.doe@example.com',
+    });
+    vi.restoreAllMocks();
+  });
+
   it('should accept an Insertions output, that appear in the store', () => {
     const Store = signalStore(
       {

@@ -73,7 +73,7 @@ export type ReloadQueriesConfig<
         | CustomReloadOnSpecificMutationStatus<QueryAndMutationRecord>;
     };
 
-export type OptimisticPathMutationQuery<
+export type PatchMutationQuery<
   QueryAndMutationRecord extends QueryAndMutationRecordConstraints
 > = QueryAndMutationRecord['query']['state'] extends object
   ? {
@@ -83,12 +83,12 @@ export type OptimisticPathMutationQuery<
         QueryAndMutationRecord['query']['state'],
         DottedPathPathToTuple<queryPatchPath>
       > extends infer TargetedType
-        ? OptimisticPatchQueryFn<QueryAndMutationRecord, TargetedType>
+        ? PatchQueryFn<QueryAndMutationRecord, TargetedType>
         : never;
     }
   : never;
 
-export type OptimisticPatchQueryFn<
+export type PatchQueryFn<
   QueryAndMutationRecord extends QueryAndMutationRecordConstraints,
   TargetedType
 > = (

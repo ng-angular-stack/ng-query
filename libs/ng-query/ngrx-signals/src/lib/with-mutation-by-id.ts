@@ -17,7 +17,7 @@ import {
 } from '@ngrx/signals';
 import { InternalType, MergeObject } from './types/util.type';
 import {
-  OptimisticPathMutationQuery,
+  PatchMutationQuery,
   ReloadQueriesConfig,
   QueryAndMutationRecordConstraints,
   FilterQueryById,
@@ -110,7 +110,7 @@ type QueryDeclarativeEffect<
    * If the mutation data is not compatible with the query state, it will not patch.
    * Be careful! If the mutation is already in a loading state, trigger the mutation again will cancelled the previous mutation loader and will patch with the new value.
    */
-  optimisticPatch?: OptimisticPathMutationQuery<QueryAndMutationRecord>;
+  optimisticPatch?: PatchMutationQuery<QueryAndMutationRecord>;
   filter: FilterQueryById<QueryAndMutationRecord>;
 };
 

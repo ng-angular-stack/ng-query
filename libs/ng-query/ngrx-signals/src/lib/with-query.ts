@@ -26,8 +26,8 @@ import {
 } from './types/boolean-or-mapper-fn-by-path.type';
 import {
   QueryDeclarativeEffect,
-  setOptimisticPatchFromMutationOnQueryValue,
-  setOptimisticUpdateFromMutationOnQueryValue,
+  setAllPatchFromMutationOnQueryValue,
+  setAllUpdatesFromMutationOnQueryValue,
   triggerQueryReloadOnMutationStatusChange,
 } from './core/query.core';
 import { ResourceByIdRef } from './resource-by-id';
@@ -261,9 +261,12 @@ export function withQuery<
                           ? mutationResource.value()
                           : undefined;
 
-                        if (mutationEffectOptions?.optimisticUpdate) {
+                        if (
+                          mutationEffectOptions?.optimisticUpdate ||
+                          mutationEffectOptions?.update
+                        ) {
                           untracked(() => {
-                            setOptimisticUpdateFromMutationOnQueryValue({
+                            setAllUpdatesFromMutationOnQueryValue({
                               mutationStatus,
                               queryResourceTarget: queryResource,
                               mutationEffectOptions,
@@ -289,9 +292,12 @@ export function withQuery<
                             });
                           });
                         }
-                        if (mutationEffectOptions.optimisticPatch) {
+                        if (
+                          mutationEffectOptions.optimisticPatch ||
+                          mutationEffectOptions.patch
+                        ) {
                           untracked(() => {
-                            setOptimisticPatchFromMutationOnQueryValue({
+                            setAllPatchFromMutationOnQueryValue({
                               mutationStatus,
                               queryResourceTarget: queryResource,
                               mutationEffectOptions,
@@ -362,10 +368,12 @@ export function withQuery<
                               mutationResource.hasValue()
                                 ? mutationResource.value()
                                 : undefined;
-
-                            if (mutationEffectOptions?.optimisticUpdate) {
+                            if (
+                              mutationEffectOptions?.optimisticUpdate ||
+                              mutationEffectOptions?.update
+                            ) {
                               untracked(() => {
-                                setOptimisticUpdateFromMutationOnQueryValue({
+                                setAllUpdatesFromMutationOnQueryValue({
                                   mutationStatus,
                                   queryResourceTarget: queryResource,
                                   mutationEffectOptions,
@@ -391,9 +399,12 @@ export function withQuery<
                                 });
                               });
                             }
-                            if (mutationEffectOptions.optimisticPatch) {
+                            if (
+                              mutationEffectOptions.optimisticPatch ||
+                              mutationEffectOptions.patch
+                            ) {
                               untracked(() => {
-                                setOptimisticPatchFromMutationOnQueryValue({
+                                setAllPatchFromMutationOnQueryValue({
                                   mutationStatus,
                                   queryResourceTarget: queryResource,
                                   mutationEffectOptions,

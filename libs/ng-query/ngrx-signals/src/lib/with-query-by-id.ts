@@ -28,8 +28,8 @@ import { nestedEffect } from './types/util';
 import { createNestedStateUpdate } from './core/update-state.util';
 import {
   QueryDeclarativeEffect,
-  setOptimisticPatchFromMutationOnQueryValue,
-  setOptimisticUpdateFromMutationOnQueryValue,
+  setAllPatchFromMutationOnQueryValue,
+  setAllUpdatesFromMutationOnQueryValue,
   triggerQueryReloadOnMutationStatusChange,
 } from './core/query.core';
 import { PublicSignalStore } from './types/shared.type';
@@ -349,7 +349,7 @@ export function withQueryById<
 
                         if (mutationEffectOptions?.optimisticUpdate) {
                           untracked(() => {
-                            setOptimisticUpdateFromMutationOnQueryValue({
+                            setAllUpdatesFromMutationOnQueryValue({
                               mutationStatus,
                               //@ts-expect-error not understand from where the error come from
                               queryResourceTarget: queryResourcesById,
@@ -379,7 +379,7 @@ export function withQueryById<
                         }
                         if (mutationEffectOptions.optimisticPatch) {
                           untracked(() => {
-                            setOptimisticPatchFromMutationOnQueryValue({
+                            setAllPatchFromMutationOnQueryValue({
                               mutationStatus,
                               //@ts-expect-error not understand from where the error come from
                               queryResourceTarget: queryResourcesById,
@@ -460,7 +460,7 @@ export function withQueryById<
                             }
                             if (mutationEffectOptions?.optimisticUpdate) {
                               untracked(() => {
-                                setOptimisticUpdateFromMutationOnQueryValue({
+                                setAllUpdatesFromMutationOnQueryValue({
                                   mutationStatus,
                                   //@ts-expect-error not understand from where the error come from
                                   queryResourceTarget: queryResourcesById,
@@ -490,7 +490,7 @@ export function withQueryById<
                             }
                             if (mutationEffectOptions.optimisticPatch) {
                               untracked(() => {
-                                setOptimisticPatchFromMutationOnQueryValue({
+                                setAllPatchFromMutationOnQueryValue({
                                   mutationStatus,
                                   //@ts-expect-error not understand from where the error come from
                                   queryResourceTarget: queryResourcesById,

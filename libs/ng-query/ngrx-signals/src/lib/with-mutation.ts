@@ -20,8 +20,8 @@ import {
   getNestedStateValue,
 } from './core/update-state.util';
 import {
-  OptimisticPatchQueryFn,
-  OptimisticPathMutationQuery,
+  PatchQueryFn,
+  PatchMutationQuery,
   ReloadQueriesConfig,
   QueryAndMutationRecordConstraints,
   FilterQueryById,
@@ -102,7 +102,7 @@ export type QueryImperativeEffect<
      * If the mutation data is not compatible with the query state, it will not patch.
      * Be careful! If the mutation is already in a loading state, trigger the mutation again will cancelled the previous mutation loader and will patch with the new value.
      */
-    optimisticPatch?: OptimisticPathMutationQuery<QueryAndMutationRecord>;
+    optimisticPatch?: PatchMutationQuery<QueryAndMutationRecord>;
   },
   QueryAndMutationRecord['query']['isGroupedResource'] extends true
     ? {
@@ -747,7 +747,7 @@ function optimisticPatchQueryResource<
   Object.entries(
     queryMutationConfig.optimisticPatch as Record<
       string,
-      OptimisticPatchQueryFn<QueryAndMutationRecord, any>
+      PatchQueryFn<QueryAndMutationRecord, any>
     >
   ).forEach(([path, optimisticPatch]) => {
     const queryValue = queryResource.hasValue()
@@ -767,7 +767,7 @@ function optimisticPatchQueryResource<
       queryResources,
       mutationIdentifier,
       mutationResources,
-    } as Parameters<OptimisticPatchQueryFn<QueryAndMutationRecord, any>>[0]);
+    } as Parameters<PatchQueryFn<QueryAndMutationRecord, any>>[0]);
 
     const updatedValue = createNestedStateUpdate({
       state: queryValue,
