@@ -1,1 +1,28 @@
+<div class="demo-navigation">
+  <h1>ng-query Demo</h1>
+  <label for="page-selector">Navigate to demo page:</label>
+  <select 
+    id="page-selector" 
+    (change)="navigate($event)" 
+    [value]="currentRoute"
+    class="page-selector">
+    <option value="">Select a demo...</option>
+    <option value="/query-and-mutation-local">
+      Query and Mutation (Local)
+    </option>
+    <option value="/global-query-and-mutation">
+      Global Query and Mutation
+    </option>
+    <option value="/no-store/1">No Store (User ID: 1)</option>
+    <option value="/no-store-by-id/1">No Store by ID (User ID: 1)</option>
+    <option value="/list-with-pagination">List with Pagination</option>
+    <option value="/list-with-pagination-global">
+      List with Pagination (Global)
+    </option>
+    <option value="/pagination-granular-mutations">
+      Pagination Granular Mutations
+    </option>
+  </select>
+</div>
+
 <router-outlet />
