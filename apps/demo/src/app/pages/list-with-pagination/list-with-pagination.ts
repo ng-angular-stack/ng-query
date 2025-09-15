@@ -8,15 +8,11 @@ import {
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { withServices } from './util';
 import { ApiService } from './api.service';
-import {
-  globalQueries,
-  localStoragePersister,
-  SignalProxy,
-  withQueryById,
-} from '@ng-query/ngrx-signals';
+import { withQueryById } from '@ng-query/ngrx-signals';
 import { rxQueryById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
 import { insertPrefetchData } from '@ng-query/ngrx-signals/insertions/insert-prefetch-data';
+import { StatusComponent } from '../../ui/status.component';
 export type User = {
   id: string;
   name: string;
@@ -94,7 +90,7 @@ const UserListServerStateStore = signalStore(
 @Component({
   selector: 'app-list-with-pagination',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StatusComponent],
   templateUrl: './list-with-pagination.html',
   styleUrls: ['./list-with-pagination.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

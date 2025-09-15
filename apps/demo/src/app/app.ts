@@ -16,10 +16,10 @@ export class App implements OnInit {
   ngOnInit() {
     // Set initial route
     this.updateCurrentRoute(this.router.url);
-    
+
     // Listen to route changes
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.updateCurrentRoute(event.url);
       });

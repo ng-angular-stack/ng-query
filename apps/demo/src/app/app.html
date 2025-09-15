@@ -1,11 +1,12 @@
 <div class="demo-navigation">
   <h1>ng-query Demo</h1>
   <label for="page-selector">Navigate to demo page:</label>
-  <select 
-    id="page-selector" 
-    (change)="navigate($event)" 
+  <select
+    id="page-selector"
+    (change)="navigate($event)"
     [value]="currentRoute"
-    class="page-selector">
+    class="page-selector"
+  >
     <option value="">Select a demo...</option>
     <option value="/query-and-mutation-local">
       Query and Mutation (Local)

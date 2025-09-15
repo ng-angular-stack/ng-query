@@ -15,6 +15,7 @@ import {
 } from '@ng-query/ngrx-signals';
 import { rxQueryById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
+import { StatusComponent } from '../../ui/status.component';
 
 export type User = {
   id: string;
@@ -93,7 +94,7 @@ const UserListServerStateStore = signalStore(
 @Component({
   selector: 'app-list-with-pagination',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StatusComponent],
   templateUrl: './list-with-pagination.html',
   styleUrls: ['./list-with-pagination.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

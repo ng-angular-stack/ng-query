@@ -5,6 +5,50 @@ import { Component, input, ResourceStatus } from '@angular/core';
   selector: 'app-status',
   standalone: true,
   imports: [CommonModule],
+  styles: [
+    `
+      .badge {
+        margin-left: 8px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .badge-gray {
+        background: #e2e8f0;
+        color: #4a5568;
+      }
+
+      .badge-red {
+        background: #fed7d7;
+        color: #c53030;
+        animation: shake 0.5s ease-in-out;
+      }
+
+      .badge-orange {
+        background: #feebc8;
+        color: #c05621;
+      }
+
+      .badge-green {
+        background: #c6f6d5;
+        color: #2f855a;
+        animation: pulse 0.5s ease-in-out;
+      }
+
+      .badge-blue {
+        background: #bee3f8;
+        color: #2b6cb0;
+      }
+
+      .badge-darkgray {
+        background: #cbd5e0;
+        color: #4a5568;
+      }
+    `,
+  ],
   template: `
     @switch(status()) { @case ('idle') {
     <span class="badge-container">
