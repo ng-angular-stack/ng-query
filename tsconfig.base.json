@@ -27,8 +27,8 @@
       "@ng-query/ngrx-signals/insertions/insert-prefect-data": [
         "libs/ng-query/ngrx-signals/insertions/insert-prefect-data/src/index.ts"
       ],
-      "@ng-query/ngrx-signals/insertions/insert-prefetch-data": [
-        "libs/ng-query/ngrx-signals/insertions/insert-prefetch-data/src/index.ts"
+      "@ng-query/ngrx-signals/insertions/insert-prefetch-next-data": [
+        "libs/ng-query/ngrx-signals/insertions/insert-prefetch-next-data/src/index.ts"
       ],
       "@ng-query/ngrx-signals/insertions/insertion-factory": [
         "libs/ng-query/ngrx-signals/insertions/insertion-factory/src/index.ts"

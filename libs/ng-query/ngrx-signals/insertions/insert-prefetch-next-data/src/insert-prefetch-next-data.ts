@@ -2,7 +2,7 @@ import { effect, ResourceRef, Signal, signal } from '@angular/core';
 import { InsertionByIdParams } from '@ng-query/ngrx-signals';
 import { SignalStoreFeatureResult } from '@ngrx/signals';
 
-export function insertPrefetchData<
+export function insertPrefetchNextData<
   Input extends SignalStoreFeatureResult,
   StoreInput,
   GroupIdentifier extends string | number,

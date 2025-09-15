@@ -35,6 +35,7 @@
 
 - Display a paginated list of user (previous page, next page, page size)
 - Use `insertPaginationPlaceholderData` to easily display the current page data and a placeholder data while the next page data is loading
+- Use `insertPrefetchData` that will fetch the next page once the current page is loaded.
 
 ## List with cached pagination (Global query)
 

@@ -56,6 +56,10 @@ export default defineConfig({
                 link: '/insertions/insert-pagination-place-holder-data',
               },
               {
+                text: 'Prefetch Next Data',
+                link: '/insertions/insert-prefetch-next-data.md',
+              },
+              {
                 text: 'Placeholder Data',
                 link: '/insertions/insert-place-holder-data',
               },

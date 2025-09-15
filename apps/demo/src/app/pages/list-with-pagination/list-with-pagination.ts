@@ -11,7 +11,7 @@ import { ApiService } from './api.service';
 import { withQueryById } from '@ng-query/ngrx-signals';
 import { rxQueryById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
-import { insertPrefetchData } from '@ng-query/ngrx-signals/insertions/insert-prefetch-data';
+import { insertPrefetchData } from '@ng-query/ngrx-signals/insertions/insert-prefetch-next-data';
 import { StatusComponent } from '../../ui/status.component';
 export type User = {
   id: string;
