@@ -1,5 +1,6 @@
 import { query } from '../../../src';
 import { insertFactory } from './index';
+
 describe('insertionFactory', () => {
   it('should create an insertion that will be plug in the query insertion pipeline', () => {
     const testInsertion = insertFactory(
@@ -13,7 +14,6 @@ describe('insertionFactory', () => {
         params: () => ({
           id: '1',
         }),
-        identifier: (params) => params.id,
         loader: async ({ params }) => {
           return {
             id: params.id,

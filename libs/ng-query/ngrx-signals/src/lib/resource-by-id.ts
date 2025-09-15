@@ -1,6 +1,5 @@
 import {
   inject,
-  resource,
   signal,
   ResourceOptions,
   ResourceRef,
@@ -11,6 +10,7 @@ import {
   linkedSignal,
   WritableSignal,
   computed,
+  Signal,
 } from '@angular/core';
 import { preservedResource } from './preserved-resource';
 
@@ -35,11 +35,8 @@ export type ResourceByIdHandler<
    * Add a new ResourceRef instance
    */
   add: (
-    id: ({
-      identifier,
-    }: {
-      identifier: Identifier<ResourceParams, GroupIdentifier>;
-    }) => GroupIdentifier,
+    // todo pass params instead of id and create the id from the params using the identifier function
+    params: NonNullable<ResourceParams>,
     options?: {
       defaultValue?: State;
     }
@@ -166,13 +163,39 @@ export function resourceById<
         return newState;
       });
     },
-    add: (id, options?: { defaultValue?: State }) => {
-      const group = id({ identifier });
+    add: (resourceParams, options?: { defaultValue?: State }) => {
+      const group = identifier(resourceParams);
+      const filteredGlobalParamsByGroup = linkedSignal({
+        source: params,
+        computation: (incomingParamsValue, previousGroupParamsData) => {
+          if (!incomingParamsValue) {
+            return incomingParamsValue;
+          }
+          // filter the request push a value by comparing with the current group
+          if (identifier(incomingParamsValue) !== group) {
+            return (
+              (previousGroupParamsData?.value as ResourceParams) ??
+              resourceParams
+            );
+          }
+          // The request push a value that concerns the current group
+          return incomingParamsValue;
+        },
+      });
+      const paramsWithEqualRule = computed(
+        filteredGlobalParamsByGroup as Signal<NonNullable<ResourceParams>>,
+        //@ts-expect-error TypeScript misinterpreting
+        {
+          ...(equalParams !== 'default' && {
+            equal: resourceEqualParams,
+          }),
+        }
+      );
       const resourceRef = createDynamicResource(injector, {
         group,
         resourceOptions: {
           loader,
-          params: resourceEqualParams,
+          params: paramsWithEqualRule,
           stream,
           defaultValue: options?.defaultValue,
         } as ResourceOptions<unknown, unknown>,

@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { withServices } from './util';
 import { ApiService } from './api.service';
@@ -7,44 +12,15 @@ import {
   globalQueries,
   localStoragePersister,
   SignalProxy,
+  withQueryById,
 } from '@ng-query/ngrx-signals';
 import { rxQueryById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
+import { insertPrefetchData } from '@ng-query/ngrx-signals/insertions/insert-prefetch-data';
 export type User = {
   id: string;
   name: string;
 };
-
-const { withUsersQueryById } = globalQueries(
-  {
-    queriesById: {
-      users: {
-        queryById: (
-          {
-            pagination,
-          }: SignalProxy<{ pagination: { page: number; pageSize: number } }>,
-          api = inject(ApiService)
-        ) =>
-          rxQueryById(
-            {
-              params: pagination,
-              identifier: (params) => `${params.page}-${params.pageSize}`,
-              stream: ({ params }) =>
-                api.getDataList$({
-                  page: params.page,
-                  pageSize: params.pageSize,
-                }),
-            },
-            insertPaginationPlaceholderData
-          ),
-      },
-    },
-  },
-  {
-    featureName: 'list-with-pagination-global',
-    persister: localStoragePersister,
-  }
-);
 
 const UserListServerStateStore = signalStore(
   withServices(() => ({
@@ -56,9 +32,40 @@ const UserListServerStateStore = signalStore(
       pageSize: 4,
     },
   }),
-  withUsersQueryById((store) => ({
-    setQuerySource: () => ({ pagination: store.pagination }),
-  })),
+  withQueryById('users', ({ pagination, api }) =>
+    rxQueryById(
+      {
+        params: pagination,
+        identifier: (params) => `${params.page}-${params.pageSize}`,
+        stream: ({ params }) =>
+          api.getDataList$({
+            page: params.page,
+            pageSize: params.pageSize,
+          }),
+      },
+      insertPaginationPlaceholderData,
+      insertPrefetchData(
+        ({
+          insertions: { currentPageData, isPlaceHolderData },
+          resourceParamsSrc,
+        }) => ({
+          hasNextData: computed(
+            () => !isPlaceHolderData() && !!currentPageData()?.length
+          ),
+          nextParams: () => {
+            const params = resourceParamsSrc();
+            if (!params) {
+              return undefined;
+            }
+            return {
+              ...params,
+              page: params.page + 1,
+            };
+          },
+        })
+      )
+    )
+  ),
   withMethods((store) => ({
     nextPage: () =>
       patchState(store, (state) => ({

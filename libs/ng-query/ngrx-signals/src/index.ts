@@ -21,6 +21,8 @@ export type {
   InsertionsByIdFactory,
   InsertionsFactory,
   InsertionByIdParams,
+  DefaultInsertionParams,
+  DefaultInsertionByIdParams,
 } from './lib/core/query.core';
 export { resourceById } from './lib/resource-by-id';
 export type {

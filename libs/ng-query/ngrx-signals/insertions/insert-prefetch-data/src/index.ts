@@ -1,4 +1,1 @@
-export {
-  insertPaginationPlaceholderData,
-  insertPaginationPlaceholderData as insertPlaceholderData,
-} from './insert-prefetch-data';
+export { insertPrefetchData } from './insert-prefetch-data';

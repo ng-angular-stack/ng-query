@@ -4,7 +4,7 @@ An helper that help you to create custom insertion function.
 
 :::warning
 
-- It only accepts one parameter
+- The first parameter is used to be the expected return type where the insertion is added
 - It does not handle generic type parameter
   :::
 
@@ -26,4 +26,37 @@ query(
 
 myQuery.myOutput // string
 
+```
+
+## 2nd parameter : Access to the query/mutation context
+
+It is possible to access to the context in order to use the resourceById or resource...
+Add a second parameter to the custom function.
+
+- `context` type is `InsertFactoryAllContext`
+
+:::warning
+
+- For now it is not fully correctly typed, TS does not handle correctly the types
+- The generics parameters does not works
+  :::
+
+Example:
+
+```ts
+export const insertPrefetchDataEffect = insertFactory(
+  (
+    firstParam: {
+      hasNextData: Signal<boolean>;
+      nextDataIdentifier: () => string;
+    },
+    context
+  ) => {
+    const { resourceById, identifier, resourceParamsSrc } = context as DefaultInsertionByIdParams;
+    // do some stuff
+    return {
+      // ...
+    };
+  }
+);
 ```

@@ -499,14 +499,13 @@ export function setAllUpdatesFromMutationOnQueryValue<
     });
 }
 
-export type InsertionsFactory<
+type InsertionParams<
   Input extends SignalStoreFeatureResult,
   StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
-  InsertsOutputs,
-  PreviousInsertionsOutputs = {}
-> = (context: {
+  PreviousInsertionsOutputs
+> = {
   input: Input;
   store: StoreInput;
   resource: ResourceRef<ResourceState>;
@@ -514,7 +513,24 @@ export type InsertionsFactory<
   insertions: keyof PreviousInsertionsOutputs extends string
     ? PreviousInsertionsOutputs
     : never;
-}) => InsertsOutputs;
+};
+
+export type InsertionsFactory<
+  Input extends SignalStoreFeatureResult,
+  StoreInput,
+  ResourceState extends object | undefined,
+  ResourceParams,
+  InsertsOutputs,
+  PreviousInsertionsOutputs = {}
+> = (
+  context: InsertionParams<
+    Input,
+    StoreInput,
+    ResourceState,
+    ResourceParams,
+    PreviousInsertionsOutputs
+  >
+) => InsertsOutputs;
 
 export type InsertionByIdParams<
   Input extends SignalStoreFeatureResult,
@@ -552,3 +568,20 @@ export type InsertionsByIdFactory<
     PreviousInsertionsOutputs
   >
 ) => InsertionsOutputs;
+
+export type DefaultInsertionByIdParams = InsertionByIdParams<
+  SignalStoreFeatureResult,
+  unknown,
+  string,
+  {},
+  unknown,
+  {}
+>;
+
+export type DefaultInsertionParams = InsertionParams<
+  SignalStoreFeatureResult,
+  unknown,
+  {},
+  unknown,
+  unknown
+>;

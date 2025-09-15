@@ -30,7 +30,7 @@
       "@ng-query/ngrx-signals/insertions/insert-prefetch-data": [
         "libs/ng-query/ngrx-signals/insertions/insert-prefetch-data/src/index.ts"
       ],
-      "@ng-query/ngrx-signals/insertions/insertionFactory": [
+      "@ng-query/ngrx-signals/insertions/insertion-factory": [
         "libs/ng-query/ngrx-signals/insertions/insertion-factory/src/index.ts"
       ],
       "test-type": ["libs/test-type/src/index.ts"],

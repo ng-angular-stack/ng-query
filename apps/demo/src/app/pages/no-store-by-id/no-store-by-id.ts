@@ -44,7 +44,7 @@ const { injectUserQueryById } = globalQueries(
   template: `
     <div>
       User
-      <app-status [status]="userQueryById.currentPageStatus() ?? 'idle'" />
+      <app-status [status]="userQueryById.currentPageStatus()" />
       :
       <pre>{{ userQueryById.currentPageData() | json }}</pre>
     </div>

@@ -9,6 +9,7 @@ import {
   linkedSignal,
   WritableSignal,
   computed,
+  Signal,
 } from '@angular/core';
 import { RxResourceOptions } from '@angular/core/rxjs-interop';
 import { preservedRxResource } from './preserved-rx-resource';
@@ -128,12 +129,39 @@ export function rxResourceById<
         return newState;
       });
     },
-    add: (id, options?: { defaultValue?: State }) => {
-      const group = id({ identifier });
+    add: (resourceParams, options?: { defaultValue?: State }) => {
+      const group = identifier(resourceParams);
+      const filteredGlobalParamsByGroup = linkedSignal({
+        source: params,
+        computation: (incomingParamsValue, previousGroupParamsData) => {
+          if (!incomingParamsValue) {
+            return incomingParamsValue;
+          }
+          // filter the request push a value by comparing with the current group
+          if (identifier(incomingParamsValue) !== group) {
+            return (
+              (previousGroupParamsData?.value as ResourceParams) ??
+              resourceParams
+            );
+          }
+          // The request push a value that concerns the current group
+          return incomingParamsValue;
+        },
+      });
+      const paramsWithEqualRule = computed(
+        filteredGlobalParamsByGroup as Signal<NonNullable<ResourceParams>>,
+        //@ts-expect-error TypeScript misinterpreting
+        {
+          ...(equalParams !== 'default' && {
+            equal: resourceEqualParams,
+          }),
+        }
+      );
+
       const resourceRef = createDynamicRxResource(injector, {
         group,
         resourceOptions: {
-          params: resourceEqualParams,
+          params: paramsWithEqualRule,
           stream,
           defaultValue: options?.defaultValue,
         } as RxResourceOptions<unknown, unknown>,

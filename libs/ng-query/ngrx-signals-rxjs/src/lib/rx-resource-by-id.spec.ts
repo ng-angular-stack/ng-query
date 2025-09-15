@@ -53,21 +53,30 @@ describe('rxResourceById', () => {
       expect(rxResourceByIdRef).toBeDefined();
       expect(rxResourceByIdRef()).toEqual({});
 
-      rxResourceByIdRef.add(() => '123', {
-        defaultValue: { id: '123' },
-      });
+      rxResourceByIdRef.add(
+        { id: '123' },
+        {
+          defaultValue: { id: '123' },
+        }
+      );
       const resourceRef123 = rxResourceByIdRef()['123'];
 
       await vi.runAllTimersAsync();
       expect(resourceRef123).toBeDefined();
       expect(resourceRef123?.value()).toEqual({ id: '123' });
 
-      rxResourceByIdRef.add(() => '1234', {
-        defaultValue: { id: '1234' },
-      });
-      rxResourceByIdRef.add(() => '12345', {
-        defaultValue: { id: '12345' },
-      });
+      rxResourceByIdRef.add(
+        { id: '1234' },
+        {
+          defaultValue: { id: '1234' },
+        }
+      );
+      rxResourceByIdRef.add(
+        { id: '12345' },
+        {
+          defaultValue: { id: '12345' },
+        }
+      );
       await vi.runAllTimersAsync();
 
       const resourceRef1234 = rxResourceByIdRef()['1234'];
