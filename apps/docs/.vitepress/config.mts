@@ -63,14 +63,14 @@ export default defineConfig({
                 text: 'Placeholder Data',
                 link: '/insertions/insert-place-holder-data',
               },
-              {
-                text: 'UX Loader',
-                link: '/insertions/insert-ux-loader.md',
-              },
-              {
-                text: 'Last successful value',
-                link: '/insertions/insert-last-successful-value.md',
-              },
+              // {
+              //   text: 'UX Loader',
+              //   link: '/insertions/insert-ux-loader.md',
+              // },
+              // {
+              //   text: 'Last successful value',
+              //   link: '/insertions/insert-last-successful-value.md',
+              // },
             ],
           },
           { text: 'Server State Store', link: '/signal-store-server-state' },
