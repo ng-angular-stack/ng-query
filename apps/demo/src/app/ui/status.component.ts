@@ -7,13 +7,25 @@ import { Component, input, ResourceStatus } from '@angular/core';
   imports: [CommonModule],
   styles: [
     `
+      .badge-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .status-emoji {
+        display: inline-block;
+        font-size: 14px;
+        line-height: 1;
+      }
+
       .badge {
-        margin-left: 8px;
         padding: 4px 8px;
         border-radius: 6px;
         font-size: 12px;
         font-weight: 500;
         transition: all 0.3s ease;
+        line-height: 1;
       }
 
       .badge-gray {
@@ -46,6 +58,17 @@ import { Component, input, ResourceStatus } from '@angular/core';
       .badge-darkgray {
         background: #cbd5e0;
         color: #4a5568;
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-2px); }
+        75% { transform: translateX(2px); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
       }
     `,
   ],

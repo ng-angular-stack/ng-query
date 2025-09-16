@@ -6,7 +6,6 @@
   background: #232323;
   border-radius: 14px;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
-  font-family: 'Segoe UI', Arial, sans-serif;
   color: #eaeaea;
 }
 
@@ -50,7 +49,7 @@
   border-radius: 4px;
 }
 
-:host input[type='checkbox'] {
+:host input[type="checkbox"] {
   accent-color: #444;
   transform: scale(1.25);
   margin: 0;
@@ -58,7 +57,7 @@
   outline: none;
   transition: box-shadow 0.2s;
 }
-:host input[type='checkbox']:focus {
+:host input[type="checkbox"]:focus {
   box-shadow: 0 0 0 2px #888;
 }
 

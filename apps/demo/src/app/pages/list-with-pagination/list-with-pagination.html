@@ -6,7 +6,9 @@
           User Management:
 
           <app-status
-            [status]="userListServerStateStore.usersQueryById.currentPageStatus()"
+            [status]="
+              userListServerStateStore.usersQueryById.currentPageStatus()
+            "
           />
         </h2>
 
@@ -16,8 +18,6 @@
               <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Status</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -27,7 +27,7 @@
               <tr>
                 <td>{{ user.id }}</td>
 
-                <td>{{user.name }}</td>
+                <td>{{ user.name }}</td>
               </tr>
               } @if
               (!userListServerStateStore.usersQueryById.currentPageData()?.length)
@@ -64,7 +64,11 @@
           <div>
             Next page status:
             <app-status
-              [status]="userListServerStateStore.usersQueryById.nextResource()?.status() ?? 'idle'"
+              [status]="
+                userListServerStateStore.usersQueryById
+                  .nextResource()
+                  ?.status() ?? 'idle'
+              "
             />
           </div>
         </div>

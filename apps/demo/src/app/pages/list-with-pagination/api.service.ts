@@ -48,7 +48,7 @@ export class ApiService {
           data.page * data.pageSize
         )
       ),
-      delay(2000)
+      delay(7000)
     );
   }
 
