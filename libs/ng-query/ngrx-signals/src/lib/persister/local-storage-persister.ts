@@ -257,7 +257,8 @@ export function localStoragePersister(prefix: string): QueriesPersister {
             if (queryByIdValue && typeof queryByIdValue === 'object') {
               Object.entries(queryByIdValue).forEach(
                 ([resourceKey, resourceValue]) => {
-                  queryByIdResource.add(() => resourceKey, {
+                  // todo  now each time we access to a reource the value is retrieved from the cache but it starts to load ! check why ?
+                  queryByIdResource.addById(resourceKey, {
                     defaultValue: resourceValue,
                   });
                 }

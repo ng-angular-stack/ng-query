@@ -41,6 +41,16 @@ export type ResourceByIdHandler<
       defaultValue?: State;
     }
   ) => void;
+  /**
+   * ! The added resource may not load immediately if the global params do not match the identifier function.
+   * Useful at the app initialization when the resource value is retrieved from a persister for example.
+   */
+  addById: (
+    id: string | number,
+    options?: {
+      defaultValue?: State;
+    }
+  ) => void;
 };
 
 export type Identifier<ResourceParams, GroupIdentifier> = (
@@ -177,6 +187,44 @@ export function resourceById<
               (previousGroupParamsData?.value as ResourceParams) ??
               resourceParams
             );
+          }
+          // The request push a value that concerns the current group
+          return incomingParamsValue;
+        },
+      });
+      const paramsWithEqualRule = computed(
+        filteredGlobalParamsByGroup as Signal<NonNullable<ResourceParams>>,
+        //@ts-expect-error TypeScript misinterpreting
+        {
+          ...(equalParams !== 'default' && {
+            equal: resourceEqualParams,
+          }),
+        }
+      );
+      const resourceRef = createDynamicResource(injector, {
+        group,
+        resourceOptions: {
+          loader,
+          params: paramsWithEqualRule,
+          stream,
+          defaultValue: options?.defaultValue,
+        } as ResourceOptions<unknown, unknown>,
+      });
+      resourceByGroup.update((state) => ({
+        ...state,
+        [group]: resourceRef,
+      }));
+    },
+    addById: (group, options?: { defaultValue?: State }) => {
+      const filteredGlobalParamsByGroup = linkedSignal({
+        source: params,
+        computation: (incomingParamsValue, previousGroupParamsData) => {
+          if (!incomingParamsValue) {
+            return incomingParamsValue;
+          }
+          // filter the request push a value by comparing with the current group
+          if (identifier(incomingParamsValue) !== group) {
+            return previousGroupParamsData?.value as ResourceParams;
           }
           // The request push a value that concerns the current group
           return incomingParamsValue;
