@@ -34,12 +34,14 @@
 ## List with pagination (Local query)
 
 - Display a paginated list of user (previous page, next page, page size)
+- Keep in memory the loaded data per page
 - Use `insertPaginationPlaceholderData` to easily display the current page data and a placeholder data while the next page data is loading
 - Use `insertPrefetchData` that will fetch the next page once the current page is loaded.
 
 ## List with cached pagination (Global query)
 
 - Display a paginated list of user (previous page, next page, page size)
+- Keep in memory the loaded data per page
 - Using a cached (from localStorage) global query, that is plugged inside a signalStore
 - Use `insertPaginationPlaceholderData` to easily display the current page data and a placeholder data while the next page data is loading
 
