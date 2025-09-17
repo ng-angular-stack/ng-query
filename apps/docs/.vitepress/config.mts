@@ -85,5 +85,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/ng-angular-stack/ng-query' },
     ],
   },
-  head: [['link', { rel: 'icon', href: '/assets/favicon.png' }]],
+  head: [
+    ['link', { rel: 'icon', href: '/assets/favicon.png', type: 'image/png' }],
+  ],
 });
