@@ -2,7 +2,7 @@
 
 ## Import
 
-`import { queryById, mutationById } from '@ng-query/ngrx-signals-rxjs';`
+`import { queryById, mutationById, withQueryById, withMutationById } from '@ng-query/ngrx-signals-rxjs';`
 
 `import { rxQueryById, rxMutationById } from '@ng-query/ngrx-signals-rxjs';`
 

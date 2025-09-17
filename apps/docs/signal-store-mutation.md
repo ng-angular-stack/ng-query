@@ -2,7 +2,7 @@
 
 ## Import:
 
-`import { mutation } from '@ng-query/ngrx-signals';`
+`import { mutation, withMutation } from '@ng-query/ngrx-signals';`
 
 `import { rxMutation } from '@ng-query/ngrx-signals-rxjs';`
 
@@ -22,9 +22,6 @@ For more [info](https://dev.to/lcsga/les-signals-angular-ne-remplacent-pas-les-o
 ### Example
 
 ```typescript
-import { signalStore, withMutation } from '@ngrx/signals';
-import { mutation } from './mutation';
-
 const Store = signalStore(
   withMutation('updateUser', () =>
     mutation({

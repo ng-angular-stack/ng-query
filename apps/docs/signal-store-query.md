@@ -2,7 +2,7 @@
 
 ## Import:
 
-`import { query } from '@ng-query/ngrx-signals';`
+`import { query, withQuery } from '@ng-query/ngrx-signals';`
 
 `import { rxQuery } from '@ng-query/ngrx-signals-rxjs';`
 
@@ -17,9 +17,6 @@ To use a query, you define it in your Signal Store using the `withQuery` feature
 ### Example
 
 ```typescript
-import { signalStore, withQuery } from '@ngrx/signals';
-import { query } from './query';
-
 const Store = signalStore(
   withState({ id: 5 }),
   withQuery('user', (store) =>
