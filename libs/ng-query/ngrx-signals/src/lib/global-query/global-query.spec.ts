@@ -2,12 +2,18 @@ import { signalStore, withState } from '@ngrx/signals';
 import { Expect, Equal } from 'test-type';
 import { globalQueries } from './global-queries';
 import { of } from 'rxjs';
-import { inject, Injectable, ResourceRef, signal } from '@angular/core';
+import {
+  inject,
+  Injectable,
+  resource,
+  ResourceRef,
+  signal,
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { withMutation } from '../with-mutation';
 import { SignalProxy } from '../signal-proxy';
 import { vi } from 'vitest';
-import { ResourceByIdRef } from '../resource-by-id';
+import { resourceById, ResourceByIdRef } from '../resource-by-id';
 import { query } from '../query';
 import { mutation } from '../mutation';
 import { queryById } from '../query-by-id';
@@ -686,27 +692,186 @@ describe('Global Queries', () => {
 });
 
 describe('Global queries with persister', () => {
-  it('Should enable persisted queries', () => {
-    const { injectUserQuery } = globalQueries(
-      {
-        queries: {
-          user: {
-            query: () =>
-              query({
-                params: () => '1',
-                loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
-              }),
+  beforeEach(() => {
+    localStorage.clear();
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+  it('Should enable persisted queries', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const sourceParams = signal('1');
+      const resourceToPersist = resource({
+        params: sourceParams,
+        loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
+      });
+      // await vi.runOnlyPendingTimersAsync();
+
+      // const _injector = inject(Injector);
+      localStoragePersister('test').addQueryToPersist({
+        key: 'user',
+        queryResource: resourceToPersist,
+        queryResourceParamsSrc: sourceParams,
+        cacheTime: 1000 * 60,
+        waitForParamsSrcToBeEqualToPreviousValue: true,
+      });
+    });
+    await vi.runOnlyPendingTimersAsync();
+    let injectUserQueryResult: ResourceRef<{ id: string; name: string }>;
+    await TestBed.runInInjectionContext(async () => {
+      const sourceParams = signal('1');
+      const { injectUserQuery } = globalQueries(
+        {
+          queries: {
+            user: {
+              query: () =>
+                query({
+                  params: sourceParams,
+                  loader: async ({ params: id }) => {
+                    console.log('id', id);
+                    await vi.advanceTimersByTimeAsync(10000);
+                    return {
+                      id,
+                      name: 'User ' + id,
+                    };
+                  },
+                }),
+            },
           },
         },
-      },
-      {
-        persister: localStoragePersister,
-      }
-    );
+        {
+          persister: localStoragePersister,
+        }
+      );
+      const injectedQuery = injectUserQuery();
+      injectUserQueryResult = injectedQuery;
+      // todo check if should  be local and the value should be retrieved from the persister
+      console.log('injectedQuery.value()', injectedQuery.value());
+      console.log('injectedQuery.status()', injectedQuery.status());
+      expect(injectedQuery).toBeDefined();
+    });
+    // await vi.runOnlyPendingTimersAsync();
+
+    // TestBed.runInInjectionContext(() => {
+    //   console.log('injectedQuery.value()', injectUserQueryResult.value());
+    //   console.log('injectedQuery.status()', injectUserQueryResult.status());
+    //   expect(injectUserQueryResult).toBeDefined();
+    // });
   });
-  // todo
-  // TestBed.runInInjectionContext(() => {
-  //   const injectedQuery = injectUserQuery();
-  //   expect(injectedQuery).toBeDefined();
-  // });
+
+  it('Should enable persisted queriesById (with string params)', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const sourceParams = signal('1');
+      const resourceToPersist = resourceById({
+        params: sourceParams,
+        identifier: (id) => id,
+        loader: async ({ params: id }) => ({ id, name: 'User ' + id }),
+      });
+      // await vi.runOnlyPendingTimersAsync();
+
+      // const _injector = inject(Injector);
+      localStoragePersister('').addQueryByIdToPersist({
+        key: 'user',
+        //@ts-expect-error typing id error
+        queryByIdResource: resourceToPersist,
+        queryResourceParamsSrc: sourceParams,
+        cacheTime: 1000 * 60,
+        waitForParamsSrcToBeEqualToPreviousValue: true,
+      });
+    });
+    await vi.runAllTimersAsync();
+    await TestBed.runInInjectionContext(async () => {
+      const sourceParams = signal('1');
+      const { injectUserQueryById } = globalQueries(
+        {
+          queriesById: {
+            user: {
+              queryById: () =>
+                queryById({
+                  params: sourceParams,
+                  identifier: (id) => id,
+                  loader: async ({ params: id }) => {
+                    console.log('id', id); // should not be called
+                    await vi.advanceTimersByTimeAsync(10000);
+                    return {
+                      id,
+                      name: 'User ' + id,
+                    };
+                  },
+                }),
+            },
+          },
+        },
+        {
+          persister: localStoragePersister,
+        }
+      );
+      const injectedQueryById = injectUserQueryById();
+      expect(injectedQueryById()['1']?.status()).toEqual('local');
+      expect(injectedQueryById()['1']?.value()).toEqual({
+        id: '1',
+        name: 'User 1',
+      });
+    });
+  });
+
+  it('Should enable persisted queriesById (with object params)', async () => {
+    const resourceOptions = {
+      //@ts-expect-error will works inside resource
+      identifier: ({ id }) => id,
+      //@ts-expect-error will works inside resource
+      loader: async ({ params: { id } }) => {
+        await wait(10000);
+        return { id, name: 'User ' + id };
+      },
+    };
+    await TestBed.runInInjectionContext(async () => {
+      const sourceParams = signal({ id: '1' });
+      const resourceToPersist = resourceById({
+        params: sourceParams,
+        ...resourceOptions,
+      });
+      localStoragePersister('').addQueryByIdToPersist({
+        key: 'user',
+        //@ts-expect-error typing id error
+        queryByIdResource: resourceToPersist,
+        queryResourceParamsSrc: sourceParams,
+        cacheTime: 1000 * 60,
+        waitForParamsSrcToBeEqualToPreviousValue: true,
+      });
+    });
+    await vi.runAllTimersAsync();
+    await TestBed.runInInjectionContext(async () => {
+      const sourceParams = signal({ id: '1' });
+      const { injectUserQueryById } = globalQueries(
+        {
+          queriesById: {
+            user: {
+              queryById: () =>
+                queryById({
+                  params: sourceParams,
+                  ...resourceOptions,
+                }),
+            },
+          },
+        },
+        {
+          persister: localStoragePersister,
+        }
+      );
+      const injectedQueryById = injectUserQueryById();
+      expect(injectedQueryById()['1']?.status()).toEqual('local');
+      expect(injectedQueryById()['1']?.value()).toEqual({
+        id: '1',
+        name: 'User 1',
+      });
+    });
+  });
 });
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), ms);
+  });
+}

@@ -1,4 +1,5 @@
 import {
+  assertInInjectionContext,
   effect,
   inject,
   Injector,
