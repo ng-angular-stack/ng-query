@@ -13,6 +13,7 @@ import {
 } from './persister.type';
 import { nestedEffect } from '../types/util';
 import { isEqual } from '../global-query/util';
+import { ResourceByIdRef } from '../resource-by-id';
 
 export function localStoragePersister(prefix: string): QueriesPersister {
   const _injector = inject(Injector);
@@ -70,7 +71,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         }
         untracked(() => {
           const queryParams = queryResourceParamsSrc();
-          console.log('queryResource.value()', queryResource.value());
+
           localStorage.setItem(
             storageKey,
             JSON.stringify({
@@ -165,35 +166,79 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         }
 
         const { queryByIdResource, queryResourceParamsSrc, storageKey } = data;
-        const queryByIdValue = Object.entries(queryByIdResource() ?? {}).reduce<
-          Record<string, any>
-        >((acc, [resourceKey, resource]) => {
-          const queryStatus = resource?.status();
-          if (queryStatus !== 'resolved' && queryStatus !== 'local') {
-            return acc;
-          }
-          acc[resourceKey] = resource?.value();
-          return acc;
-        }, {});
 
-        untracked(() => {
-          const queryParams = queryResourceParamsSrc();
-          localStorage.setItem(
-            storageKey,
-            JSON.stringify({
-              queryParams,
-              queryByIdValue,
+        const newRecordInQueryByIdForNestedEffect = linkedSignal<
+          any,
+          { newKeys: string[] } | undefined
+        >({
+          source: queryByIdResource,
+          computation: (
+            currentSource: ReturnType<
+              ResourceByIdRef<string, unknown, unknown>
+            >,
+            previous
+          ) => {
+            if (!currentSource || !Object.keys(currentSource).length) {
+              return undefined;
+            }
+
+            const currentKeys = Object.keys(currentSource);
+            const previousKeys = Array.from(previous?.source?.keys() || []);
+            const newKeys = currentKeys.filter(
+              (key) => !previousKeys.includes(key)
+            ) as string[];
+            return newKeys.length > 0 ? { newKeys } : previous?.value;
+          },
+        });
+        newRecordInQueryByIdForNestedEffect()?.newKeys.forEach((newRecord) => {
+          const data = untracked(() => queryByIdResource()[newRecord]);
+          nestedEffect(_injector, () => {
+            if (!data) {
+              return;
+            }
+
+            let storedValue: QueryByIdStored | undefined;
+            try {
+              storedValue = JSON.parse(
+                localStorage.getItem(storageKey) || 'undefined'
+              );
+            } catch (e) {
+              console.error('Error parsing stored value from localStorage', e);
+              localStorage.removeItem(storageKey);
+            }
+            storedValue = storedValue ?? {
+              queryParams: queryResourceParamsSrc(),
+              queryByIdValue: {},
               timestamp: Date.now(),
-            })
-          );
+            };
+
+            const isStable =
+              data.status() === 'resolved' || data.status() === 'local';
+            const dataValue = data.value();
+            console.log('data.value()', data.value());
+            untracked(() => {
+              storedValue = {
+                queryParams: queryResourceParamsSrc(),
+                queryByIdValue: {
+                  ...storedValue?.queryByIdValue,
+                  [newRecord]: {
+                    params:
+                      storedValue?.queryByIdValue[newRecord]?.params ??
+                      queryResourceParamsSrc(),
+                    value: data.value(),
+                    reloadOnMount: !isStable,
+                    timestamp: Date.now(),
+                  },
+                },
+                timestamp: Date.now(),
+              };
+              localStorage.setItem(storageKey, JSON.stringify(storedValue));
+            });
+          });
         });
       });
     });
   });
-
-  function isValueExpired(timestamp: number, cacheTime: number): boolean {
-    return Date.now() - timestamp > cacheTime;
-  }
 
   return {
     addQueryToPersist(data: PersistedQuery): void {
@@ -241,33 +286,35 @@ export function localStoragePersister(prefix: string): QueriesPersister {
       const { key, queryByIdResource, queryResourceParamsSrc, cacheTime } =
         data;
 
-      const storageKey = `${prefix}${key}`;
-      const storedValue = localStorage.getItem(storageKey);
+      const storageKey = `${prefix}-${key}`;
+      let storedValue: QueryByIdStored | undefined;
+      try {
+        storedValue = JSON.parse(
+          localStorage.getItem(storageKey) || 'undefined'
+        );
+      } catch (e) {
+        console.error('Error parsing stored value from localStorage', e);
+        localStorage.removeItem(storageKey);
+      }
 
-      if (storedValue) {
-        try {
-          const { queryByIdValue, timestamp } = JSON.parse(storedValue);
-          if (
-            timestamp &&
-            cacheTime > 0 &&
-            isValueExpired(timestamp, cacheTime)
-          ) {
-            localStorage.removeItem(storageKey);
-          } else {
-            if (queryByIdValue && typeof queryByIdValue === 'object') {
-              Object.entries(queryByIdValue).forEach(
-                ([resourceKey, resourceValue]) => {
-                  // todo  now each time we access to a reource the value is retrieved from the cache but it starts to load ! check why ?
-                  queryByIdResource.addById(resourceKey, {
-                    defaultValue: resourceValue,
-                  });
-                }
-              );
+      const storedValueWithValidCacheTime =
+        removeNotValidRecordsWithValidCacheTime(
+          storageKey,
+          storedValue,
+          cacheTime
+        );
+      if (storedValueWithValidCacheTime) {
+        const { queryByIdValue } = storedValueWithValidCacheTime;
+
+        if (queryByIdValue && typeof queryByIdValue === 'object') {
+          Object.entries(queryByIdValue).forEach(
+            ([resourceKey, resourceValue]) => {
+              queryByIdResource.addById(resourceKey, {
+                defaultParam: resourceValue.params,
+                defaultValue: resourceValue.value,
+              });
             }
-          }
-        } catch (e) {
-          console.error('Error parsing stored value from localStorage', e);
-          localStorage.removeItem(storageKey);
+          );
         }
       }
       queriesByIdMap.update((map) => {
@@ -300,7 +347,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
     clearAllQueries(): void {
       queriesMap().forEach((_, key) => {
-        localStorage.removeItem(`${prefix}${key}`);
+        localStorage.removeItem(`${prefix}-${key}`);
       });
       queriesMap.update((map) => {
         map.clear();
@@ -310,7 +357,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
     clearAllQueriesById(): void {
       queriesByIdMap().forEach((_, key) => {
-        localStorage.removeItem(`${prefix}${key}`);
+        localStorage.removeItem(`${prefix}-${key}`);
       });
       queriesByIdMap.update((map) => {
         map.clear();
@@ -321,5 +368,72 @@ export function localStoragePersister(prefix: string): QueriesPersister {
       this.clearAllQueriesById();
       this.clearAllQueries();
     },
+  };
+}
+
+type QueryByIdStored = {
+  queryParams: any;
+  queryByIdValue: Record<
+    string,
+    {
+      params: any;
+      value: any;
+      /**
+       * Use it when the resource was loading and didn't finish before the app was closed
+       */
+      reloadOnMount: boolean;
+      timestamp: number;
+    }
+  >;
+  /**
+   * Newest timestamp of the stored value
+   */
+  timestamp: number;
+};
+
+function isValueExpired(timestamp: number, cacheTime: number): boolean {
+  return Date.now() - timestamp > cacheTime;
+}
+
+function removeNotValidRecordsWithValidCacheTime(
+  storageKey: string,
+  storedValue: QueryByIdStored | undefined,
+  cacheTime: number
+): QueryByIdStored | undefined {
+  if (!storedValue) {
+    return undefined;
+  }
+
+  const { queryByIdValue, timestamp } = storedValue;
+
+  if (timestamp && cacheTime > 0 && isValueExpired(timestamp, cacheTime)) {
+    // remove from storage
+    localStorage.removeItem(storageKey);
+    return undefined;
+  }
+
+  const validQueryByIdValue = Object.entries(queryByIdValue).reduce(
+    (acc, [key, value]) => {
+      const isValueExpiredResult = isValueExpired(value.timestamp, cacheTime);
+      if (!isValueExpiredResult) {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as QueryByIdStored['queryByIdValue']
+  );
+
+  // update local storage
+  localStorage.setItem(
+    storageKey,
+    JSON.stringify({
+      ...storedValue,
+      queryByIdValue: validQueryByIdValue,
+    })
+  );
+
+  return {
+    ...storedValue,
+    queryByIdValue: validQueryByIdValue,
   };
 }

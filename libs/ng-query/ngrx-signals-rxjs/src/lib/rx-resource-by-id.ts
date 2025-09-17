@@ -171,16 +171,22 @@ export function rxResourceById<
         [group]: resourceRef,
       }));
     },
-    addById: (group, options?: { defaultValue?: State }) => {
+    addById: (
+      group,
+      options?: { defaultValue?: State; defaultParam?: ResourceParams }
+    ) => {
       const filteredGlobalParamsByGroup = linkedSignal({
         source: params,
         computation: (incomingParamsValue, previousGroupParamsData) => {
           if (!incomingParamsValue) {
-            return incomingParamsValue;
+            return incomingParamsValue ?? options?.defaultParam;
           }
           // filter the request push a value by comparing with the current group
           if (identifier(incomingParamsValue) !== group) {
-            return previousGroupParamsData?.value as ResourceParams;
+            return (
+              (previousGroupParamsData?.value as ResourceParams) ??
+              options?.defaultParam
+            );
           }
           // The request push a value that concerns the current group
           return incomingParamsValue;

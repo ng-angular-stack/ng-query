@@ -48,6 +48,7 @@ export type ResourceByIdHandler<
   addById: (
     id: string | number,
     options?: {
+      defaultParam?: ResourceParams;
       defaultValue?: State;
     }
   ) => void;
@@ -66,6 +67,18 @@ export type ResourceByIdRef<
 > &
   ResourceByIdHandler<GroupIdentifier, State, ResourceParams>;
 
+export type EqualParams<
+  ResourceParams,
+  GroupIdentifier extends string | number
+> =
+  | 'default'
+  | 'useIdentifier'
+  | ((
+      a: ResourceParams,
+      b: ResourceParams,
+      identifierFn: (params: ResourceParams) => GroupIdentifier
+    ) => boolean);
+
 export function resourceById<
   State,
   ResourceParams,
@@ -79,14 +92,7 @@ export function resourceById<
 }: Omit<ResourceOptions<State, ResourceParams>, 'params'> & {
   params: () => ResourceParams; // must be a mandatory field
   identifier: Identifier<NoInfer<ResourceParams>, GroupIdentifier>;
-  equalParams?:
-    | 'default'
-    | 'useIdentifier'
-    | ((
-        a: ResourceParams,
-        b: ResourceParams,
-        identifierFn: (params: ResourceParams) => GroupIdentifier
-      ) => boolean);
+  equalParams?: EqualParams<ResourceParams, GroupIdentifier>;
 }): ResourceByIdRef<GroupIdentifier, State, ResourceParams> {
   const injector = inject(Injector);
 
@@ -215,16 +221,22 @@ export function resourceById<
         [group]: resourceRef,
       }));
     },
-    addById: (group, options?: { defaultValue?: State }) => {
+    addById: (
+      group,
+      options?: { defaultValue?: State; defaultParam?: ResourceParams }
+    ) => {
       const filteredGlobalParamsByGroup = linkedSignal({
         source: params,
         computation: (incomingParamsValue, previousGroupParamsData) => {
           if (!incomingParamsValue) {
-            return incomingParamsValue;
+            return incomingParamsValue ?? options?.defaultParam;
           }
           // filter the request push a value by comparing with the current group
           if (identifier(incomingParamsValue) !== group) {
-            return previousGroupParamsData?.value as ResourceParams;
+            return (
+              (previousGroupParamsData?.value as ResourceParams) ??
+              options?.defaultParam
+            );
           }
           // The request push a value that concerns the current group
           return incomingParamsValue;
