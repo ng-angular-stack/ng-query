@@ -21,9 +21,17 @@ const { injectUserQueryById } = globalQueries(
         ) =>
           queryById(
             {
-              params: source.id,
-              identifier: (params) => params,
-              loader: ({ params: id }) => api.getItemById(id),
+              params: () => {
+                const sourceId = source.id();
+                return sourceId
+                  ? {
+                      id: sourceId,
+                    }
+                  : undefined;
+              },
+              identifier: (params) => params.id,
+              equalParams: 'useIdentifier',
+              loader: ({ params: { id } }) => api.getItemById(id),
             },
             insertPlaceholderData
           ),

@@ -164,12 +164,13 @@ export function rxResourceById<
           params: paramsWithEqualRule,
           stream,
           defaultValue: options?.defaultValue,
-        } as RxResourceOptions<unknown, unknown>,
+        } as RxResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({
         ...state,
         [group]: resourceRef,
       }));
+      return resourceRef;
     },
     addById: (
       group,
@@ -208,12 +209,13 @@ export function rxResourceById<
           params: paramsWithEqualRule,
           stream,
           defaultValue: options?.defaultValue,
-        } as RxResourceOptions<unknown, unknown>,
+        } as RxResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({
         ...state,
         [group]: resourceRef,
       }));
+      return resourceRef;
     },
   };
 

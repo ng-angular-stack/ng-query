@@ -40,7 +40,7 @@ export type ResourceByIdHandler<
     options?: {
       defaultValue?: State;
     }
-  ) => void;
+  ) => ResourceRef<State>;
   /**
    * ! The added resource may not load immediately if the global params do not match the identifier function.
    * Useful at the app initialization when the resource value is retrieved from a persister for example.
@@ -51,7 +51,7 @@ export type ResourceByIdHandler<
       defaultParam?: ResourceParams;
       defaultValue?: State;
     }
-  ) => void;
+  ) => ResourceRef<State>;
 };
 
 export type Identifier<ResourceParams, GroupIdentifier> = (
@@ -214,12 +214,13 @@ export function resourceById<
           params: paramsWithEqualRule,
           stream,
           defaultValue: options?.defaultValue,
-        } as ResourceOptions<unknown, unknown>,
+        } as ResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({
         ...state,
         [group]: resourceRef,
       }));
+      return resourceRef;
     },
     addById: (
       group,
@@ -258,12 +259,13 @@ export function resourceById<
           params: paramsWithEqualRule,
           stream,
           defaultValue: options?.defaultValue,
-        } as ResourceOptions<unknown, unknown>,
+        } as ResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({
         ...state,
         [group]: resourceRef,
       }));
+      return resourceRef;
     },
   };
 

@@ -200,7 +200,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
             let storedValue: QueryByIdStored | undefined;
             try {
               storedValue = JSON.parse(
-                localStorage.getItem(storageKey) || 'undefined'
+                localStorage.getItem(storageKey) || 'null'
               );
             } catch (e) {
               console.error('Error parsing stored value from localStorage', e);
@@ -214,8 +214,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
             const isStable =
               data.status() === 'resolved' || data.status() === 'local';
-            const dataValue = data.value();
-            console.log('data.value()', data.value());
+            const dataValue = data.hasValue() ? data.value() : undefined;
             untracked(() => {
               storedValue = {
                 queryParams: queryResourceParamsSrc(),
@@ -225,7 +224,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
                     params:
                       storedValue?.queryByIdValue[newRecord]?.params ??
                       queryResourceParamsSrc(),
-                    value: data.value(),
+                    value: dataValue,
                     reloadOnMount: !isStable,
                     timestamp: Date.now(),
                   },
@@ -289,9 +288,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
       const storageKey = `${prefix}-${key}`;
       let storedValue: QueryByIdStored | undefined;
       try {
-        storedValue = JSON.parse(
-          localStorage.getItem(storageKey) || 'undefined'
-        );
+        storedValue = JSON.parse(localStorage.getItem(storageKey) || 'null');
       } catch (e) {
         console.error('Error parsing stored value from localStorage', e);
         localStorage.removeItem(storageKey);
@@ -309,10 +306,14 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         if (queryByIdValue && typeof queryByIdValue === 'object') {
           Object.entries(queryByIdValue).forEach(
             ([resourceKey, resourceValue]) => {
-              queryByIdResource.addById(resourceKey, {
+              const resourceRef = queryByIdResource.addById(resourceKey, {
                 defaultParam: resourceValue.params,
                 defaultValue: resourceValue.value,
               });
+              // The reload strategy can be improved to prioritize the current displayed resource
+              if (resourceValue.reloadOnMount) {
+                resourceRef.reload();
+              }
             }
           );
         }
