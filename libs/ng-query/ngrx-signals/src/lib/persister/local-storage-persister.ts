@@ -334,7 +334,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     clearQuery(queryKey: string): void {
       queriesMap.update((map) => {
         map.delete(queryKey);
-        localStorage.removeItem(`${prefix}${queryKey}`);
+        localStorage.removeItem(`${prefix}-${queryKey}`);
         return map;
       });
     },
@@ -342,7 +342,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     clearQueryBy(queryByIdKey: string): void {
       queriesByIdMap.update((map) => {
         map.delete(queryByIdKey);
-        localStorage.removeItem(`${prefix}${queryByIdKey}`);
+        localStorage.removeItem(`${prefix}-${queryByIdKey}`);
         return map;
       });
     },

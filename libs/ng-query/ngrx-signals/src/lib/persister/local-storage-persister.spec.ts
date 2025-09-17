@@ -40,7 +40,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -92,7 +92,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -126,7 +126,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -179,7 +179,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -220,7 +220,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -257,7 +257,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -302,7 +302,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -341,7 +341,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -380,7 +380,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
@@ -428,7 +428,7 @@ describe('localStoragePersister', () => {
         },
       });
 
-      const persister = localStoragePersister('query-');
+      const persister = localStoragePersister('query');
 
       persister.addQueryToPersist({
         key: 'user',
