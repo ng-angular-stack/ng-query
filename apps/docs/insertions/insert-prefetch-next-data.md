@@ -44,4 +44,5 @@ Next page status: <app-status [status]="userListServerStateStore.usersQueryById.
 
 Once the current resource (often the current page) is loaded, it will fetch the next page data.
 
-- `hasNextData` is an observable, and every time it returns `true`, `nextParams` will be called and generate an the next identifier. If their is no matching identifier, a new resource is created otherwise, it just return the existing resource
+- `hasNextData` is a signal, and every time it returns `true`, `nextParams` will be called and generate an the next identifier. If their is no matching identifier, a new resource is created otherwise, it just return the existing resource
+- `prefetch` is a method that it callable by passing params, and a new resource will be created and his loader called. It helps to prefetch some data
