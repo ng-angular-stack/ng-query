@@ -1,7 +1,7 @@
 import { ResourceStatus, signal, Signal } from '@angular/core';
 import { insertPaginationPlaceholderData } from './insert-pagination-place-holder-data';
 import { TestBed } from '@angular/core/testing';
-import { queryById } from '../../../src';
+import { globalQueries, queryById, QueryByIdRef } from '../../../src';
 
 describe('insertPaginationPlaceholderData', () => {
   it('should return the data of the currentPage', () => {
@@ -21,7 +21,8 @@ describe('insertPaginationPlaceholderData', () => {
         },
         insertPaginationPlaceholderData
       );
-      const finalResult = result({}, {} as any);
+      const finalResult = result({} as any, {} as any);
+
       expectTypeOf(finalResult.queryByIdRef).toEqualTypeOf<
         QueryByIdRef<
           string,
@@ -40,7 +41,7 @@ describe('insertPaginationPlaceholderData', () => {
                 }>
               | undefined
             >;
-            currentPageStatus: Signal<ResourceStatus | undefined>;
+            currentPageStatus: Signal<ResourceStatus>;
             isPlaceHolderData: Signal<boolean>;
           }
         >

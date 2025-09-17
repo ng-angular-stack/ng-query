@@ -45,13 +45,17 @@ export function insertPrefetchNextData<
         return;
       }
       const currentResource = resourceById()[identifier(currentParams)];
+
       if (!hasNextData()) {
+        console.log('no next data');
         nextResource.set(undefined);
         return;
       }
       const isCurrentResourceResolved =
         currentResource?.status() === 'resolved' || 'local';
       if (!isCurrentResourceResolved) {
+        console.log('no next data 1');
+
         return;
       }
       const nextDataParams = nextParams();
@@ -60,11 +64,16 @@ export function insertPrefetchNextData<
         : undefined;
       if (!nextDataParams || !nextResourceId) {
         nextResource.set(undefined);
+        console.log('no next data 2');
+
         return;
       }
       const hasNextDataValue = !!resourceById()[nextResourceId];
+      console.log('hasNextDataValue', hasNextDataValue);
       if (hasNextDataValue) {
         nextResource.set(resourceById()[nextResourceId]);
+        console.log(' next data 3', resourceById()[nextResourceId]?.status());
+
         return;
       }
       resourceById.add(nextDataParams);
@@ -72,6 +81,7 @@ export function insertPrefetchNextData<
     });
     return {
       nextResource: nextResource.asReadonly(),
+      prefetch: resourceById.add,
     };
   };
 }

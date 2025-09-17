@@ -1,4 +1,5 @@
-import { query } from '../../../src';
+import { TestBed } from '@angular/core/testing';
+import { queryById } from '../../../src';
 import { insertFactory } from './index';
 
 describe('insertionFactory', () => {
@@ -9,26 +10,32 @@ describe('insertionFactory', () => {
       })
     );
 
-    const result = query(
-      {
-        params: () => ({
-          id: '1',
-        }),
-        loader: async ({ params }) => {
-          return {
-            id: params.id,
-            name: 'Test Name',
-          };
+    TestBed.runInInjectionContext(() => {
+      const result = queryById(
+        {
+          params: () => ({
+            id: '1',
+          }),
+          identifier: (params) => params.id,
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Test Name',
+            };
+          },
         },
-      },
-      (data) => ({ nextPage: 2 }),
-      testInsertion(({ insertions: { nextPage } }) => ({
-        hasNextPage: nextPage !== undefined,
-      }))
-    );
+        (data) => ({ nextPage: 2 }),
+        testInsertion(({ insertions: { nextPage } }) => ({
+          hasNextPage: nextPage !== undefined,
+        }))
+      );
 
-    expect(
-      result({} as any, {} as any).queryByIdRef.insertionsOutputs.hasNextPage
-    ).toBe(true);
+      expect(
+        result({} as any, {} as any).queryByIdRef.insertionsOutputs.hasNextPage
+      ).toBe(true);
+      expectTypeOf(
+        result({} as any, {} as any).queryByIdRef.insertionsOutputs.hasNextPage
+      ).toEqualTypeOf<boolean>();
+    });
   });
 });

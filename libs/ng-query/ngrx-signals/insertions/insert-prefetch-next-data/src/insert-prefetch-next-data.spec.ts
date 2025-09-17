@@ -1,11 +1,18 @@
-import { ResourceStatus, signal, Signal } from '@angular/core';
-import { queryById, QueryByIdRef, globalQueries } from '@ng-query/ngrx-signals';
+import { computed, signal } from '@angular/core';
+import { queryById, globalQueries } from '@ng-query/ngrx-signals';
 import { TestBed } from '@angular/core/testing';
-import { insertPrefectData } from '../../insert-prefect-data/src/insert-prefect-data';
+import { insertPrefetchNextData } from './insert-prefetch-next-data';
 
-describe('insertPaginationPlaceholderData', () => {
-  it('should return the data of the currentPage', () => {
-    TestBed.runInInjectionContext(() => {
+describe('insertPrefetchNextData', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+  it('should prefetch next data', async () => {
+    await TestBed.runInInjectionContext(async () => {
       const result = queryById(
         {
           params: () => ({
@@ -19,44 +26,60 @@ describe('insertPaginationPlaceholderData', () => {
             };
           },
         },
-        insertPrefectData
+        insertPrefetchNextData((context) => ({
+          hasNextData: computed(() => {
+            console.log('hasNextData');
+            return context.resourceParamsSrc()?.id === '1';
+          }),
+          nextParams: () => ({
+            ...context.resourceParamsSrc(),
+            id: '2',
+          }),
+        }))
       );
-      const finalResult = result({}, {} as any);
+      const finalResult = result({} as any, {} as any);
 
-      // todo
+      await vi.runAllTimersAsync();
+      const nextStatus = finalResult.queryByIdRef.insertionsOutputs
+        .nextResource()
+        ?.status();
+      expect(nextStatus).toBe('resolved');
     });
   });
 
-  it('should return a placeholder data during loading', async () => {
-    vi.useFakeTimers();
+  it('should enable to prefetch data', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const pagination = signal(1);
-      const { injectUsersQueryById } = globalQueries({
-        queriesById: {
-          users: {
-            queryById: () =>
-              queryById(
-                {
-                  params: pagination,
-                  loader: async ({ params: pagination }) => {
-                    await wait(10000);
-                    return Promise.resolve([
-                      {
-                        name: 'User' + pagination,
-                      },
-                    ]);
-                  },
-                  identifier: (params) => params,
-                },
-                insertPaginationPlaceholderData
-              ),
+      const result = queryById(
+        {
+          params: () => ({
+            id: '1',
+          }),
+          identifier: (params) => params.id,
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Test Name',
+            };
           },
         },
-      });
-      const userQuery = injectUsersQueryById();
+        insertPrefetchNextData((context) => ({
+          hasNextData: computed(() => {
+            return context.resourceParamsSrc()?.id === '1';
+          }),
+          nextParams: () => ({
+            ...context.resourceParamsSrc(),
+            id: '2',
+          }),
+        }))
+      );
+      const finalResult = result({} as any, {} as any);
+      const prefetchedResource =
+        finalResult.queryByIdRef.insertionsOutputs.prefetch({
+          id: '3',
+        });
+      await vi.runAllTimersAsync();
 
-      // todo
-      vi.restoreAllMocks();
+      expect(prefetchedResource.status()).toBe('resolved');
     });
   });
 });

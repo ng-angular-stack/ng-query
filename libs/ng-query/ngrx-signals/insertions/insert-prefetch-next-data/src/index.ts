@@ -1,1 +1,1 @@
-export { insertPrefetchNextData as insertPrefetchData } from './insert-prefetch-next-data';
+export { insertPrefetchNextData } from './insert-prefetch-next-data';
