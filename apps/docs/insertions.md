@@ -50,6 +50,7 @@ userQuery.total(); // number
 
 - **Do not use insertions to interact with other queries or mutations.** Insertions are designed to extend the current query or mutation only.
 - Use [insertFactory](insertions/insert-factory) to help you create custom insertions (see dedicated page).
+- To create custom insertion that handle generic types parameters, check how `insertPrefetchNextData` is build.
 
 ## Bundle Size Consideration
 
