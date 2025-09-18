@@ -21,6 +21,7 @@
               </tr>
             </thead>
             <tbody>
+              @if(userListServerStateStore.usersQueryById.currentPageData()) {
               @for(user of
               userListServerStateStore.usersQueryById.currentPageData(); track
               user.id) {
@@ -29,15 +30,13 @@
 
                 <td>{{ user.name }}</td>
               </tr>
-              } @if
-              (!userListServerStateStore.usersQueryById.currentPageData()?.length)
-              {
+              } @empty {
               <tr>
                 <td colspan="4" style="text-align: center; padding: 32px">
                   No users found
                 </td>
               </tr>
-              }
+              } }
             </tbody>
           </table>
         </div>
