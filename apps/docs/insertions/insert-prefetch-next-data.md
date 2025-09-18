@@ -34,10 +34,12 @@ rxQueryById(
 );
 ```
 
-Usage like:
+Usage:
 
 ```html
-Next page status: <app-status [status]="userListServerStateStore.usersQueryById.nextResource()?.status() ?? 'idle'" />
+Next page status: <app-status [status]="store.usersQueryById.nextResource()?.status() ?? 'idle'" />
+
+<button (mouseenter)="store.usersQueryById.prefetchNext()">Next Page</button>
 ```
 
 ## Effect
@@ -45,4 +47,8 @@ Next page status: <app-status [status]="userListServerStateStore.usersQueryById.
 Once the current resource (often the current page) is loaded, it will fetch the next page data.
 
 - `hasNextData` is a signal, and every time it returns `true`, `nextParams` will be called and generate an the next identifier. If their is no matching identifier, a new resource is created otherwise, it just return the existing resource
+
+## Exposed utilities
+
 - `prefetch` is a method exposed that it callable by passing params, and a new resource will be created and his loader called. It helps to prefetch some data
+- `prefetchNext`, if called, it will start the prefetch of the next page. It may be used with `(mouseenter)` to start the prefetch of the next page before the user click on the button.

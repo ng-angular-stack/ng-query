@@ -56,7 +56,11 @@
           <button class="btn" (click)="userListServerStateStore.previousPage()">
             Previous
           </button>
-          <button class="btn" (click)="userListServerStateStore.nextPage()">
+          <button
+            class="btn"
+            (click)="userListServerStateStore.nextPage()"
+            (mouseenter)="userListServerStateStore.usersQueryById.prefetchNext()"
+          >
             Next
           </button>
         </div>

@@ -131,6 +131,13 @@ export function rxResourceById<
     },
     add: (resourceParams, options?: { defaultValue?: State }) => {
       const group = identifier(resourceParams);
+      if (resourceByGroup()[group]) {
+        console.warn(
+          `[rxResourceById] - A resource with the id ${group} already exist.`
+        );
+        return resourceByGroup()[group] as ResourceRef<State>;
+      }
+
       const filteredGlobalParamsByGroup = linkedSignal({
         source: params,
         computation: (incomingParamsValue, previousGroupParamsData) => {
@@ -148,6 +155,7 @@ export function rxResourceById<
           return incomingParamsValue;
         },
       });
+      debugger;
       const paramsWithEqualRule = computed(
         filteredGlobalParamsByGroup as Signal<NonNullable<ResourceParams>>,
         //@ts-expect-error TypeScript misinterpreting

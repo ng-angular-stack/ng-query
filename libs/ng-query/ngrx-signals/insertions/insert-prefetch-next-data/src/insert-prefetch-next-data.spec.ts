@@ -1,5 +1,5 @@
-import { computed, signal } from '@angular/core';
-import { queryById, globalQueries } from '@ng-query/ngrx-signals';
+import { computed } from '@angular/core';
+import { queryById } from '@ng-query/ngrx-signals';
 import { TestBed } from '@angular/core/testing';
 import { insertPrefetchNextData } from './insert-prefetch-next-data';
 
