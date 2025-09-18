@@ -80,6 +80,10 @@ export default defineConfig({
         text: 'Examples',
         items: [{ text: 'Examples', link: '/examples/overview' }],
       },
+      {
+        text: 'Press kit',
+        link: '/press-kit',
+      },
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ng-angular-stack/ng-query' },

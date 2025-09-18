@@ -12,9 +12,10 @@ Ajout des tests manquants en même temps
 
 ## Feature
 
+- ajout presskit
+- finir de gérer le github
+-
 - example pokemon
-- rename insertions to use
-- add usePrefectEffect
 - // Todo backlog: add reset pagination that remove all the other page ?
 - hide internal type from the props store
 - Pagination, reset des pages quand sort/pageSize change
@@ -24,21 +25,14 @@ Ajout des tests manquants en même temps
 - ajouter page pour demander de l'aide dans la doc
 - faire doc pour llm
 - faire un globalQueriesStore qui permet de gérer le cache, et de partager aussi les mutations de façon global et d'y réagir depuis les queries
-- Pour éviter que ça aille dans tous les sens faire un truc genre: query(..., withOption(...), withExtension(...))
-- préserver les résultats précédents pagintation, ajouter une fonction qui va exposer current page et current résult ? et exposer en plus des resources ? évite de recréer des trucs dédiés
 - gérer les mutations qui se lancent mais on n'a pas le résultat (car on a refresh la page avant)
 - returned source should be an object, it will be easier for improvments
-- ajouter inject dans cachedQueries
-- todo inject global queries directly & tester une seule instance shared
-- permettre au non l'ajout d'un persister (option)
-- ajouter test queryById localstorage
 - checker de voir si on a encore besoin du runOnInjectionContext & injector
-- Faire un withRxMutation basé sur les observables
+- Faire un withRxMutation basé sur les observables ?
 - cache persister, auto reload si observé ?
 - Dans les cachesPersister rajouter une map clé/date d'expiration, comme ça à l'initialisation ça peut clean tout ce qui est outdated
 - Penser au cas où une mutation vient modifier une query qui n'est pas encore récupérée du cache (pas possible je crois, via ce que j'ai mis en place)
 - Cache auto refetch si /WindowsFocus / interval...
-- query pagination & cache
 - query infinit pagination & cache
 - resourceById cache pour ne pas relancer l'appel ? Si on revient sur une même "page"
 - Plus tard quand les events du signalStore seront OP, ajouter un opérateur on$ ou un helper pour récupérer l'observable
