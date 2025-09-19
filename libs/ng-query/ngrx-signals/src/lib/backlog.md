@@ -12,8 +12,8 @@ Ajout des tests manquants en même temps
 
 ## Feature
 
-- ajout presskit
-- finir de gérer le github
+- ajout insertOutputs$
+- finir de gérer le github/discord
 -
 - example pokemon
 - // Todo backlog: add reset pagination that remove all the other page ?
