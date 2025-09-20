@@ -48,6 +48,8 @@ userQuery.total(); // number
 
 ## Best Practices
 
+- prefix `insert` for all utilities that does not rely on RxJs
+- prefix `rxInset` it your utility function relies on Rxjs
 - **Do not use insertions to interact with other queries or mutations.** Insertions are designed to extend the current query or mutation only.
 - Use [insertFactory](insertions/insert-factory) to help you create custom insertions (see dedicated page).
 - To create custom insertion that handle generic types parameters, check how `insertPrefetchNextData` is build.

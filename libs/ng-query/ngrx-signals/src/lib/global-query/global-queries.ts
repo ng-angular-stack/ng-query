@@ -386,9 +386,15 @@ export function globalQueries<
             const _injector = inject(Injector);
             signalProxy.$set(pluggableData?.(signalProxy));
             if (queriesMap.has(key)) {
-              return queriesMap.get(key)?.queryRef.resource;
+              return Object.assign(
+                queriesMap.get(key)?.queryRef.resource ?? {},
+                queriesMap.get(key)?.queryRef.insertionsOutputs ?? {}
+              );
             }
-            return queryData(_injector).queryRef.resource;
+            return Object.assign(
+              queryData(_injector)?.queryRef.resource ?? {},
+              queryData(_injector)?.queryRef.insertionsOutputs ?? {}
+            );
           };
 
           return acc;
@@ -447,6 +453,7 @@ export function globalQueries<
         acc[injectQueryName] = (pluggableData) => {
           const _injector = inject(Injector);
           signalProxy.$set(pluggableData?.(signalProxy));
+
           if (queriesByIdMap.has(key)) {
             return Object.assign(
               queriesByIdMap.get(key)?.queryByIdRef.resourceById ?? {},

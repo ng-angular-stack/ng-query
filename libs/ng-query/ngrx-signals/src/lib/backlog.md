@@ -1,18 +1,8 @@
-## Query
-
-Gestion de la method pour trigger une query & ajout à la signature
-
-## ById
-
-gérer le trigger de plusieurs d'un coup
-
-## Doc
-
 Ajout des tests manquants en même temps
 
 ## Feature
 
-- ajout insertOutputs$
+- improve insertObservablesOutputs to help to know when a resource if removed/created.... (maybe using groupBy)
 - finir de gérer le github/discord
 -
 - example pokemon

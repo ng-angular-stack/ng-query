@@ -11,6 +11,7 @@ export { withMutation } from './lib/with-mutation';
 export { mutation } from './lib/mutation';
 export { mutationById } from './lib/mutation-by-id';
 export type { SignalProxy } from './lib/signal-proxy';
+export { nestedEffect } from './lib/types/util';
 export type { InternalType } from './lib/types/util.type';
 export * from './lib/types/brand';
 export type {
@@ -21,6 +22,7 @@ export type {
   InsertionsByIdFactory,
   InsertionsFactory,
   InsertionByIdParams,
+  InsertionParams,
   DefaultInsertionParams,
   DefaultInsertionByIdParams,
 } from './lib/core/query.core';

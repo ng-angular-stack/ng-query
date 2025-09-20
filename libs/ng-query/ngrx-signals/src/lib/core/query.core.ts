@@ -499,7 +499,7 @@ export function setAllUpdatesFromMutationOnQueryValue<
     });
 }
 
-type InsertionParams<
+export type InsertionParams<
   Input extends SignalStoreFeatureResult,
   StoreInput,
   ResourceState extends object | undefined,

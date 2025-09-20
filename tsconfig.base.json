@@ -21,6 +21,9 @@
       "@ng-query/ngrx-signals-rxjs": [
         "libs/ng-query/ngrx-signals-rxjs/src/index.ts"
       ],
+      "@ng-query/ngrx-signals-rxjs/rx-insertions/rx-insert-observables": [
+        "libs/ng-query/ngrx-signals-rxjs/rx-insertions/rx-insert-observables/src/index.ts"
+      ],
       "@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data": [
         "libs/ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data/src/index.ts"
       ],

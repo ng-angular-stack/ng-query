@@ -1,5 +1,4 @@
 import {
-  assertInInjectionContext,
   effect,
   inject,
   Injector,
@@ -250,7 +249,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         cacheTime,
       } = data;
 
-      const storageKey = `${prefix}-${key}`;
+      const storageKey = getStorageKey(prefix, key);
       const storedValue = localStorage.getItem(storageKey);
       if (storedValue && !waitForParamsSrcToBeEqualToPreviousValue) {
         try {
@@ -286,7 +285,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
       const { key, queryByIdResource, queryResourceParamsSrc, cacheTime } =
         data;
 
-      const storageKey = `${prefix}-${key}`;
+      const storageKey = getStorageKey(prefix, key);
       let storedValue: QueryByIdStored | undefined;
       try {
         storedValue = JSON.parse(localStorage.getItem(storageKey) || 'null');
@@ -349,7 +348,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
     clearAllQueries(): void {
       queriesMap().forEach((_, key) => {
-        localStorage.removeItem(`${prefix}-${key}`);
+        localStorage.removeItem(getStorageKey(prefix, key));
       });
       queriesMap.update((map) => {
         map.clear();
@@ -359,7 +358,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
     clearAllQueriesById(): void {
       queriesByIdMap().forEach((_, key) => {
-        localStorage.removeItem(`${prefix}-${key}`);
+        localStorage.removeItem(getStorageKey(prefix, key));
       });
       queriesByIdMap.update((map) => {
         map.clear();
@@ -392,6 +391,10 @@ type QueryByIdStored = {
    */
   timestamp: number;
 };
+
+function getStorageKey(prefix: string, key: string) {
+  return `ng-query-${prefix}-${key}`;
+}
 
 function isValueExpired(timestamp: number, cacheTime: number): boolean {
   return Date.now() - timestamp > cacheTime;

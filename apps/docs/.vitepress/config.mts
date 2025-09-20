@@ -63,6 +63,10 @@ export default defineConfig({
                 text: 'Placeholder Data',
                 link: '/insertions/insert-place-holder-data',
               },
+              {
+                text: 'Rx: Observables',
+                link: '/insertions/rx-insert-observables',
+              },
               // {
               //   text: 'UX Loader',
               //   link: '/insertions/insert-ux-loader.md',
@@ -83,6 +87,10 @@ export default defineConfig({
       {
         text: 'Press kit',
         link: '/press-kit',
+      },
+      {
+        text: 'Backlog',
+        link: '/backlog',
       },
     ],
     socialLinks: [

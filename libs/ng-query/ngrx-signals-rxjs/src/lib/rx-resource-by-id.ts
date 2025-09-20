@@ -155,7 +155,7 @@ export function rxResourceById<
           return incomingParamsValue;
         },
       });
-      debugger;
+
       const paramsWithEqualRule = computed(
         filteredGlobalParamsByGroup as Signal<NonNullable<ResourceParams>>,
         //@ts-expect-error TypeScript misinterpreting

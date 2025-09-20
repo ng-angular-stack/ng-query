@@ -23,7 +23,15 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "rx-insertions/**/src/**/*.test.ts",
+    "rx-insertions/**/src/**/*.spec.ts",
+    "rx-insertions/**/src/**/*.test.tsx",
+    "rx-insertions/**/src/**/*.spec.tsx",
+    "rx-insertions/**/src/**/*.test.js",
+    "rx-insertions/**/src/**/*.spec.js",
+    "rx-insertions/**/src/**/*.test.jsx",
+    "rx-insertions/**/src/**/*.spec.jsx"
   ],
   "files": ["src/test-setup.ts"]
 }
