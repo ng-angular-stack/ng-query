@@ -21,8 +21,8 @@
               </tr>
             </thead>
             <tbody>
-              @for(user of store.usersQueryById.currentPageData(); track
-              user.id) {
+              @if(store.usersQueryById.currentPageData()) { @for(user of
+              store.usersQueryById.currentPageData(); track user.id) {
               <tr>
                 <td>{{ user.id }}</td>
 
@@ -38,13 +38,13 @@
                   </button>
                 </td>
               </tr>
-              } @if (!store.usersQueryById.currentPageData()?.length) {
+              } @empty {
               <tr>
                 <td colspan="4" style="text-align: center; padding: 32px">
                   No users found
                 </td>
               </tr>
-              }
+              }}
             </tbody>
           </table>
         </div>
