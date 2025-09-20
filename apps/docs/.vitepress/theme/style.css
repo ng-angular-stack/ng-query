@@ -118,6 +118,30 @@ html.dark {
   color: transparent !important;
 }
 
+.VPNavBarTitle .title::after {
+  content: 'EXPERIMENTAL';
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-warning-soft);
+  border: 1px solid var(--vp-c-warning-1);
+  padding: 2px 6px;
+  position: absolute;
+  right: -17px;
+  bottom: 0%;
+  transform: translateY(-50%);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 100px;
+}
+.home .VPNavBarTitle .title::after {
+  right: -105px;
+}
+
+.VPNavBarTitle {
+  position: relative;
+}
+
 /**
  * Component: Button
  * -------------------------------------------------------------------------- */

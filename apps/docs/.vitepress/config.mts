@@ -80,10 +80,7 @@ export default defineConfig({
           { text: 'Server State Store', link: '/signal-store-server-state' },
         ],
       },
-      {
-        text: 'Examples',
-        items: [{ text: 'Examples', link: '/examples/overview' }],
-      },
+      { text: 'Examples', link: '/examples/overview' },
       {
         text: 'Press kit',
         link: '/press-kit',
