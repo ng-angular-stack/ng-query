@@ -9,6 +9,7 @@ Declarative configuration is done inside `withQuery` using the `on` property. Th
 ### Example: Declarative Query Effects
 
 ```typescript
+withMutation("user", ...),
 withQuery(
 	'user',
 	() => query({ ... }),
