@@ -20,6 +20,7 @@ export default defineConfig(() => ({
     include: [
       '{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'insertions/**/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'utils/**/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
     setupFiles: ['src/test-setup.ts'],
     reporters: ['default'],

@@ -36,6 +36,9 @@
       "@ng-query/ngrx-signals/insertions/insertion-factory": [
         "libs/ng-query/ngrx-signals/insertions/insertion-factory/src/index.ts"
       ],
+      "@ng-query/ngrx-signals/utils/ux-loader": [
+        "libs/ng-query/ngrx-signals/utils/ux-loader/src/index.ts"
+      ],
       "test-type": ["libs/test-type/src/index.ts"],
       "types-testing": ["test-types.ts"]
     }
