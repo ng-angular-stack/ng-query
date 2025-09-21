@@ -92,6 +92,7 @@ export default defineConfig({
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ng-angular-stack/ng-query' },
+      { icon: 'discord', link: 'https://discord.gg/euGevj9E' },
     ],
   },
   head: [
