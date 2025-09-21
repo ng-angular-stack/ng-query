@@ -35,10 +35,6 @@ export class ApiService {
 
   public readonly updateError = signal(false);
 
-  constructor() {
-    this.dataList$.subscribe((dataList) => console.log(dataList));
-  }
-
   getDataList$(data: { page: number; pageSize: number }): Observable<User[]> {
     return this.dataList$.pipe(
       take(1),

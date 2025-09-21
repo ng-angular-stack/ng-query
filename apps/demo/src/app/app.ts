@@ -39,9 +39,7 @@ export class App implements OnInit {
   navigate(event: Event) {
     const target = event.target as HTMLSelectElement;
     const url = target.value;
-    if (url) {
-      console.log('Navigating to:', url);
-      this.router.navigateByUrl(url);
-    }
+    console.log('Navigating to:', url);
+    this.router.navigateByUrl(url);
   }
 }
