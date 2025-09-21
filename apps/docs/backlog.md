@@ -2,7 +2,6 @@
 
 ## Priority
 
-- Ensure their is no memory leak (since their is a lot of effect that are used, I do not know how the "unsubscribe" works as for observables)
 - A package that does not use the NgRx SignalStore & Server State Store (it will come together)
   - A way for query to be updated by other query result
 - Infinite pagination/query (the a strategy to invalidate the cache as tanstackQuery does)
