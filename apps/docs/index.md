@@ -26,3 +26,37 @@ features:
   - title: Designed for Signal Store
     details: Fully compatible and easily integrated with NgRx SignalStore, providing type safety, autocompletion, and high performance.
 ---
+
+<div class="demo-section">
+  <h2 class="demo-title">Teaser 🎥</h2>
+  <video controls muted loop width="800" preload="none" poster="/assets/ng-query-v1.jpg" loading="lazy" class="demo-video">
+    <source src="/assets/ng-query-v1.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+<style>
+@media (min-width: 600px) {
+  .demo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .demo-title {
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .demo-video {
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    max-width: 800px;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+</style>
