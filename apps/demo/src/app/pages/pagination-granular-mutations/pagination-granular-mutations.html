@@ -61,6 +61,7 @@
             <option [value]="16">16</option>
           </select>
           <button class="btn" (click)="store.previousPage()">Previous</button>
+          <span class="current-page"> {{ store.pagination.page() }} </span>
           <button class="btn" (click)="store.nextPage()">Next</button>
         </div>
       </div>

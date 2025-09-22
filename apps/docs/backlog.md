@@ -2,7 +2,6 @@
 
 ## Priority
 
-- Ensure their is no memory leak (since their is a lot of effect that are used, I do not know how the "unsubscribe" works as for observables)
 - A package that does not use the NgRx SignalStore & Server State Store (it will come together)
   - A way for query to be updated by other query result
 - Infinite pagination/query (the a strategy to invalidate the cache as tanstackQuery does)
@@ -14,7 +13,9 @@
 
 ## Other
 
+- A Chrome Dev tool to track queries and mutations requests
 - A page that compare Angular TanStackQuery and other solutions with @ng-query
+- Once ng-query will be standalone (can works without the signalStore), a page to show how to implements ng-query with client state management (StateAdapt, RxAngular...)
 - Improve the insertObservables (to help to know when a new resource is created, and when is it reset/deleted) (their is maybe a memory leak to check)
 - Add a more complex example named "Pokemon" based on queryById / mutationById
 - Add property `reset` / `resetResource` for `ById` to help to remove/clean some resource that are no more needed (in pagination, it may be used to clean some not valid pagination)

@@ -11,3 +11,19 @@ nx release publish # publie sur npm (selon "packageRoot" de chaque projet)
 ## Tests with UI
 
 npx nx run ng-query-ngrx-signals:test --watch --ui
+
+## Server State Store
+
+const {withUserServerState, injectUserServerState, includeUserServerState} = serverStateStore("user", useMutation("save"), useQuery("user", ....))
+
+const {injectOtherServerState} = serverStateStore("other", includeUserServerState({public: true/false}), ...)
+
+injectOtherServerState() // pas accès direct à userState si pas explicitement public
+
+///
+
+const {includeSaveUserMutation(), injectSaveUserMutation} = globalMutation("saveUser", ...);
+
+const {injectOtherServerState} = serverStateStore("other", includeUserServerState({public: true/false}),includeSaveUserMutation(), ...)
+
+const {includeUserQuery, withUserQuery} = globalQuery("user", ...); // can not be mutated, otherwise use serverStateStore
