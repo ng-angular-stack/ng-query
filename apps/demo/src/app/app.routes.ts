@@ -36,4 +36,9 @@ export const appRoutes: Route[] = [
         './pages/pagination-granular-mutations/pagination-granular-mutations'
       ),
   },
+  {
+    path: 'query-vs-query-by-id',
+    loadComponent: () =>
+      import('./pages/comparator/query-vs-query-by-id/query-vs-query-by-id'),
+  },
 ];

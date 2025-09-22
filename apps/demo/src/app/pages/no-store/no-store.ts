@@ -63,7 +63,7 @@ const { injectUserQuery } = globalQueries(
     <button (click)="nextPage()">Next user</button>
   `,
 })
-export default class GlobalQueryAndMutation {
+export default class GlobalQuery {
   public readonly userId = input<string>();
   protected readonly userQuery = injectUserQuery(() => ({
     id: this.userId,

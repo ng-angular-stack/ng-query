@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import {
   globalQueries,
   localStoragePersister,
@@ -37,7 +37,7 @@ const { injectUserQueryById } = globalQueries(
 );
 
 @Component({
-  selector: 'app-no-store',
+  selector: 'app-no-store-by-id',
   standalone: true,
   imports: [CommonModule, StatusComponent],
   styleUrls: ['no-store-by-id.css'],
@@ -59,7 +59,7 @@ const { injectUserQueryById } = globalQueries(
     <button (click)="nextPage()">Next user</button>
   `,
 })
-export default class GlobalQueryAndMutation {
+export default class GlobalQueryById {
   public readonly userId = input<string>();
   protected readonly userQueryById = injectUserQueryById(() => ({
     id: this.userId,
