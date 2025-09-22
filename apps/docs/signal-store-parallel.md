@@ -126,3 +126,23 @@ store.userMutationById()['5']?.hasValue();
 // To mutate a specific user
 store.mutateUser({ id: '5', name: 'New Name', email: 'new@example.com' });
 ```
+
+## Query vs QueryById
+
+Here a visual comparison between using query and queryById.
+
+![Query vs QueryById](public/assets/query-vs-query-by-id.gif)
+
+<a target="_blank" href="https://stackblitz.com/github/ng-angular-stack/ng-query-demo?file=src%2Fapp%2Fpages%2Flist-with-pagination%2Flist-with-pagination.ts&initialpath=query-vs-query-by-id">Demo example
+</a>
+
+### Note:
+
+For a more pertinent example :
+
+- `query` use the `preservePreviousValue: () => true` option
+- `queryById` implements `insertPlaceholderData` that helps to display the current "page"
+
+### Other example
+
+I recommend you to check the pagination examples.
