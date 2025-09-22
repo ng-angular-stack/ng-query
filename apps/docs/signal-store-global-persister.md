@@ -22,20 +22,24 @@ If your app used multiples `globalQueries` please fill the `featureName` option 
 
 The `localStoragePersister` is a built-in persister that stores query results in the browser's localStorage. It can be used with global queries to automatically persist and restore query data.
 
+`import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';`
+
 ### Example Usage
 
 ```typescript
-import { localStoragePersister } from '.../local-storage-persister';
-
 const { withUserQuery, injectUserQuery } = globalQueries({
 	queries: {
 		user: {
-			query: () => rxQuery({ ... }),
+			query: () => query({ ... }),
+		},
+	},
+	queriesById: {
+		users: {
+			queryById: () => queryById({ ... }),
 		},
 	},
 }, {
 	persister: localStoragePersister,
-	cacheTime: 60000, // 1 minute cache
 });
 ```
 

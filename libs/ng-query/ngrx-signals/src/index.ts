@@ -33,5 +33,5 @@ export type {
   Identifier,
 } from './lib/resource-by-id';
 export { globalQueries } from './lib/global-query/global-queries';
-export { localStoragePersister } from './lib/persister/local-storage-persister';
+export { localStoragePersister } from '../persisters/local-storage/src/local-storage-persister';
 export * from './lib/persister/persister.type';

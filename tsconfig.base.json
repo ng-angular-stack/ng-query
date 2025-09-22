@@ -36,6 +36,9 @@
       "@ng-query/ngrx-signals/insertions/insertion-factory": [
         "libs/ng-query/ngrx-signals/insertions/insertion-factory/src/index.ts"
       ],
+      "@ng-query/ngrx-signals/persisters/local-storage": [
+        "libs/ng-query/ngrx-signals/persisters/local-storage/src/index.ts"
+      ],
       "test-type": ["libs/test-type/src/index.ts"],
       "types-testing": ["test-types.ts"]
     }

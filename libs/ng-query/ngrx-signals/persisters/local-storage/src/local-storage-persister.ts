@@ -10,10 +10,10 @@ import {
   PersistedQuery,
   PersistedQueryById,
   QueriesPersister,
-} from './persister.type';
-import { nestedEffect } from '../types/util';
-import { isEqual } from '../global-query/util';
-import { ResourceByIdRef } from '../resource-by-id';
+} from '../../../src/lib/persister/persister.type';
+import { nestedEffect } from '../../../src/lib/types/util';
+import { isEqual } from '../../../src/lib/global-query/util';
+import { ResourceByIdRef } from '../../../src/lib/resource-by-id';
 
 export function localStoragePersister(prefix: string): QueriesPersister {
   const _injector = inject(Injector);
@@ -333,7 +333,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     clearQuery(queryKey: string): void {
       queriesMap.update((map) => {
         map.delete(queryKey);
-        localStorage.removeItem(`${prefix}-${queryKey}`);
+        localStorage.removeItem(getStorageKey(prefix, queryKey));
         return map;
       });
     },
@@ -341,7 +341,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     clearQueryBy(queryByIdKey: string): void {
       queriesByIdMap.update((map) => {
         map.delete(queryByIdKey);
-        localStorage.removeItem(`${prefix}-${queryByIdKey}`);
+        localStorage.removeItem(getStorageKey(prefix, queryByIdKey));
         return map;
       });
     },
