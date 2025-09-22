@@ -67,10 +67,10 @@ export default defineConfig({
                 text: 'Rx: Observables',
                 link: '/insertions/rx-insert-observables',
               },
-              // {
-              //   text: 'UX Loader',
-              //   link: '/insertions/insert-ux-loader.md',
-              // },
+              {
+                text: 'UX Loader',
+                link: '/insertions/insert-ux-loader',
+              },
               // {
               //   text: 'Last successful value',
               //   link: '/insertions/insert-last-successful-value.md',
