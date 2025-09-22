@@ -54,6 +54,9 @@
           <button class="btn" (click)="userListServerStateStore.previousPage()">
             Previous
           </button>
+          <span class="current-page">
+            {{ userListServerStateStore.pagination.page() }}
+          </span>
           <button class="btn" (click)="userListServerStateStore.nextPage()">
             Next
           </button>
