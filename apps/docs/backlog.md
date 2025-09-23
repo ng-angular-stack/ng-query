@@ -10,6 +10,7 @@
 - When `signalStore events` will be stable, the `rxQuery/rxMutation...` will accepts an event as params source, the property may be named `onEvent: event`
 - Adding `insertUxLoader`, as it may avoid some flaky screen/loader. It is something that can easily improve the UX and the is a fundamental value of this lib
 - Propose a dedicated utility for handling update from `websocket`
+- Improve `method` implementation from `mutationById`(when it will be called multiple times in the same cycle, it will create all the target resource according to the generated identifiers). eg. mutateUserById(1);mutateUserById(2);mutateUserById(3); => will create all the resources and set the mutationParamsSrc to 3
 
 ## Other
 
