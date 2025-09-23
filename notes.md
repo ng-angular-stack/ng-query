@@ -13,16 +13,27 @@ npx nx run ng-query-ngrx-signals:test --watch --ui
 
 ## Server State Store
 
-const {withUserServerState, injectUserServerState, includeUserServerState} = serverStateStore("user", useMutation("save"), useQuery("user", ....))
+const {withUserServerState, injectUserServerState, includeUserServerState} = serverState("user", useMutation("save"), useQuery("get", ....))
+const {withUserServerState, injectUserServerState, includeUserServerState} = serverState("user", useMutation("save"), useQuery({
+name: "get",
+adapters: [signalStoreAdapter]
+}, ....))
+// pluggable
+const {withUserServerState, injectUserServerState, includeUserServerState} = serverStateStore("user", (entries: SignalProxy<>) => serverState(useMutation("save"), useQuery({
+name: "get",
+adapters: [signalStoreAdapter]
+}, ....)))
 
-const {injectOtherServerState} = serverStateStore("other", includeUserServerState({public: true/false}), ...)
+const {injectOtherServerState} = serverState("other", includeUserServerState({public: true/false}), ...)
 
 injectOtherServerState() // pas accès direct à userState si pas explicitement public
 
 ///
 
-const {includeSaveUserMutation(), injectSaveUserMutation} = globalMutation("saveUser", ...);
+const {includeSaveUserMutation(), injectSaveUserMutation} = globalMutation("saveUser", (entries: SignalProxy<>) => ...);
 
 const {injectOtherServerState} = serverStateStore("other", includeUserServerState({public: true/false}),includeSaveUserMutation(), ...)
 
 const {includeUserQuery, withUserQuery} = globalQuery("user", ...); // can not be mutated, otherwise use serverStateStore
+
+// rajouter un flag feature
