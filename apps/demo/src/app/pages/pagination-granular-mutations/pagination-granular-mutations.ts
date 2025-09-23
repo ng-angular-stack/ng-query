@@ -5,13 +5,13 @@ import { withServices } from './util';
 import { ApiService } from './api.service';
 import {
   globalQueries,
-  localStoragePersister,
   SignalProxy,
   withMutationById,
 } from '@ng-query/ngrx-signals';
 import { rxMutationById, rxQueryById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
 import { StatusComponent } from '../../ui/status.component';
+import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
 
 export type User = {
   id: string;

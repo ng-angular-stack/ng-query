@@ -6,14 +6,15 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+
+import { isEqual } from './util';
 import {
+  nestedEffect,
   PersistedQuery,
   PersistedQueryById,
   QueriesPersister,
-} from '../../../src/lib/persister/persister.type';
-import { nestedEffect } from '../../../src/lib/types/util';
-import { isEqual } from '../../../src/lib/global-query/util';
-import { ResourceByIdRef } from '../../../src/lib/resource-by-id';
+  ResourceByIdRef,
+} from '@ng-query/ngrx-signals';
 
 export function localStoragePersister(prefix: string): QueriesPersister {
   const _injector = inject(Injector);

@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import {
   globalQueries,
-  localStoragePersister,
   mutation,
   query,
   SignalProxy,
@@ -17,6 +16,7 @@ import {
 } from '@ngrx/signals';
 import { ApiService, User } from './api.service';
 import { StatusComponent } from '../../ui/status.component';
+import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
 
 const { withUserQuery } = globalQueries(
   {

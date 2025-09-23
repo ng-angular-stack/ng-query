@@ -8,14 +8,11 @@ import {
   withState,
 } from '@ngrx/signals';
 import { ApiService } from './api.service';
-import {
-  globalQueries,
-  localStoragePersister,
-  SignalProxy,
-} from '@ng-query/ngrx-signals';
+import { globalQueries, SignalProxy } from '@ng-query/ngrx-signals';
 import { rxQueryById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
 import { StatusComponent } from '../../ui/status.component';
+import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
 
 export type User = {
   id: string;
