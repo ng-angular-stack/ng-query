@@ -19,7 +19,12 @@ name: "get",
 adapters: [signalStoreAdapter]
 }, ....))
 // pluggable
-const {withUserServerState, injectUserServerState, includeUserServerState} = serverStateStore("user", (entries: SignalProxy<>) => serverState(useMutation("save"), useQuery({
+const {withUserServerState, injectUserServerState, includeUserServerState} = serverStateSetup("user", (entries: SignalProxy<>) => serverState(useMutation("save"), useQuery({
+name: "get",
+adapters: [signalStoreAdapter]
+}, ....)))
+
+const {withUserServerState, injectUserServerState, includeUserServerState} = serverStateSetup( (entries: SignalProxy<>) => serverState("user", useMutation("save"), useQuery({
 name: "get",
 adapters: [signalStoreAdapter]
 }, ....)))
@@ -32,8 +37,8 @@ injectOtherServerState() // pas accès direct à userState si pas explicitement 
 
 const {includeSaveUserMutation(), injectSaveUserMutation} = globalMutation("saveUser", (entries: SignalProxy<>) => ...);
 
-const {injectOtherServerState} = serverStateStore("other", includeUserServerState({public: true/false}),includeSaveUserMutation(), ...)
+const {injectOtherServerState} = serverStateSetup("other", includeUserServerState({public: true/false}),includeSaveUserMutation(), ...)
 
-const {includeUserQuery, withUserQuery} = globalQuery("user", ...); // can not be mutated, otherwise use serverStateStore
+const {includeUserQuery, withUserQuery} = globalQuery("user", ...); // can not be mutated, otherwise use serverStateSetup
 
 // rajouter un flag feature

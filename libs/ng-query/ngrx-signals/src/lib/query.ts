@@ -15,16 +15,11 @@ import { PublicSignalStore } from './types/shared.type';
 import { preservedResource } from './preserved-resource';
 //todo handle logic of insertion inside with-query and globalqueries
 type QueryOutput<
-  StoreInput extends PublicSignalStore<Input>,
-  Input extends SignalStoreFeatureResult,
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
   InsertionsOutput
-> = (
-  store: StoreInput,
-  context: Input
-) => {
+> = {
   queryRef: QueryRef<
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
@@ -46,20 +41,20 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+
+
 >(
   queryConfig: Omit<
     ResourceWithParamsOrParamsFn<QueryState, QueryParams, QueryArgsParams>,
     'method'
   >
-): QueryOutput<StoreInput, Input, QueryState, QueryParams, QueryArgsParams, {}>;
+): QueryOutput<QueryState, QueryParams, QueryArgsParams, {}>;
 export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
+
+,
   Insertion1
 >(
   queryConfig: Omit<
@@ -67,26 +62,17 @@ export function query<
     'method'
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >
-): QueryOutput<
-  StoreInput,
-  Input,
-  QueryState,
-  QueryParams,
-  QueryArgsParams,
-  Insertion1
->;
+): QueryOutput<QueryState, QueryParams, QueryArgsParams, Insertion1>;
 export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
+
+,
   Insertion1,
   Insertion2
 >(
@@ -95,23 +81,17 @@ export function query<
     'method'
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >
 ): QueryOutput<
-  StoreInput,
-  Input,
   QueryState,
   QueryParams,
   QueryArgsParams,
@@ -121,8 +101,8 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
+
+,
   Insertion1,
   Insertion2,
   Insertion3
@@ -132,31 +112,23 @@ export function query<
     'method'
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >
 ): QueryOutput<
-  StoreInput,
-  Input,
   QueryState,
   QueryParams,
   QueryArgsParams,
@@ -166,8 +138,8 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
+
+,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -178,39 +150,29 @@ export function query<
     'method'
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >
 ): QueryOutput<
-  StoreInput,
-  Input,
   QueryState,
   QueryParams,
   QueryArgsParams,
@@ -220,8 +182,6 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -233,47 +193,35 @@ export function query<
     'method'
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >
 ): QueryOutput<
-  StoreInput,
-  Input,
   QueryState,
   QueryParams,
   QueryArgsParams,
@@ -283,8 +231,6 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -297,55 +243,41 @@ export function query<
     'method'
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >
 ): QueryOutput<
-  StoreInput,
-  Input,
   QueryState,
   QueryParams,
   QueryArgsParams,
@@ -355,8 +287,8 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
+
+,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -370,63 +302,47 @@ export function query<
     'method'
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >,
   insertion7: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion7,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
   >
 ): QueryOutput<
-  StoreInput,
-  Input,
   QueryState,
   QueryParams,
   QueryArgsParams,
@@ -442,22 +358,15 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+
+
 >(
   queryConfig: Omit<
     ResourceWithParamsOrParamsFn<QueryState, QueryParams, QueryArgsParams>,
     'method'
   >,
   ...insertions: any[]
-): QueryOutput<
-  StoreInput,
-  Input,
-  QueryState,
-  QueryParams,
-  QueryArgsParams,
-  {}
-> {
+): QueryOutput<QueryState, QueryParams, QueryArgsParams, {}> {
   const queryResourceParamsFnSignal = signal<QueryParams | undefined>(
     undefined
   );
@@ -473,7 +382,7 @@ export function query<
     params: resourceParamsSrc,
   } as ResourceOptions<any, any>);
 
-  return (store, context) => ({
+  return {
     queryRef: {
       resource: queryResource,
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
@@ -481,8 +390,6 @@ export function query<
       >,
       insertionsOutputs: (
         insertions as InsertionsFactory<
-          NoInfer<Input>,
-          NoInfer<StoreInput>,
           NoInfer<QueryState>,
           NoInfer<QueryParams>,
           {}
@@ -491,8 +398,6 @@ export function query<
         return {
           ...acc,
           ...insert({
-            input: context,
-            store,
             resource: queryResource as ResourceRef<QueryState>,
             resourceParams: resourceParamsSrc as WritableSignal<
               NoInfer<QueryParams>
@@ -509,5 +414,5 @@ export function query<
       false
     >,
     [__INTERNAL_QueryBrand]: true,
-  });
+  };
 }

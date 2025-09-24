@@ -500,14 +500,10 @@ export function setAllUpdatesFromMutationOnQueryValue<
 }
 
 export type InsertionParams<
-  Input extends SignalStoreFeatureResult,
-  StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
   PreviousInsertionsOutputs
 > = {
-  input: Input;
-  store: StoreInput;
   resource: ResourceRef<ResourceState>;
   resourceParams: WritableSignal<ResourceParams>;
   insertions: keyof PreviousInsertionsOutputs extends string
@@ -516,16 +512,12 @@ export type InsertionParams<
 };
 
 export type InsertionsFactory<
-  Input extends SignalStoreFeatureResult,
-  StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
   InsertsOutputs,
   PreviousInsertionsOutputs = {}
 > = (
   context: InsertionParams<
-    Input,
-    StoreInput,
     ResourceState,
     ResourceParams,
     PreviousInsertionsOutputs
@@ -578,10 +570,4 @@ export type DefaultInsertionByIdParams = InsertionByIdParams<
   {}
 >;
 
-export type DefaultInsertionParams = InsertionParams<
-  SignalStoreFeatureResult,
-  unknown,
-  {},
-  unknown,
-  unknown
->;
+export type DefaultInsertionParams = InsertionParams<{}, unknown, unknown>;

@@ -1,99 +1,18 @@
-import {
-  EffectRef,
-  Injector,
-  ResourceRef,
-  Signal,
-  WritableSignal,
-  effect,
-  inject,
-  linkedSignal,
-  untracked,
-} from '@angular/core';
-import {
-  patchState,
-  Prettify,
-  SignalStoreFeature,
-  signalStoreFeature,
-  SignalStoreFeatureResult,
-  withProps,
-  WritableStateSource,
-} from '@ngrx/signals';
-import { InternalType, MergeObject } from './types/util.type';
-import { createNestedStateUpdate } from './core/update-state.util';
-import {
-  AssociatedStateMapperFn,
-  BooleanOrMapperFnByPath,
-} from './types/boolean-or-mapper-fn-by-path.type';
-import {
-  QueryDeclarativeEffect,
-  setAllPatchFromMutationOnQueryValue,
-  setAllUpdatesFromMutationOnQueryValue,
-  triggerQueryReloadOnMutationStatusChange,
-} from './core/query.core';
-import { ResourceByIdRef } from './resource-by-id';
-import { nestedEffect } from './types/util';
-import { PublicSignalStore } from './types/shared.type';
+import { QueryDeclarativeEffect } from '../core/query.core';
+import { InternalType, MergeObject } from '../types/util.type';
+import { ContextConstraints, ServerStateFactory } from './server-state';
+import { QueryRef } from '../with-query';
+import { ResourceRef } from '@angular/core';
+import { Prettify } from '@ngrx/signals';
 
-export type QueryRef<ResourceState, ResourceParams, InsertionsOutput> = {
-  resource: ResourceRef<ResourceState | undefined>;
-  resourceParamsSrc: WritableSignal<ResourceParams | undefined>;
-  insertionsOutputs: InsertionsOutput;
-};
-
-type WithQueryOutputStoreConfig<
-  ResourceName,
-  ResourceState extends object | undefined,
-  ResourceParams,
-  ResourceArgsParams,
-  IsGroupedByGroup,
-  InsertionsOutputs
-> = {
-  state: {};
-  props: {
-    [key in `${ResourceName & string}Query`]: MergeObject<
-      ResourceRef<ResourceState>,
-      InsertionsOutputs
-    >;
-  } & {
-    __query: {
-      [key in ResourceName & string]: Prettify<
-        InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          IsGroupedByGroup
-        >
-      >;
-    };
-  };
-
-  methods: {};
-};
-
-export type QueryOptions<
-  StoreInput extends PublicSignalStore<Input>,
-  Input extends SignalStoreFeatureResult,
+type QueryOptions<
+  Context extends ContextConstraints,
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
   OtherProperties
-> = (store: StoreInput) => {
-  /**
-   * Will update the state at the given path with the resource data.
-   * If the type of targeted state does not match the type of the resource,
-   * a function is required.
-   * - If the function is requested without the real needs, you may declare deliberately the store as a parameter of the option factory.
-   */
-  associatedClientState?: BooleanOrMapperFnByPath<
-    NoInfer<Input>['state'],
-    NoInfer<ResourceState>,
-    NoInfer<ResourceParams>
-  > extends infer BooleanOrMapperFnByPath
-    ? {
-        [Path in keyof BooleanOrMapperFnByPath]?: BooleanOrMapperFnByPath[Path];
-      }
-    : never;
-  on?: Input['props'] extends {
+> = {
+  on?: Context extends {
     __mutation: infer Mutations;
   }
     ? {
@@ -131,27 +50,17 @@ export type QueryOptions<
   [key in keyof OtherProperties]: OtherProperties[key];
 };
 
-/**
- *
- * @param resourceName
- * @param queryFactory
- * @param options To help for type inference, you may always get the store as a parameter. Otherwise the mapResourceToState may be requested without the real needs
- */
-export function withQuery<
-  Input extends SignalStoreFeatureResult,
+export function useQuery<
+  Context extends ContextConstraints,
   const ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutputs,
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory: (
-    store: StoreInput,
-    injector: Injector
-  ) => {
+  queryFactory: {
     queryRef: QueryRef<
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
@@ -166,23 +75,30 @@ export function withQuery<
     >;
   },
   optionsFactory?: QueryOptions<
-    StoreInput,
-    Input,
+    Context,
     ResourceState,
     ResourceParams,
     ResourceArgsParams,
     OtherProperties
   >
-): SignalStoreFeature<
-  Input,
-  WithQueryOutputStoreConfig<
-    ResourceName,
-    ResourceState,
-    ResourceParams,
-    ResourceArgsParams,
-    false,
-    InsertionsOutputs
-  >
+): ServerStateFactory<
+  [Context],
+  {
+    props: {
+      [key in `${ResourceName & string}Query`]: MergeObject<
+        ResourceRef<ResourceState>,
+        InsertionsOutputs
+      >;
+    };
+    methods: {};
+    __query: {
+      [key in ResourceName & string]: Prettify<
+        InternalType<ResourceState, ResourceParams, ResourceArgsParams, false>
+      >;
+    };
+    __mutation: {};
+    __types: {};
+  }
 > {
   return ((context: SignalStoreFeatureResult) => {
     return signalStoreFeature(
@@ -191,7 +107,7 @@ export function withQuery<
         const queryConfigData = queryFactory(
           store as unknown as StoreInput,
           _injector
-        );
+        )(store as unknown as StoreInput, context as unknown as Input);
 
         const queryResourceParamsSrc =
           queryConfigData.queryRef.resourceParamsSrc;
@@ -436,48 +352,4 @@ export function withQuery<
       InsertionsOutputs
     >
   >;
-}
-
-function updateAssociatedClientStates<
-  ResourceState extends object | undefined,
-  ResourceParams
->({
-  associatedClientStates,
-  store,
-  queryResource,
-  queryResourceParamsSrc,
-}: {
-  associatedClientStates: [
-    string,
-    boolean | AssociatedStateMapperFn<ResourceState, ResourceParams, unknown>
-  ][];
-  store: WritableStateSource<any>;
-  queryResource: ResourceRef<ResourceState | undefined>;
-  queryResourceParamsSrc: Signal<ResourceParams | undefined>;
-}) {
-  associatedClientStates.forEach(([path, associatedClientState]) => {
-    patchState(store, (state) => {
-      const resourceData = queryResource.hasValue()
-        ? (queryResource.value() as ResourceState | undefined)
-        : undefined;
-
-      const value =
-        typeof associatedClientState === 'boolean'
-          ? resourceData
-          : associatedClientState({
-              queryResource: queryResource as ResourceRef<ResourceState>,
-              queryParams: queryResourceParamsSrc() as NonNullable<
-                NoInfer<ResourceParams>
-              >,
-            });
-
-      const keysPath = (path as string).split('.');
-      const result = createNestedStateUpdate({
-        state,
-        keysPath,
-        value,
-      });
-      return result;
-    });
-  });
 }
