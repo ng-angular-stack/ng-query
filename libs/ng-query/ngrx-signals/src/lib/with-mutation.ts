@@ -292,11 +292,13 @@ export function withMutation<
           queriesWithOptimisticPatch.length ||
           queriesWithReload.length;
 
+        const mutation = Object.assign(
+          mutationResource,
+          mutationConfigData.mutationRef.insertionsOutputs ?? {}
+        );
+
         return {
-          [`${mutationName}Mutation`]: Object.assign(
-            mutationResource,
-            mutationConfigData.mutationRef.insertionsOutputs ?? {}
-          ),
+          [`${mutationName}Mutation`]: mutation,
           ...(hasQueriesEffects && {
             [`_${mutationName}Effect`]: effect(() => {
               const mutationStatus = mutationResource.status();
@@ -367,7 +369,8 @@ export function withMutation<
             const mutationMethod = mutationConfig.method;
             if (mutationMethod) {
               const mutationParamsResult = mutationMethod(mutationParams);
-              store.__mutation[`${mutationName}Mutation`].paramsSource.set(
+              const __mutation = store.__mutation[`${mutationName}Mutation`];
+              __mutation.paramsSource.set(
                 mutationParamsResult as ResourceParams
               );
             }

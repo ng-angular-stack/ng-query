@@ -252,11 +252,13 @@ export function withMutationById<
         });
         const insertionsOutputs =
           mutationConfigData.mutationByIdRef.insertionsOutputs ?? {};
+
+        const mutationById = Object.assign(
+          mutationResourcesById,
+          insertionsOutputs
+        );
         return {
-          [`${mutationName}MutationById`]: Object.assign(
-            mutationResourcesById,
-            insertionsOutputs
-          ),
+          [`${mutationName}MutationById`]: mutationById,
           ...(hasQueriesEffects && {
             [`_${mutationName}EffectById`]: effect(() => {
               // todo add test for nestedEffect !
@@ -326,6 +328,7 @@ export function withMutationById<
           __mutation: {
             [`${mutationName}MutationById`]: {
               paramsSource: mutationResourceParamsSrc,
+              mutationById,
             },
           },
         };
@@ -342,10 +345,13 @@ export function withMutationById<
           ) => {
             const mutationMethod = mutationConfig.method;
             if (mutationMethod) {
+              const __mutation =
+                store.__mutation[`${mutationName}MutationById`];
               const mutationParamsResult = mutationMethod(mutationParams);
-              store.__mutation[`${mutationName}MutationById`].paramsSource.set(
-                mutationParamsResult as ResourceParams
-              );
+              if (mutationParamsResult) {
+                __mutation.mutationById.add(mutationParamsResult);
+              }
+              __mutation.paramsSource.set(mutationParamsResult);
             }
           },
         };

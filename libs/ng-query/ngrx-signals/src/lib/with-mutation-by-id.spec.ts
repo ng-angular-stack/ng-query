@@ -311,6 +311,63 @@ describe('withMutationById', () => {
     expect(user5QueryReloadSpy.mock.calls.length).toBe(1);
   });
 
+  it('5- Should trigger multiples resource creation in same cycle, when calling method', async () => {
+    const returnedUser = {
+      id: '5',
+      name: 'John Doe',
+      email: 'test@a.com',
+    };
+    const Store = signalStore(
+      withState({
+        usersFetched: [] as User[],
+        lastUserFetched: undefined as User | undefined,
+      }),
+      withMutationById('user', () =>
+        mutationById({
+          method: (user: User) => user,
+          loader: ({ params: user }) => {
+            return lastValueFrom(of(user));
+          },
+          identifier: ({ id }) => id,
+        })
+      )
+    );
+
+    TestBed.configureTestingModule({
+      providers: [Store],
+    });
+    const store = TestBed.inject(Store);
+    expect(store.usersFetched().length).toBe(0);
+
+    await vi.runAllTimersAsync();
+
+    store.mutateUser({
+      id: '5',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    store.mutateUser({
+      id: '6',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    store.mutateUser({
+      id: '7',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    store.mutateUser({
+      id: '8',
+      name: 'Updated User',
+      email: 'updated.doe@example.com',
+    });
+    await vi.runAllTimersAsync();
+    expect(store.userMutationById()['5']?.status()).toEqual('resolved');
+    expect(store.userMutationById()['6']?.status()).toEqual('resolved');
+    expect(store.userMutationById()['7']?.status()).toEqual('resolved');
+    expect(store.userMutationById()['8']?.status()).toEqual('resolved');
+  });
+
   it('#1- Should expose private query type', async () => {
     const returnedUser = {
       id: '5',
