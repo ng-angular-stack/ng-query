@@ -40,9 +40,7 @@ type QueryOutput<
 export function query<
   QueryState extends object | undefined,
   QueryParams,
-  QueryArgsParams,
-
-
+  QueryArgsParams
 >(
   queryConfig: Omit<
     ResourceWithParamsOrParamsFn<QueryState, QueryParams, QueryArgsParams>,
@@ -53,8 +51,6 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-
-,
   Insertion1
 >(
   queryConfig: Omit<
@@ -71,8 +67,6 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-
-,
   Insertion1,
   Insertion2
 >(
@@ -101,8 +95,6 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-
-,
   Insertion1,
   Insertion2,
   Insertion3
@@ -138,8 +130,6 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-
-,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -287,8 +277,6 @@ export function query<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-
-,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -357,9 +345,7 @@ export function query<
 export function query<
   QueryState extends object | undefined,
   QueryParams,
-  QueryArgsParams,
-
-
+  QueryArgsParams
 >(
   queryConfig: Omit<
     ResourceWithParamsOrParamsFn<QueryState, QueryParams, QueryArgsParams>,

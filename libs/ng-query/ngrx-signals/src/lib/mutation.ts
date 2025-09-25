@@ -13,16 +13,11 @@ import { PublicSignalStore } from './types/shared.type';
 import { InsertionsFactory } from './core/query.core';
 
 type MutationOutput<
-  StoreInput extends PublicSignalStore<Input>,
-  Input extends SignalStoreFeatureResult,
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
   Insertions
-> = (
-  store: StoreInput,
-  context: Input
-) => {
+> = {
   mutationRef: MutationRef<
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
@@ -52,14 +47,7 @@ export function mutation<
     MutationParams,
     MutationArgsParams
   >
-): MutationOutput<
-  StoreInput,
-  Input,
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
-  {}
->;
+): MutationOutput<MutationState, MutationParams, MutationArgsParams, {}>;
 export function mutation<
   MutationState extends object | undefined,
   MutationParams,
@@ -74,15 +62,11 @@ export function mutation<
     MutationArgsParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >
 ): MutationOutput<
-  StoreInput,
-  Input,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -103,23 +87,17 @@ export function mutation<
     MutationArgsParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >
 ): MutationOutput<
-  StoreInput,
-  Input,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -141,31 +119,23 @@ export function mutation<
     MutationArgsParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >
 ): MutationOutput<
-  StoreInput,
-  Input,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -188,39 +158,29 @@ export function mutation<
     MutationArgsParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >
 ): MutationOutput<
-  StoreInput,
-  Input,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -244,47 +204,35 @@ export function mutation<
     MutationArgsParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >
 ): MutationOutput<
-  StoreInput,
-  Input,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -309,55 +257,41 @@ export function mutation<
     MutationArgsParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >
 ): MutationOutput<
-  StoreInput,
-  Input,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -383,63 +317,47 @@ export function mutation<
     MutationArgsParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >,
   insertion7: InsertionsFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion7,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
   >
 ): MutationOutput<
-  StoreInput,
-  Input,
   MutationState,
   MutationParams,
   MutationArgsParams,
@@ -464,14 +382,7 @@ export function mutation<
     MutationArgsParams
   >,
   ...insertions: any[]
-): MutationOutput<
-  StoreInput,
-  Input,
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
-  {}
-> {
+): MutationOutput<MutationState, MutationParams, MutationArgsParams, {}> {
   const mutationResourceParamsFnSignal = signal<MutationParams | undefined>(
     undefined
   );
@@ -484,7 +395,7 @@ export function mutation<
     params: resourceParamsSrc,
   } as ResourceOptions<any, any>);
 
-  return (store, context) => ({
+  return {
     mutationRef: {
       resource: mutationResource,
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
@@ -493,8 +404,6 @@ export function mutation<
       method: mutationConfig.method,
       insertionsOutputs: (
         insertions as InsertionsFactory<
-          NoInfer<Input>,
-          NoInfer<StoreInput>,
           NoInfer<MutationState>,
           NoInfer<MutationParams>,
           {}
@@ -503,8 +412,6 @@ export function mutation<
         return {
           ...acc,
           ...insert({
-            input: context,
-            store,
             resource: mutationResource as ResourceRef<MutationState>,
             resourceParams: resourceParamsSrc as WritableSignal<
               NoInfer<MutationParams>
@@ -520,5 +427,5 @@ export function mutation<
       NoInfer<MutationArgsParams>,
       false
     >,
-  });
+  };
 }
