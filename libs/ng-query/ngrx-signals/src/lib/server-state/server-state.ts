@@ -10,14 +10,14 @@ export type ContextConstraints = {
     string,
     {
       mutationRef: MutationRef<unknown, unknown, any, unknown>;
-      __types: InternalType<unknown, unknown, unknown, false>;
+      __types: InternalType<unknown, unknown, unknown, boolean>;
     }
   >;
   __query: Record<
     string,
     {
       queryRef: QueryRef<unknown, unknown, unknown>;
-      __types: InternalType<unknown, unknown, unknown, false>;
+      __types: InternalType<unknown, unknown, unknown, boolean>;
     }
   >;
 };

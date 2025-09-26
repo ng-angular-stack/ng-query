@@ -28,7 +28,14 @@ describe('serverState', () => {
           query({
             params: () => 5,
             loader: async ({ params: id }) => ({ id, name: 'test' }),
-          })
+          }),
+          {
+            on: {
+              saveMutation: {
+                optimisticUpdate: ({ mutationParams }) => mutationParams,
+              },
+            },
+          }
         ),
         useQuery('test2', () =>
           query({

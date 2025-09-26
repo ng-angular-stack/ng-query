@@ -3,7 +3,6 @@ import { InternalType, MergeObject } from '../types/util.type';
 import { ContextConstraints, ServerStateFactory } from './server-state';
 import { QueryRef } from '../with-query';
 import { ResourceRef } from '@angular/core';
-import { Prettify } from '@ngrx/signals';
 
 type QueryOptions<
   Context extends ContextConstraints,
@@ -12,37 +11,44 @@ type QueryOptions<
   ResourceArgsParams,
   OtherProperties
 > = {
-  on?: Context extends {
-    __mutation: infer Mutations;
-  }
+  on?: Context['__mutation'] extends infer Mutations
     ? {
         [key in keyof Mutations as `${key &
-          string}${'isGroupedResource' extends keyof Mutations[key]
-          ? Mutations[key]['isGroupedResource'] extends true
-            ? 'MutationById'
-            : ''
-          : never}`]?: Mutations[key] extends InternalType<
-          infer MutationState,
-          infer MutationParams,
-          infer MutationArgsParams,
-          infer MutationIsByGroup,
-          infer MutationGroupIdentifier
-        >
-          ? QueryDeclarativeEffect<{
-              query: InternalType<
-                ResourceState,
-                ResourceParams,
-                ResourceArgsParams,
-                false
-              >;
-              mutation: InternalType<
-                MutationState,
-                MutationParams,
-                MutationArgsParams,
-                MutationIsByGroup,
-                MutationGroupIdentifier
-              >;
-            }>
+          string}${'__types' extends keyof Mutations[key]
+          ? Mutations[key]['__types'] extends InternalType<
+              infer _State,
+              infer _Params,
+              infer _Args,
+              infer IsGroupedResource
+            >
+            ? IsGroupedResource extends true
+              ? 'MutationById'
+              : 'Mutation'
+            : never
+          : never}`]?: '__types' extends keyof Mutations[key]
+          ? Mutations[key]['__types'] extends InternalType<
+              infer MutationState,
+              infer MutationParams,
+              infer MutationArgsParams,
+              infer MutationIsByGroup,
+              infer MutationGroupIdentifier
+            >
+            ? QueryDeclarativeEffect<{
+                query: InternalType<
+                  ResourceState,
+                  ResourceParams,
+                  ResourceArgsParams,
+                  false
+                >;
+                mutation: InternalType<
+                  MutationState,
+                  MutationParams,
+                  MutationArgsParams,
+                  MutationIsByGroup,
+                  MutationGroupIdentifier
+                >;
+              }>
+            : never
           : never;
       }
     : never;
