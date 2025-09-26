@@ -1,8 +1,24 @@
-import { QueryDeclarativeEffect } from '../core/query.core';
+import {
+  QueryDeclarativeEffect,
+  setAllPatchFromMutationOnQueryValue,
+  setAllUpdatesFromMutationOnQueryValue,
+  triggerQueryReloadOnMutationStatusChange,
+} from '../core/query.core';
 import { InternalType, MergeObject } from '../types/util.type';
 import { ContextConstraints, ServerStateFactory } from './server-state';
 import { QueryRef } from '../with-query';
-import { ResourceRef } from '@angular/core';
+import {
+  effect,
+  EffectRef,
+  inject,
+  Injector,
+  linkedSignal,
+  ResourceRef,
+  Signal,
+  untracked,
+} from '@angular/core';
+import { ResourceByIdRef } from '../resource-by-id';
+import { nestedEffect } from '../types/util';
 
 type QueryOptions<
   Context extends ContextConstraints,
@@ -143,7 +159,7 @@ export function useQuery<
           false
         >;
       }),
-  optionsFactory?: QueryOptions<
+  queryOptions?: QueryOptions<
     Context,
     ResourceState,
     ResourceParams,
@@ -158,12 +174,30 @@ export function useQuery<
   ResourceParams,
   ResourceArgsParams
 > {
-  return (context) => {
-    const queryResult =
-      typeof queryFactory === 'function' ? queryFactory() : queryFactory;
-    const {
-      queryRef: { resource: queryResource, insertionsOutputs },
-    } = queryResult;
+  const _injector = inject(Injector);
+  const queryResult =
+    typeof queryFactory === 'function' ? queryFactory() : queryFactory;
+  const {
+    queryRef: { resource: queryResource, insertionsOutputs },
+  } = queryResult;
+  const mutationsConfigEffect = Object.entries(
+    (queryOptions?.on ?? {}) as Record<string, QueryDeclarativeEffect<any>>
+  );
+
+  return (contextData) => {
+    handleQueryMutationsReactions<
+      Context,
+      ResourceName,
+      ResourceState,
+      ResourceParams
+    >(
+      mutationsConfigEffect,
+      contextData.context as unknown as Context,
+      resourceName,
+      queryResource,
+      _injector
+    );
+
     return {
       props: {
         [`${resourceName as ResourceName}Query`]: Object.assign(
@@ -184,4 +218,189 @@ export function useQuery<
       ResourceArgsParams
     >;
   };
+}
+
+function handleQueryMutationsReactions<
+  Context extends ContextConstraints,
+  const ResourceName extends string,
+  ResourceState extends object | undefined,
+  ResourceParams
+>(
+  mutationsConfigEffect: [string, QueryDeclarativeEffect<any>][],
+  context: Context,
+  resourceName: ResourceName,
+  queryResource: ResourceRef<NoInfer<ResourceState> | undefined>,
+  _injector: Injector
+) {
+  mutationsConfigEffect.reduce((acc, [mutationName, mutationEffectOptions]) => {
+    const formattedMutationName = mutationName.replace('Mutation', '');
+    const mutationTargeted = context.__mutation[formattedMutationName]
+      ?.mutationRef.resource as
+      | ResourceRef<any>
+      | ResourceByIdRef<string | number, any, ResourceParams>;
+    if ('hasValue' in mutationTargeted) {
+      const mutationResource = mutationTargeted as ResourceRef<any>;
+      return {
+        ...acc,
+        [`_on${formattedMutationName}${resourceName}QueryEffect`]: effect(
+          () => {
+            const mutationStatus = mutationResource.status();
+            const mutationParamsSrc = context.__mutation[formattedMutationName]
+              .mutationRef.resourceParamsSrc as Signal<any>;
+            // use to track the value of the mutation
+            const _mutationValueChanged = mutationResource.hasValue()
+              ? mutationResource.value()
+              : undefined;
+
+            if (
+              mutationEffectOptions?.optimisticUpdate ||
+              mutationEffectOptions?.update
+            ) {
+              untracked(() => {
+                setAllUpdatesFromMutationOnQueryValue({
+                  mutationStatus,
+                  queryResourceTarget: queryResource,
+                  mutationEffectOptions,
+                  mutationResource,
+                  mutationParamsSrc,
+                  mutationIdentifier: undefined,
+                  mutationResources: undefined,
+                });
+              });
+            }
+            const reloadCConfig = mutationEffectOptions.reload;
+            if (reloadCConfig) {
+              untracked(() => {
+                triggerQueryReloadOnMutationStatusChange({
+                  mutationStatus,
+                  queryResourceTarget: queryResource,
+                  mutationEffectOptions,
+                  mutationResource,
+                  mutationParamsSrc,
+                  reloadCConfig,
+                  mutationIdentifier: undefined,
+                  mutationResources: undefined,
+                });
+              });
+            }
+            if (
+              mutationEffectOptions.optimisticPatch ||
+              mutationEffectOptions.patch
+            ) {
+              untracked(() => {
+                setAllPatchFromMutationOnQueryValue({
+                  mutationStatus,
+                  queryResourceTarget: queryResource,
+                  mutationEffectOptions,
+                  mutationResource,
+                  mutationParamsSrc,
+                  mutationIdentifier: undefined,
+                  mutationResources: undefined,
+                });
+              });
+            }
+          }
+        ),
+      };
+    }
+    const newMutationResourceRefForNestedEffect = linkedSignal<
+      ResourceByIdRef<string | number, ResourceState, ResourceParams>,
+      { newKeys: (string | number)[] } | undefined
+    >({
+      source: mutationTargeted as any,
+      computation: (currentSource, previous) => {
+        if (!currentSource || !Object.keys(currentSource).length) {
+          return undefined;
+        }
+
+        const currentKeys = Object.keys(currentSource) as (string | number)[];
+        const previousKeys = Object.keys(previous?.source || {}) as (
+          | string
+          | number
+        )[];
+
+        // Find keys that exist in current but not in previous
+        const newKeys = currentKeys.filter(
+          (key) => !previousKeys.includes(key)
+        );
+
+        return newKeys.length > 0 ? { newKeys } : previous?.value;
+      },
+    });
+
+    return {
+      ...acc,
+      [`_on${formattedMutationName}${resourceName}QueryEffect`]: effect(() => {
+        if (!newMutationResourceRefForNestedEffect()?.newKeys) {
+          return;
+        }
+        newMutationResourceRefForNestedEffect()?.newKeys.forEach(
+          (mutationIdentifier) => {
+            nestedEffect(_injector, () => {
+              const mutationResource = mutationTargeted()[mutationIdentifier];
+
+              if (!mutationResource) {
+                return;
+              }
+              const mutationStatus = mutationResource.status();
+              const mutationParamsSrc = context.__mutation[
+                formattedMutationName
+              ].mutationRef.resourceParamsSrc as Signal<any>;
+              // use to track the value of the mutation
+              const _mutationValueChanged = mutationResource.hasValue()
+                ? mutationResource.value()
+                : undefined;
+              if (
+                mutationEffectOptions?.optimisticUpdate ||
+                mutationEffectOptions?.update
+              ) {
+                untracked(() => {
+                  setAllUpdatesFromMutationOnQueryValue({
+                    mutationStatus,
+                    queryResourceTarget: queryResource,
+                    mutationEffectOptions,
+                    mutationResource,
+                    mutationParamsSrc,
+                    mutationIdentifier,
+                    mutationResources: mutationTargeted,
+                  });
+                });
+              }
+              const reloadCConfig = mutationEffectOptions.reload;
+              if (reloadCConfig) {
+                untracked(() => {
+                  triggerQueryReloadOnMutationStatusChange({
+                    mutationStatus,
+                    queryResourceTarget: queryResource,
+                    mutationEffectOptions,
+                    mutationResource,
+                    mutationParamsSrc,
+                    reloadCConfig,
+                    mutationIdentifier,
+                    mutationResources: mutationTargeted,
+                  });
+                });
+              }
+              if (
+                mutationEffectOptions.optimisticPatch ||
+                mutationEffectOptions.patch
+              ) {
+                untracked(() => {
+                  setAllPatchFromMutationOnQueryValue({
+                    mutationStatus,
+                    queryResourceTarget: queryResource,
+                    mutationEffectOptions,
+                    mutationResource,
+                    mutationParamsSrc,
+                    mutationIdentifier: mutationIdentifier,
+                    mutationResources: mutationTargeted,
+                  });
+                });
+              }
+            });
+          }
+        );
+      }),
+    };
+  }, {} as Record<`_on${string}${ResourceName}QueryEffect`, EffectRef>);
 }
