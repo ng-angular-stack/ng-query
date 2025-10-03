@@ -14,6 +14,7 @@
 
 ## Other
 
+- reused the same function/logic in withQuery adn useQuery
 - A Chrome Dev tool to track queries and mutations requests
 - A page that compare Angular TanStackQuery and other solutions with @ng-query
 - Once ng-query will be standalone (can works without the signalStore), a page to show how to implements ng-query with client state management (StateAdapt, RxAngular...)

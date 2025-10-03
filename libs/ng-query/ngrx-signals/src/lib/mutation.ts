@@ -9,7 +9,6 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { MutationRef } from './with-mutation';
-import { PublicSignalStore } from './types/shared.type';
 import { InsertionsFactory } from './core/query.core';
 
 type MutationOutput<
@@ -38,9 +37,7 @@ type MutationOutput<
 export function mutation<
   MutationState extends object | undefined,
   MutationParams,
-  MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+  MutationArgsParams
 >(
   mutationConfig: ResourceWithParamsOrParamsFn<
     MutationState,
@@ -52,8 +49,6 @@ export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1
 >(
   mutationConfig: ResourceWithParamsOrParamsFn<
@@ -76,8 +71,6 @@ export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2
 >(
@@ -107,8 +100,6 @@ export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2,
   Insertion3
@@ -145,8 +136,6 @@ export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -190,8 +179,6 @@ export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -242,8 +229,6 @@ export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -301,8 +286,6 @@ export function mutation<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -372,9 +355,7 @@ export function mutation<
 export function mutation<
   MutationState extends object | undefined,
   MutationParams,
-  MutationArgsParams,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+  MutationArgsParams
 >(
   mutationConfig: ResourceWithParamsOrParamsFn<
     MutationState,

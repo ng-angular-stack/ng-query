@@ -4,22 +4,16 @@ import { InternalType } from './types/util.type';
 import { MutationByIdRef } from './with-mutation-by-id';
 import { signal, WritableSignal } from '@angular/core';
 import { resourceById } from './resource-by-id';
-import { PublicSignalStore } from './types/shared.type';
 import { InsertionsByIdFactory } from './core/query.core';
 
 type MutationByIdOutput<
-  StoreInput extends PublicSignalStore<Input>,
-  Input extends SignalStoreFeatureResult,
   MutationGroupIdentifier extends string | number,
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
   InsertionsOutput
-> = (
-  store: StoreInput,
-  context: Input
-) => {
-  mutationByIdRef: MutationByIdRef<
+> = {
+  mutationRef: MutationByIdRef<
     NoInfer<MutationGroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
@@ -42,9 +36,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+  MutationGroupIdentifier extends string | number
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,
@@ -53,8 +45,6 @@ export function mutationById<
     MutationGroupIdentifier
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -66,8 +56,6 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1
 >(
   mutationConfig: ResourceByIdConfig<
@@ -77,16 +65,12 @@ export function mutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -98,8 +82,6 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2
 >(
@@ -110,16 +92,12 @@ export function mutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -127,8 +105,6 @@ export function mutationById<
     Insertions1
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -140,8 +116,6 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3
@@ -153,16 +127,12 @@ export function mutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -170,8 +140,6 @@ export function mutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -179,8 +147,6 @@ export function mutationById<
     Insertions1 & Insertions2
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -192,8 +158,6 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -206,16 +170,12 @@ export function mutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -223,8 +183,6 @@ export function mutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -232,8 +190,6 @@ export function mutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -241,8 +197,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -254,8 +208,6 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -269,16 +221,12 @@ export function mutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -286,8 +234,6 @@ export function mutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -295,8 +241,6 @@ export function mutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -304,8 +248,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3
   >,
   insertions5: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -313,8 +255,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -326,8 +266,6 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -342,16 +280,12 @@ export function mutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -359,8 +293,6 @@ export function mutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -368,8 +300,6 @@ export function mutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -377,8 +307,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3
   >,
   insertions5: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -386,8 +314,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4
   >,
   insertions6: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -395,8 +321,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4 & Insertions5
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -413,8 +337,6 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -430,16 +352,12 @@ export function mutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -447,8 +365,6 @@ export function mutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -456,8 +372,6 @@ export function mutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -465,8 +379,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3
   >,
   insertions5: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -474,8 +386,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4
   >,
   insertions6: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -483,8 +393,6 @@ export function mutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4 & Insertions5
   >,
   insertions7: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -497,8 +405,6 @@ export function mutationById<
       Insertions6
   >
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -515,9 +421,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+  MutationGroupIdentifier extends string | number
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,
@@ -527,8 +431,6 @@ export function mutationById<
   >,
   ...insertions: any[]
 ): MutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -552,8 +454,8 @@ export function mutationById<
     params: resourceParamsSrc,
     equalParams: mutationConfig.equalParams ?? 'default',
   });
-  return (store, context) => ({
-    mutationByIdRef: {
+  return {
+    mutationRef: {
       resourceById: mutationResourcesById,
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
         MutationParams | undefined
@@ -561,8 +463,6 @@ export function mutationById<
       method: mutationConfig.method,
       insertionsOutputs: (
         insertions as InsertionsByIdFactory<
-          NoInfer<Input>,
-          NoInfer<StoreInput>,
           NoInfer<MutationState>,
           NoInfer<MutationParams>,
           NoInfer<MutationGroupIdentifier>,
@@ -572,8 +472,6 @@ export function mutationById<
         return {
           ...acc,
           ...insert({
-            input: context,
-            store,
             resourceById: mutationResourcesById,
             resourceParamsSrc: resourceParamsSrc as WritableSignal<
               NoInfer<MutationParams> | undefined
@@ -591,5 +489,5 @@ export function mutationById<
       true,
       NoInfer<MutationGroupIdentifier>
     >,
-  });
+  };
 }
