@@ -148,11 +148,11 @@ describe('serverState', () => {
       expect(q.testQuery.value).toBeDefined();
       expect(q.testQuery.value()).toEqual({ id: 3, name: 'test' });
 
-      q.mutateSave({ id: 3, name: 'testMutated' });
+      q.mutateSaveById({ id: 3, name: 'testMutated' });
       await vi.runAllTimersAsync();
       expect(q.testQuery.value()).toEqual({ id: 3, name: 'testMutated' });
 
-      q.mutateSave({ id: 3, name: 'error' });
+      q.mutateSaveById({ id: 3, name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
       expect(q.testQuery.status()).toEqual('reloading');
     });

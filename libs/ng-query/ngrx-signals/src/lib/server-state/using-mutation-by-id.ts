@@ -19,7 +19,7 @@ type SpecificUseMutationByIdOutputs<
   };
   methods: [ResourceArgsParams] extends [unknown]
     ? {
-        [key in `mutate${Capitalize<ResourceName>}`]: (
+        [key in `mutate${Capitalize<ResourceName>}ById`]: (
           payload: ResourceArgsParams
         ) => void;
       }
@@ -73,7 +73,7 @@ export function usingMutationById<
   ResourceArgsParams,
   GroupIdentifier extends string | number,
   InsertionsOutputs,
-  OtherProperties
+  OtherProperties // maybe add options only for this ?
 >(
   resourceName: ResourceName,
   mutationFactory:

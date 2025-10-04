@@ -233,13 +233,15 @@ function handleQueryMutationsReactions<
   _injector: Injector
 ) {
   mutationsConfigEffect.reduce((acc, [mutationName, mutationEffectOptions]) => {
-    const formattedMutationName = mutationName.replace('Mutation', '');
+    const formattedMutationName = mutationName
+      .replace('Mutation', '')
+      .replace('ById', '');
     const mutationTargeted = context.__mutation[formattedMutationName]
-      ?.mutationRef.resource as
-      | ResourceRef<any>
-      | ResourceByIdRef<string | number, any, ResourceParams>;
-    if ('hasValue' in mutationTargeted) {
-      const mutationResource = mutationTargeted as ResourceRef<any>;
+      ?.mutationRef as
+      | { resource: ResourceRef<any> }
+      | { resourceById: ResourceByIdRef<string | number, any, ResourceParams> };
+    if ('resource' in mutationTargeted) {
+      const mutationResource = mutationTargeted.resource;
       return {
         ...acc,
         [`_on${formattedMutationName}${resourceName}QueryEffect`]: effect(
@@ -303,11 +305,12 @@ function handleQueryMutationsReactions<
         ),
       };
     }
+    const mutationResources = mutationTargeted.resourceById;
     const newMutationResourceRefForNestedEffect = linkedSignal<
       ResourceByIdRef<string | number, ResourceState, ResourceParams>,
       { newKeys: (string | number)[] } | undefined
     >({
-      source: mutationTargeted as any,
+      source: mutationResources as any,
       computation: (currentSource, previous) => {
         if (!currentSource || !Object.keys(currentSource).length) {
           return undefined;
@@ -337,7 +340,8 @@ function handleQueryMutationsReactions<
         newMutationResourceRefForNestedEffect()?.newKeys.forEach(
           (mutationIdentifier) => {
             nestedEffect(_injector, () => {
-              const mutationResource = mutationTargeted()[mutationIdentifier];
+              const mutationResource =
+                mutationTargeted.resourceById()[mutationIdentifier];
 
               if (!mutationResource) {
                 return;
@@ -362,7 +366,7 @@ function handleQueryMutationsReactions<
                     mutationResource,
                     mutationParamsSrc,
                     mutationIdentifier,
-                    mutationResources: mutationTargeted,
+                    mutationResources,
                   });
                 });
               }
@@ -377,7 +381,7 @@ function handleQueryMutationsReactions<
                     mutationParamsSrc,
                     reloadCConfig,
                     mutationIdentifier,
-                    mutationResources: mutationTargeted,
+                    mutationResources,
                   });
                 });
               }
@@ -393,7 +397,7 @@ function handleQueryMutationsReactions<
                     mutationResource,
                     mutationParamsSrc,
                     mutationIdentifier: mutationIdentifier,
-                    mutationResources: mutationTargeted,
+                    mutationResources,
                   });
                 });
               }
