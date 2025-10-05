@@ -35,7 +35,7 @@ import { ResourceByIdRef } from './resource-by-id';
 import { nestedEffect } from './types/util';
 
 export type MutationByIdRef<
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   ResourceState,
   ResourceParams,
   ParamsArgs,
@@ -54,7 +54,7 @@ type WithMutationByIdOutputStoreConfig<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   InsertionsOutput
 > = {
   state: {};
@@ -140,7 +140,7 @@ export function withMutationById<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput
 >(

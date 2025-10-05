@@ -17,7 +17,7 @@ export type BooleanOrMapperFnByPathById<
   State extends object,
   QueryState,
   QueryParams,
-  QueryIdentifier extends string | number
+  QueryIdentifier extends string
 > = Prettify<
   FlatAllObjectDeepPath<
     MakeOptionalPropertiesRequired<State>,
@@ -31,7 +31,7 @@ type FlatAllObjectDeepPath<
   State extends object,
   QueryState,
   QueryParams,
-  QueryIdentifier extends string | number
+  QueryIdentifier extends string
 > = UnionToTuple<keyof State> extends string[]
   ? __ObjectDeep<
       UnionToTuple<keyof State>,
@@ -50,7 +50,7 @@ type __ObjectDeep<
   State,
   QueryState,
   QueryParams,
-  QueryIdentifier extends string | number,
+  QueryIdentifier extends string,
   Acc extends {} = DefaultObject,
   RootPath extends string = ''
 > = keys extends [infer Head, ...infer Tail]
@@ -168,7 +168,7 @@ export type AssociatedStateMapperFnById<
   QueryState,
   QueryParams,
   ResultState,
-  QueryIdentifier extends string | number
+  QueryIdentifier extends string
 > = (data: {
   queryResource: ResourceRef<QueryState>;
   queryParams: QueryParams;

@@ -3,42 +3,33 @@ import { __InternalSharedMutationConfig, MutationRef } from '../with-mutation';
 import { QueryRef } from '../with-query';
 import { InternalType } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
+import { QueryByIdRef } from '../with-query-by-id';
+
+export type MutationDictionary = Record<
+  string,
+  {
+    mutationRef:
+      | MutationRef<unknown, unknown, any, unknown>
+      | MutationByIdRef<string, unknown, unknown, unknown, unknown>;
+    __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
+  }
+>;
+
+export type QueryDictionary = Record<
+  string,
+  {
+    queryRef:
+      | QueryRef<unknown, unknown, unknown>
+      | QueryByIdRef<string, unknown, unknown, unknown>;
+    __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
+  }
+>;
 
 export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>;
-  __mutation: Record<
-    string,
-    | {
-        mutationRef:
-          | MutationRef<unknown, unknown, any, unknown>
-          | MutationByIdRef<
-              string | number,
-              unknown,
-              unknown,
-              unknown,
-              unknown
-            >;
-        __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
-      }
-    | {
-        mutationRef: MutationByIdRef<
-          string | number,
-          unknown,
-          unknown,
-          unknown,
-          unknown
-        >;
-        __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
-      }
-  >;
-  __query: Record<
-    string,
-    {
-      queryRef: QueryRef<unknown, unknown, unknown>;
-      __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
-    }
-  >;
+  __mutation: {};
+  __query: {};
 };
 
 type EmptyContext = {

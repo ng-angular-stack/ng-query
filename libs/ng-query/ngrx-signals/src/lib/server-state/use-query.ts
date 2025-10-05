@@ -5,7 +5,11 @@ import {
   triggerQueryReloadOnMutationStatusChange,
 } from '../core/query.core';
 import { InternalType, MergeObject } from '../types/util.type';
-import { ContextConstraints, ServerStateFactory } from './server-state';
+import {
+  ContextConstraints,
+  MutationDictionary,
+  ServerStateFactory,
+} from './server-state';
 import { QueryRef } from '../with-query';
 import {
   effect,
@@ -236,10 +240,9 @@ function handleQueryMutationsReactions<
     const formattedMutationName = mutationName
       .replace('Mutation', '')
       .replace('ById', '');
-    const mutationTargeted = context.__mutation[formattedMutationName]
-      ?.mutationRef as
-      | { resource: ResourceRef<any> }
-      | { resourceById: ResourceByIdRef<string | number, any, ResourceParams> };
+    const mutationTargeted = (context.__mutation as MutationDictionary)[
+      formattedMutationName
+    ]?.mutationRef;
     if ('resource' in mutationTargeted) {
       const mutationResource = mutationTargeted.resource;
       return {
@@ -247,8 +250,9 @@ function handleQueryMutationsReactions<
         [`_on${formattedMutationName}${resourceName}QueryEffect`]: effect(
           () => {
             const mutationStatus = mutationResource.status();
-            const mutationParamsSrc = context.__mutation[formattedMutationName]
-              .mutationRef.resourceParamsSrc as Signal<any>;
+            const mutationParamsSrc = (
+              context.__mutation as MutationDictionary
+            )[formattedMutationName].mutationRef.resourceParamsSrc;
             // use to track the value of the mutation
             const _mutationValueChanged = mutationResource.hasValue()
               ? mutationResource.value()
@@ -307,8 +311,8 @@ function handleQueryMutationsReactions<
     }
     const mutationResources = mutationTargeted.resourceById;
     const newMutationResourceRefForNestedEffect = linkedSignal<
-      ResourceByIdRef<string | number, ResourceState, ResourceParams>,
-      { newKeys: (string | number)[] } | undefined
+      ResourceByIdRef<string, ResourceState, ResourceParams>,
+      { newKeys: string[] } | undefined
     >({
       source: mutationResources as any,
       computation: (currentSource, previous) => {
@@ -316,11 +320,8 @@ function handleQueryMutationsReactions<
           return undefined;
         }
 
-        const currentKeys = Object.keys(currentSource) as (string | number)[];
-        const previousKeys = Object.keys(previous?.source || {}) as (
-          | string
-          | number
-        )[];
+        const currentKeys = Object.keys(currentSource) as string[];
+        const previousKeys = Object.keys(previous?.source || {}) as string[];
 
         // Find keys that exist in current but not in previous
         const newKeys = currentKeys.filter(
@@ -347,9 +348,9 @@ function handleQueryMutationsReactions<
                 return;
               }
               const mutationStatus = mutationResource.status();
-              const mutationParamsSrc = context.__mutation[
-                formattedMutationName
-              ].mutationRef.resourceParamsSrc as Signal<any>;
+              const mutationParamsSrc = (
+                context.__mutation as MutationDictionary
+              )[formattedMutationName].mutationRef.resourceParamsSrc;
               // use to track the value of the mutation
               const _mutationValueChanged = mutationResource.hasValue()
                 ? mutationResource.value()

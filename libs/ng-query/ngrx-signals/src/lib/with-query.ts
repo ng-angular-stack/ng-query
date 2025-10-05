@@ -242,7 +242,7 @@ export function withQuery<
               (acc, [mutationName, mutationEffectOptions]) => {
                 const mutationTargeted = (store as any)[mutationName] as
                   | ResourceRef<any>
-                  | ResourceByIdRef<string | number, any, ResourceParams>;
+                  | ResourceByIdRef<string, any, ResourceParams>;
                 if ('hasValue' in mutationTargeted) {
                   const mutationResource = mutationTargeted as ResourceRef<any>;
                   return {
@@ -310,12 +310,8 @@ export function withQuery<
                   };
                 }
                 const newMutationResourceRefForNestedEffect = linkedSignal<
-                  ResourceByIdRef<
-                    string | number,
-                    ResourceState,
-                    ResourceParams
-                  >,
-                  { newKeys: (string | number)[] } | undefined
+                  ResourceByIdRef<string, ResourceState, ResourceParams>,
+                  { newKeys: string[] } | undefined
                 >({
                   source: mutationTargeted as any,
                   computation: (currentSource, previous) => {
@@ -323,13 +319,10 @@ export function withQuery<
                       return undefined;
                     }
 
-                    const currentKeys = Object.keys(currentSource) as (
-                      | string
-                      | number
-                    )[];
+                    const currentKeys = Object.keys(currentSource) as string[];
                     const previousKeys = Object.keys(
                       previous?.source || {}
-                    ) as (string | number)[];
+                    ) as string[];
 
                     // Find keys that exist in current but not in previous
                     const newKeys = currentKeys.filter(

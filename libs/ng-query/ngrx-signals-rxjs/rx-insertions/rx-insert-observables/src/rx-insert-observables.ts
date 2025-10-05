@@ -11,36 +11,25 @@ import {
   nestedEffect,
   ResourceByIdRef,
 } from '@ng-query/ngrx-signals';
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { Observable, ObservedValueOf, Subject } from 'rxjs';
 
 export const rxInsertObservables = <
-  Input extends SignalStoreFeatureResult,
-  StoreInput,
   ResourceState extends object | undefined,
   ResourceParams,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   PreviousInsertionsOutputs = {}
 >(
   data:
     | InsertionByIdParams<
-        Input,
-        StoreInput,
         GroupIdentifier,
         ResourceState,
         ResourceParams,
         PreviousInsertionsOutputs
       >
-    | InsertionParams<
-        Input,
-        StoreInput,
-        ResourceState,
-        ResourceParams,
-        PreviousInsertionsOutputs
-      >
+    | InsertionParams<ResourceState, ResourceParams, PreviousInsertionsOutputs>
 ): {
   data$: Observable<
-    string | number extends GroupIdentifier
+    string extends GroupIdentifier
       ? {
           value: ResourceState | undefined;
           status: ResourceStatus;

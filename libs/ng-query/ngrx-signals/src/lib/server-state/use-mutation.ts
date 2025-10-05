@@ -26,9 +26,9 @@ type SpecificUseMutationOutputs<
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationRef<
-        NoInfer<ResourceState>,
-        NoInfer<ResourceParams>,
-        NoInfer<ResourceArgsParams>,
+        ResourceState,
+        ResourceParams,
+        ResourceArgsParams,
         InsertionsOutputs
       >;
       __types: InternalType<

@@ -5,7 +5,7 @@ import { SignalStoreFeatureResult } from '@ngrx/signals';
 export function insertPrefetchNextData<
   Input extends SignalStoreFeatureResult,
   StoreInput,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   ResourceState extends object | undefined,
   ResourceParams,
   PreviousInsertionsOutputs

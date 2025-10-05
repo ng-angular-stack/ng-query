@@ -28,8 +28,8 @@ type QueryRefType = {
 };
 
 type QueryByIdRefType = {
-  queryByIdRef: QueryByIdRef<string | number, unknown, unknown, unknown>;
-  __types: InternalType<unknown, unknown, unknown, true, string | number>;
+  queryByIdRef: QueryByIdRef<string, unknown, unknown, unknown>;
+  __types: InternalType<unknown, unknown, unknown, true, string>;
 };
 
 type CachedQuery = {
@@ -74,7 +74,7 @@ type WithQueryByIdOutputMapper<
       CachedQueryById['query']['queryByIdRef']['resourceById'],
       string,
       {},
-      string | number,
+      string,
       boolean,
       CachedQueryById['query']['queryByIdRef']['insertionsOutputs']
     >

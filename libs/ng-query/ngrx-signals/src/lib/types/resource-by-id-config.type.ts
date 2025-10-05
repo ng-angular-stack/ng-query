@@ -4,8 +4,12 @@ export type ResourceByIdConfig<
   ResourceState,
   Params,
   ParamsArgs,
-  GroupIdentifier extends string | number
+  GroupIdentifier extends string
 > = ResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> & {
+  /**
+   * A unique identifier for the resource, derived from the params.
+   * It should be a string that uniquely identifies the resource based on the params.
+   */
   identifier: (params: NoInfer<NonNullable<Params>>) => GroupIdentifier;
   /**
    * Under the hood, a resource is generated for each new identifier generated when the params source change.

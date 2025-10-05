@@ -4,7 +4,7 @@ export type RxResourceByIdConfig<
   ResourceState,
   Params,
   ParamsArgs,
-  GroupIdentifier extends string | number
+  GroupIdentifier extends string
 > = RxResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> & {
   identifier: (params: NoInfer<NonNullable<Params>>) => GroupIdentifier;
   /**

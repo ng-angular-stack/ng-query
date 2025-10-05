@@ -1,4 +1,3 @@
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { ResourceByIdConfig } from './types/resource-by-id-config.type';
 import { InternalType } from './types/util.type';
 import { MutationByIdRef } from './with-mutation-by-id';
@@ -7,28 +6,28 @@ import { resourceById } from './resource-by-id';
 import { InsertionsByIdFactory } from './core/query.core';
 
 type MutationByIdOutput<
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
   InsertionsOutput
 > = {
   mutationRef: MutationByIdRef<
-    NoInfer<MutationGroupIdentifier>,
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
-    NoInfer<MutationArgsParams>,
+    MutationGroupIdentifier,
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     InsertionsOutput
   >;
   /**
    * Only used to help type inference, not used in the actual implementation.
    */
   __types: InternalType<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
-    NoInfer<MutationArgsParams>,
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     true,
-    NoInfer<MutationGroupIdentifier>
+    MutationGroupIdentifier
   >;
 };
 
@@ -36,7 +35,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number
+  MutationGroupIdentifier extends string
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,
@@ -55,7 +54,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   Insertions1
 >(
   mutationConfig: ResourceByIdConfig<
@@ -81,7 +80,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   Insertions1,
   Insertions2
 >(
@@ -115,7 +114,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   Insertions1,
   Insertions2,
   Insertions3
@@ -157,7 +156,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -207,7 +206,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -265,7 +264,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -336,7 +335,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number,
+  MutationGroupIdentifier extends string,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -421,7 +420,7 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string | number
+  MutationGroupIdentifier extends string
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,

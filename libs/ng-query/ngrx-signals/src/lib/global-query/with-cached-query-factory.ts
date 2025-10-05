@@ -74,7 +74,7 @@ export function withCachedQueryByIdToPlugFactory<
   QueryState extends object | undefined,
   QueryParams,
   PlugData extends object,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   IsPluggableQuery,
   InsertionsOutputs
 >(

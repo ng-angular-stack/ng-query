@@ -6,6 +6,8 @@ import { useMutation } from './use-mutation';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 import { usingMutationById } from './using-mutation-by-id';
+import { usingQueryById } from './using-query-by-id';
+import { queryById } from '../query-by-id';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -104,13 +106,13 @@ describe('serverState', () => {
     });
   });
 
-  it('should enable declaring useMutationById and useQueryById', async () => {
+  it('should enable declaring useMutationById and useQuery', async () => {
     await TestBed.runInInjectionContext(async () => {
       const q = serverState(
         usingMutationById(
           'save',
           mutationById({
-            method: (data: { id: number; name: string }) => data,
+            method: (data: { id: string; name: string }) => data,
             identifier: (params) => params.id,
             loader: async ({ params }) => {
               if (params.name === 'error') {
@@ -123,7 +125,7 @@ describe('serverState', () => {
         useQuery(
           'test',
           query({
-            params: () => 3,
+            params: () => '3',
             loader: async ({ params: id }) => {
               await wait(10000);
               return { id, name: 'test' };
@@ -146,15 +148,73 @@ describe('serverState', () => {
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
       expect(q.testQuery.value).toBeDefined();
-      expect(q.testQuery.value()).toEqual({ id: 3, name: 'test' });
+      expect(q.testQuery.value()).toEqual({ id: '3', name: 'test' });
 
-      q.mutateSaveById({ id: 3, name: 'testMutated' });
+      q.mutateSaveById({ id: '3', name: 'testMutated' });
       await vi.runAllTimersAsync();
       expect(q.testQuery.value()).toEqual({ id: 3, name: 'testMutated' });
 
-      q.mutateSaveById({ id: 3, name: 'error' });
+      q.mutateSaveById({ id: '3', name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
       expect(q.testQuery.status()).toEqual('reloading');
+    });
+  });
+
+  it('should enable declaring useMutationById and usingQueryById', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const q = serverState(
+        usingMutationById(
+          'save',
+          mutationById({
+            method: (data: { id: string; name: string }) => data,
+            identifier: (params) => '' + params.id,
+            loader: async ({ params }) => {
+              if (params.name === 'error') {
+                throw new Error('Error');
+              }
+              return params;
+            },
+          })
+        ),
+        usingQueryById(
+          'test',
+          queryById({
+            params: () => '3',
+            identifier: (data) => data,
+            loader: async ({ params: id }) => {
+              await wait(10000);
+              return { id, name: 'test' };
+            },
+          }),
+          {
+            on: {
+              saveMutationById: {
+                filter: ({ mutationParams, queryIdentifier }) =>
+                  mutationParams.id === queryIdentifier,
+                optimisticUpdate: ({ mutationParams }) => mutationParams,
+                reload: {
+                  onMutationError: true,
+                },
+              },
+            },
+          }
+        )
+      );
+      await vi.runAllTimersAsync();
+      expect(q).toBeDefined();
+      expect(q.testQueryById()['3']?.value).toBeDefined();
+      expect(q.testQueryById()['3']?.value()).toEqual({ id: 3, name: 'test' });
+
+      q.mutateSaveById({ id: '3', name: 'testMutated' });
+      await vi.runAllTimersAsync();
+      expect(q.testQueryById()['3']?.value()).toEqual({
+        id: 3,
+        name: 'testMutated',
+      });
+
+      q.mutateSaveById({ id: '3', name: 'error' });
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(q.testQueryById()['3']?.status()).toEqual('reloading');
     });
   });
 });

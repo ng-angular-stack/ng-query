@@ -19,7 +19,7 @@ type Prettify<T> = {
 } & {};
 
 export type ResourceByIdHandler<
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   State,
   ResourceParams
 > = {
@@ -36,7 +36,7 @@ export type ResourceByIdHandler<
    */
   add: (
     // todo pass params instead of id and create the id from the params using the identifier function
-    params: NonNullable<ResourceParams>,
+    params: ResourceParams,
     options?: {
       defaultValue?: State;
     }
@@ -46,7 +46,7 @@ export type ResourceByIdHandler<
    * Useful at the app initialization when the resource value is retrieved from a persister for example.
    */
   addById: (
-    id: string | number,
+    id: GroupIdentifier,
     options?: {
       defaultParam?: ResourceParams;
       defaultValue?: State;
@@ -59,7 +59,7 @@ export type Identifier<ResourceParams, GroupIdentifier> = (
 ) => GroupIdentifier;
 
 export type ResourceByIdRef<
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   State,
   ResourceParams
 > = WritableSignal<
@@ -67,10 +67,7 @@ export type ResourceByIdRef<
 > &
   ResourceByIdHandler<GroupIdentifier, State, ResourceParams>;
 
-export type EqualParams<
-  ResourceParams,
-  GroupIdentifier extends string | number
-> =
+export type EqualParams<ResourceParams, GroupIdentifier extends string> =
   | 'default'
   | 'useIdentifier'
   | ((
@@ -82,7 +79,7 @@ export type EqualParams<
 export function resourceById<
   State,
   ResourceParams,
-  GroupIdentifier extends string | number
+  GroupIdentifier extends string
 >({
   identifier,
   params,
@@ -180,7 +177,7 @@ export function resourceById<
       });
     },
     add: (resourceParams, options?: { defaultValue?: State }) => {
-      const group = identifier(resourceParams);
+      const group = identifier(resourceParams as any);
       if (resourceByGroup()[group]) {
         console.warn(
           `[resourceById] - A resource with the id ${group} already exist.`
@@ -282,7 +279,7 @@ const RESOURCE_INSTANCE_TOKEN = new InjectionToken<ResourceRef<unknown>>(
   'Injection token used to provide a dynamically created ResourceRef instance.'
 );
 
-interface DynamicResourceConfig<T, R, GroupIdentifier extends string | number> {
+interface DynamicResourceConfig<T, R, GroupIdentifier extends string> {
   resourceOptions: ResourceOptions<T, R>;
   group: GroupIdentifier;
 }
@@ -296,7 +293,7 @@ interface DynamicResourceConfig<T, R, GroupIdentifier extends string | number> {
  *
  * Maybe their is a better way to instantiate a resource dynamically.
  */
-function createDynamicResource<T, R, GroupIdentifier extends string | number>(
+function createDynamicResource<T, R, GroupIdentifier extends string>(
   parentInjector: Injector,
   resourceConfig: DynamicResourceConfig<T, R, GroupIdentifier>
 ) {

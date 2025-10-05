@@ -123,7 +123,7 @@ export function triggerQueryReloadFromMutationChange<
   queryResource: ResourceRef<QueryAndMutationRecord['query']['state']>;
   queryResources:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['query']['state'],
         QueryAndMutationRecord['query']['params']
       >
@@ -136,7 +136,7 @@ export function triggerQueryReloadFromMutationChange<
   mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
   mutationResources:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['mutation']['state'],
         QueryAndMutationRecord['mutation']['params']
       >
@@ -189,7 +189,7 @@ export function triggerQueryReloadOnMutationStatusChange<
   mutationStatus: string;
   queryResourceTarget:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['query']['state'],
         QueryAndMutationRecord['query']['params']
       >
@@ -213,7 +213,7 @@ export function triggerQueryReloadOnMutationStatusChange<
     | undefined;
   mutationResources:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['mutation']['state'],
         QueryAndMutationRecord['mutation']['params']
       >
@@ -240,13 +240,11 @@ export function triggerQueryReloadOnMutationStatusChange<
       return;
     }
     const queryResourcesById = queryResourceTarget as ResourceByIdRef<
-      string | number,
+      string,
       QueryAndMutationRecord['query']['state'],
       QueryAndMutationRecord['query']['params']
     >;
-    Object.entries(
-      queryResourcesById() as Record<string | number, ResourceRef<any>>
-    )
+    Object.entries(queryResourcesById() as Record<string, ResourceRef<any>>)
       .filter(([queryIdentifier, queryResource]) => {
         return (
           mutationEffectOptions as {
@@ -292,7 +290,7 @@ export function setAllPatchFromMutationOnQueryValue<
   mutationStatus: string;
   queryResourceTarget:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['query']['state'],
         QueryAndMutationRecord['query']['params']
       >
@@ -305,7 +303,7 @@ export function setAllPatchFromMutationOnQueryValue<
     | undefined;
   mutationResources:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['mutation']['state'],
         QueryAndMutationRecord['mutation']['params']
       >
@@ -352,13 +350,11 @@ export function setAllPatchFromMutationOnQueryValue<
     return;
   }
   const queryResourcesById = queryResourceTarget as ResourceByIdRef<
-    string | number,
+    string,
     QueryAndMutationRecord['query']['state'],
     QueryAndMutationRecord['query']['params']
   >;
-  Object.entries(
-    queryResourcesById() as Record<string | number, ResourceRef<any>>
-  )
+  Object.entries(queryResourcesById() as Record<string, ResourceRef<any>>)
     .filter(([queryIdentifier, queryResource]) =>
       (
         mutationEffectOptions as {
@@ -418,7 +414,7 @@ export function setAllUpdatesFromMutationOnQueryValue<
   mutationStatus: string;
   queryResourceTarget:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['query']['state'],
         QueryAndMutationRecord['query']['params']
       >
@@ -431,7 +427,7 @@ export function setAllUpdatesFromMutationOnQueryValue<
     | undefined;
   mutationResources:
     | ResourceByIdRef<
-        string | number,
+        string,
         QueryAndMutationRecord['mutation']['state'],
         QueryAndMutationRecord['mutation']['params']
       >
@@ -463,13 +459,11 @@ export function setAllUpdatesFromMutationOnQueryValue<
     return;
   }
   const queryResourceById = queryResourceTarget as ResourceByIdRef<
-    string | number,
+    string,
     QueryAndMutationRecord['query']['state'],
     QueryAndMutationRecord['query']['params']
   >;
-  Object.entries(
-    queryResourceById() as Record<string | number, ResourceRef<any>>
-  )
+  Object.entries(queryResourceById() as Record<string, ResourceRef<any>>)
     .filter(([queryIdentifier, queryResource]) =>
       (
         mutationEffectOptions as {
@@ -525,7 +519,7 @@ export type InsertionsFactory<
 ) => InsertsOutputs;
 
 export type InsertionByIdParams<
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   ResourceState extends object | undefined,
   ResourceParams,
   PreviousInsertionsOutputs
@@ -541,7 +535,7 @@ export type InsertionByIdParams<
 export type InsertionsByIdFactory<
   ResourceState extends object | undefined,
   ResourceParams,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   InsertionsOutputs,
   PreviousInsertionsOutputs = {}
 > = (

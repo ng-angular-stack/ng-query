@@ -35,7 +35,7 @@ import {
 import { PublicSignalStore } from './types/shared.type';
 
 export type QueryByIdRef<
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   ResourceState,
   ResourceParams,
   InsertionsOutput
@@ -52,7 +52,7 @@ type WithQueryByIdOutputStoreConfig<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   InsertionsOutputs
 > = {
   state: {};
@@ -87,7 +87,7 @@ export type QueryByIdOptions<
   Input extends SignalStoreFeatureResult,
   ResourceState extends object | undefined,
   ResourceParams,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   ResourceArgsParams,
   OtherProperties
 > = (store: StoreInput) => {
@@ -173,7 +173,7 @@ export function withQueryById<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutputs,
   OtherProperties
@@ -330,7 +330,7 @@ export function withQueryById<
               (acc, [mutationName, mutationEffectOptions]) => {
                 const mutationTargeted = (store as any)[mutationName] as
                   | ResourceRef<any>
-                  | ResourceByIdRef<string | number, any, any>;
+                  | ResourceByIdRef<string, any, any>;
                 if ('hasValue' in mutationTargeted) {
                   const mutationResource = mutationTargeted as ResourceRef<any>;
                   return {
@@ -543,7 +543,7 @@ export function withQueryById<
 function updateAssociatedClientStates<
   ResourceState extends object | undefined,
   ResourceParams,
-  GroupIdentifier extends string | number
+  GroupIdentifier extends string
 >({
   associatedClientStates,
   store,

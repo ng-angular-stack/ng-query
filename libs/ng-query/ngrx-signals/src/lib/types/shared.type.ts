@@ -37,7 +37,7 @@ export type CustomReloadOnSpecificMutationStatus<
         ? {
             queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
             queryResources: ResourceByIdRef<
-              string | number,
+              string,
               QueryAndMutationRecord['query']['state'],
               QueryAndMutationRecord['query']['params']
             >;
@@ -47,7 +47,7 @@ export type CustomReloadOnSpecificMutationStatus<
         ? {
             mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
             mutationResources: ResourceByIdRef<
-              string | number,
+              string,
               QueryAndMutationRecord['mutation']['state'],
               QueryAndMutationRecord['mutation']['params']
             >;
@@ -106,7 +106,7 @@ export type PatchQueryFn<
         >;
         targetedState: TargetedType | undefined;
       },
-      QueryAndMutationRecord['query']['groupIdentifier'] extends string | number
+      QueryAndMutationRecord['query']['groupIdentifier'] extends string
         ? {
             queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
             queryResources: ResourceByIdRef<
@@ -116,9 +116,7 @@ export type PatchQueryFn<
             >;
           }
         : {},
-      QueryAndMutationRecord['mutation']['groupIdentifier'] extends
-        | string
-        | number
+      QueryAndMutationRecord['mutation']['groupIdentifier'] extends string
         ? {
             mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
             mutationResources: ResourceByIdRef<
@@ -146,7 +144,7 @@ export type FilterQueryById<
           NoInfer<QueryAndMutationRecord['mutation']['params']>
         >;
       },
-      QueryAndMutationRecord['query']['groupIdentifier'] extends string | number
+      QueryAndMutationRecord['query']['groupIdentifier'] extends string
         ? {
             queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
             queryResources: ResourceByIdRef<
@@ -156,9 +154,7 @@ export type FilterQueryById<
             >;
           }
         : {},
-      QueryAndMutationRecord['mutation']['groupIdentifier'] extends
-        | string
-        | number
+      QueryAndMutationRecord['mutation']['groupIdentifier'] extends string
         ? {
             mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
             mutationResources: ResourceByIdRef<

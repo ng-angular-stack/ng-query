@@ -20,7 +20,7 @@ type Prettify<T> = {
 } & {};
 
 export type RxResourceByIdRef<
-  GroupIdentifier extends string | number,
+  GroupIdentifier extends string,
   State,
   ResourceParams
 > = WritableSignal<
@@ -31,7 +31,7 @@ export type RxResourceByIdRef<
 export function rxResourceById<
   State,
   ResourceParams,
-  GroupIdentifier extends string | number
+  GroupIdentifier extends string
 >({
   identifier,
   params,
@@ -234,7 +234,7 @@ const RESOURCE_INSTANCE_TOKEN = new InjectionToken<ResourceRef<unknown>>(
   'Injection token used to provide a dynamically created ResourceRef instance.'
 );
 
-interface DynamicResourceConfig<T, R, GroupIdentifier extends string | number> {
+interface DynamicResourceConfig<T, R, GroupIdentifier extends string> {
   resourceOptions: RxResourceOptions<T, R>;
   group: GroupIdentifier;
 }
@@ -248,7 +248,7 @@ interface DynamicResourceConfig<T, R, GroupIdentifier extends string | number> {
  *
  * Maybe their is a better way to instantiate a resource dynamically.
  */
-function createDynamicRxResource<T, R, GroupIdentifier extends string | number>(
+function createDynamicRxResource<T, R, GroupIdentifier extends string>(
   parentInjector: Injector,
   resourceConfig: DynamicResourceConfig<T, R, GroupIdentifier>
 ) {

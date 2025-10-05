@@ -10,7 +10,7 @@ export const DYNAMIC_EFFECT_REF_INSTANCE_TOKEN = new InjectionToken<EffectRef>(
   'Injection token used to provide a dynamically created effectRef instance.'
 );
 
-export function nestedEffect<T, R, GroupIdentifier extends string | number>(
+export function nestedEffect<T, R, GroupIdentifier extends string>(
   parentInjector: Injector,
   effectFn: (onCleanup: EffectCleanupRegisterFn) => void
 ) {
