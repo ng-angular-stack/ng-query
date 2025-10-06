@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
 import { serverState } from './server-state';
-import { useQuery } from './use-query';
-import { useMutation } from './use-mutation';
+import { usingQuery } from './using-query';
+import { usingMutation } from './using-mutation';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 import { usingMutationById } from './using-mutation-by-id';
@@ -20,21 +20,21 @@ describe('serverState', () => {
   it('should enable creating queries and mutations', async () => {
     await TestBed.runInInjectionContext(async () => {
       const q = serverState(
-        useMutation(
+        usingMutation(
           'save',
           mutation({
             method: (data: { id: number; name: string }) => data,
             loader: async ({ params }) => params,
           })
         ),
-        useQuery(
+        usingQuery(
           'test',
           query({
             params: () => 5,
             loader: async ({ params: id }) => ({ id, name: 'test' }),
           })
         ),
-        useQuery('test2', () =>
+        usingQuery('test2', () =>
           query({
             params: () => 3,
             loader: async ({ params: id }) => ({ id, name: 'test2' }),
@@ -58,7 +58,7 @@ describe('serverState', () => {
   it('a query can react to a mutation change', async () => {
     await TestBed.runInInjectionContext(async () => {
       const q = serverState(
-        useMutation(
+        usingMutation(
           'save',
           mutation({
             method: (data: { id: number; name: string }) => data,
@@ -70,7 +70,7 @@ describe('serverState', () => {
             },
           })
         ),
-        useQuery(
+        usingQuery(
           'test',
           query({
             params: () => 3,
@@ -122,7 +122,7 @@ describe('serverState', () => {
             },
           })
         ),
-        useQuery(
+        usingQuery(
           'test',
           query({
             params: () => '3',

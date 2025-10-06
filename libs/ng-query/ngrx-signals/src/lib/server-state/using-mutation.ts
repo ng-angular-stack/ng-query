@@ -60,7 +60,7 @@ type UseMutationOutputs<
   >
 >;
 
-export function useMutation<
+export function usingMutation<
   Context extends ContextConstraints,
   const ResourceName extends string,
   ResourceState extends object | undefined,

@@ -18,7 +18,6 @@ import {
   Injector,
   linkedSignal,
   ResourceRef,
-  Signal,
   untracked,
 } from '@angular/core';
 import { ResourceByIdRef } from '../resource-by-id';
@@ -126,7 +125,7 @@ type UseQueryOutputs<
   >
 >;
 
-export function useQuery<
+export function usingQuery<
   Context extends ContextConstraints,
   const ResourceName extends string,
   ResourceState extends object | undefined,
