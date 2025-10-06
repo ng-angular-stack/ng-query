@@ -28,7 +28,7 @@ type QueryRefType = {
 };
 
 type QueryByIdRefType = {
-  queryByIdRef: QueryByIdRef<string, unknown, unknown, unknown>;
+  queryRef: QueryByIdRef<string, unknown, unknown, unknown>;
   __types: InternalType<unknown, unknown, unknown, true, string>;
 };
 
@@ -71,12 +71,12 @@ type WithQueryByIdOutputMapper<
   >}QueryById`]: ReturnType<
     typeof withCachedQueryByIdToPlugFactory<
       k & string,
-      CachedQueryById['query']['queryByIdRef']['resourceById'],
+      CachedQueryById['query']['queryRef']['resourceById'],
       string,
       {},
       string,
       boolean,
-      CachedQueryById['query']['queryByIdRef']['insertionsOutputs']
+      CachedQueryById['query']['queryRef']['insertionsOutputs']
     >
   >;
 } & {
@@ -85,7 +85,7 @@ type WithQueryByIdOutputMapper<
       source: SignalProxy<NoInfer<{}>>
     ) => SignalWrapperParams<NoInfer<{}>>
   ) => ResourceRef<
-    CachedQueryById['query']['queryByIdRef']['resourceById'] | undefined
+    CachedQueryById['query']['queryRef']['resourceById'] | undefined
   >;
 };
 
@@ -101,7 +101,7 @@ type WithQueryOutputMapperTyped<
   },
   k extends keyof QueryRecord
 > = QueryRecord[k]['query'] extends infer All
-  ? All extends (data: infer Data) => (store: any, context: any) => infer R
+  ? All extends (data: infer Data) => infer R
     ? R extends {
         queryRef: QueryRef<infer State, infer Params, infer InsertionsOutput>;
       }
@@ -138,7 +138,7 @@ type WithInjectQueryOutputMapperTyped<
   },
   k extends keyof QueryRecord
 > = QueryRecord[k]['query'] extends infer All
-  ? All extends (data: infer Data) => (store: any, context: any) => infer R
+  ? All extends (data: infer Data) => infer R
     ? R extends {
         queryRef: QueryRef<infer State, infer Params, infer InsertionsOutput>;
       }
@@ -161,9 +161,9 @@ type WithInjectQueryByIdOutputMapperTyped<
   },
   k extends keyof QueryByIdRecord
 > = QueryByIdRecord[k]['queryById'] extends infer All
-  ? All extends (data: infer Data) => (store: any, context: any) => infer R
+  ? All extends (data: infer Data) => infer R
     ? R extends {
-        queryByIdRef: QueryByIdRef<
+        queryRef: QueryByIdRef<
           infer GroupIdentifier,
           infer State,
           infer Params,
@@ -191,9 +191,9 @@ type WithQueryByIdOutputMapperTyped<
   },
   k extends keyof QueryByIdRecord
 > = QueryByIdRecord[k]['queryById'] extends infer All
-  ? All extends (data: infer Data) => (store: any, context: any) => infer R
+  ? All extends (data: infer Data) => infer R
     ? R extends {
-        queryByIdRef: QueryByIdRef<
+        queryRef: QueryByIdRef<
           infer GroupIdentifier,
           infer State,
           infer Params,
@@ -348,8 +348,8 @@ export function globalQueries<
               const isPluggableQuery = value.query.length > 0;
               const queryData = (
                 isPluggableQuery
-                  ? ((value.query as any)(signalProxy) as any)({}, {})
-                  : (value.query as any)()?.({}, {})
+                  ? ((value.query as any)(signalProxy) as any)
+                  : (value.query as any)()
               ) as QueryRefType;
               const queryRef = queryData.queryRef;
               const queryResource = queryRef.resource;
@@ -415,13 +415,15 @@ export function globalQueries<
             return queriesByIdMap.get(key);
           }
           return runInInjectionContext(injector, () => {
+            console.log('value', value);
+            console.log('alue.queryById', value.queryById);
             const isPluggableQuery = value.queryById.length > 0;
             const queryData = (
               isPluggableQuery
-                ? ((value.queryById as any)(signalProxy) as any)({}, {})
-                : (value.queryById as any)()?.({}, {})
+                ? ((value.queryById as any)(signalProxy) as any)
+                : (value.queryById as any)()
             ) as QueryByIdRefType;
-            const queryByRef = queryData.queryByIdRef;
+            const queryByRef = queryData.queryRef;
             const queryByIdResource = queryByRef.resourceById;
             const queryResourceParamsSrc = queryByRef.resourceParamsSrc;
             cacheGlobalConfig
@@ -456,13 +458,13 @@ export function globalQueries<
 
           if (queriesByIdMap.has(key)) {
             return Object.assign(
-              queriesByIdMap.get(key)?.queryByIdRef.resourceById ?? {},
-              queriesByIdMap.get(key)?.queryByIdRef.insertionsOutputs
+              queriesByIdMap.get(key)?.queryRef.resourceById ?? {},
+              queriesByIdMap.get(key)?.queryRef.insertionsOutputs
             );
           }
           return Object.assign(
-            queryData(_injector)?.queryByIdRef.resourceById ?? {},
-            queryData(_injector)?.queryByIdRef.insertionsOutputs ?? {}
+            queryData(_injector)?.queryRef.resourceById ?? {},
+            queryData(_injector)?.queryRef.insertionsOutputs ?? {}
           );
         };
 

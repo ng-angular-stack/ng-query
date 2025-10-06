@@ -34,7 +34,7 @@ describe('queryById', () => {
         },
         identifier: (params) => params,
       });
-      type queryByIdFn__types = ReturnType<typeof queryByIdFn>['__types'];
+      type queryByIdFn__types = (typeof queryByIdFn)['__types'];
 
       type ExpectQueryByFnTypesToBeRetrieved = Expect<
         Equal<
@@ -212,7 +212,7 @@ describe('queryById', () => {
       const source = signal({ page: 1, pageSize: 10 });
       const result = queryById({
         params: source,
-        identifier: (params) => params.page,
+        identifier: (params) => '' + params.page,
         loader: async ({ params }) => {
           await wait(2000);
           return {
@@ -221,8 +221,8 @@ describe('queryById', () => {
             email: 'test@a.com',
           } satisfies User;
         },
-      })({} as any, {} as any);
-      expect(result.queryByIdRef).toBeDefined();
+      });
+      expect(result.queryRef).toBeDefined();
 
       await vi.runAllTimersAsync();
 
@@ -230,8 +230,8 @@ describe('queryById', () => {
 
       await vi.runAllTimersAsync();
 
-      const resource1 = result.queryByIdRef.resourceById()[1];
-      const resource2 = result.queryByIdRef.resourceById()[2];
+      const resource1 = result.queryRef.resourceById()[1];
+      const resource2 = result.queryRef.resourceById()[2];
 
       await vi.runAllTimersAsync();
       expect(resource1?.status()).toEqual('resolved');

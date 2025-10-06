@@ -42,7 +42,7 @@ describe('queryById', () => {
         },
         identifier: (params) => params,
       });
-      type queryByIdFn__types = ReturnType<typeof queryByIdFn>['__types'];
+      type queryByIdFn__types = (typeof queryByIdFn)['__types'];
 
       type ExpectQueryByFnTypesToBeRetrieved = Expect<
         Equal<

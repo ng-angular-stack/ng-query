@@ -28,10 +28,10 @@ describe('rxResourceById', () => {
           // Simulate a stream
           return of(params);
         },
-      })({} as any, {} as any);
+      });
       expect(mutationConfig).toBeDefined();
-      expect(mutationConfig.mutationByIdRef.resourceById()).toEqual({});
-      expect(mutationConfig.mutationByIdRef.resourceParamsSrc).toBeDefined();
+      expect(mutationConfig.mutationRef.resourceById()).toEqual({});
+      expect(mutationConfig.mutationRef.resourceParamsSrc).toBeDefined();
       type ExpectTypeTObeGroupedMutation = Expect<
         Equal<
           typeof mutationConfig.__types,
@@ -67,11 +67,11 @@ describe('rxResourceById', () => {
           // Simulate a stream
           return of(params);
         },
-      })({} as any, {} as any);
+      });
       expect(mutationConfig).toBeDefined();
-      expect(mutationConfig.mutationByIdRef.resourceById()).toEqual({});
-      expect(mutationConfig.mutationByIdRef.resourceParamsSrc).toBeDefined();
-      expect(mutationConfig.mutationByIdRef.resourceParamsSrc()).toEqual({
+      expect(mutationConfig.mutationRef.resourceById()).toEqual({});
+      expect(mutationConfig.mutationRef.resourceParamsSrc).toBeDefined();
+      expect(mutationConfig.mutationRef.resourceParamsSrc()).toEqual({
         id: '1',
       });
 
@@ -131,7 +131,8 @@ describe('rxResourceById', () => {
             id: string;
             name: string;
             email: string;
-          }>
+          }>,
+          string
         >
       >
     >;
@@ -198,7 +199,7 @@ describe('rxResourceById', () => {
       const source = signal({ page: 1, pageSize: 10 });
       const result = rxMutationById({
         params: source,
-        identifier: (params) => params.page,
+        identifier: (params) => '' + params.page,
         stream: ({ params }) => {
           return of({
             id: '' + params.page,
@@ -206,15 +207,15 @@ describe('rxResourceById', () => {
             email: 'test@a.com',
           }).pipe(delay(2000));
         },
-      })({} as any, {} as any);
-      expect(result.mutationByIdRef).toBeDefined();
+      });
+      expect(result.mutationRef).toBeDefined();
 
       await vi.runAllTimersAsync();
       source.set({ page: 2, pageSize: 10 });
       await vi.runAllTimersAsync();
 
-      const resource1 = result.mutationByIdRef.resourceById()[1];
-      const resource2 = result.mutationByIdRef.resourceById()[2];
+      const resource1 = result.mutationRef.resourceById()[1];
+      const resource2 = result.mutationRef.resourceById()[2];
 
       expect(resource1?.status()).toEqual('resolved');
       expect(resource2?.status()).toEqual('resolved');

@@ -213,10 +213,7 @@ export function withMutation<
   InsertionsOutputs
 >(
   mutationName: MutationName,
-  mutationFactory: (store: StoreInput) => (
-    store: StoreInput,
-    context: Input
-  ) => {
+  mutationFactory: (store: StoreInput) => {
     mutationRef: MutationRef<
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
@@ -260,7 +257,7 @@ export function withMutation<
       withProps((store) => {
         const mutationConfigData = mutationFactory(
           store as unknown as StoreInput
-        )(store as unknown as StoreInput, context as unknown as Input);
+        );
 
         const mutationResourceParamsSrc =
           mutationConfigData.mutationRef.resourceParamsSrc;
@@ -358,7 +355,7 @@ export function withMutation<
         // ! only used to get the method (do not used to get the src because, it will regenerate the mutation)
         const mutationResourceOption = mutationFactory(
           store as unknown as StoreInput
-        )(store as unknown as StoreInput, context as unknown as Input);
+        );
         const mutationConfig = mutationResourceOption.mutationRef;
         return {
           [`mutate${capitalizedMutationName}`]: (

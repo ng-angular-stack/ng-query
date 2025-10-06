@@ -30,11 +30,9 @@ describe('insertionFactory', () => {
         }))
       );
 
-      expect(
-        result({} as any, {} as any).queryByIdRef.insertionsOutputs.hasNextPage
-      ).toBe(true);
+      expect(result.queryRef.insertionsOutputs.hasNextPage).toBe(true);
       expectTypeOf(
-        result({} as any, {} as any).queryByIdRef.insertionsOutputs.hasNextPage
+        result.queryRef.insertionsOutputs.hasNextPage
       ).toEqualTypeOf<boolean>();
     });
   });

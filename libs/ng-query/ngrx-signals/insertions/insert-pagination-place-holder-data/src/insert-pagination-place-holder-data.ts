@@ -1,10 +1,7 @@
 import { computed } from '@angular/core';
 import { InsertionByIdParams } from '@ng-query/ngrx-signals';
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 
 export const insertPaginationPlaceholderData = <
-  Input extends SignalStoreFeatureResult,
-  StoreInput,
   GroupIdentifier extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -14,8 +11,6 @@ export const insertPaginationPlaceholderData = <
   resourceParamsSrc,
   identifier,
 }: InsertionByIdParams<
-  Input,
-  StoreInput,
   GroupIdentifier,
   ResourceState,
   ResourceParams,
@@ -44,8 +39,10 @@ export const insertPaginationPlaceholderData = <
   return {
     currentPageData: computed(() => {
       const page = resourceParamsSrc();
+
       const resources = resourceById();
       const pageKey = page ? identifier(page) : undefined;
+      console.log('pageKey', pageKey);
       if (!pageKey) {
         return;
       }

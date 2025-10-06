@@ -24,7 +24,7 @@ describe('query', () => {
         },
       });
       expect(queryRef).toBeDefined();
-      const queryResult = queryRef({} as any, {} as any);
+      const queryResult = queryRef;
       expect(queryResult.queryRef).toBeDefined();
       expect(queryResult.queryRef.resource).toBeDefined();
       expect(queryResult.queryRef.resourceParamsSrc).toBeDefined();

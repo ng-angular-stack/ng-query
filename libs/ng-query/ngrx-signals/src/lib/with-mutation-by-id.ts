@@ -145,11 +145,8 @@ export function withMutationById<
   InsertionsOutput
 >(
   mutationName: ResourceName,
-  mutationFactory: (store: StoreInput) => (
-    store: StoreInput,
-    context: Input
-  ) => {
-    mutationByIdRef: MutationByIdRef<
+  mutationFactory: (store: StoreInput) => {
+    mutationRef: MutationByIdRef<
       NoInfer<GroupIdentifier>,
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
@@ -197,12 +194,12 @@ export function withMutationById<
 
         const mutationConfigData = mutationFactory(
           store as unknown as StoreInput
-        )(store as unknown as StoreInput, context as unknown as Input);
+        );
 
         const mutationResourceParamsSrc =
-          mutationConfigData.mutationByIdRef.resourceParamsSrc;
+          mutationConfigData.mutationRef.resourceParamsSrc;
         const mutationResourcesById =
-          mutationConfigData.mutationByIdRef.resourceById;
+          mutationConfigData.mutationRef.resourceById;
 
         const queriesMutation = (queriesEffectsFn?.(
           store as unknown as StoreInput
@@ -251,7 +248,7 @@ export function withMutationById<
           },
         });
         const insertionsOutputs =
-          mutationConfigData.mutationByIdRef.insertionsOutputs ?? {};
+          mutationConfigData.mutationRef.insertionsOutputs ?? {};
 
         const mutationById = Object.assign(
           mutationResourcesById,
@@ -337,8 +334,8 @@ export function withMutationById<
         // ! only used to get the method (do not used to get the src because, it will regenerate the mutation)
         const mutationResourceOption = mutationFactory(
           store as unknown as StoreInput
-        )(store as unknown as StoreInput, context as unknown as Input);
-        const mutationConfig = mutationResourceOption.mutationByIdRef;
+        );
+        const mutationConfig = mutationResourceOption.mutationRef;
         return {
           [`mutate${capitalizedMutationName}`]: (
             mutationParams: ResourceArgsParams

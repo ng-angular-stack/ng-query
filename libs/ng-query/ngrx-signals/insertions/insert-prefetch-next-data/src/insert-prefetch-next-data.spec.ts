@@ -37,10 +37,10 @@ describe('insertPrefetchNextData', () => {
           }),
         }))
       );
-      const finalResult = result({} as any, {} as any);
+      const finalResult = result;
 
       await vi.runAllTimersAsync();
-      const nextStatus = finalResult.queryByIdRef.insertionsOutputs
+      const nextStatus = finalResult.queryRef.insertionsOutputs
         .nextResource()
         ?.status();
       expect(nextStatus).toBe('resolved');
@@ -72,9 +72,9 @@ describe('insertPrefetchNextData', () => {
           }),
         }))
       );
-      const finalResult = result({} as any, {} as any);
+      const finalResult = result;
       const prefetchedResource =
-        finalResult.queryByIdRef.insertionsOutputs.prefetch({
+        finalResult.queryRef.insertionsOutputs.prefetch({
           id: '3',
         });
       await vi.runAllTimersAsync();

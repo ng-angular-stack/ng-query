@@ -1,4 +1,3 @@
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { ResourceWithParamsOrParamsFn } from './types/resource-with-params-or-params-fn.type';
 import { InternalType } from './types/util.type';
 import { QueryRef } from './with-query';
@@ -11,9 +10,8 @@ import {
 } from '@angular/core';
 import { __INTERNAL_QueryBrand } from './types/brand';
 import { InsertionsFactory } from './core/query.core';
-import { PublicSignalStore } from './types/shared.type';
 import { preservedResource } from './preserved-resource';
-//todo handle logic of insertion inside with-query and globalqueries
+
 type QueryOutput<
   QueryState extends object | undefined,
   QueryParams,

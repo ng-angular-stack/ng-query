@@ -1,9 +1,4 @@
-import { SignalStoreFeatureResult } from '@ngrx/signals';
-import {
-  InsertionsByIdFactory,
-  InternalType,
-  PublicSignalStore,
-} from '@ng-query/ngrx-signals';
+import { InsertionsByIdFactory, InternalType } from '@ng-query/ngrx-signals';
 import { MutationByIdRef } from '@ng-query/ngrx-signals';
 import { signal, WritableSignal } from '@angular/core';
 import { RxResourceByIdConfig } from './types/rx-resource-by-id-config.type';
@@ -11,18 +6,13 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { rxResourceById } from './rx-resource-by-id';
 
 type RxMutationByIdOutput<
-  StoreInput extends PublicSignalStore<Input>,
-  Input extends SignalStoreFeatureResult,
   MutationGroupIdentifier extends string,
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
   InsertionsOutput
-> = (
-  store: StoreInput,
-  context: Input
-) => {
-  mutationByIdRef: MutationByIdRef<
+> = {
+  mutationRef: MutationByIdRef<
     NoInfer<MutationGroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
@@ -45,9 +35,7 @@ export function rxMutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+  MutationGroupIdentifier extends string
 >(
   mutationConfig: RxResourceByIdConfig<
     MutationState,
@@ -56,8 +44,6 @@ export function rxMutationById<
     MutationGroupIdentifier
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -69,8 +55,6 @@ export function rxMutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1
 >(
   mutationConfig: RxResourceByIdConfig<
@@ -80,16 +64,12 @@ export function rxMutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -101,8 +81,6 @@ export function rxMutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2
 >(
@@ -113,16 +91,12 @@ export function rxMutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -130,8 +104,6 @@ export function rxMutationById<
     Insertions1
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -143,8 +115,6 @@ export function rxMutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3
@@ -156,16 +126,12 @@ export function rxMutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -173,8 +139,6 @@ export function rxMutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -182,8 +146,6 @@ export function rxMutationById<
     Insertions1 & Insertions2
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -195,8 +157,6 @@ export function rxMutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -209,16 +169,12 @@ export function rxMutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -226,8 +182,6 @@ export function rxMutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -235,8 +189,6 @@ export function rxMutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -244,8 +196,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -257,8 +207,6 @@ export function rxMutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -272,16 +220,12 @@ export function rxMutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -289,8 +233,6 @@ export function rxMutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -298,8 +240,6 @@ export function rxMutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -307,8 +247,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3
   >,
   insertions5: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -316,8 +254,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -329,8 +265,6 @@ export function rxMutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -345,16 +279,12 @@ export function rxMutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -362,8 +292,6 @@ export function rxMutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -371,8 +299,6 @@ export function rxMutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -380,8 +306,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3
   >,
   insertions5: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -389,8 +313,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4
   >,
   insertions6: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -398,8 +320,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4 & Insertions5
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -416,8 +336,6 @@ export function rxMutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -433,16 +351,12 @@ export function rxMutationById<
     MutationGroupIdentifier
   >,
   insertions1: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
     Insertions1
   >,
   insertions2: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -450,8 +364,6 @@ export function rxMutationById<
     Insertions1
   >,
   insertions3: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -459,8 +371,6 @@ export function rxMutationById<
     Insertions1 & Insertions2
   >,
   insertions4: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -468,8 +378,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3
   >,
   insertions5: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -477,8 +385,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4
   >,
   insertions6: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -486,8 +392,6 @@ export function rxMutationById<
     Insertions1 & Insertions2 & Insertions3 & Insertions4 & Insertions5
   >,
   insertions7: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     NoInfer<MutationGroupIdentifier>,
@@ -500,8 +404,6 @@ export function rxMutationById<
       Insertions6
   >
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -518,9 +420,7 @@ export function rxMutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+  MutationGroupIdentifier extends string
 >(
   mutationConfig: RxResourceByIdConfig<
     MutationState,
@@ -530,8 +430,6 @@ export function rxMutationById<
   >,
   ...insertions: any[]
 ): RxMutationByIdOutput<
-  StoreInput,
-  Input,
   MutationGroupIdentifier,
   MutationState,
   MutationParams,
@@ -557,8 +455,8 @@ export function rxMutationById<
     params: resourceParamsSrc,
     equalParams: mutationConfig.equalParams ?? 'default',
   });
-  return (store, context) => ({
-    mutationByIdRef: {
+  return {
+    mutationRef: {
       resourceById: mutationResourcesById,
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
         MutationParams | undefined
@@ -566,8 +464,6 @@ export function rxMutationById<
       method: mutationConfig.method,
       insertionsOutputs: (
         insertions as InsertionsByIdFactory<
-          NoInfer<Input>,
-          NoInfer<StoreInput>,
           NoInfer<MutationState>,
           NoInfer<MutationParams>,
           NoInfer<MutationGroupIdentifier>,
@@ -577,8 +473,6 @@ export function rxMutationById<
         return {
           ...acc,
           ...insert({
-            input: context,
-            store,
             resourceById: mutationResourcesById,
             resourceParamsSrc: resourceParamsSrc as WritableSignal<
               NoInfer<MutationParams> | undefined
@@ -596,5 +490,5 @@ export function rxMutationById<
       true,
       NoInfer<MutationGroupIdentifier>
     >,
-  });
+  };
 }

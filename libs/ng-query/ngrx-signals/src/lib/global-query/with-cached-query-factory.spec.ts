@@ -91,7 +91,7 @@ describe('withCachedQueryByIdToPlugFactory', () => {
       const resourceParamsSrc = signal<{ id: number } | undefined>(undefined);
       const resourceRef = resourceById({
         params: resourceParamsSrc,
-        identifier: (request) => request.id,
+        identifier: (request) => '' + request.id,
         loader: ({ params }) =>
           Promise.resolve({ id: params?.id, name: 'Romain' }),
       });
@@ -109,7 +109,7 @@ describe('withCachedQueryByIdToPlugFactory', () => {
           pagination: 1;
         }
       >('user', pluggableConfig, () => ({
-        queryByIdRef: {
+        queryRef: {
           resourceById: resourceRef,
           resourceParamsSrc: resourceParamsSrc,
           insertionsOutputs: {
@@ -146,6 +146,9 @@ describe('withCachedQueryByIdToPlugFactory', () => {
             {
               id: number;
               name: string;
+            },
+            {
+              id: number;
             }
           > & {
             pagination: 1;

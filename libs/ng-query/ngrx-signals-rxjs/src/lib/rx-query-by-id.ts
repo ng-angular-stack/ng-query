@@ -1,4 +1,3 @@
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { signal, WritableSignal } from '@angular/core';
 import { rxResourceById } from './rx-resource-by-id';
 import { RxResourceByIdConfig } from './types/rx-resource-by-id-config.type';
@@ -6,24 +5,18 @@ import {
   __INTERNAL_QueryBrand,
   InsertionsByIdFactory,
   InternalType,
-  PublicSignalStore,
   QueryByIdRef,
 } from '@ng-query/ngrx-signals';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 type RxQueryByIdOutput<
-  StoreInput extends PublicSignalStore<Input>,
-  Input extends SignalStoreFeatureResult,
   QueryGroupIdentifier extends string,
   QueryState extends object | undefined,
   QueryParams,
   InsertionsOutput,
   QueryArgsParams
-> = (
-  store: StoreInput,
-  context: Input
-) => {
-  queryByIdRef: QueryByIdRef<
+> = {
+  queryRef: QueryByIdRef<
     NoInfer<QueryGroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
@@ -44,8 +37,6 @@ export function rxQueryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2
 >(
@@ -59,16 +50,12 @@ export function rxQueryById<
     'method'
   >,
   insert1?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
     InsertionsOutput1
   >,
   insert2?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -76,8 +63,6 @@ export function rxQueryById<
     InsertionsOutput1
   >
 ): RxQueryByIdOutput<
-  StoreInput,
-  Input,
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
@@ -89,8 +74,6 @@ export function rxQueryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3
@@ -105,16 +88,12 @@ export function rxQueryById<
     'method'
   >,
   insert1?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
     InsertionsOutput1
   >,
   insert2?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -122,8 +101,6 @@ export function rxQueryById<
     InsertionsOutput1
   >,
   insert3?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -131,8 +108,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2
   >
 ): RxQueryByIdOutput<
-  StoreInput,
-  Input,
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
@@ -144,8 +119,6 @@ export function rxQueryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -161,16 +134,12 @@ export function rxQueryById<
     'method'
   >,
   insert1?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
     InsertionsOutput1
   >,
   insert2?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -178,8 +147,6 @@ export function rxQueryById<
     InsertionsOutput1
   >,
   insert3?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -187,8 +154,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2
   >,
   insert4?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -196,8 +161,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >
 ): RxQueryByIdOutput<
-  StoreInput,
-  Input,
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
@@ -209,8 +172,6 @@ export function rxQueryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -227,16 +188,12 @@ export function rxQueryById<
     'method'
   >,
   insert1?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
     InsertionsOutput1
   >,
   insert2?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -244,8 +201,6 @@ export function rxQueryById<
     InsertionsOutput1
   >,
   insert3?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -253,8 +208,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2
   >,
   insert4?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -262,8 +215,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >,
   insert5?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -274,8 +225,6 @@ export function rxQueryById<
       InsertionsOutput4
   >
 ): RxQueryByIdOutput<
-  StoreInput,
-  Input,
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
@@ -291,8 +240,6 @@ export function rxQueryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -310,16 +257,12 @@ export function rxQueryById<
     'method'
   >,
   insert1?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
     InsertionsOutput1
   >,
   insert2?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -327,8 +270,6 @@ export function rxQueryById<
     InsertionsOutput1
   >,
   insert3?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -336,8 +277,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2
   >,
   insert4?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -345,8 +284,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >,
   insert5?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -357,8 +294,6 @@ export function rxQueryById<
       InsertionsOutput4
   >,
   insert6?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -370,8 +305,6 @@ export function rxQueryById<
       InsertionsOutput5
   >
 ): RxQueryByIdOutput<
-  StoreInput,
-  Input,
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
@@ -388,8 +321,6 @@ export function rxQueryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -408,16 +339,12 @@ export function rxQueryById<
     'method'
   >,
   insert1?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
     InsertionsOutput1
   >,
   insert2?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -425,8 +352,6 @@ export function rxQueryById<
     InsertionsOutput1
   >,
   insert3?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -434,8 +359,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2
   >,
   insert4?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -443,8 +366,6 @@ export function rxQueryById<
     InsertionsOutput1 & InsertionsOutput2 & InsertionsOutput3
   >,
   insert5?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -455,8 +376,6 @@ export function rxQueryById<
       InsertionsOutput4
   >,
   insert6?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -468,8 +387,6 @@ export function rxQueryById<
       InsertionsOutput5
   >,
   insert7?: InsertionsByIdFactory<
-    NoInfer<Input>,
-    NoInfer<StoreInput>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     NoInfer<QueryGroupIdentifier>,
@@ -482,8 +399,6 @@ export function rxQueryById<
       InsertionsOutput6
   >
 ): RxQueryByIdOutput<
-  StoreInput,
-  Input,
   QueryGroupIdentifier,
   QueryState,
   QueryParams,
@@ -500,9 +415,7 @@ export function rxQueryById<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  QueryGroupIdentifier extends string,
-  Input extends SignalStoreFeatureResult,
-  const StoreInput extends PublicSignalStore<Input>
+  QueryGroupIdentifier extends string
 >(
   queryConfig: Omit<
     RxResourceByIdConfig<
@@ -514,11 +427,8 @@ export function rxQueryById<
     'method'
   >,
   ...insertions: any[]
-): (
-  store: StoreInput,
-  context: Input
-) => {
-  queryByIdRef: QueryByIdRef<
+): {
+  queryRef: QueryByIdRef<
     NoInfer<QueryGroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
@@ -556,16 +466,14 @@ export function rxQueryById<
     params: resourceParamsSrc,
     equalParams: queryConfig.equalParams ?? 'useIdentifier',
   });
-  return (store, context) => ({
-    queryByIdRef: {
+  return {
+    queryRef: {
       resourceById: queryResourcesById,
       resourceParamsSrc: resourceParamsSrc as WritableSignal<
         QueryParams | undefined
       >,
       insertionsOutputs: (
         insertions as InsertionsByIdFactory<
-          NoInfer<Input>,
-          NoInfer<StoreInput>,
           NoInfer<QueryState>,
           NoInfer<QueryParams>,
           NoInfer<QueryGroupIdentifier>,
@@ -575,8 +483,6 @@ export function rxQueryById<
         return {
           ...acc,
           ...insert({
-            input: context,
-            store,
             resourceById: queryResourcesById,
             resourceParamsSrc: resourceParamsSrc as WritableSignal<
               NoInfer<QueryParams> | undefined
@@ -595,5 +501,5 @@ export function rxQueryById<
       NoInfer<QueryGroupIdentifier>
     >,
     [__INTERNAL_QueryBrand]: true,
-  });
+  };
 }

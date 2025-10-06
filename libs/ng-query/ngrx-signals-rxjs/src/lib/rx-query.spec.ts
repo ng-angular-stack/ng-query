@@ -20,7 +20,7 @@ type User = {
 describe('rxQuery', () => {
   it('1- should accept signal param as source', () => {
     TestBed.runInInjectionContext(() => {
-      const queryRef = rxQuery({
+      const query = rxQuery({
         params: () => '5',
         stream: ({ params }) => {
           return of({
@@ -30,8 +30,8 @@ describe('rxQuery', () => {
           });
         },
       });
-      expect(queryRef).toBeDefined();
-      const queryResult = queryRef({} as any, {} as any);
+      expect(query).toBeDefined();
+      const queryResult = query;
       expect(queryResult.queryRef).toBeDefined();
       expect(queryResult.queryRef.resource).toBeDefined();
       expect(queryResult.queryRef.resourceParamsSrc).toBeDefined();
@@ -52,7 +52,7 @@ describe('rxQuery', () => {
         },
       });
       expect(queryRef).toBeDefined();
-      const queryResult = queryRef({} as any, {} as any);
+      const queryResult = queryRef;
       expect(queryResult.queryRef).toBeDefined();
       expect(queryResult.queryRef.resource).toBeDefined();
       expect(queryResult.queryRef.resourceParamsSrc).toBeDefined();

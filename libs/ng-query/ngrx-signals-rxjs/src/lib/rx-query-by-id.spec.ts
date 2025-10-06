@@ -20,11 +20,11 @@ describe('rxResourceById', () => {
         stream: ({ params }) => {
           return of(params);
         },
-      })({} as any, {} as any);
+      });
       expect(queryConfig).toBeDefined();
-      expect(queryConfig.queryByIdRef.resourceById()).toEqual({});
-      expect(queryConfig.queryByIdRef.resourceParamsSrc).toBeDefined();
-      expect(queryConfig.queryByIdRef.resourceParamsSrc()).toEqual({ id: '1' });
+      expect(queryConfig.queryRef.resourceById()).toEqual({});
+      expect(queryConfig.queryRef.resourceParamsSrc).toBeDefined();
+      expect(queryConfig.queryRef.resourceParamsSrc()).toEqual({ id: '1' });
 
       type ExpectTypeTObeGroupedQuery = Expect<
         Equal<
@@ -53,10 +53,10 @@ describe('rxResourceById', () => {
         stream: ({ params }) => {
           return of(params);
         },
-      })({} as any, {} as any);
+      });
       expect(queryConfig).toBeDefined();
-      expect(queryConfig.queryByIdRef.resourceById()).toEqual({});
-      expect(queryConfig.queryByIdRef.resourceParamsSrc).toBeDefined();
+      expect(queryConfig.queryRef.resourceById()).toEqual({});
+      expect(queryConfig.queryRef.resourceParamsSrc).toBeDefined();
 
       type ExpectTypeTObeGroupedQuery = Expect<
         Equal<
@@ -96,7 +96,7 @@ describe('rxResourceById', () => {
       );
       type ExpectTypeWithInsertions = Expect<
         Equal<
-          ReturnType<typeof result>['queryByIdRef']['insertionsOutputs'],
+          (typeof result)['queryRef']['insertionsOutputs'],
           {
             pagination: number;
           }
@@ -112,7 +112,7 @@ describe('rxResourceById', () => {
       const source = signal({ page: 1, pageSize: 10 });
       const result = rxQueryById({
         params: source,
-        identifier: (params) => params.page,
+        identifier: (params) => '' + params.page,
         stream: ({ params }) => {
           return of({
             id: '' + params.page,
@@ -120,8 +120,8 @@ describe('rxResourceById', () => {
             email: 'test@a.com',
           } satisfies User).pipe(delay(2000));
         },
-      })({} as any, {} as any);
-      expect(result.queryByIdRef).toBeDefined();
+      });
+      expect(result.queryRef).toBeDefined();
 
       await vi.runAllTimersAsync();
 
@@ -129,8 +129,8 @@ describe('rxResourceById', () => {
 
       await vi.runAllTimersAsync();
 
-      const resource1 = result.queryByIdRef.resourceById()[1];
-      const resource2 = result.queryByIdRef.resourceById()[2];
+      const resource1 = result.queryRef.resourceById()[1];
+      const resource2 = result.queryRef.resourceById()[2];
 
       await vi.runAllTimersAsync();
       expect(resource1?.status()).toEqual('resolved');

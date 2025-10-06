@@ -182,11 +182,8 @@ export function withQueryById<
   queryFactory: (
     store: StoreInput,
     injector: Injector
-  ) => (
-    store: StoreInput,
-    context: Input
   ) => {
-    queryByIdRef: QueryByIdRef<
+    queryRef: QueryByIdRef<
       NoInfer<GroupIdentifier>,
       NoInfer<ResourceState>,
       NoInfer<ResourceParams>,
@@ -229,11 +226,10 @@ export function withQueryById<
         const queryConfigData = queryFactory(
           store as unknown as StoreInput,
           _injector
-        )(store as unknown as StoreInput, context as unknown as Input);
+        );
 
-        const resourceParamsSrc =
-          queryConfigData.queryByIdRef.resourceParamsSrc;
-        const queryResourcesById = queryConfigData.queryByIdRef.resourceById;
+        const resourceParamsSrc = queryConfigData.queryRef.resourceParamsSrc;
+        const queryResourcesById = queryConfigData.queryRef.resourceById;
         const queryOptions = optionsFactory?.(store as unknown as StoreInput);
 
         const associatedClientStates = Object.entries(
@@ -283,7 +279,7 @@ export function withQueryById<
         return {
           [`${resourceName}QueryById`]: Object.assign(
             queryResourcesById,
-            queryConfigData.queryByIdRef.insertionsOutputs ?? {}
+            queryConfigData.queryRef.insertionsOutputs ?? {}
           ),
           ...(associatedClientStates.length && {
             [`_${resourceName}EffectById`]: effect(() => {

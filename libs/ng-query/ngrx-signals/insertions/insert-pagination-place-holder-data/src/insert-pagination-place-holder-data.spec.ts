@@ -1,4 +1,4 @@
-import { ResourceStatus, signal, Signal } from '@angular/core';
+import { computed, ResourceStatus, signal, Signal } from '@angular/core';
 import { insertPaginationPlaceholderData } from './insert-pagination-place-holder-data';
 import { TestBed } from '@angular/core/testing';
 import { globalQueries, queryById, QueryByIdRef } from '../../../src';
@@ -6,7 +6,7 @@ import { globalQueries, queryById, QueryByIdRef } from '../../../src';
 describe('insertPaginationPlaceholderData', () => {
   it('should return the data of the currentPage', () => {
     TestBed.runInInjectionContext(() => {
-      const result = queryById(
+      const finalResult = queryById(
         {
           params: () => ({
             id: '1',
@@ -21,9 +21,8 @@ describe('insertPaginationPlaceholderData', () => {
         },
         insertPaginationPlaceholderData
       );
-      const finalResult = result({} as any, {} as any);
 
-      expectTypeOf(finalResult.queryByIdRef).toEqualTypeOf<
+      expectTypeOf(finalResult.queryRef).toEqualTypeOf<
         QueryByIdRef<
           string,
           NoInfer<{
@@ -47,7 +46,7 @@ describe('insertPaginationPlaceholderData', () => {
         >
       >();
       expect(
-        finalResult.queryByIdRef.insertionsOutputs.currentPageData
+        finalResult.queryRef.insertionsOutputs.currentPageData
       ).toBeDefined();
     });
   });
@@ -71,7 +70,7 @@ describe('insertPaginationPlaceholderData', () => {
                       },
                     ]);
                   },
-                  identifier: (params) => params,
+                  identifier: (params) => '' + params,
                 },
                 insertPaginationPlaceholderData
               ),
@@ -82,6 +81,7 @@ describe('insertPaginationPlaceholderData', () => {
 
       expect(userQuery.currentPageData()).toEqual(undefined);
       await vi.advanceTimersByTimeAsync(15000);
+      console.log('userQuery.currentPageData()', userQuery.currentPageData());
       expect(userQuery.currentPageData()).toEqual([{ name: 'User1' }]);
       pagination.set(2);
       await vi.advanceTimersByTimeAsync(5000);

@@ -4,7 +4,6 @@ Ajout des tests manquants en même temps
 
 - improve insertObservablesOutputs to help to know when a resource if removed/created.... (maybe using groupBy)
 - finir de gérer le github/discord
--
 - example pokemon
 - // Todo backlog: add reset pagination that remove all the other page ?
 - hide internal type from the props store

@@ -62,7 +62,7 @@ export function withCachedQueryToPlugFactory<
           ) as SignalWrapperParams<PlugData>;
           querySourceProxy.$set(source);
         }
-        return () => queryRef(injector);
+        return queryRef(injector);
       },
       options
     );
@@ -81,7 +81,7 @@ export function withCachedQueryByIdToPlugFactory<
   name: QueryName,
   querySourceProxy: SignalProxy<PlugData, true>,
   queryByIdRef: (injector: Injector) => {
-    queryByIdRef: QueryByIdRef<
+    queryRef: QueryByIdRef<
       GroupIdentifier,
       QueryState,
       QueryParams,
@@ -126,7 +126,7 @@ export function withCachedQueryByIdToPlugFactory<
           ) as SignalWrapperParams<PlugData>;
           querySourceProxy.$set(source);
         }
-        return () => queryByIdRef(injector);
+        return queryByIdRef(injector);
       },
       options
     );

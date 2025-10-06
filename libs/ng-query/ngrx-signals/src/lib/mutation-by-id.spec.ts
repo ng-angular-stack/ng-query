@@ -34,7 +34,7 @@ describe('mutationById', () => {
         },
         identifier: (params) => params,
       });
-      type mutationByIdFn__types = ReturnType<typeof mutationByIdFn>['__types'];
+      type mutationByIdFn__types = (typeof mutationByIdFn)['__types'];
 
       type ExpectMutationByFnTypesToBeRetrieved = Expect<
         Equal<
@@ -214,7 +214,7 @@ describe('mutationById', () => {
       const source = signal({ page: 1, pageSize: 10 });
       const result = mutationById({
         params: source,
-        identifier: (params) => params.page,
+        identifier: (params) => '' + params.page,
         loader: async ({ params }) => {
           await wait(2000);
           return {
@@ -223,15 +223,15 @@ describe('mutationById', () => {
             email: 'test@a.com',
           };
         },
-      })({} as any, {} as any);
-      expect(result.mutationByIdRef).toBeDefined();
+      });
+      expect(result.mutationRef).toBeDefined();
 
       await vi.runAllTimersAsync();
       source.set({ page: 2, pageSize: 10 });
       await vi.runAllTimersAsync();
 
-      const resource1 = result.mutationByIdRef.resourceById()[1];
-      const resource2 = result.mutationByIdRef.resourceById()[2];
+      const resource1 = result.mutationRef.resourceById()[1];
+      const resource2 = result.mutationRef.resourceById()[2];
 
       expect(resource1?.status()).toEqual('resolved');
       expect(resource2?.status()).toEqual('resolved');

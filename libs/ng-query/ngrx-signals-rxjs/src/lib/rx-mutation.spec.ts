@@ -25,7 +25,7 @@ describe('rxMutation', () => {
         },
       });
       expect(mutationRef).toBeDefined();
-      const mutationResult = mutationRef({} as any, {} as any);
+      const mutationResult = mutationRef;
       expect(mutationResult.mutationRef).toBeDefined();
       expect(mutationResult.mutationRef.resource).toBeDefined();
       expect(mutationResult.mutationRef.resourceParamsSrc).toBeDefined();
@@ -46,7 +46,7 @@ describe('rxMutation', () => {
         },
       });
       expect(mutationRef).toBeDefined();
-      const mutationResult = mutationRef({} as any, {} as any);
+      const mutationResult = mutationRef;
       expect(mutationResult.mutationRef).toBeDefined();
       expect(mutationResult.mutationRef.resource).toBeDefined();
       expect(mutationResult.mutationRef.resourceParamsSrc).toBeDefined();
@@ -69,7 +69,7 @@ describe('rxMutation', () => {
         },
       });
       expect(mutationRef).toBeDefined();
-      const mutationResult = mutationRef({} as any, {} as any);
+      const mutationResult = mutationRef;
       expect(mutationResult.mutationRef).toBeDefined();
       expect(mutationResult.mutationRef.resource).toBeDefined();
       expect(mutationResult.mutationRef.resourceParamsSrc).toBeDefined();
