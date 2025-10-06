@@ -55,7 +55,7 @@ type SpecificUseMutationByIdOutputs<
         GroupIdentifier
       >;
     };
-  }; // todo check if the types are preserved
+  };
   __query: {};
 };
 
