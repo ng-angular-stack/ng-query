@@ -62,6 +62,11 @@ type ToServerStateOutputs<
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<Outputs>;
 };
 
+type ServerStateOptions<Name> = {
+  providedIn?: 'root' | 'scoped' | 'platform';
+  name?: Name;
+};
+
 type MergeContexts<C extends ContextConstraints[]> = C extends [
   infer First,
   ...infer Rest
@@ -83,41 +88,6 @@ type MergeTwoContexts<
   __query: A['__query'] & B['__query'];
 };
 
-type ServerStateOptions<Name> = {
-  providedIn?: 'root' | 'scoped' | 'platform';
-  name?: Name;
-};
-
-export function serverState<
-  outputs1 extends ContextConstraints,
-  const Name extends string = ''
->(
-  factory1: ServerStateFactory<[EmptyContext], outputs1>
-): ToServerStateOutputs<[outputs1], Name>;
-export function serverState<
-  outputs1 extends ContextConstraints,
-  const Name extends string = ''
->(
-  factory1: ServerStateFactory<[EmptyContext], outputs1>
-  // options?: ServerStateOptions<Name>
-): ToServerStateOutputs<[outputs1], Name>;
-export function serverState<
-  outputs1 extends ContextConstraints,
-  outputs2 extends ContextConstraints,
-  const Name extends string = ''
->(
-  factory1: ServerStateFactory<[EmptyContext], outputs1>,
-  factory2: ServerStateFactory<[outputs1], outputs2>
-): ToServerStateOutputs<[outputs1, outputs2], Name>;
-export function serverState<
-  outputs1 extends ContextConstraints,
-  outputs2 extends ContextConstraints,
-  const Name extends string = ''
->(
-  factory1: ServerStateFactory<[EmptyContext], outputs1>,
-  factory2: ServerStateFactory<[outputs1], outputs2>
-  // options?: ServerStateOptions<Name>
-): ToServerStateOutputs<[outputs1, outputs2], Name>;
 export function serverState<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
@@ -126,9 +96,25 @@ export function serverState<
 >(
   factory1: ServerStateFactory<[EmptyContext], outputs1>,
   factory2: ServerStateFactory<[outputs1], outputs2>,
-  factory3: ServerStateFactory<[outputs2], outputs3>
-  // options?: ServerStateOptions<Name>
+  factory3: ServerStateFactory<[outputs2], outputs3>,
+  options?: ServerStateOptions<Name>
 ): ToServerStateOutputs<[outputs1, outputs2, outputs3], Name>;
+export function serverState<
+  outputs1 extends ContextConstraints,
+  outputs2 extends ContextConstraints,
+  const Name extends string = ''
+>(
+  factory1: ServerStateFactory<[EmptyContext], outputs1>,
+  factory2: ServerStateFactory<[outputs1], outputs2>,
+  options?: ServerStateOptions<Name>
+): ToServerStateOutputs<[outputs1, outputs2], Name>;
+export function serverState<
+  outputs1 extends ContextConstraints,
+  const Name extends string = ''
+>(
+  factory1: ServerStateFactory<[EmptyContext], outputs1>,
+  options?: ServerStateOptions<Name>
+): ToServerStateOutputs<[outputs1], Name>;
 export function serverState(
   ...data: any[]
 ): ToServerStateOutputs<EmptyContext[], string> {

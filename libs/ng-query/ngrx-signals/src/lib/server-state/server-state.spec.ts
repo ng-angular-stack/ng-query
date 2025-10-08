@@ -103,24 +103,25 @@ describe('serverState', () => {
           }
         )
       );
+      const state = injectServerState();
       await vi.runAllTimersAsync();
-      expect(q).toBeDefined();
-      expect(q.testQuery.value).toBeDefined();
-      expect(q.testQuery.value()).toEqual({ id: 3, name: 'test' });
+      expect(state).toBeDefined();
+      expect(state.testQuery.value).toBeDefined();
+      expect(state.testQuery.value()).toEqual({ id: 3, name: 'test' });
 
-      q.mutateSave({ id: 3, name: 'testMutated' });
+      state.mutateSave({ id: 3, name: 'testMutated' });
       await vi.runAllTimersAsync();
-      expect(q.testQuery.value()).toEqual({ id: 3, name: 'testMutated' });
+      expect(state.testQuery.value()).toEqual({ id: 3, name: 'testMutated' });
 
-      q.mutateSave({ id: 3, name: 'error' });
+      state.mutateSave({ id: 3, name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
-      expect(q.testQuery.status()).toEqual('reloading');
+      expect(state.testQuery.status()).toEqual('reloading');
     });
   });
 
   it('should enable declaring useMutationById and useQuery', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const q = serverState(
+      const { injectServerState } = serverState(
         usingMutationById(
           'save',
           mutationById({
@@ -157,6 +158,7 @@ describe('serverState', () => {
           }
         )
       );
+      const q = injectServerState();
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
       expect(q.testQuery.value).toBeDefined();
@@ -174,7 +176,7 @@ describe('serverState', () => {
 
   it('should enable declaring useMutationById and usingQueryById', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const q = serverState(
+      const { injectServerState } = serverState(
         usingMutationById(
           'save',
           mutationById({
@@ -212,6 +214,7 @@ describe('serverState', () => {
           }
         )
       );
+      const q = injectServerState();
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
       expect(q.testQueryById()['3']?.value).toBeDefined();
