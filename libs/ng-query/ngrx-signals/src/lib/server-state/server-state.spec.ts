@@ -8,6 +8,7 @@ import { mutationById } from '../mutation-by-id';
 import { usingMutationById } from './using-mutation-by-id';
 import { usingQueryById } from './using-query-by-id';
 import { queryById } from '../query-by-id';
+import { inject } from '@angular/core';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -19,7 +20,7 @@ describe('serverState', () => {
 
   it('should enable creating queries and mutations', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const q = serverState(
+      const { injectServerState } = serverState(
         usingMutation(
           'save',
           mutation({
@@ -42,22 +43,32 @@ describe('serverState', () => {
         )
       );
       await vi.runAllTimersAsync();
-      expect(q).toBeDefined();
-      expect(q.testQuery.value).toBeDefined();
-      expect(q.testQuery.value()).toEqual({ id: 5, name: 'test' });
-      expect(q.test2Query.value).toBeDefined();
-      expect(q.test2Query.value()).toEqual({ id: 3, name: 'test2' });
+      const testServerState = injectServerState();
+      expect(testServerState).toBeDefined();
+      expect(testServerState.testQuery.value).toBeDefined();
+      expect(testServerState.testQuery.value()).toEqual({
+        id: 5,
+        name: 'test',
+      });
+      expect(testServerState.test2Query.value).toBeDefined();
+      expect(testServerState.test2Query.value()).toEqual({
+        id: 3,
+        name: 'test2',
+      });
 
-      expect(q.mutateSave).toBeDefined();
-      q.mutateSave({ id: 3, name: 'test' });
+      expect(testServerState.mutateSave).toBeDefined();
+      testServerState.mutateSave({ id: 3, name: 'test' });
       await vi.runAllTimersAsync();
-      expect(q.saveMutation.value()).toEqual({ id: 3, name: 'test' });
+      expect(testServerState.saveMutation.value()).toEqual({
+        id: 3,
+        name: 'test',
+      });
     });
   });
 
   it('a query can react to a mutation change', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const q = serverState(
+      const { injectServerState } = serverState(
         usingMutation(
           'save',
           mutation({
@@ -80,6 +91,7 @@ describe('serverState', () => {
             },
           }),
           {
+            testOn: {},
             on: {
               saveMutation: {
                 optimisticUpdate: ({ mutationParams }) => mutationParams,
@@ -215,6 +227,118 @@ describe('serverState', () => {
       q.mutateSaveById({ id: '3', name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
       expect(q.testQueryById()['3']?.status()).toEqual('reloading');
+    });
+  });
+});
+
+describe('serverState options', () => {
+  it('should provide the store in the root injector when providedIn is "root"', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { injectUserServerState } = serverState(
+        usingMutation(
+          'save',
+          mutation({
+            method: (data: { id: number; name: string }) => data,
+            loader: async ({ params }) => params,
+          })
+        ),
+        usingQuery(
+          'test',
+          query({
+            params: () => 5,
+            loader: async ({ params: id }) => ({ id, name: 'test' }),
+          })
+        ),
+        usingQuery('test2', () =>
+          query({
+            params: () => 3,
+            loader: async ({ params: id }) => ({ id, name: 'test2' }),
+          })
+        ),
+        {
+          name: 'user',
+        }
+      );
+      const userServerState = injectUserServerState();
+      // todo fix exposed functions
+      await vi.runAllTimersAsync();
+      expect(userServerState).toBeDefined();
+      expect(userServerState.testQuery.value).toBeDefined();
+      expect(userServerState.testQuery.value()).toEqual({
+        id: 5,
+        name: 'test',
+      });
+      expect(userServerState.test2Query.value).toBeDefined();
+      expect(userServerState.test2Query.value()).toEqual({
+        id: 3,
+        name: 'test2',
+      });
+
+      expect(userServerState.mutateSave).toBeDefined();
+      userServerState.mutateSave({ id: 3, name: 'test' });
+      await vi.runAllTimersAsync();
+      expect(userServerState.saveMutation.value()).toEqual({
+        id: 3,
+        name: 'test',
+      });
+    });
+  });
+
+  // todo test shared instance
+  it('should provide a shared store  by default', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { injectUserServerState, UserServerState } = serverState(
+        usingMutation(
+          'save',
+          mutation({
+            method: (data: { id: number; name: string }) => data,
+            loader: async ({ params }) => params,
+          })
+        ),
+        usingQuery(
+          'test',
+          query({
+            params: () => 5,
+            loader: async ({ params: id }) => ({ id, name: 'test' }),
+          })
+        ),
+        usingQuery('test2', () =>
+          query({
+            params: () => 3,
+            loader: async ({ params: id }) => ({ id, name: 'test2' }),
+          })
+        ),
+        {
+          name: 'user',
+        }
+      );
+      const userServerState = injectUserServerState();
+      await vi.runAllTimersAsync();
+      expect(userServerState).toBeDefined();
+      expect(userServerState.testQuery.value).toBeDefined();
+      expect(userServerState.testQuery.value()).toEqual({
+        id: 5,
+        name: 'test',
+      });
+      expect(userServerState.test2Query.value).toBeDefined();
+      expect(userServerState.test2Query.value()).toEqual({
+        id: 3,
+        name: 'test2',
+      });
+
+      expect(userServerState.mutateSave).toBeDefined();
+      userServerState.mutateSave({ id: 3, name: 'test' });
+      await vi.runAllTimersAsync();
+      expect(userServerState.saveMutation.value()).toEqual({
+        id: 3,
+        name: 'test',
+      });
+      const sameUserServerState = inject(UserServerState);
+      expect(sameUserServerState.test2Query.value).toBeDefined();
+      expect(userServerState.saveMutation.value()).toEqual({
+        id: 3,
+        name: 'test',
+      });
     });
   });
 });
