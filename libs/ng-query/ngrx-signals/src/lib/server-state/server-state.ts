@@ -43,12 +43,22 @@ type EmptyContext = {
 type ContextInput<Context extends ContextConstraints> = {
   context: Context;
 };
+
+/**
+ * ! Do not use it to generate the output of utilities like (usingQuery, usingMutation, etc..),
+ * ! the context is not correctly inferred (use ServerStateFactoryUtility instead)
+ */
 export type ServerStateFactory<
   Context extends ContextConstraints[],
   ServerStateActionOutputs extends ContextConstraints
 > = (
   contextData: ContextInput<MergeContexts<Context>>
 ) => ServerStateActionOutputs;
+
+export type ServerStateFactoryUtility<
+  Context extends ContextConstraints,
+  ServerStateActionOutputs extends ContextConstraints
+> = (contextData: ContextInput<Context>) => ServerStateActionOutputs;
 
 type ToServerStateOutputs<
   Context extends ContextConstraints[],
@@ -92,11 +102,24 @@ export function serverState<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
   outputs3 extends ContextConstraints,
+  outputs4 extends ContextConstraints,
   const Name extends string = ''
 >(
   factory1: ServerStateFactory<[EmptyContext], outputs1>,
   factory2: ServerStateFactory<[outputs1], outputs2>,
-  factory3: ServerStateFactory<[outputs2], outputs3>,
+  factory3: ServerStateFactory<[outputs1, outputs2], outputs3>,
+  factory4: ServerStateFactory<[outputs1, outputs2, outputs3], outputs4>,
+  options?: ServerStateOptions<Name>
+): ToServerStateOutputs<[outputs1, outputs2, outputs3, outputs4], Name>;
+export function serverState<
+  outputs1 extends ContextConstraints,
+  outputs2 extends ContextConstraints,
+  outputs3 extends ContextConstraints,
+  const Name extends string = ''
+>(
+  factory1: ServerStateFactory<[EmptyContext], outputs1>,
+  factory2: ServerStateFactory<[outputs1], outputs2>,
+  factory3: ServerStateFactory<[outputs1, outputs2], outputs3>,
   options?: ServerStateOptions<Name>
 ): ToServerStateOutputs<[outputs1, outputs2, outputs3], Name>;
 export function serverState<

@@ -1,5 +1,5 @@
 import { InternalType, MergeObject } from '../types/util.type';
-import { ContextConstraints, ServerStateFactory } from './server-state';
+import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { ResourceRef } from '@angular/core';
 import { MutationRef } from '../with-mutation';
 
@@ -49,8 +49,8 @@ type UseMutationOutputs<
   InsertionsOutputs,
   ResourceParams,
   ResourceArgsParams
-> = ServerStateFactory<
-  [Context],
+> = ServerStateFactoryUtility<
+  Context,
   SpecificUseMutationOutputs<
     ResourceName,
     ResourceState,

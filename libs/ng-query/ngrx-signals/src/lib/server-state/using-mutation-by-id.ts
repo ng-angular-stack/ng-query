@@ -119,7 +119,7 @@ export function usingMutationById<
           ResourceState,
           ResourceParams,
           ResourceArgsParams,
-          false,
+          true,
           GroupIdentifier
         >;
       })

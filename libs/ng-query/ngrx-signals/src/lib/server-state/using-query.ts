@@ -8,7 +8,7 @@ import { InternalType, MergeObject } from '../types/util.type';
 import {
   ContextConstraints,
   MutationDictionary,
-  ServerStateFactory,
+  ServerStateFactoryUtility,
 } from './server-state';
 import { QueryRef } from '../with-query';
 import {
@@ -30,6 +30,7 @@ type QueryOptions<
   ResourceArgsParams,
   OtherProperties
 > = {
+  testOn?: Context['__mutation'] extends infer Mutations ? Mutations : never;
   on?: Context['__mutation'] extends infer Mutations
     ? {
         [key in keyof Mutations as `${key &
@@ -78,9 +79,9 @@ type QueryOptions<
 type SpecificUseQueryOutputs<
   ResourceName extends string,
   ResourceState extends object | undefined,
-  InsertionsOutputs,
   ResourceParams,
-  ResourceArgsParams
+  ResourceArgsParams,
+  InsertionsOutputs
 > = {
   props: {
     [key in `${ResourceName & string}Query`]: MergeObject<
@@ -111,17 +112,17 @@ type UseQueryOutputs<
   Context extends ContextConstraints,
   ResourceName extends string,
   ResourceState extends object | undefined,
-  InsertionsOutputs,
   ResourceParams,
-  ResourceArgsParams
-> = ServerStateFactory<
-  [Context],
+  ResourceArgsParams,
+  InsertionsOutputs
+> = ServerStateFactoryUtility<
+  Context,
   SpecificUseQueryOutputs<
     ResourceName,
     ResourceState,
-    InsertionsOutputs,
     ResourceParams,
-    ResourceArgsParams
+    ResourceArgsParams,
+    InsertionsOutputs
   >
 >;
 
@@ -163,7 +164,7 @@ export function usingQuery<
         >;
       }),
   queryOptions?: QueryOptions<
-    Context,
+    NoInfer<Context>,
     ResourceState,
     ResourceParams,
     ResourceArgsParams,
@@ -173,9 +174,9 @@ export function usingQuery<
   Context,
   ResourceName,
   ResourceState,
-  InsertionsOutputs,
   ResourceParams,
-  ResourceArgsParams
+  ResourceArgsParams,
+  InsertionsOutputs
 > {
   const _injector = inject(Injector);
   const queryResult =
@@ -216,9 +217,9 @@ export function usingQuery<
     } as SpecificUseQueryOutputs<
       ResourceName,
       ResourceState,
-      InsertionsOutputs,
       ResourceParams,
-      ResourceArgsParams
+      ResourceArgsParams,
+      InsertionsOutputs
     >;
   };
 }

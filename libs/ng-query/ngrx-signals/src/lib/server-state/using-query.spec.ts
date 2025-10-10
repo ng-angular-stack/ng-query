@@ -11,7 +11,11 @@ import { TestBed } from '@angular/core/testing';
 import { expectTypeOf, vi } from 'vitest';
 import { usingQuery } from './using-query';
 import { query } from '../query';
-import { serverState } from './server-state';
+import { serverState, ServerStateFactory } from './server-state';
+import { usingMutation } from './using-mutation';
+import { usingMutationById } from './using-mutation-by-id';
+import { mutation } from '../mutation';
+import { mutationById } from '../mutation-by-id';
 
 type User = {
   id: string;
@@ -27,7 +31,7 @@ describe('usingQuery', () => {
     vi.restoreAllMocks();
   });
   it('1- Should expose a query resource', () => {
-    const Store = serverState(
+    const { ServerState } = serverState(
       usingQuery('user', () =>
         query({
           params: () => '5',
@@ -43,15 +47,15 @@ describe('usingQuery', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     expect(store.userQuery).toBeDefined();
   });
 
   it('2- should have idle state when query params are undefined', () => {
-    const Store = serverState(
+    const { ServerState } = serverState(
       usingQuery('user', () =>
         query({
           params: () => undefined,
@@ -67,15 +71,15 @@ describe('usingQuery', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     expect(store.userQuery.status()).toBe('idle');
   });
 
   it('3 should have loading state when query params are defined', () => {
-    const Store = serverState(
+    const { ServerState } = serverState(
       usingQuery('user', () =>
         query({
           params: () => '5',
@@ -92,15 +96,15 @@ describe('usingQuery', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     expect(store.userQuery.status()).toBe('loading');
   });
 
   it('4 should have resolved status when loader completes successfully', async () => {
-    const Store = serverState(
+    const { ServerState } = serverState(
       usingQuery('user', () =>
         query({
           params: () => '5',
@@ -117,9 +121,9 @@ describe('usingQuery', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     expect(store.userQuery.value()).toEqual(undefined);
 
@@ -135,7 +139,7 @@ describe('usingQuery', () => {
   });
 
   it('5 should handle query with resource stream', async () => {
-    const Store = serverState(
+    const { ServerState } = serverState(
       usingQuery('user', () =>
         query({
           params: () => '5',
@@ -171,9 +175,9 @@ describe('usingQuery', () => {
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     expect(store.userQuery.value()).toEqual(undefined);
     expect(store.userQuery.status()).toEqual('loading');
@@ -190,59 +194,9 @@ describe('usingQuery', () => {
       count: 6,
     });
   });
-
-  it('6 should update associated query states', async () => {
-    const newUser = {
-      id: '5',
-      name: 'John Doe',
-      email: 'test@a.com',
-    };
-    const Store = serverState(
-      withState({
-        user: undefined as User | undefined,
-        userSelected: undefined as { id: string } | undefined,
-      }),
-      usingQuery(
-        'user',
-        () =>
-          query({
-            params: () => '5',
-            loader: async ({ params }) => {
-              await wait(10000);
-              console.log('newUser', newUser);
-              return newUser;
-            },
-          }),
-        () => ({
-          associatedClientState: {
-            user: true,
-            userSelected: ({ queryResource }) => {
-              type _ExpectQueryResourceToBeTyped = Expect<
-                Equal<typeof queryResource, ResourceRef<User>>
-              >;
-              return {
-                id: queryResource.value().id,
-              };
-            },
-          },
-        })
-      )
-    );
-    TestBed.configureTestingModule({
-      providers: [Store],
-    });
-    const store = TestBed.inject(Store);
-
-    await vi.runAllTimersAsync();
-    expect(store.userQuery.status()).toEqual('resolved');
-    expect(store.user()).toEqual(newUser);
-    expect(store.userSelected()).toEqual({
-      id: newUser.id,
-    });
-  });
 });
 
-describe('Declarative server state, usingQuery and withMutation', () => {
+describe('Declarative server state, usingQuery and usingMutation', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -250,8 +204,8 @@ describe('Declarative server state, usingQuery and withMutation', () => {
     vi.restoreAllMocks();
   });
   it('1- usingQuery should handle optimistic updates', async () => {
-    const Store = serverState(
-      withMutation('userEmail', () =>
+    const { ServerState } = serverState(
+      usingMutation('userEmail', () =>
         mutation({
           method: ({ id, email }: { id: string; email: string }) => ({
             id,
@@ -282,7 +236,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               };
             },
           }),
-        () => ({
+        {
           on: {
             userEmailMutation: {
               optimisticUpdate: ({ queryResource, mutationParams }) => {
@@ -293,14 +247,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
@@ -315,8 +269,8 @@ describe('Declarative server state, usingQuery and withMutation', () => {
   });
 
   it('2- usingQuery should reload on mutation error', async () => {
-    const Store = serverState(
-      withMutation('userEmail', () =>
+    const { ServerState } = serverState(
+      usingMutation('userEmail', () =>
         mutation({
           method: ({ id, email }: { id: string; email: string }) => ({
             id,
@@ -349,7 +303,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               };
             },
           }),
-        () => ({
+        {
           on: {
             userEmailMutation: {
               reload: {
@@ -357,14 +311,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
@@ -378,8 +332,8 @@ describe('Declarative server state, usingQuery and withMutation', () => {
     expect(store.userQuery.status()).toBe('reloading');
   });
   it('3- usingQuery should reload on mutation error if mutation params id is "error"', async () => {
-    const Store = serverState(
-      withMutation('userEmail', () =>
+    const { ServerState } = serverState(
+      usingMutation('userEmail', () =>
         mutation({
           method: ({ id, email }: { id: string; email: string }) => ({
             id,
@@ -416,7 +370,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               };
             },
           }),
-        () => ({
+        {
           on: {
             userEmailMutation: {
               reload: {
@@ -425,14 +379,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
@@ -459,8 +413,8 @@ describe('Declarative server state, usingQuery and withMutation', () => {
   });
 
   it('4- usingQuery should handle optimisticPatch', async () => {
-    const Store = serverState(
-      withMutation('userEmail', () =>
+    const { ServerState } = serverState(
+      usingMutation('userEmail', () =>
         mutation({
           method: ({ id, email }: { id: string; email: string }) => ({
             id,
@@ -489,7 +443,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               };
             },
           }),
-        () => ({
+        {
           on: {
             userEmailMutation: {
               optimisticPatch: {
@@ -500,14 +454,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
@@ -522,18 +476,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
     expect(store.userQuery.value().email).toBe('mutated@test.com');
   });
 
-  it('5- Should handle withMutationById reactions effect', async () => {
+  it('5- Should handle usingMutationById reactions effect', async () => {
     const returnedUser = (id: string) => ({
       id: `${id}`,
       name: 'John Doe',
       email: 'test@a.com',
     });
-    const Store = serverState(
-      withState({
-        usersFetched: [] as User[],
-        lastUserFetched: undefined as User | undefined,
-      }),
-      withMutationById('user', () =>
+    const { ServerState } = serverState(
+      usingMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -555,7 +505,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               return returnedUser(params);
             },
           }),
-        () => ({
+        {
           on: {
             userMutationById: {
               filter: ({ mutationIdentifier, queryResource }) =>
@@ -568,19 +518,19 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [ServerState, ApplicationRef],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
     const userQuery = store.userQuery;
     await vi.runAllTimersAsync();
     expect(userQuery?.value()).toEqual(returnedUser('5'));
     const userQuery5ReloadSpy = vi.spyOn(userQuery!, 'reload');
-    store.mutateUser({
+    store.mutateUserById({
       id: '5',
       name: 'Updated User',
       email: 'updated.doe@example.com',
@@ -592,8 +542,8 @@ describe('Declarative server state, usingQuery and withMutation', () => {
   });
 
   it('6- usingQuery should handle updates', async () => {
-    const Store = serverState(
-      withMutation('userEmail', () =>
+    const { ServerState } = serverState(
+      usingMutation('userEmail', () =>
         mutation({
           method: ({ id, email }: { id: string; email: string }) => ({
             id,
@@ -624,7 +574,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               };
             },
           }),
-        () => ({
+        {
           on: {
             userEmailMutation: {
               update: ({ queryResource, mutationParams }) => {
@@ -636,14 +586,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
@@ -657,8 +607,8 @@ describe('Declarative server state, usingQuery and withMutation', () => {
     expect(store.userQuery.value().email).toBe('mutated@test.com');
   });
   it('7- usingQuery should handle patch', async () => {
-    const Store = serverState(
-      withMutation('userEmail', () =>
+    const { ServerState } = serverState(
+      usingMutation('userEmail', () =>
         mutation({
           method: ({ id, email }: { id: string; email: string }) => ({
             id,
@@ -687,7 +637,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               };
             },
           }),
-        () => ({
+        {
           on: {
             userEmailMutation: {
               patch: {
@@ -698,14 +648,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store],
+      providers: [ServerState],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
 
     await vi.runAllTimersAsync();
     expect(store.userQuery.status()).toBe('resolved');
@@ -718,18 +668,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
     expect(store.userQuery.status()).toBe('local');
     expect(store.userQuery.value().email).toBe('mutated@test.com');
   });
-  it('8- Should handle withMutationById update', async () => {
+  it('8- Should handle usingMutationById update', async () => {
     const returnedUser = (id: string) => ({
       id: `${id}`,
       name: 'John Doe',
       email: 'test@a.com',
     });
-    const Store = serverState(
-      withState({
-        usersFetched: [] as User[],
-        lastUserFetched: undefined as User | undefined,
-      }),
-      withMutationById('user', () =>
+    const { ServerState } = serverState(
+      usingMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -751,7 +697,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               return returnedUser(params);
             },
           }),
-        () => ({
+        {
           on: {
             userMutationById: {
               filter: ({ mutationIdentifier, queryResource }) =>
@@ -766,18 +712,18 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [ServerState, ApplicationRef],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
     const userQuery = store.userQuery;
     await vi.runAllTimersAsync();
     expect(userQuery?.value()).toEqual(returnedUser('5'));
-    store.mutateUser({
+    store.mutateUserById({
       id: '5',
       name: 'Updated User',
       email: 'updated.doe@example.com',
@@ -791,18 +737,14 @@ describe('Declarative server state, usingQuery and withMutation', () => {
     });
     vi.restoreAllMocks();
   });
-  it('9- Should handle withMutationById patch', async () => {
+  it('9- Should handle usingMutationById patch', async () => {
     const returnedUser = (id: string) => ({
       id: `${id}`,
       name: 'John Doe',
       email: 'test@a.com',
     });
-    const Store = serverState(
-      withState({
-        usersFetched: [] as User[],
-        lastUserFetched: undefined as User | undefined,
-      }),
-      withMutationById('user', () =>
+    const { ServerState } = serverState(
+      usingMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -824,7 +766,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               return returnedUser(params);
             },
           }),
-        () => ({
+        {
           on: {
             userMutationById: {
               filter: ({ mutationIdentifier, queryResource }) =>
@@ -836,18 +778,18 @@ describe('Declarative server state, usingQuery and withMutation', () => {
               },
             },
           },
-        })
+        }
       )
     );
 
     TestBed.configureTestingModule({
-      providers: [Store, ApplicationRef],
+      providers: [ServerState, ApplicationRef],
     });
-    const store = TestBed.inject(Store);
+    const store = TestBed.inject(ServerState);
     const userQuery = store.userQuery;
     await vi.runAllTimersAsync();
     expect(userQuery?.value()).toEqual(returnedUser('5'));
-    store.mutateUser({
+    store.mutateUserById({
       id: '5',
       name: 'Updated User',
       email: 'updated.doe@example.com',
@@ -863,10 +805,7 @@ describe('Declarative server state, usingQuery and withMutation', () => {
   });
 
   it('should accept an Insertions output, that appear in the store', () => {
-    const Store = serverState(
-      {
-        providedIn: 'root',
-      },
+    const { ServerState } = serverState(
       usingQuery('user', () =>
         query(
           {
@@ -888,10 +827,13 @@ describe('Declarative server state, usingQuery and withMutation', () => {
             };
           }
         )
-      )
+      ),
+      {
+        providedIn: 'root',
+      }
     );
     TestBed.runInInjectionContext(() => {
-      const store = inject(Store);
+      const store = inject(ServerState);
       expectTypeOf(store.userQuery.pagination).toEqualTypeOf<{
         page: number;
       }>();
@@ -903,8 +845,8 @@ describe('Declarative server state, usingQuery and withMutation', () => {
 // Typing test👇
 
 type InferServerStateFeatureReturnedType<
-  T extends ServerStateFeature<any, any>
-> = T extends ServerStateFeature<any, infer R> ? R : never;
+  T extends ServerStateFactory<[any], any>
+> = T extends ServerStateFactory<any, infer R> ? R : never;
 
 describe('usingQuery typing', () => {
   it('Should be well typed', () => {
@@ -924,7 +866,7 @@ describe('usingQuery typing', () => {
     type PropsKeys = keyof ResultType['props'];
 
     type _ExpectTheResourceNameAndQueriesTypeRecord = Expect<
-      Equal<PropsKeys, 'userQuery' | '__query'>
+      Equal<PropsKeys, 'userQuery'>
     >;
 
     type _ExpectThePropsToHaveARecordWithResourceRef = Expect<
@@ -933,136 +875,23 @@ describe('usingQuery typing', () => {
 
     type _ExpectThePropsToHaveARecordusingQueryNameAndHistype = Expect<
       Equal<
-        ResultType['props']['__query'],
+        ResultType['props'],
         {
-          user: {
-            state: User;
-            params: string;
-            args: unknown;
-            isGroupedResource: false;
-            groupIdentifier: unknown;
-          };
+          userQuery: ResourceRef<
+            NoInfer<{
+              id: string;
+              name: string;
+              email: string;
+            }>
+          >;
         }
       >
     >;
-    // todo check if it can be merged
-
-    const multiplesusingQuery = serverStateFeature(
-      withState({
-        userSelected: {
-          id: '5',
-        },
-        user: undefined as User | undefined,
-        test: 3,
-      }),
-      usingQuery(
-        'userDetails',
-        (store) =>
-          query({
-            params: store.userSelected,
-            loader: async ({ params }) => {
-              type _ExpectParamsToBeTyped = Expect<
-                Equal<
-                  typeof params,
-                  {
-                    id: string;
-                  }
-                >
-              >;
-              return <User>{
-                id: 'params.id',
-                name: 'John Doe',
-                email: 'test@a.com',
-              };
-            },
-          }),
-        () => ({
-          associatedClientState: {
-            user: true,
-            'userSelected.id': (queryResource) => '5',
-          },
-        })
-      ),
-      usingQuery('users', (store) =>
-        query({
-          params: () => '5',
-          loader: async ({ params }) => {
-            return [
-              {
-                id: params,
-                name: 'John Doe',
-                email: 'test@a.com',
-              },
-            ] satisfies User[];
-          },
-        })
-      )
-    );
-
-    type ResultTypeMultiplesQuery = InferServerStateFeatureReturnedType<
-      typeof multiplesusingQuery
-    >;
-
-    type _ExpectThePropsToHaveARecordWithMultipleQueryNameAndHistype = Expect<
-      Equal<
-        keyof ResultTypeMultiplesQuery['props']['__query'],
-        'userDetails' | 'users'
-      >
-    >;
-  });
-
-  it('clientStatePath option should infer serverState state path', () => {
-    const _queryByIdTest = serverState(
-      withState({
-        pagination: {
-          page: 1,
-          pageSize: 10,
-          filters: {
-            search: '',
-            sort: '',
-            order: 'asc',
-          },
-        },
-        selectedUserId: undefined,
-        user: undefined as User | undefined,
-      }),
-      usingQuery(
-        'userQuery',
-        () =>
-          query({
-            params: () => ({
-              id: '5',
-            }),
-            loader: async () => {
-              return <Omit<User, 'id'>>{
-                name: 'John Doe',
-                email: 'test@a.com',
-              };
-            },
-          }),
-        () => ({
-          associatedClientState: {
-            user: ({ queryParams, queryResource }) => {
-              type _ExpectQueryParamsToBeTyped = Expect<
-                Equal<typeof queryParams, { id: string }>
-              >;
-              type _ExpectQueryResourceToBeTyped = Expect<
-                Equal<typeof queryResource, ResourceRef<Omit<User, 'id'>>>
-              >;
-              return {
-                id: queryParams.id,
-                ...queryResource.value(),
-              };
-            },
-          },
-        })
-      )
-    );
   });
 
   it('Should react to mutation changes', async () => {
-    const _Store = serverState(
-      withMutation('userName', () =>
+    const { injectServerState } = serverState(
+      usingMutation('userName', () =>
         mutation({
           method: (id: string) => ({ id }),
           loader: async ({ params }) => {
@@ -1074,7 +903,7 @@ describe('usingQuery typing', () => {
           },
         })
       ),
-      withMutation('userEmail', () =>
+      usingMutation('userEmail', () =>
         mutation({
           method: (id: string) => ({ id }),
           loader: async ({ params }) => {
@@ -1082,7 +911,21 @@ describe('usingQuery typing', () => {
               id: params.id,
               name: 'Updated Name',
               email: 'er@d',
-            } satisfies User;
+              lol: 5,
+            } satisfies User & { lol: number };
+          },
+        })
+      ),
+      usingMutation('userTest', () =>
+        mutation({
+          method: (id: string) => ({ id }),
+          loader: async ({ params }) => {
+            return {
+              id: params.id,
+              name: 'Updated Name',
+              email: 'er@d',
+              lol: 5,
+            } satisfies User & { lol: number };
           },
         })
       ),
@@ -1099,7 +942,7 @@ describe('usingQuery typing', () => {
               } satisfies User;
             },
           }),
-        () => ({
+        {
           on: {
             userNameMutation: {
               optimisticUpdate: ({
@@ -1162,9 +1005,13 @@ describe('usingQuery typing', () => {
               },
             },
           },
-        })
+        }
       )
     );
+    const result = injectServerState();
+    result.mutateUserEmail('newEmail');
+    result.mutateUserName('newName');
+    result.mutateUserTest('newName');
   });
 });
 
