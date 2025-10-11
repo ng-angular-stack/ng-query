@@ -1,5 +1,4 @@
 import { Expect, Equal } from 'test-type';
-import { withState } from '@ngrx/signals';
 import {
   ApplicationRef,
   inject,

@@ -76,7 +76,7 @@ type QueryOptions<
   [key in keyof OtherProperties]: OtherProperties[key];
 };
 
-type SpecificUseQueryOutputs<
+type SpecificUsingQueryOutputs<
   ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -90,6 +90,7 @@ type SpecificUseQueryOutputs<
     >;
   };
   methods: {};
+  inputs: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryRef<
@@ -117,7 +118,7 @@ type UseQueryOutputs<
   InsertionsOutputs
 > = ServerStateFactoryUtility<
   Context,
-  SpecificUseQueryOutputs<
+  SpecificUsingQueryOutputs<
     ResourceName,
     ResourceState,
     ResourceParams,
@@ -150,7 +151,7 @@ export function usingQuery<
           false
         >;
       }
-    | (() => {
+    | ((inputs: Context['inputs']) => {
         queryRef: QueryRef<
           NoInfer<ResourceState>,
           NoInfer<ResourceParams>,
@@ -179,16 +180,19 @@ export function usingQuery<
   InsertionsOutputs
 > {
   const _injector = inject(Injector);
-  const queryResult =
-    typeof queryFactory === 'function' ? queryFactory() : queryFactory;
-  const {
-    queryRef: { resource: queryResource, insertionsOutputs },
-  } = queryResult;
-  const mutationsConfigEffect = Object.entries(
-    (queryOptions?.on ?? {}) as Record<string, QueryDeclarativeEffect<any>>
-  );
 
   return (contextData) => {
+    const queryResult =
+      typeof queryFactory === 'function'
+        ? queryFactory(contextData.context.inputs)
+        : queryFactory;
+    const {
+      queryRef: { resource: queryResource, insertionsOutputs },
+    } = queryResult;
+    const mutationsConfigEffect = Object.entries(
+      (queryOptions?.on ?? {}) as Record<string, QueryDeclarativeEffect<any>>
+    );
+
     handleQueryMutationsReactions<
       Context,
       ResourceName,
@@ -213,8 +217,9 @@ export function usingQuery<
         [resourceName as ResourceName]: queryResult,
       },
       __mutation: {},
+      inputs: {},
       methods: {},
-    } as SpecificUseQueryOutputs<
+    } as SpecificUsingQueryOutputs<
       ResourceName,
       ResourceState,
       ResourceParams,

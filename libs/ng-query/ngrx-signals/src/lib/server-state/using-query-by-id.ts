@@ -4,42 +4,24 @@ import {
   inject,
   Injector,
   linkedSignal,
-  ResourceRef,
-  Signal,
   untracked,
   WritableSignal,
 } from '@angular/core';
-import {
-  patchState,
-  Prettify,
-  SignalStoreFeature,
-  signalStoreFeature,
-  SignalStoreFeatureResult,
-  withProps,
-  WritableStateSource,
-} from '@ngrx/signals';
+
 import {
   QueryDeclarativeEffect,
   setAllUpdatesFromMutationOnQueryValue,
   triggerQueryReloadOnMutationStatusChange,
   setAllPatchFromMutationOnQueryValue,
 } from '../core/query.core';
-import { createNestedStateUpdate } from '../core/update-state.util';
 import { ResourceByIdRef } from '../resource-by-id';
-import {
-  BooleanOrMapperFnByPathById,
-  AssociatedStateMapperFnById,
-} from '../types/boolean-or-mapper-fn-by-path-by-id.type';
-import { PublicSignalStore } from '../types/shared.type';
 import { nestedEffect } from '../types/util';
 import { MergeObject, InternalType } from '../types/util.type';
 import {
   ContextConstraints,
   MutationDictionary,
-  ServerStateFactory,
+  ServerStateFactoryUtility,
 } from './server-state';
-import { MutationByIdRef } from '../with-mutation-by-id';
-import { MutationRef } from '../with-mutation';
 
 export type QueryByIdRef<
   GroupIdentifier extends string,
@@ -67,6 +49,7 @@ type SpecificUsingQueryOutputs<
     >;
   };
   methods: {};
+  inputs: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryByIdRef<
@@ -95,8 +78,8 @@ type UsingQueryOutputs<
   ResourceArgsParams,
   GroupIdentifier extends string,
   InsertionsOutputs
-> = ServerStateFactory<
-  [Context],
+> = ServerStateFactoryUtility<
+  Context,
   SpecificUsingQueryOutputs<
     GroupIdentifier,
     ResourceName,

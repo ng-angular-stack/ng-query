@@ -4,7 +4,8 @@ import { QueryRef } from '../with-query';
 import { InternalType } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
-import { inject, InjectionToken } from '@angular/core';
+import { inject, InjectionToken, signal } from '@angular/core';
+import { createSignalProxy } from '../signal-proxy';
 
 export type MutationDictionary = Record<
   string,
@@ -29,6 +30,7 @@ export type QueryDictionary = Record<
 export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>;
+  inputs: {};
   __mutation: {};
   __query: {};
 };
@@ -36,6 +38,7 @@ export type ContextConstraints = {
 type EmptyContext = {
   props: {};
   methods: Record<string, Function>;
+  inputs: {};
   __mutation: {};
   __query: {};
 };
@@ -65,9 +68,12 @@ type ToServerStateOutputs<
   Name extends string,
   Outputs = Prettify<
     MergeContexts<Context>['props'] & MergeContexts<Context>['methods']
-  >
+  >,
+  InputsToPlugin = MergeContexts<Context>['inputs']
 > = {
-  [key in `inject${Capitalize<Name>}ServerState`]: () => Outputs;
+  [key in `inject${Capitalize<Name>}ServerState`]: keyof InputsToPlugin extends never
+    ? () => Outputs
+    : (inputs: Partial<InputsToPlugin>) => Outputs;
 } & {
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<Outputs>;
 };
@@ -94,6 +100,7 @@ type MergeTwoContexts<
 > = {
   methods: A['methods'] & B['methods'];
   props: A['props'] & B['props'];
+  inputs: A['inputs'] & B['inputs'];
   __mutation: A['__mutation'] & B['__mutation'];
   __query: A['__query'] & B['__query'];
 };
@@ -141,7 +148,9 @@ export function serverState<
 export function serverState(
   ...data: any[]
 ): ToServerStateOutputs<EmptyContext[], string> {
-  const [factories, optionsOrFactory] = data;
+  const factories = data.slice(0, -1);
+  const optionsOrFactory = data.at(-1);
+
   const isLastFactory = typeof optionsOrFactory === 'function';
 
   const options = isLastFactory
@@ -149,23 +158,47 @@ export function serverState(
     : (optionsOrFactory as ServerStateOptions<any> | undefined);
   const providedIn =
     options?.providedIn === 'scoped' ? null : options?.providedIn ?? 'root';
+  const pluggableInputs = createSignalProxy(signal({}));
   const token = new InjectionToken('ServerStateStore', {
     providedIn,
     factory: () => {
       const { propsAndMethods } = [
         ...factories,
         ...(isLastFactory ? [optionsOrFactory] : []),
-      ].reduce((acc, factory) => {
-        const result = factory({ context: acc.context });
-        return {
-          context: { ...acc.context, ...result },
-          propsAndMethods: {
-            ...acc.propsAndMethods,
-            ...result.props,
-            ...result.methods,
-          },
-        };
-      }, {} as { context: EmptyContext; propsAndMethods: {} });
+      ].reduce(
+        (acc, factory) => {
+          const result = factory({
+            context: { ...acc.context, inputs: pluggableInputs },
+          });
+          Object.entries(result.inputs).forEach(([key, value]) => {
+            const hasValue = pluggableInputs.$ref(key as never);
+            if (!hasValue) {
+              pluggableInputs.$patch({ [key]: value } as any);
+            }
+          });
+          return {
+            context: { ...acc.context, ...result, pluggableInputs },
+            propsAndMethods: {
+              ...acc.propsAndMethods,
+              ...result.props,
+              ...result.methods,
+            },
+          };
+        },
+        {
+          context: {
+            props: {},
+            methods: {},
+            inputs: {}, // passing pluggableInputs here seems to not works
+            __mutation: {},
+            __query: {},
+          } as EmptyContext,
+          propsAndMethods: {},
+        } as {
+          context: EmptyContext;
+          propsAndMethods: {};
+        }
+      );
       return propsAndMethods;
     },
   });
@@ -175,7 +208,12 @@ export function serverState(
     : '';
   const injectNameServerState = `inject${capitalizedName}ServerState`;
   return {
-    [injectNameServerState]: () => inject(token),
+    [injectNameServerState]: (inputs: unknown) => {
+      if (inputs) {
+        pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
+      }
+      return inject(token);
+    },
     [`${capitalizedName}ServerState`]: token,
   } as ToServerStateOutputs<EmptyContext[], string>;
 }

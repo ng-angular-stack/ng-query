@@ -23,6 +23,7 @@ type SpecificUseMutationOutputs<
         ) => void;
       }
     : {};
+  inputs: {};
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationRef<
@@ -138,6 +139,7 @@ export function usingMutation<
         [resourceName as ResourceName]: mutationResult,
       },
       __query: {},
+      inputs: {},
       methods: method
         ? {
             [`mutate${capitalizedMutationName}`]: (data: any) => {

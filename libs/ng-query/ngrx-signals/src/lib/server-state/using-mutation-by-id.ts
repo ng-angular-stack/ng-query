@@ -1,5 +1,5 @@
 import { InternalType, MergeObject } from '../types/util.type';
-import { ContextConstraints, ServerStateFactory } from './server-state';
+import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { ResourceByIdRef } from '../resource-by-id';
 
@@ -38,6 +38,7 @@ type SpecificUseMutationByIdOutputs<
         ) => void;
       }
     : {};
+  inputs: {};
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationByIdRef<
@@ -67,8 +68,8 @@ type UsingMutationOutputs<
   ResourceParams,
   ResourceArgsParams,
   GroupIdentifier extends string
-> = ServerStateFactory<
-  [Context],
+> = ServerStateFactoryUtility<
+  Context,
   SpecificUseMutationByIdOutputs<
     ResourceName,
     ResourceState,
@@ -159,6 +160,7 @@ export function usingMutationById<
       __mutation: {
         [resourceName as ResourceName]: mutationResult,
       },
+      inputs: {},
       __query: {},
       methods: method
         ? {

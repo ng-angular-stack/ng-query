@@ -34,6 +34,9 @@ export type SignalProxy<
         /** Replace the whole object */
         $set(next: SignalWrapperParams<T>): void;
 
+        /** Update the object with partial values */
+        $patch(partial: Partial<SignalWrapperParams<T>>): void;
+
         /** Get the raw property (Signal or plain value) from the current object */
         $ref<K extends keyof T>(key: K): T[K];
       }
@@ -56,6 +59,16 @@ export function createSignalProxy<T extends AnyRecord>(
         (state as any).set(next);
       } else {
         (state as any)(next);
+      }
+    },
+    $patch(partial: Partial<T>) {
+      // Merge partial with current state
+      const current = state();
+      const updated = { ...current, ...partial };
+      if ((state as any).set) {
+        (state as any).set(updated);
+      } else {
+        (state as any)(updated);
       }
     },
     $ref<K extends keyof T>(key: K): T[K] {

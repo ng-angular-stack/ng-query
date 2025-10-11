@@ -91,7 +91,6 @@ describe('serverState', () => {
             },
           }),
           {
-            testOn: {},
             on: {
               saveMutation: {
                 optimisticUpdate: ({ mutationParams }) => mutationParams,
