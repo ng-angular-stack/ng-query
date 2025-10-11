@@ -8,7 +8,7 @@ import { mutationById } from '../mutation-by-id';
 import { usingMutationById } from './using-mutation-by-id';
 import { usingQueryById } from './using-query-by-id';
 import { queryById } from '../query-by-id';
-import { inject } from '@angular/core';
+import { inject, Injector } from '@angular/core';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -42,8 +42,9 @@ describe('serverState', () => {
           })
         )
       );
-      await vi.runAllTimersAsync();
       const testServerState = injectServerState();
+
+      await vi.runAllTimersAsync();
       expect(testServerState).toBeDefined();
       expect(testServerState.testQuery.value).toBeDefined();
       expect(testServerState.testQuery.value()).toEqual({
@@ -325,6 +326,7 @@ describe('serverState options', () => {
         }
       );
       const userServerState = injectUserServerState();
+      const sameUserServerState = inject(UserServerState);
       await vi.runAllTimersAsync();
       expect(userServerState).toBeDefined();
       expect(userServerState.testQuery.value).toBeDefined();
@@ -345,7 +347,7 @@ describe('serverState options', () => {
         id: 3,
         name: 'test',
       });
-      const sameUserServerState = inject(UserServerState);
+
       expect(sameUserServerState.test2Query.value).toBeDefined();
       expect(userServerState.saveMutation.value()).toEqual({
         id: 3,
