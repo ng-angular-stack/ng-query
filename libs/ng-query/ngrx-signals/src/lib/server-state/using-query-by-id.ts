@@ -262,6 +262,7 @@ export function usingQueryById<
           InsertionsOutputs
         >,
       },
+      inputs: {},
       __query: {
         [resourceName as ResourceName]: queryResult,
       },

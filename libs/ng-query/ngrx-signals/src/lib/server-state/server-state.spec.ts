@@ -165,7 +165,7 @@ describe('serverState', () => {
 
       q.mutateSaveById({ id: '3', name: 'testMutated' });
       await vi.runAllTimersAsync();
-      expect(q.testQuery.value()).toEqual({ id: 3, name: 'testMutated' });
+      expect(q.testQuery.value()).toEqual({ id: '3', name: 'testMutated' });
 
       q.mutateSaveById({ id: '3', name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
@@ -217,12 +217,15 @@ describe('serverState', () => {
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
       expect(q.testQueryById()['3']?.value).toBeDefined();
-      expect(q.testQueryById()['3']?.value()).toEqual({ id: 3, name: 'test' });
+      expect(q.testQueryById()['3']?.value()).toEqual({
+        id: '3',
+        name: 'test',
+      });
 
       q.mutateSaveById({ id: '3', name: 'testMutated' });
       await vi.runAllTimersAsync();
       expect(q.testQueryById()['3']?.value()).toEqual({
-        id: 3,
+        id: '3',
         name: 'testMutated',
       });
 
@@ -234,6 +237,13 @@ describe('serverState', () => {
 });
 
 describe('serverState options', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   it('should provide the store in the root injector when providedIn is "root"', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectUserServerState } = serverState(

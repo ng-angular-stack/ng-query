@@ -4,7 +4,12 @@ import { QueryRef } from '../with-query';
 import { InternalType } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
-import { inject, InjectionToken, signal } from '@angular/core';
+import {
+  assertInInjectionContext,
+  inject,
+  InjectionToken,
+  signal,
+} from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
 
 export type MutationDictionary = Record<
@@ -209,6 +214,7 @@ export function serverState(
   const injectNameServerState = `inject${capitalizedName}ServerState`;
   return {
     [injectNameServerState]: (inputs: unknown) => {
+      assertInInjectionContext(serverState);
       if (inputs) {
         pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
       }
