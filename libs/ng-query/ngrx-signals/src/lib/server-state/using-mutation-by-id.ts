@@ -91,39 +91,24 @@ export function usingMutationById<
   OtherProperties // maybe add options only for this ?
 >(
   resourceName: ResourceName,
-  mutationFactory:
-    | {
-        mutationRef: MutationByIdRef<
-          NoInfer<GroupIdentifier>,
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          NoInfer<ResourceArgsParams>,
-          InsertionsOutputs
-        >;
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          true,
-          GroupIdentifier
-        >;
-      }
-    | (() => {
-        mutationRef: MutationByIdRef<
-          NoInfer<GroupIdentifier>,
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          NoInfer<ResourceArgsParams>,
-          InsertionsOutputs
-        >;
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          true,
-          GroupIdentifier
-        >;
-      })
+  mutationFactory: (inputs: Context['inputs']) => {
+    // ! avoid to get the MutationRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
+    // That why it is always wrapped in a function
+    mutationRef: MutationByIdRef<
+      NoInfer<GroupIdentifier>,
+      NoInfer<ResourceState>,
+      NoInfer<ResourceParams>,
+      NoInfer<ResourceArgsParams>,
+      InsertionsOutputs
+    >;
+    __types: InternalType<
+      ResourceState,
+      ResourceParams,
+      ResourceArgsParams,
+      true,
+      GroupIdentifier
+    >;
+  }
 ): UsingMutationOutputs<
   Context,
   ResourceName,
@@ -133,11 +118,8 @@ export function usingMutationById<
   ResourceArgsParams,
   GroupIdentifier
 > {
-  return (context) => {
-    const mutationResult =
-      typeof mutationFactory === 'function'
-        ? mutationFactory()
-        : mutationFactory;
+  return (contextData) => {
+    const mutationResult = mutationFactory(contextData.context.inputs);
     const {
       mutationRef: {
         resourceById: mutationResource,

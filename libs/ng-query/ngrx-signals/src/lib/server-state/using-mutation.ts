@@ -71,35 +71,22 @@ export function usingMutation<
   OtherProperties
 >(
   resourceName: ResourceName,
-  mutationFactory:
-    | {
-        mutationRef: MutationRef<
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          NoInfer<ResourceArgsParams>,
-          InsertionsOutputs
-        >;
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          false
-        >;
-      }
-    | (() => {
-        mutationRef: MutationRef<
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          NoInfer<ResourceArgsParams>,
-          InsertionsOutputs
-        >;
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          false
-        >;
-      })
+  mutationFactory: (inputs: Context['inputs']) => {
+    // ! avoid to get the MutationRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
+    // That why it is always wrapped in a function
+    mutationRef: MutationRef<
+      NoInfer<ResourceState>,
+      NoInfer<ResourceParams>,
+      NoInfer<ResourceArgsParams>,
+      InsertionsOutputs
+    >;
+    __types: InternalType<
+      ResourceState,
+      ResourceParams,
+      ResourceArgsParams,
+      false
+    >;
+  }
 ): UseMutationOutputs<
   Context,
   ResourceName,
@@ -108,11 +95,8 @@ export function usingMutation<
   ResourceParams,
   ResourceArgsParams
 > {
-  return (context) => {
-    const mutationResult =
-      typeof mutationFactory === 'function'
-        ? mutationFactory()
-        : mutationFactory;
+  return (contextData) => {
+    const mutationResult = mutationFactory(contextData.context.inputs);
     const {
       mutationRef: {
         resource: mutationResource,

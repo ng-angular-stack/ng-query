@@ -8,6 +8,7 @@ import {
   assertInInjectionContext,
   inject,
   InjectionToken,
+  Injector,
   signal,
 } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
@@ -60,13 +61,17 @@ export type ServerStateFactory<
   Context extends ContextConstraints[],
   ServerStateActionOutputs extends ContextConstraints
 > = (
-  contextData: ContextInput<MergeContexts<Context>>
+  contextData: ContextInput<MergeContexts<Context>>,
+  injector: Injector
 ) => ServerStateActionOutputs;
 
 export type ServerStateFactoryUtility<
   Context extends ContextConstraints,
   ServerStateActionOutputs extends ContextConstraints
-> = (contextData: ContextInput<Context>) => ServerStateActionOutputs;
+> = (
+  contextData: ContextInput<Context>,
+  injector: Injector
+) => ServerStateActionOutputs;
 
 type ToServerStateOutputs<
   Context extends ContextConstraints[],
@@ -167,14 +172,19 @@ export function serverState(
   const token = new InjectionToken('ServerStateStore', {
     providedIn,
     factory: () => {
+      const injector = inject(Injector);
+      console.log('test');
       const { propsAndMethods } = [
         ...factories,
         ...(isLastFactory ? [optionsOrFactory] : []),
       ].reduce(
         (acc, factory) => {
-          const result = factory({
-            context: { ...acc.context, inputs: pluggableInputs },
-          });
+          const result = factory(
+            {
+              context: { ...acc.context, inputs: pluggableInputs },
+            },
+            injector
+          );
           Object.entries(result.inputs).forEach(([key, value]) => {
             const hasValue = pluggableInputs.$ref(key as never);
             if (!hasValue) {

@@ -15,6 +15,7 @@
 
 ## Other
 
+- Enable to use `query`, `mutation` in standalone without using `withQuery` or `usingQuery`... (maybe using a symbol to pass the metda data ?)
 - reused the same function/logic in withQuery adn useQuery
 - A Chrome Dev tool to track queries and mutations requests
 - A page that compare Angular TanStackQuery and other solutions with @ng-query

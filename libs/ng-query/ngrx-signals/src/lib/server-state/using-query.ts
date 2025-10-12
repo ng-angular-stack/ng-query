@@ -137,33 +137,21 @@ export function usingQuery<
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory:
-    | {
-        queryRef: QueryRef<
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          InsertionsOutputs
-        >;
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          false
-        >;
-      }
-    | ((inputs: Context['inputs']) => {
-        queryRef: QueryRef<
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          InsertionsOutputs
-        >;
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          false
-        >;
-      }),
+  queryFactory: (inputs: Context['inputs']) => {
+    // ! avoid to get the QueryRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
+    // That why it is always wrapped in a function
+    queryRef: QueryRef<
+      NoInfer<ResourceState>,
+      NoInfer<ResourceParams>,
+      InsertionsOutputs
+    >;
+    __types: InternalType<
+      ResourceState,
+      ResourceParams,
+      ResourceArgsParams,
+      false
+    >;
+  },
   queryOptions?: QueryOptions<
     NoInfer<Context>,
     ResourceState,
@@ -179,13 +167,8 @@ export function usingQuery<
   ResourceArgsParams,
   InsertionsOutputs
 > {
-  const _injector = inject(Injector);
-
-  return (contextData) => {
-    const queryResult =
-      typeof queryFactory === 'function'
-        ? queryFactory(contextData.context.inputs)
-        : queryFactory;
+  return (contextData, injector) => {
+    const queryResult = queryFactory(contextData.context.inputs);
     const {
       queryRef: { resource: queryResource, insertionsOutputs },
     } = queryResult;
@@ -203,7 +186,7 @@ export function usingQuery<
       contextData.context as unknown as Context,
       resourceName,
       queryResource,
-      _injector
+      injector
     );
 
     return {
@@ -245,8 +228,6 @@ function handleQueryMutationsReactions<
     const formattedMutationName = mutationName
       .replace('Mutation', '')
       .replace('ById', '');
-    console.log('context.__mutation', context.__mutation);
-    console.log('mutationName', mutationName);
     const mutationTargeted = (context.__mutation as MutationDictionary)[
       formattedMutationName
     ]?.mutationRef;

@@ -176,39 +176,22 @@ export function usingQueryById<
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory:
-    | ({
-        queryRef: QueryByIdRef<
-          NoInfer<GroupIdentifier>,
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          InsertionsOutputs
-        >;
-      } & {
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          true,
-          GroupIdentifier
-        >;
-      })
-    | (() => {
-        queryRef: QueryByIdRef<
-          NoInfer<GroupIdentifier>,
-          NoInfer<ResourceState>,
-          NoInfer<ResourceParams>,
-          InsertionsOutputs
-        >;
-      } & {
-        __types: InternalType<
-          ResourceState,
-          ResourceParams,
-          ResourceArgsParams,
-          true,
-          GroupIdentifier
-        >;
-      }),
+  queryFactory: (inputs: Context['inputs']) => {
+    queryRef: QueryByIdRef<
+      NoInfer<GroupIdentifier>,
+      NoInfer<ResourceState>,
+      NoInfer<ResourceParams>,
+      InsertionsOutputs
+    >;
+  } & {
+    __types: InternalType<
+      ResourceState,
+      ResourceParams,
+      ResourceArgsParams,
+      true,
+      GroupIdentifier
+    >;
+  },
   queryOptions?: QueryByIdOptions<
     Context,
     ResourceState,
@@ -226,17 +209,14 @@ export function usingQueryById<
   GroupIdentifier,
   InsertionsOutputs
 > {
-  const _injector = inject(Injector);
-  const queryResult =
-    typeof queryFactory === 'function' ? queryFactory() : queryFactory;
-  const {
-    queryRef: { resourceById: queryResourcesById, insertionsOutputs },
-  } = queryResult;
-  const mutationsConfigEffect = Object.entries(
-    (queryOptions?.on ?? {}) as Record<string, QueryDeclarativeEffect<any>>
-  );
-
-  return (contextData) => {
+  return (contextData, injector) => {
+    const queryResult = queryFactory(contextData.context.inputs);
+    const {
+      queryRef: { resourceById: queryResourcesById, insertionsOutputs },
+    } = queryResult;
+    const mutationsConfigEffect = Object.entries(
+      (queryOptions?.on ?? {}) as Record<string, QueryDeclarativeEffect<any>>
+    );
     const context = contextData.context;
 
     handleQueryByIdMutationEffects<
@@ -250,7 +230,7 @@ export function usingQueryById<
       context as unknown as Context,
       resourceName,
       queryResourcesById,
-      _injector
+      injector
     );
     return {
       props: {
