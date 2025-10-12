@@ -181,8 +181,27 @@ export function serverState(
               pluggableInputs.$patch({ [key]: value } as any);
             }
           });
+
           return {
-            context: { ...acc.context, ...result, pluggableInputs },
+            context: {
+              inputs: { ...acc.context.inputs, ...result.inputs }, // not really useful
+              props: {
+                ...acc.context.props,
+                ...result.props,
+              },
+              methods: {
+                ...acc.context.methods,
+                ...result.methods,
+              },
+              __query: {
+                ...acc.context.__query,
+                ...result.__query,
+              },
+              __mutation: {
+                ...acc.context.__mutation,
+                ...result.__mutation,
+              },
+            },
             propsAndMethods: {
               ...acc.propsAndMethods,
               ...result.props,

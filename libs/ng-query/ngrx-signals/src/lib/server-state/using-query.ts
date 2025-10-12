@@ -245,9 +245,13 @@ function handleQueryMutationsReactions<
     const formattedMutationName = mutationName
       .replace('Mutation', '')
       .replace('ById', '');
+    console.log('context.__mutation', context.__mutation);
+    console.log('mutationName', mutationName);
     const mutationTargeted = (context.__mutation as MutationDictionary)[
       formattedMutationName
     ]?.mutationRef;
+    console.log('formattedMutationName', formattedMutationName);
+    console.log('mutationTargeted', mutationTargeted);
     if ('resource' in mutationTargeted) {
       const mutationResource = mutationTargeted.resource;
       return {
