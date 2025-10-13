@@ -1,10 +1,7 @@
 import { effect, ResourceRef, Signal, signal } from '@angular/core';
 import { InsertionByIdParams } from '@ng-query/ngrx-signals';
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 
 export function insertPrefetchNextData<
-  Input extends SignalStoreFeatureResult,
-  StoreInput,
   GroupIdentifier extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -12,8 +9,6 @@ export function insertPrefetchNextData<
 >(
   entries: (
     data: InsertionByIdParams<
-      Input,
-      StoreInput,
       GroupIdentifier,
       ResourceState,
       ResourceParams,
@@ -26,8 +21,6 @@ export function insertPrefetchNextData<
 ) {
   return (
     context: InsertionByIdParams<
-      Input,
-      StoreInput,
       GroupIdentifier,
       ResourceState,
       ResourceParams,

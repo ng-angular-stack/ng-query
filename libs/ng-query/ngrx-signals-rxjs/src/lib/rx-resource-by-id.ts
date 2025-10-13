@@ -130,7 +130,7 @@ export function rxResourceById<
       });
     },
     add: (resourceParams, options?: { defaultValue?: State }) => {
-      const group = identifier(resourceParams);
+      const group = identifier(resourceParams as NonNullable<ResourceParams>);
       if (resourceByGroup()[group]) {
         console.warn(
           `[rxResourceById] - A resource with the id ${group} already exist.`

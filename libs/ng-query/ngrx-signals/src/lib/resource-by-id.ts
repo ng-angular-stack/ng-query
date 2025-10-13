@@ -55,7 +55,7 @@ export type ResourceByIdHandler<
 };
 
 export type Identifier<ResourceParams, GroupIdentifier> = (
-  request: NonNullable<NoInfer<ResourceParams>>
+  request: NonNullable<ResourceParams>
 ) => GroupIdentifier;
 
 export type ResourceByIdRef<
