@@ -147,8 +147,14 @@ export function usingMutationById<
       methods: method
         ? {
             [`mutate${capitalizedMutationName}ById`]: (data: any) => {
-              const params = method(data);
-              resourceParamsSrc.set(params);
+              if (method) {
+                const mutationParamsResult = method(data);
+
+                if (mutationParamsResult) {
+                  mutationResource.add(mutationParamsResult);
+                }
+                resourceParamsSrc.set(mutationParamsResult);
+              }
             },
           }
         : {},
