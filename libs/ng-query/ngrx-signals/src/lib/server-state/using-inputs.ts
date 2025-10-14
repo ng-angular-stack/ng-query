@@ -11,6 +11,9 @@ type SpecificUsingInputsOutputs<Inputs extends {}> = {
   methods: {};
   inputs: Prettify<ToSignalObject<Inputs>>;
   __injections: {};
+  queryParams: {};
+  sources: {};
+  __sources: {};
   __query: {};
   __mutation: {};
 };
@@ -29,6 +32,9 @@ export function usingInputs<
       props: {},
       inputs: inputs,
       __injections: {},
+      queryParams: {},
+      sources: {},
+      __sources: {},
       __query: {},
       __mutation: {},
       methods: {},

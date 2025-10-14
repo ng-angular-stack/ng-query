@@ -38,6 +38,9 @@ export type ContextConstraints = {
   methods: Record<string, Function>;
   inputs: {};
   __injections: {};
+  queryParams: {};
+  sources: {};
+  __sources: {};
   __mutation: {};
   __query: {};
 };
@@ -46,6 +49,9 @@ type EmptyContext = {
   props: {};
   methods: Record<string, Function>;
   inputs: {};
+  queryParams: {};
+  sources: {};
+  __sources: {};
   __injections: {};
   __mutation: {};
   __query: {};
@@ -235,6 +241,9 @@ export function serverState(
             props: {},
             methods: {},
             inputs: {}, // passing pluggableInputs here seems to not works
+            queryParams: {},
+            sources: {},
+            __sources: {},
             __injections: {},
             __mutation: {},
             __query: {},

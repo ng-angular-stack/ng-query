@@ -39,6 +39,9 @@ type SpecificUseMutationByIdOutputs<
       }
     : {};
   inputs: {};
+  queryParams: {};
+  sources: {};
+  __sources: {};
   __injections: {};
   __mutation: {
     [key in ResourceName]: {
@@ -148,6 +151,9 @@ export function usingMutationById<
       },
       inputs: {},
       __injections: {},
+      queryParams: {},
+      sources: {},
+      __sources: {},
       __query: {},
       methods: method
         ? {

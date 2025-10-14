@@ -4,7 +4,7 @@
 
 - A package that does not use the NgRx SignalStore & Server State Store (it will come together)
   - A way for query to be updated by other query result
-- accept number value for identifier
+- ! accept number value for identifier (and params)
 - Infinite pagination/query (the a strategy to invalidate the cache as tanstackQuery does)
 - Why the globalQueries does not propose the autocompletion (I may not do that if I find a better approach with the Server State Store, that will replace it)
 - `fallbackUpdate` to help to set the query state when a mutation failed (useful if their is an optimistic update) (I would like to propose the `lastSuccessfulValue` but it is not simple, because their is cases where multiples mutations can be trigger in parallel).

@@ -51,6 +51,9 @@ type SpecificUsingQueryOutputs<
   methods: {};
   inputs: {};
   __injections: {};
+  queryParams: {};
+  sources: {};
+  __sources: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryByIdRef<
@@ -248,6 +251,9 @@ export function usingQueryById<
       },
       inputs: {},
       __injections: {},
+      queryParams: {},
+      sources: {},
+      __sources: {},
       __query: {
         [resourceName as ResourceName]: queryResult,
       },

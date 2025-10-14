@@ -40,3 +40,4 @@ export { usingMutation } from './lib/server-state/using-mutation';
 export { usingMutationById } from './lib/server-state/using-mutation-by-id';
 export { usingQuery } from './lib/server-state/using-query';
 export { usingQueryById } from './lib/server-state/using-query-by-id';
+export { usingInject } from './lib/server-state/using-inject';

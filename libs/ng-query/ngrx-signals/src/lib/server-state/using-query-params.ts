@@ -11,9 +11,6 @@ type SpecificUsingInjectionsOutputs<Injections extends {}> = {
   props: {};
   methods: {};
   inputs: {};
-  queryParams: {};
-  sources: {};
-  __sources: {};
   __injections: {
     [key in keyof Injections as Uncapitalize<key & string>]: InferProvidedType<
       Injections[key]
@@ -31,9 +28,11 @@ type UsingInputsOutputs<
   SpecificUsingInjectionsOutputs<Injections>
 >;
 
-// todo checker si ok avec les token si valeur bien infer / service / token et générics
+// todo exposer en plus de la fonction pour setLesQueryParams, getCurrentQueryParams,reset ?
+// todo créer un utiliatire usingSources (privé par défaut et possible public) qui permet d'exposer des methodes/event s qui vont servir  a set les queryParams et aussi les états partagés
+// Ca sera des signals qui seront exposés (avantage switchMap/debounce de base)
 
-export function usingInject<
+export function usingQueryParams<
   Context extends ContextConstraints,
   Injections extends {}
 >(
@@ -57,9 +56,6 @@ export function usingInject<
     return {
       props: {},
       inputs: {},
-      queryParams: {},
-      sources: {},
-      __sources: {},
       __injections: injectedInjections,
       __query: {},
       __mutation: {},

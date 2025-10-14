@@ -92,6 +92,9 @@ type SpecificUsingQueryOutputs<
   methods: {};
   inputs: {};
   __injections: {};
+  queryParams: {};
+  sources: {};
+  __sources: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryRef<
@@ -206,6 +209,9 @@ export function usingQuery<
       __mutation: {},
       inputs: {},
       __injections: {},
+      queryParams: {},
+      sources: {},
+      __sources: {},
       methods: {},
     } as SpecificUsingQueryOutputs<
       ResourceName,

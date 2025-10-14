@@ -7,6 +7,7 @@ import {
   globalQueries,
   serverState,
   SignalProxy,
+  usingInject,
   withMutationById,
 } from '@ng-query/ngrx-signals';
 import { rxMutationById, rxQueryById } from '@ng-query/ngrx-signals-rxjs';
@@ -22,7 +23,7 @@ export type User = {
 // todo add persister
 
 const UserListServerStateStore = serverState(
-  withServices(() => ({
+  usingInject(() => ({
     api: inject(ApiService),
   })),
   withState({
