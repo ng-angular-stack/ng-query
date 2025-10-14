@@ -91,6 +91,7 @@ type SpecificUsingQueryOutputs<
   };
   methods: {};
   inputs: {};
+  __injections: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryRef<
@@ -137,7 +138,7 @@ export function usingQuery<
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory: (inputs: Context['inputs']) => {
+  queryFactory: (context: Context['inputs'] & Context['__injections']) => {
     // ! avoid to get the QueryRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
     queryRef: QueryRef<
@@ -168,7 +169,10 @@ export function usingQuery<
   InsertionsOutputs
 > {
   return (contextData, injector) => {
-    const queryResult = queryFactory(contextData.context.inputs);
+    const queryResult = queryFactory({
+      ...contextData.context.inputs,
+      ...contextData.context.__injections,
+    });
     const {
       queryRef: { resource: queryResource, insertionsOutputs },
     } = queryResult;
@@ -201,6 +205,7 @@ export function usingQuery<
       },
       __mutation: {},
       inputs: {},
+      __injections: {},
       methods: {},
     } as SpecificUsingQueryOutputs<
       ResourceName,

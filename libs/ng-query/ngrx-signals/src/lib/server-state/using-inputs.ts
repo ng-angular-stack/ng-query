@@ -6,10 +6,11 @@ type ToSignalObject<T> = {
   [K in keyof T]: Signal<T[K]>;
 };
 
-type SpecificUsingQueryOutputs<Inputs extends {}> = {
+type SpecificUsingInputsOutputs<Inputs extends {}> = {
   props: {};
   methods: {};
   inputs: Prettify<ToSignalObject<Inputs>>;
+  __injections: {};
   __query: {};
   __mutation: {};
 };
@@ -17,7 +18,7 @@ type SpecificUsingQueryOutputs<Inputs extends {}> = {
 type UsingInputsOutputs<
   Context extends ContextConstraints,
   Inputs extends {}
-> = ServerStateFactoryUtility<Context, SpecificUsingQueryOutputs<Inputs>>;
+> = ServerStateFactoryUtility<Context, SpecificUsingInputsOutputs<Inputs>>;
 
 export function usingInputs<
   Context extends ContextConstraints,
@@ -27,9 +28,10 @@ export function usingInputs<
     return {
       props: {},
       inputs: inputs,
+      __injections: {},
       __query: {},
       __mutation: {},
       methods: {},
-    } as SpecificUsingQueryOutputs<Inputs>;
+    } as SpecificUsingInputsOutputs<Inputs>;
   };
 }

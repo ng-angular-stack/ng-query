@@ -39,6 +39,7 @@ type SpecificUseMutationByIdOutputs<
       }
     : {};
   inputs: {};
+  __injections: {};
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationByIdRef<
@@ -91,7 +92,7 @@ export function usingMutationById<
   OtherProperties // maybe add options only for this ?
 >(
   resourceName: ResourceName,
-  mutationFactory: (inputs: Context['inputs']) => {
+  mutationFactory: (context: Context['inputs'] & Context['__injections']) => {
     // ! avoid to get the MutationRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
     mutationRef: MutationByIdRef<
@@ -119,7 +120,10 @@ export function usingMutationById<
   GroupIdentifier
 > {
   return (contextData) => {
-    const mutationResult = mutationFactory(contextData.context.inputs);
+    const mutationResult = mutationFactory({
+      ...contextData.context.inputs,
+      ...contextData.context.__injections,
+    });
     const {
       mutationRef: {
         resourceById: mutationResource,
@@ -143,6 +147,7 @@ export function usingMutationById<
         [resourceName as ResourceName]: mutationResult,
       },
       inputs: {},
+      __injections: {},
       __query: {},
       methods: method
         ? {

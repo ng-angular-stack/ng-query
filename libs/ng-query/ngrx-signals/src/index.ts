@@ -34,3 +34,9 @@ export type {
 } from './lib/resource-by-id';
 export { globalQueries } from './lib/global-query/global-queries';
 export * from './lib/persister/persister.type';
+export { serverState } from './lib/server-state/server-state';
+export { usingInputs } from './lib/server-state/using-inputs';
+export { usingMutation } from './lib/server-state/using-mutation';
+export { usingMutationById } from './lib/server-state/using-mutation-by-id';
+export { usingQuery } from './lib/server-state/using-query';
+export { usingQueryById } from './lib/server-state/using-query-by-id';

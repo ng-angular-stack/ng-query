@@ -37,6 +37,7 @@ export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>;
   inputs: {};
+  __injections: {};
   __mutation: {};
   __query: {};
 };
@@ -45,6 +46,7 @@ type EmptyContext = {
   props: {};
   methods: Record<string, Function>;
   inputs: {};
+  __injections: {};
   __mutation: {};
   __query: {};
 };
@@ -111,6 +113,7 @@ type MergeTwoContexts<
   methods: A['methods'] & B['methods'];
   props: A['props'] & B['props'];
   inputs: A['inputs'] & B['inputs'];
+  __injections: A['__injections'] & B['__injections'];
   __mutation: A['__mutation'] & B['__mutation'];
   __query: A['__query'] & B['__query'];
 };
@@ -159,7 +162,7 @@ export function serverState(
   ...data: any[]
 ): ToServerStateOutputs<EmptyContext[], string> {
   const factories = data.slice(0, -1);
-  const optionsOrFactory = data.at(-1);
+  const [optionsOrFactory] = data.slice(-1);
 
   const isLastFactory = typeof optionsOrFactory === 'function';
 
@@ -179,7 +182,12 @@ export function serverState(
         ...(isLastFactory ? [optionsOrFactory] : []),
       ].reduce(
         (acc, factory) => {
-          const result = factory(
+          const result = (
+            factory as ServerStateFactory<
+              [ContextConstraints],
+              ContextConstraints
+            >
+          )(
             {
               context: { ...acc.context, inputs: pluggableInputs },
             },
@@ -191,10 +199,13 @@ export function serverState(
               pluggableInputs.$patch({ [key]: value } as any);
             }
           });
-
           return {
             context: {
               inputs: { ...acc.context.inputs, ...result.inputs }, // not really useful
+              __injections: {
+                ...acc.context.__injections,
+                ...result.__injections,
+              },
               props: {
                 ...acc.context.props,
                 ...result.props,
@@ -224,6 +235,7 @@ export function serverState(
             props: {},
             methods: {},
             inputs: {}, // passing pluggableInputs here seems to not works
+            __injections: {},
             __mutation: {},
             __query: {},
           } as EmptyContext,

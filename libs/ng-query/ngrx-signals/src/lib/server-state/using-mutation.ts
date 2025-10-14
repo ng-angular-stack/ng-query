@@ -24,6 +24,7 @@ type SpecificUseMutationOutputs<
       }
     : {};
   inputs: {};
+  __injections: {};
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationRef<
@@ -71,7 +72,7 @@ export function usingMutation<
   OtherProperties
 >(
   resourceName: ResourceName,
-  mutationFactory: (inputs: Context['inputs']) => {
+  mutationFactory: (context: Context['inputs'] & Context['__injections']) => {
     // ! avoid to get the MutationRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
     mutationRef: MutationRef<
@@ -96,7 +97,10 @@ export function usingMutation<
   ResourceArgsParams
 > {
   return (contextData) => {
-    const mutationResult = mutationFactory(contextData.context.inputs);
+    const mutationResult = mutationFactory({
+      ...contextData.context.inputs,
+      ...contextData.context.__injections,
+    });
     const {
       mutationRef: {
         resource: mutationResource,
@@ -124,6 +128,7 @@ export function usingMutation<
       },
       __query: {},
       inputs: {},
+      __injections: {},
       methods: method
         ? {
             [`mutate${capitalizedMutationName}`]: (data: any) => {

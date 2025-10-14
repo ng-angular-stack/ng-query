@@ -50,6 +50,7 @@ type SpecificUsingQueryOutputs<
   };
   methods: {};
   inputs: {};
+  __injections: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryByIdRef<
@@ -176,7 +177,7 @@ export function usingQueryById<
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory: (inputs: Context['inputs']) => {
+  queryFactory: (context: Context['inputs'] & Context['__injections']) => {
     queryRef: QueryByIdRef<
       NoInfer<GroupIdentifier>,
       NoInfer<ResourceState>,
@@ -210,7 +211,10 @@ export function usingQueryById<
   InsertionsOutputs
 > {
   return (contextData, injector) => {
-    const queryResult = queryFactory(contextData.context.inputs);
+    const queryResult = queryFactory({
+      ...contextData.context.inputs,
+      ...contextData.context.__injections,
+    });
     const {
       queryRef: { resourceById: queryResourcesById, insertionsOutputs },
     } = queryResult;
@@ -243,6 +247,7 @@ export function usingQueryById<
         >,
       },
       inputs: {},
+      __injections: {},
       __query: {
         [resourceName as ResourceName]: queryResult,
       },
