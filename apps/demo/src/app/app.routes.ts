@@ -41,4 +41,16 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./pages/comparator/query-vs-query-by-id/query-vs-query-by-id'),
   },
+  {
+    path: 'server-state',
+    children: [
+      {
+        path: 'pagination-granular-mutations',
+        loadComponent: () =>
+          import(
+            './pages/server-state/pagination-granular-mutations/pagination-granular-mutations'
+          ),
+      },
+    ],
+  },
 ];

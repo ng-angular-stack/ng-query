@@ -41,7 +41,7 @@ type SpecificUseMutationByIdOutputs<
   inputs: {};
   queryParams: {};
   sources: {};
-  __sources: {};
+
   __injections: {};
   __mutation: {
     [key in ResourceName]: {
@@ -126,6 +126,7 @@ export function usingMutationById<
     const mutationResult = mutationFactory({
       ...contextData.context.inputs,
       ...contextData.context.__injections,
+      ...contextData.context.queryParams,
     });
     const {
       mutationRef: {
@@ -153,7 +154,7 @@ export function usingMutationById<
       __injections: {},
       queryParams: {},
       sources: {},
-      __sources: {},
+
       __query: {},
       methods: method
         ? {

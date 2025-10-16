@@ -27,7 +27,7 @@ type SpecificUseMutationOutputs<
   __injections: {};
   queryParams: {};
   sources: {};
-  __sources: {};
+
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationRef<
@@ -103,6 +103,7 @@ export function usingMutation<
     const mutationResult = mutationFactory({
       ...contextData.context.inputs,
       ...contextData.context.__injections,
+      ...contextData.context.queryParams,
     });
     const {
       mutationRef: {
@@ -134,7 +135,7 @@ export function usingMutation<
       __injections: {},
       queryParams: {},
       sources: {},
-      __sources: {},
+
       methods: method
         ? {
             [`mutate${capitalizedMutationName}`]: (data: any) => {

@@ -1,19 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { withServices } from './util';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+} from '@angular/core';
 import { ApiService } from './api.service';
 import {
-  globalQueries,
+  queryById,
   serverState,
-  SignalProxy,
   usingInject,
-  withMutationById,
+  usingMutationById,
+  usingQueryById,
+  usingQueryParams,
 } from '@ng-query/ngrx-signals';
-import { rxMutationById, rxQueryById } from '@ng-query/ngrx-signals-rxjs';
+import { rxMutationById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
-import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
 import { StatusComponent } from '../../../ui/status.component';
+import { Router } from '@angular/router';
 
 export type User = {
   id: string;
@@ -22,59 +26,62 @@ export type User = {
 
 // todo add persister
 
-const UserListServerStateStore = serverState(
+const { injectUserListServerState } = serverState(
   usingInject(() => ({
-    api: inject(ApiService),
+    ApiService,
   })),
-  withState({
-    pagination: {
-      page: 1,
-      pageSize: 4,
-    },
-  }),
-  withMutationById('user', (store) =>
+  usingQueryParams(
+    'pagination',
+    () => ({
+      page: {
+        defaultValue: 1,
+        parse: (value: string) => parseInt(value, 10),
+        serialize: (value: unknown) => String(value),
+      },
+      pageSize: {
+        defaultValue: 4,
+        parse: (value: string) => parseInt(value, 10),
+        serialize: (value: unknown) => String(value),
+      },
+    }),
+    {
+      methods: {
+        nextPage: (state) => ({
+          ...state,
+          page: state.page + 1,
+        }),
+        previousPage: (state) => ({
+          ...state,
+          page: Math.max(1, state.page - 1),
+        }),
+        setPageSize: (state, size: number) => ({
+          ...state,
+          page: 1,
+          pageSize: size,
+        }),
+      },
+    }
+  ),
+  usingMutationById('user', ({ apiService }) =>
     rxMutationById({
       method: (user: User) => user,
       identifier: ({ id }) => id,
-      stream: ({ params: user }) => store.api.updateItem(user),
+      stream: ({ params: user }) => apiService.updateItem(user),
     })
   ),
-  withUsersQueryById((store) => ({
-    setQuerySource: () => ({ pagination: store.pagination }),
-    on: {
-      userMutationById: {
-        filter: ({ mutationParams, queryResource }) =>
-          queryResource.value().some((user) => user.id === mutationParams.id),
-        optimisticUpdate: ({ queryResource, mutationParams: userMutated }) =>
-          queryResource
-            .value()
-            .map((user) => (user.id === userMutated.id ? userMutated : user)),
+  usingQueryById('users', ({ pagination, apiService }) =>
+    queryById(
+      {
+        params: pagination,
+        identifier: ({ page, pageSize }) => `${page}-${pageSize}`,
+        loader: ({ params: pagination }) => apiService.getDataList(pagination),
       },
-    },
-  })),
-  withMethods((store) => ({
-    nextPage: () =>
-      patchState(store, (state) => ({
-        pagination: {
-          ...state.pagination,
-          page: state.pagination.page + 1,
-        },
-      })),
-    previousPage: () =>
-      patchState(store, (state) => ({
-        pagination: {
-          ...state.pagination,
-          page: state.pagination.page - 1,
-        },
-      })),
-    updatePageSize: (pageSize: number) =>
-      patchState(store, () => ({
-        pagination: {
-          page: 1,
-          pageSize: pageSize,
-        },
-      })),
-  }))
+      insertPaginationPlaceholderData
+    )
+  ),
+  {
+    name: 'UserList',
+  }
 );
 
 @Component({
@@ -84,20 +91,29 @@ const UserListServerStateStore = serverState(
   templateUrl: './pagination-granular-mutations.html',
   styleUrls: ['./pagination-granular-mutations.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [UserListServerStateStore],
 })
 export default class ListWithPagination {
-  protected readonly store = inject(UserListServerStateStore);
+  protected readonly store = injectUserListServerState();
+  private readonly router = inject(Router); // todo remove
 
   updatePageSize(event: Event) {
     const value = Number((event.target as HTMLSelectElement).value);
-    this.store.updatePageSize(value);
+    this.store.setPageSize(value);
   }
 
   protected mutateUserName(user: User) {
-    this.store.mutateUser({
+    this.store.mutateUserById({
       ...user,
       name: user.name + '-',
+    });
+  }
+
+  constructor() {
+    effect(() => {
+      console.log(
+        'component router.currentNavigation()',
+        this.router.currentNavigation()
+      );
     });
   }
 }

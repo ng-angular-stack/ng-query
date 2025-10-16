@@ -32,7 +32,7 @@ export type QueryDictionary = Record<
     __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
   }
 >;
-
+// todo ajouter standalone ? (s'exporte en plus de l'injection token ?)
 export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>;
@@ -40,7 +40,6 @@ export type ContextConstraints = {
   __injections: {};
   queryParams: {};
   sources: {};
-  __sources: {};
   __mutation: {};
   __query: {};
 };
@@ -51,7 +50,7 @@ type EmptyContext = {
   inputs: {};
   queryParams: {};
   sources: {};
-  __sources: {};
+
   __injections: {};
   __mutation: {};
   __query: {};
@@ -122,6 +121,8 @@ type MergeTwoContexts<
   __injections: A['__injections'] & B['__injections'];
   __mutation: A['__mutation'] & B['__mutation'];
   __query: A['__query'] & B['__query'];
+  queryParams: A['queryParams'] & B['queryParams'];
+  sources: A['sources'] & B['sources'];
 };
 
 export function serverState<
@@ -228,6 +229,10 @@ export function serverState(
                 ...acc.context.__mutation,
                 ...result.__mutation,
               },
+              queryParams: {
+                ...acc.context.queryParams,
+                ...result.queryParams,
+              },
             },
             propsAndMethods: {
               ...acc.propsAndMethods,
@@ -243,7 +248,7 @@ export function serverState(
             inputs: {}, // passing pluggableInputs here seems to not works
             queryParams: {},
             sources: {},
-            __sources: {},
+
             __injections: {},
             __mutation: {},
             __query: {},

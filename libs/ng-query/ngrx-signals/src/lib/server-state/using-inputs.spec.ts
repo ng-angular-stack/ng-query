@@ -48,4 +48,36 @@ describe('usingInputs', () => {
       });
     });
   });
+  it('2- It should not require inputs if no inputs are requested', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { injectTestServerState } = serverState(
+        usingQuery('user', (inputs) => {
+          console.log('inputs', inputs);
+          return query({
+            params: () => '1',
+            loader: async ({ params }) => {
+              return {
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              };
+            },
+          });
+        }),
+        {
+          name: 'test',
+        }
+      );
+      const myParams = signal('1');
+      const store = injectTestServerState();
+
+      expect(store.userQuery).toBeDefined();
+      await vi.runAllTimersAsync();
+      expect(store.userQuery.value()).toEqual({
+        id: '1',
+        name: 'John Doe',
+        email: 'test@a.com',
+      });
+    });
+  });
 });

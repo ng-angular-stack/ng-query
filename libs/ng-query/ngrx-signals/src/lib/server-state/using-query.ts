@@ -14,7 +14,6 @@ import { QueryRef } from '../with-query';
 import {
   effect,
   EffectRef,
-  inject,
   Injector,
   linkedSignal,
   ResourceRef,
@@ -94,7 +93,7 @@ type SpecificUsingQueryOutputs<
   __injections: {};
   queryParams: {};
   sources: {};
-  __sources: {};
+
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryRef<
@@ -175,6 +174,7 @@ export function usingQuery<
     const queryResult = queryFactory({
       ...contextData.context.inputs,
       ...contextData.context.__injections,
+      ...contextData.context.queryParams,
     });
     const {
       queryRef: { resource: queryResource, insertionsOutputs },
@@ -211,7 +211,7 @@ export function usingQuery<
       __injections: {},
       queryParams: {},
       sources: {},
-      __sources: {},
+
       methods: {},
     } as SpecificUsingQueryOutputs<
       ResourceName,

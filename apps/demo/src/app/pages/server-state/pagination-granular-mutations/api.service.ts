@@ -8,6 +8,7 @@ import {
   firstValueFrom,
   timer,
   Observable,
+  lastValueFrom,
 } from 'rxjs';
 
 export type User = {
@@ -45,6 +46,21 @@ export class ApiService {
         )
       ),
       delay(2000)
+    );
+  }
+
+  getDataList(data: { page: number; pageSize: number }) {
+    return lastValueFrom(
+      this.dataList$.pipe(
+        take(1),
+        map((dataList) =>
+          dataList.slice(
+            (data.page - 1) * data.pageSize,
+            data.page * data.pageSize
+          )
+        ),
+        delay(2000)
+      )
     );
   }
 
