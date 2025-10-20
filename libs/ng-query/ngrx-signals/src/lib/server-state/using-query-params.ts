@@ -1,4 +1,10 @@
-import { computed, linkedSignal, signal, Signal } from '@angular/core';
+import {
+  computed,
+  Injector,
+  linkedSignal,
+  signal,
+  Signal,
+} from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { Prettify } from '@ngrx/signals';
@@ -84,17 +90,21 @@ type SpecificUsingQueryParamsOutputs<
   };
   sources: {};
   __injections: {};
-  standalone: {
-    [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
-      T extends Partial<{
-        [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
-      }>
-    >(
-      params: T
-    ) => T;
-  };
   __query: {};
   __mutation: {};
+};
+
+type SpecificUsingQueryStandaloneOutputs<
+  QueryParamsName extends string,
+  QueryParams extends Record<string, QueryParamConfig<unknown>>
+> = {
+  [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
+    T extends Partial<{
+      [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
+    }>
+  >(
+    params: T
+  ) => T;
 };
 
 type UsingQueryParamsOutputs<
@@ -104,7 +114,8 @@ type UsingQueryParamsOutputs<
   CustomMethods
 > = ServerStateFactoryUtility<
   Context,
-  SpecificUsingQueryParamsOutputs<QueryParamsName, QueryParams, CustomMethods>
+  SpecificUsingQueryParamsOutputs<QueryParamsName, QueryParams, CustomMethods>,
+  SpecificUsingQueryStandaloneOutputs<QueryParamsName, QueryParams>
 >;
 
 // todo expose an alias to concatenate all queryprams
@@ -173,10 +184,11 @@ export function usingQueryParams<
   QueryParamsConfig,
   Methods
 > {
-  return (contextData, injector) => {
+  const queryParamsConfig = queryParamsFactory();
+  const context = (contextData: ContextConstraints, injector: Injector) => {
     const router = injector.get(Router);
     const activatedRoute = injector.get(ActivatedRoute);
-    const queryParamsConfig = queryParamsFactory();
+
     const defaultOptions = config?.options || {};
 
     // Create signals for each query parameter
@@ -309,10 +321,7 @@ export function usingQueryParams<
       ...customMethods,
     } as QueryParamMethods<QueryParamsName, QueryParamsConfig, Methods>;
     console.log('methods', methods);
-    console.log(
-      '`set${capitalize(queryParamsName)}QueryParams`',
-      `set${capitalize(queryParamsName)}QueryParams`
-    );
+
     return {
       props: {
         ...props,
@@ -320,20 +329,6 @@ export function usingQueryParams<
       },
       inputs: {},
       __injections: {},
-      standalone: {
-        [`set${capitalize(queryParamsName)}QueryParams`]: (
-          params: Partial<{
-            [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
-          }>
-        ) =>
-          serializeQueryParams(
-            {
-              ...queryParamsState(),
-              ...params,
-            },
-            queryParamsConfig
-          ),
-      },
       __query: {},
       __mutation: {},
       methods,
@@ -349,22 +344,58 @@ export function usingQueryParams<
     >;
   };
 
-  function serializeQueryParams(
-    state: {
-      [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
-    },
-    queryParamsConfig: QueryParamsConfig
-  ) {
-    return Object.entries(state).reduce((acc, [key, value]) => {
+  return Object.assign(context, {
+    [`set${capitalize(queryParamsName)}QueryParams`]: (
+      params: Partial<{
+        [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
+      }>
+    ) => serializeQueryParams(params, queryParamsConfig),
+  }) as unknown as UsingQueryParamsOutputs<
+    Context,
+    QueryParamsName,
+    QueryParamsConfig,
+    Methods
+  >;
+}
+
+function serializeQueryParams<
+  QueryParamsConfig extends Partial<Record<string, QueryParamConfig<unknown>>>
+>(
+  params: Partial<{
+    [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
+  }>,
+  queryParamsConfig: QueryParamsConfig
+) {
+  const queryParamsObject = Object.entries(params).reduce(
+    (acc, [key, value]) => {
       const paramConfig = queryParamsConfig[key];
       if (paramConfig && value !== undefined) {
         acc[key] = paramConfig.serialize(value);
       }
       return acc;
-    }, {} as Record<string, string>);
-  }
+    },
+    {} as Record<string, string>
+  );
+
+  return Object.defineProperty(queryParamsObject, 'toString', {
+    value() {
+      return serializedQueryParamsObjectToString(this);
+    },
+    enumerable: false, // 👈 ne s'affichera pas dans les clés
+  });
 }
 
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function serializedQueryParamsObjectToString(
+  queryParamsObject: Record<string, unknown>
+) {
+  return Object.entries(queryParamsObject)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`
+    )
+    .join('&');
 }

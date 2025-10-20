@@ -53,7 +53,7 @@ type SpecificUsingQueryOutputs<
   __injections: {};
   queryParams: {};
   sources: {};
-  standalone: {};
+
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryByIdRef<
@@ -262,7 +262,7 @@ export function usingQueryById<
       __injections: {},
       queryParams: {},
       sources: {},
-      standalone: {},
+
       __query: {
         [resourceName as ResourceName]: queryResult,
       },

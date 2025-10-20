@@ -27,7 +27,7 @@ type SpecificUseMutationOutputs<
   __injections: {};
   queryParams: {};
   sources: {};
-  standalone: {};
+
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationRef<
@@ -135,7 +135,7 @@ export function usingMutation<
       __injections: {},
       queryParams: {},
       sources: {},
-      standalone: {},
+
       methods: method
         ? {
             [`mutate${capitalizedMutationName}`]: (data: any) => {

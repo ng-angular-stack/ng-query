@@ -9,6 +9,7 @@ import { usingMutationById } from './using-mutation-by-id';
 import { usingQueryById } from './using-query-by-id';
 import { queryById } from '../query-by-id';
 import { inject } from '@angular/core';
+import { usingQueryParams } from './using-query-params';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -232,6 +233,25 @@ describe('serverState', () => {
       await vi.advanceTimersByTimeAsync(5000);
       expect(q.testQueryById()['3']?.status()).toEqual('reloading');
     });
+  });
+
+  it('should enable exporting standalone outputs', async () => {
+    const { injectServerState, setPaginationQueryParams } = serverState(
+      usingQueryParams('pagination', () => ({
+        page: {
+          defaultValue: 1,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
+        },
+        pageSize: {
+          defaultValue: 10,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
+        },
+      }))
+    );
+
+    expect(setPaginationQueryParams).toBeDefined();
   });
 });
 

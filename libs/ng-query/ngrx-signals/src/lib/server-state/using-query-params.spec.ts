@@ -4,7 +4,6 @@ import { serverState } from './server-state';
 import { usingQueryParams } from './using-query-params';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { firstValueFrom, lastValueFrom, map, skip, take } from 'rxjs';
 import { Location } from '@angular/common';
 @Component({
   template: '',
@@ -12,7 +11,6 @@ import { Location } from '@angular/common';
 })
 class TestComponent {
   route = inject(ActivatedRoute);
-  store = injectServerState();
 }
 
 describe('usingQueryParams', () => {
@@ -195,34 +193,41 @@ describe('usingQueryParams integration', () => {
 });
 
 describe('usingQueryParams standalone methods', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideRouter([{ path: 'test', component: TestComponent }])],
+    });
+  });
   it('should navigate to the target URL with specified query params', async () => {
-    const harness = await RouterTestingHarness.create();
+    const harness = await RouterTestingHarness.create('');
+    const { injectServerState, setPaginationQueryParams } = serverState(
+      usingQueryParams('pagination', () => ({
+        page: {
+          defaultValue: 1,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
+        },
+        pageSize: {
+          defaultValue: 10,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
+        },
+      }))
+    );
+    console.log('setPaginationQueryParams', setPaginationQueryParams);
     await TestBed.runInInjectionContext(async () => {
       const router = inject(Router);
-
-      // router.navigateByUrl;
-      // todo should be used with navigate and not navigateByUrl
-      const { injectServerState, setPaginationQueryParams } = serverState(
-        usingQueryParams('pagination', () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-          pageSize: {
-            defaultValue: 10,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-        }))
-      );
-      // todo fix, because is created once the inject is made setPaginationQueryParams
-      console.log('setPaginationQueryParams', setPaginationQueryParams);
-      const store = injectServerState();
+      const location = inject(Location);
 
       await router.navigate(['test'], {
         queryParams: setPaginationQueryParams({ page: 4, pageSize: 20 }),
       });
+
+      expect(location.path()).toEqual('/test?page=4&pageSize=20');
+    });
+    await TestBed.runInInjectionContext(() => {
+      const loation = inject(Location);
+      const store = injectServerState();
 
       expect(store.pagination()).toEqual({
         page: 4,
@@ -232,42 +237,40 @@ describe('usingQueryParams standalone methods', () => {
   });
   it('should navigateByUrl to the target URL with specified query params', async () => {
     const harness = await RouterTestingHarness.create();
+    const { injectServerState, setPaginationQueryParams } = serverState(
+      usingQueryParams('pagination', () => ({
+        page: {
+          defaultValue: 1,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
+        },
+        pageSize: {
+          defaultValue: 10,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
+        },
+      }))
+    );
     await TestBed.runInInjectionContext(async () => {
       const router = inject(Router);
 
-      // router.navigateByUrl;
-      // todo should be used with navigate and not navigateByUrl
-      const { injectServerState, setPaginationQueryParams } = serverState(
-        usingQueryParams('pagination', () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-          pageSize: {
-            defaultValue: 10,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-        }))
-      );
-      const q = setPaginationQueryParams({
-        page: 4,
-        pageSize: 20,
-      }).toString();
-      console.log('q', q);
       await router.navigateByUrl(
         `/test?${setPaginationQueryParams({
           page: 4,
           pageSize: 20,
         }).toString()}`
       );
+    });
+    await TestBed.runInInjectionContext(() => {
       const store = injectServerState();
-      console.log('store.pagination()', store.pagination());
+
       expect(store.pagination()).toEqual({
         page: 4,
         pageSize: 20,
       });
+
+      const location = inject(Location);
+      expect(location.path()).toEqual('/test?page=4&pageSize=20');
     });
   });
 });

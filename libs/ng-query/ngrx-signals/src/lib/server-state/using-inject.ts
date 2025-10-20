@@ -13,7 +13,7 @@ type SpecificUsingInjectionsOutputs<Injections extends {}> = {
   inputs: {};
   queryParams: {};
   sources: {};
-  standalone: {};
+
   __injections: {
     [key in keyof Injections as Uncapitalize<key & string>]: InferProvidedType<
       Injections[key]
@@ -59,7 +59,7 @@ export function usingInject<
       inputs: {},
       queryParams: {},
       sources: {},
-      standalone: {},
+
       __injections: injectedInjections,
       __query: {},
       __mutation: {},

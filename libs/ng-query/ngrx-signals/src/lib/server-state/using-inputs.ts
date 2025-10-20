@@ -13,7 +13,7 @@ type SpecificUsingInputsOutputs<Inputs extends {}> = {
   __injections: {};
   queryParams: {};
   sources: {};
-  standalone: {};
+
   __query: {};
   __mutation: {};
 };
@@ -34,7 +34,7 @@ export function usingInputs<
       __injections: {},
       queryParams: {},
       sources: {},
-      standalone: {},
+
       __query: {},
       __mutation: {},
       methods: {},
