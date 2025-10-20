@@ -38,6 +38,7 @@ export type ContextConstraints = {
   methods: Record<string, Function>;
   inputs: {};
   __injections: {};
+  standalone: {};
   queryParams: {};
   sources: {};
   __mutation: {};
@@ -50,8 +51,8 @@ type EmptyContext = {
   inputs: {};
   queryParams: {};
   sources: {};
-
   __injections: {};
+  standalone: {};
   __mutation: {};
   __query: {};
 };
@@ -86,14 +87,15 @@ type ToServerStateOutputs<
   Outputs = Prettify<
     MergeContexts<Context>['props'] & MergeContexts<Context>['methods']
   >,
-  InputsToPlugin = MergeContexts<Context>['inputs']
+  InputsToPlugin = MergeContexts<Context>['inputs'],
+  StandaloneOutputs = MergeContexts<Context>['standalone']
 > = {
   [key in `inject${Capitalize<Name>}ServerState`]: keyof InputsToPlugin extends never
     ? () => Outputs
     : (inputs: Partial<InputsToPlugin>) => Outputs;
 } & {
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<Outputs>;
-};
+} & StandaloneOutputs;
 
 type ServerStateOptions<Name> = {
   providedIn?: 'root' | 'scoped' | 'platform';
@@ -123,6 +125,7 @@ type MergeTwoContexts<
   __query: A['__query'] & B['__query'];
   queryParams: A['queryParams'] & B['queryParams'];
   sources: A['sources'] & B['sources'];
+  standalone: A['standalone'] & B['standalone'];
 };
 
 export function serverState<
@@ -183,8 +186,8 @@ export function serverState(
     providedIn,
     factory: () => {
       const injector = inject(Injector);
-      console.log('test');
-      const { propsAndMethods } = [
+      // todo standalone should be extracted before
+      const { propsAndMethodsAndStandalone } = [
         ...factories,
         ...(isLastFactory ? [optionsOrFactory] : []),
       ].reduce(
@@ -233,9 +236,13 @@ export function serverState(
                 ...acc.context.queryParams,
                 ...result.queryParams,
               },
+              standalone: {
+                ...acc.context.standalone,
+                ...result.standalone,
+              },
             },
-            propsAndMethods: {
-              ...acc.propsAndMethods,
+            propsAndMethodsAndStandalone: {
+              ...acc.propsAndMethodsAndStandalone,
               ...result.props,
               ...result.methods,
             },
@@ -248,18 +255,18 @@ export function serverState(
             inputs: {}, // passing pluggableInputs here seems to not works
             queryParams: {},
             sources: {},
-
             __injections: {},
+            standalone: {},
             __mutation: {},
             __query: {},
           } as EmptyContext,
-          propsAndMethods: {},
+          propsAndMethodsAndStandalone: {},
         } as {
           context: EmptyContext;
-          propsAndMethods: {};
+          propsAndMethodsAndStandalone: {};
         }
       );
-      return propsAndMethods;
+      return propsAndMethodsAndStandalone;
     },
   });
   const name = options?.name ?? '';
@@ -276,5 +283,7 @@ export function serverState(
       return inject(token);
     },
     [`${capitalizedName}ServerState`]: token,
+
+    // todo expose standalone outputs
   } as ToServerStateOutputs<EmptyContext[], string>;
 }

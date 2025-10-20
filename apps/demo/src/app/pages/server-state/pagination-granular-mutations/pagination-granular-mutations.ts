@@ -1,10 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ApiService } from './api.service';
 import {
   queryById,
@@ -17,14 +12,11 @@ import {
 import { rxMutationById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
 import { StatusComponent } from '../../../ui/status.component';
-import { Router } from '@angular/router';
 
 export type User = {
   id: string;
   name: string;
 };
-
-// todo add persister
 
 const { injectUserListServerState } = serverState(
   usingInject(() => ({
@@ -94,7 +86,6 @@ const { injectUserListServerState } = serverState(
 })
 export default class ListWithPagination {
   protected readonly store = injectUserListServerState();
-  private readonly router = inject(Router); // todo remove
 
   updatePageSize(event: Event) {
     const value = Number((event.target as HTMLSelectElement).value);
@@ -105,15 +96,6 @@ export default class ListWithPagination {
     this.store.mutateUserById({
       ...user,
       name: user.name + '-',
-    });
-  }
-
-  constructor() {
-    effect(() => {
-      console.log(
-        'component router.currentNavigation()',
-        this.router.currentNavigation()
-      );
     });
   }
 }

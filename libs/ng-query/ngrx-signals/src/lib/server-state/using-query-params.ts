@@ -84,6 +84,15 @@ type SpecificUsingQueryParamsOutputs<
   };
   sources: {};
   __injections: {};
+  standalone: {
+    [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
+      T extends Partial<{
+        [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
+      }>
+    >(
+      params: T
+    ) => T;
+  };
   __query: {};
   __mutation: {};
 };
@@ -104,6 +113,44 @@ type UsingQueryParamsOutputs<
 
 // todo tester quand on a des queryParams dans l'url au demarrage, puis on change de page et on revient
 
+/**
+ * Used to manage query parameters in the URL as part of the server state.
+ * When initialized, it reads the specified query parameters from the URL,
+ * applying parsing functions and default values as needed.
+ * It provides signals to access the current values of the query parameters
+ * and methods to update them, which will also update the URL accordingly.
+ *
+ * Warning: Please, be careful to avoid query params key collisions. (Their is no verification yet)
+ *
+ * @example
+ * ```ts
+ *  const { injectServerState } = serverState(
+ *   usingQueryParams('pagination', () => ({
+ *     page: {
+ *       defaultValue: 1,
+ *       parse: (value: string) => parseInt(value, 10),
+ *       serialize: (value: unknown) => String(value),
+ *     },
+ *     pageSize: {
+ *       defaultValue: 10,
+ *       parse: (value: string) => parseInt(value, 10),
+ *       serialize: (value: unknown) => String(value),
+ *     },
+ *   }))
+ * );
+ * ```
+ * Usage in a component:
+ * ```ts
+ * const store = injectServerState();
+ *
+ * // Accessing query param values
+ * const page = store.page(); // Signal for 'page' query param
+ * const pageSize = store.pageSize(); // Signal for 'pageSize' query param
+ * const pagination = store.pagination(); // Signal for combined pagination state
+ * // Updating query param values
+ * store.setPaginationQueryParams({ page: 2, pageSize: 20 }); // Update query params
+ * store.resetPaginationQueryParams(); // Reset to default values
+ */
 export function usingQueryParams<
   Context extends ContextConstraints,
   const QueryParamsName extends string,
@@ -129,12 +176,11 @@ export function usingQueryParams<
   return (contextData, injector) => {
     const router = injector.get(Router);
     const activatedRoute = injector.get(ActivatedRoute);
-    const queryParams = queryParamsFactory();
+    const queryParamsConfig = queryParamsFactory();
     const defaultOptions = config?.options || {};
 
     // Create signals for each query parameter
     const queryParamSignals = linkedSignal(() => {
-      console.log('router.currentNavigation()', router.currentNavigation());
       return (
         router.currentNavigation()?.extractedUrl.queryParams ??
         activatedRoute.snapshot.queryParams
@@ -143,7 +189,7 @@ export function usingQueryParams<
 
     // Create computed signals for each query parameter with parsing
     const queryParamsState = linkedSignal(() =>
-      Object.entries(queryParams).reduce((acc, [key, config]) => {
+      Object.entries(queryParamsConfig).reduce((acc, [key, config]) => {
         const rawValue = queryParamSignals()?.[key];
         if (rawValue === undefined || rawValue === null) {
           acc[key] = config.defaultValue;
@@ -157,12 +203,15 @@ export function usingQueryParams<
           return acc;
         }
       }, {} as Record<string, unknown>)
-    );
+    ) as Signal<ToState<QueryParamsConfig>>;
 
-    const props = Object.entries(queryParams).reduce((acc, [key, config]) => {
-      acc[key] = computed(() => queryParamsState()[key]);
-      return acc;
-    }, {} as Record<string, Signal<unknown>>);
+    const props = Object.entries(queryParamsConfig).reduce(
+      (acc, [key, config]) => {
+        acc[key] = computed(() => queryParamsState()[key]);
+        return acc;
+      },
+      {} as Record<string, Signal<unknown>>
+    );
 
     // Helper function to navigate with query params
     const navigateWithQueryParams = (
@@ -187,24 +236,23 @@ export function usingQueryParams<
     };
 
     // Helper function to parse state and navigate
-    const parseAndNavigate = (
+    const serializeAndNavigate = (
       state: Prettify<ToState<QueryParamsConfig>>,
       options?: QueryParamNavigationOptions
     ) => {
       queryParamSignals.set(state);
-      const serializedParams = Object.entries(state).reduce(
-        (acc, [key, value]) => {
-          const paramConfig = queryParams[key];
-          if (paramConfig && value !== undefined) {
-            acc[key] = paramConfig.serialize(value);
-          }
-          return acc;
-        },
-        {} as Record<string, string>
-      );
+      const serializedParams = serializeQueryParams(state, queryParamsConfig);
 
       navigateWithQueryParams(serializedParams, options);
     };
+
+    const defaultParams = Object.entries(queryParamsConfig).reduce(
+      (acc, [key, config]) => {
+        acc[key] = config.serialize(config.defaultValue);
+        return acc;
+      },
+      {} as Record<string, string>
+    );
 
     // Create general methods
     const generalMethods = {
@@ -218,7 +266,7 @@ export function usingQueryParams<
       ) => {
         const serializedParams = Object.entries(params).reduce(
           (acc, [key, value]) => {
-            const paramConfig = queryParams[key];
+            const paramConfig = queryParamsConfig[key];
             if (paramConfig && value !== undefined) {
               acc[key] = paramConfig.serialize(value);
             }
@@ -233,14 +281,6 @@ export function usingQueryParams<
       [`reset${capitalize(queryParamsName)}QueryParams`]: (
         options?: QueryParamNavigationOptions
       ) => {
-        const defaultParams = Object.entries(queryParams).reduce(
-          (acc, [key, config]) => {
-            acc[key] = config.serialize(config.defaultValue);
-            return acc;
-          },
-          {} as Record<string, string>
-        );
-
         navigateWithQueryParams(defaultParams, {
           ...options,
           queryParamsHandling: '',
@@ -258,7 +298,7 @@ export function usingQueryParams<
                 ...args
               );
               // Use parseAndNavigate to apply the new state and navigate
-              parseAndNavigate(newState);
+              serializeAndNavigate(newState);
             },
           };
         }, {})
@@ -268,7 +308,11 @@ export function usingQueryParams<
       ...generalMethods,
       ...customMethods,
     } as QueryParamMethods<QueryParamsName, QueryParamsConfig, Methods>;
-
+    console.log('methods', methods);
+    console.log(
+      '`set${capitalize(queryParamsName)}QueryParams`',
+      `set${capitalize(queryParamsName)}QueryParams`
+    );
     return {
       props: {
         ...props,
@@ -276,6 +320,20 @@ export function usingQueryParams<
       },
       inputs: {},
       __injections: {},
+      standalone: {
+        [`set${capitalize(queryParamsName)}QueryParams`]: (
+          params: Partial<{
+            [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
+          }>
+        ) =>
+          serializeQueryParams(
+            {
+              ...queryParamsState(),
+              ...params,
+            },
+            queryParamsConfig
+          ),
+      },
       __query: {},
       __mutation: {},
       methods,
@@ -290,6 +348,21 @@ export function usingQueryParams<
       Methods
     >;
   };
+
+  function serializeQueryParams(
+    state: {
+      [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
+    },
+    queryParamsConfig: QueryParamsConfig
+  ) {
+    return Object.entries(state).reduce((acc, [key, value]) => {
+      const paramConfig = queryParamsConfig[key];
+      if (paramConfig && value !== undefined) {
+        acc[key] = paramConfig.serialize(value);
+      }
+      return acc;
+    }, {} as Record<string, string>);
+  }
 }
 
 function capitalize(str: string): string {
