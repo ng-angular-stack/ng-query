@@ -131,11 +131,11 @@ type UsingQueryParamsOutputs<
  * It provides signals to access the current values of the query parameters
  * and methods to update them, which will also update the URL accordingly.
  *
- * Warning: Please, be careful to avoid query params key collisions. (Their is no verification yet)
+ * Warning: Please, be careful to avoid query params key collisions. (There is no verification yet)
  *
  * @example
  * ```ts
- *  const { injectServerState } = serverState(
+ * const { injectServerState, setPaginationQueryParams } = serverState(
  *   usingQueryParams('pagination', () => ({
  *     page: {
  *       defaultValue: 1,
@@ -150,17 +150,36 @@ type UsingQueryParamsOutputs<
  *   }))
  * );
  * ```
+ *
  * Usage in a component:
  * ```ts
  * const store = injectServerState();
  *
  * // Accessing query param values
- * const page = store.page(); // Signal for 'page' query param
- * const pageSize = store.pageSize(); // Signal for 'pageSize' query param
- * const pagination = store.pagination(); // Signal for combined pagination state
+ * const page = store.page();                 // Signal for 'page' query param
+ * const pageSize = store.pageSize();         // Signal for 'pageSize' query param
+ * const pagination = store.pagination();     // Signal for combined pagination state
+ *
  * // Updating query param values
  * store.setPaginationQueryParams({ page: 2, pageSize: 20 }); // Update query params
- * store.resetPaginationQueryParams(); // Reset to default values
+ * store.resetPaginationQueryParams();                        // Reset to default values
+ *
+ * // Outside of injection context:
+ * navigateToMyPage() {
+ *   await router.navigate(['my-page'], {
+ *     queryParams: setPaginationQueryParams({ page: 4, pageSize: 20 }),
+ *   });
+ * }
+ *
+ * navigateByUrlToMyPage() {
+ *   router.navigateByUrl(
+ *     `/my-page?${setPaginationQueryParams({
+ *       page: 4,
+ *       pageSize: 20,
+ *     }).toString()}`
+ *   );
+ * }
+ * ```
  */
 export function usingQueryParams<
   Context extends ContextConstraints,
