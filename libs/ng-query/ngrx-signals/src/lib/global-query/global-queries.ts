@@ -415,8 +415,6 @@ export function globalQueries<
             return queriesByIdMap.get(key);
           }
           return runInInjectionContext(injector, () => {
-            console.log('value', value);
-            console.log('alue.queryById', value.queryById);
             const isPluggableQuery = value.queryById.length > 0;
             const queryData = (
               isPluggableQuery

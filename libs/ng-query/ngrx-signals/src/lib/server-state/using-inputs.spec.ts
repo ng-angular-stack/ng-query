@@ -5,8 +5,6 @@ import { usingInputs } from './using-inputs';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-// todo expose inputs by {inputs, queryParams}
-
 describe('usingInputs', () => {
   beforeEach(() => {
     vi.useFakeTimers();

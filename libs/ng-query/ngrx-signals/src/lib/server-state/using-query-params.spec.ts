@@ -258,7 +258,15 @@ describe('usingQueryParams standalone methods', () => {
         `/test?${setPaginationQueryParams({
           page: 4,
           pageSize: 20,
-        }).toString()}`
+        })}`
+      );
+
+      console.log(
+        'navigated',
+        `${setPaginationQueryParams({
+          page: 4,
+          pageSize: 20,
+        })}`
       );
     });
     await TestBed.runInInjectionContext(() => {
