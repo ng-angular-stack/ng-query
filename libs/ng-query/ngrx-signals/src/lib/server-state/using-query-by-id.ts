@@ -218,10 +218,6 @@ export function usingQueryById<
   InsertionsOutputs
 > {
   return (contextData, injector) => {
-    console.log(
-      'contextData.context.queryParams',
-      contextData.context.queryParams
-    );
     const queryResult = queryFactory({
       ...contextData.context.inputs,
       ...contextData.context.__injections,
