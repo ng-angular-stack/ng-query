@@ -13,6 +13,8 @@ import {
 } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
 
+// todo rename forge ?
+
 // ! when adding standalone outputs make sure to assign like this: const c = Object.assign(() => true, {a: 5}) (function first)
 
 export type MutationDictionary = Record<
@@ -37,12 +39,11 @@ export type QueryDictionary = Record<
 // todo ajouter standalone ? (s'exporte en plus de l'injection token ?)
 export type ContextConstraints = {
   props: {};
-  methods: Record<string, Function>;
-  inputs: {};
+  methods: Record<string, Function>; //? (editable in injectServerState/usingServerState)
+  inputs: {}; //? (editable in injectServerState/usingServerState)
   __injections: {};
-
   queryParams: {};
-  sources: {};
+  sources: {}; //? (editable in injectServerState/usingServerState)
   __mutation: {};
   __query: {};
 };

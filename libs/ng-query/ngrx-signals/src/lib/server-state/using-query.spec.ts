@@ -1,11 +1,5 @@
 import { Expect, Equal } from 'test-type';
-import {
-  ApplicationRef,
-  inject,
-  ResourceRef,
-  ResourceStreamItem,
-  signal,
-} from '@angular/core';
+import { inject, ResourceRef, ResourceStreamItem, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { expectTypeOf, vi } from 'vitest';
 import { usingQuery } from './using-query';

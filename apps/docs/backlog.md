@@ -4,6 +4,7 @@
 
 - A package that does not use the NgRx SignalStore & Server State Store (it will come together)
   - A way for query to be updated by other query result
+  - Keep only one query that will return a Query or a QueryById depending on identifier
 - ! accept number value for identifier (and params)
 - Infinite pagination/query (the a strategy to invalidate the cache as tanstackQuery does)
 - Why the globalQueries does not propose the autocompletion (I may not do that if I find a better approach with the Server State Store, that will replace it)
