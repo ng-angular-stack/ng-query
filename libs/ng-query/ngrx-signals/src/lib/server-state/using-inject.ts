@@ -38,7 +38,7 @@ export function usingInject<
   Injections extends {}
 >(
   injections: (
-    entries: Context['inputs'] & Context['__injections']
+    entries: Context['inputs'] & Context['__injections'] & Context['sources']
   ) => Injections
 ): UsingInputsOutputs<Context, Injections> {
   return (contextData, injector) => {
@@ -46,6 +46,7 @@ export function usingInject<
       injections({
         ...contextData.context.inputs,
         ...contextData.context.__injections,
+        ...contextData.context.sources,
       })
     ).reduce(
       (acc, [key, injection]) => ({

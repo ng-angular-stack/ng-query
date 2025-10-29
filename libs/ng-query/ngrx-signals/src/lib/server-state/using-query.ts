@@ -140,7 +140,9 @@ export function usingQuery<
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory: (context: Context['inputs'] & Context['__injections']) => {
+  queryFactory: (
+    context: Context['inputs'] & Context['__injections'] & Context['sources']
+  ) => {
     // ! avoid to get the QueryRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
     queryRef: QueryRef<

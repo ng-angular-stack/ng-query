@@ -13,7 +13,8 @@ import {
 } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
 
-// todo rename forge ?
+// todo rename craft ?
+// todo filter private fields and methods
 
 // ! when adding standalone outputs make sure to assign like this: const c = Object.assign(() => true, {a: 5}) (function first)
 

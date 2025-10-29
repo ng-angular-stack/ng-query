@@ -1,14 +1,7 @@
-import {
-  computed,
-  Injector,
-  linkedSignal,
-  signal,
-  Signal,
-} from '@angular/core';
+import { computed, Injector, linkedSignal, Signal } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { Prettify } from '@ngrx/signals';
-import { UnionToTuple } from '../types/util.type';
 
 export interface QueryParamConfig<T = unknown> {
   defaultValue: NoInfer<T>;

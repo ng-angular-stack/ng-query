@@ -75,7 +75,9 @@ export function usingMutation<
   OtherProperties
 >(
   resourceName: ResourceName,
-  mutationFactory: (context: Context['inputs'] & Context['__injections']) => {
+  mutationFactory: (
+    context: Context['inputs'] & Context['__injections'] & Context['sources']
+  ) => {
     // ! avoid to get the MutationRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
     mutationRef: MutationRef<
