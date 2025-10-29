@@ -1,6 +1,6 @@
 import { computed, signal } from '@angular/core';
-import { source } from './source';
-import { ReadonlySource, toSource } from './to-source';
+import { toSource } from './to-source';
+import { ReadonlySource } from './util/source.type';
 
 describe('toSource', () => {
   beforeEach(() => {

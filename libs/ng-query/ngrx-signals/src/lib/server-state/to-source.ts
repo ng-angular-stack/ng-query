@@ -5,10 +5,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { IsUnknown } from './util/util.type';
-
-export interface ReadonlySource<T> extends Signal<T | undefined> {
-  preserveLastValue: Signal<T | undefined>;
-}
+import { ReadonlySource } from './util/source.type';
 
 export function toSource<SourceState, ComputedValue>(
   signalOrigin: Signal<SourceState> | WritableSignal<SourceState>,

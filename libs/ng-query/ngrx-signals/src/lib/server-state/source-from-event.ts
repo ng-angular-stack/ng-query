@@ -47,7 +47,7 @@ export function sourceFromEvent(
   }
 ): SourceFromEvent<unknown> {
   assertInInjectionContext(sourceFromEvent);
-  const eventSignalSource = source<any>(options?.source);
+  const eventSignalSource = source<unknown>(options?.source);
 
   const listener = (event: Event) => {
     if (options?.computedValue) {

@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { source } from './source';
+import { Source, source } from './source';
 
 describe('source', () => {
   beforeEach(() => {
@@ -11,6 +11,8 @@ describe('source', () => {
   });
   it('should generate a source that enable to emit a value, and the listener to receive it', () => {
     const mySource = source<string>();
+
+    expectTypeOf(mySource).toEqualTypeOf<Source<string>>();
 
     const myListener = computed(() => {
       const s = mySource();
