@@ -44,6 +44,7 @@ export function usingSources<
         return {
           ...acc,
           [`set${capitalize(key)}`]: (payload: unknown) => {
+            console.log('payload', payload);
             source.set(payload);
           },
         };

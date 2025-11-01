@@ -112,8 +112,10 @@ export function usingState<
     );
 
     methodsConnectedToSource.forEach((sourceSignal) => {
+      console.log('methodsConnectedToSource');
       effect(() => {
         const newValue = sourceSignal();
+        console.log('effect newValue', newValue);
         if (newValue !== undefined) {
           state.set(newValue as NoInfer<State>);
         }
