@@ -7,128 +7,57 @@ import { usingQuery } from './using-query';
 import { usingSources } from './using-sources';
 import { source } from './source';
 import { usingState } from './using-state';
+import { on } from './on';
 
 describe('usingState', () => {
   it('should enable to defined a state that react on sources and inputs and other states', async () => {
     await TestBed.runInInjectionContext(async () => {
+      const globalReset = source<{}>();
       const { injectServerState } = serverState(
-        usingInputs({
-          myParams: undefined as string | undefined,
-        }),
         usingSources({
           reset: source<string>(),
         }),
-        usingQuery('user', (inputs) => {
-          console.log('inputs', inputs);
-          return query({
-            params: inputs.myParams,
-            loader: async ({ params }) => {
-              return {
-                id: params,
-                name: 'John Doe',
-                email: 'test@a.com',
-              };
-            },
-          });
-        }),
         usingState(
-          'user',
-          ({ userQuery }) =>
-            linkedSignal<
-              | {
-                  id: string;
-                  name: string;
-                  email: string;
-                }
-              | undefined,
-              | {
-                  id: string;
-                  name: string;
-                  email: string;
-                }
-              | undefined
-            >({
-              source: () =>
-                userQuery.hasValue() ? userQuery.value() : undefined,
-              computation: (currentSource, previousData) => {
-                if (currentSource) {
-                  return currentSource;
-                }
-                return previousData?.value;
+          'numberList',
+          () => signal([1]),
+          ({ state, context: { reset } }) => {
+            return {
+              addNumber: (numberValue: number) => {
+                console.log('addNumber numberValue', numberValue);
+                const stateValue = state();
+                return [...stateValue, numberValue];
               },
-            }),
-          ({ state, context: { userQuery, connectToResetSource } }) => ({
-            restart: () => userQuery.value(),
-            setName: (name: string) => {
-              const stateValue = state();
-              if (!stateValue) {
-                return undefined;
-              }
-              return {
-                ...stateValue,
-                name,
-              };
-            },
-            _resetToUndefined: connectToResetSource(
-              (resetValue) => {
+              reset: on(reset, (resetValue) => {
                 expectTypeOf(resetValue).toEqualTypeOf<string>();
-                return userQuery.value();
-              },
-              {
-                expose: true,
-              }
-            ),
-          })
+                return [];
+              }),
+              globalReset: on(globalReset, (resetValue) => {
+                expectTypeOf(resetValue).toEqualTypeOf<{}>();
+                return [42];
+              }),
+            };
+          }
         )
       );
-      const myParams = signal('1');
-      const store = injectServerState({
-        myParams,
-      });
+      const store = injectServerState();
+      store.addNumber(2);
 
-      expectTypeOf(store.user).toEqualTypeOf<
-        Signal<
-          | {
-              id: string;
-              name: string;
-              email: string;
-            }
-          | undefined
-        >
-      >();
+      expectTypeOf(store.numberList).toEqualTypeOf<Signal<number[]>>();
 
-      expect(store.user).toEqual(undefined);
+      expect(store.numberList()).toEqual([1, 2]);
 
-      expect(store.userQuery).toBeDefined();
-      await vi.runAllTimersAsync();
-      expect(store.userQuery.value()).toEqual({
-        id: '1',
-        name: 'John Doe',
-        email: 'test@a.com',
-      });
-      expect(store.user).toEqual({
-        id: '1',
-        name: 'John Doe',
-        email: 'test@a.com',
-      });
+      store.addNumber(3);
+      expect(store.numberList()).toEqual([1, 2, 3]);
 
-      store.setName('Jane Doe'); // todo store.user.setName
-      expect(store.user).toEqual({
-        id: '1',
-        name: 'Jane Doe',
-        email: 'test@a.com',
-      });
-
-      store.restart();
-      expect(store.user).toEqual({
-        id: '1',
-        name: 'John Doe',
-        email: 'test@a.com',
-      });
-      //@ts-expect-error should not be accessible, it's a private method
-      expect(() => store._resetToUndefined()).toThrow();
-      store.reset('resetValue');
-      expect(store.user()).toEqual(undefined);
+      store.setReset('localReset');
+      await flushMicrotasks();
+      expect(store.numberList()).toEqual([]);
+      globalReset.set({});
+      expect(store.numberList()).toEqual([42]);
     });
   });
 });
+
+function flushMicrotasks(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}

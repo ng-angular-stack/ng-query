@@ -12,6 +12,7 @@ import {
   signal,
 } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
+import { ToConnectableSourceFromInject } from './util/util.type';
 
 // todo rename craft ?
 // todo filter private fields and methods
@@ -101,11 +102,14 @@ type ToServerStateOutputs<
     MergeContexts<Context>['props'] & MergeContexts<Context>['methods']
   >,
   StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
-  InputsToPlugin = MergeContexts<Context>['inputs']
+  InputsToPlugin = MergeContexts<Context>['inputs'],
+  SourcesToConnect = ToConnectableSourceFromInject<
+    MergeContexts<Context>['sources']
+  >
 > = {
   [key in `inject${Capitalize<Name>}ServerState`]: keyof InputsToPlugin extends never
     ? () => Outputs
-    : (inputs: Partial<InputsToPlugin>) => Outputs;
+    : (inputs: Partial<InputsToPlugin> & Partial<SourcesToConnect>) => Outputs;
 } & {
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<Outputs>;
 } & StandaloneOutputs;
@@ -258,12 +262,12 @@ export function serverState(
     {} as Record<string, unknown>
   );
   const pluggableInputs = createSignalProxy(signal({}));
+  let inputsKeysSet: Set<string> | undefined = undefined;
   const token = new InjectionToken('ServerStateStore', {
     providedIn,
     factory: () => {
       const injector = inject(Injector);
-      // todo standalone should be extracted before
-      const { propsAndMethods } = factoriesList.reduce(
+      const { propsAndMethods, context } = factoriesList.reduce(
         (acc, factory) => {
           const result = (
             factory as ServerStateFactory<
@@ -285,7 +289,7 @@ export function serverState(
           });
           return {
             context: {
-              inputs: { ...acc.context.inputs, ...result.inputs }, // not really useful
+              inputs: { ...acc.context.inputs, ...result.inputs },
               __injections: {
                 ...acc.context.__injections,
                 ...result.__injections,
@@ -309,6 +313,10 @@ export function serverState(
               queryParams: {
                 ...acc.context.queryParams,
                 ...result.queryParams,
+              },
+              sources: {
+                ...acc.context.sources,
+                ...result.sources,
               },
             },
             propsAndMethods: {
@@ -335,6 +343,9 @@ export function serverState(
           propsAndMethods: {};
         }
       );
+      inputsKeysSet = new Set(
+        Object.keys((context as ContextConstraints).inputs)
+      );
       return propsAndMethods;
     },
   });
@@ -344,12 +355,22 @@ export function serverState(
     : '';
   const injectNameServerState = `inject${capitalizedName}ServerState`;
   return {
-    [injectNameServerState]: (inputs: unknown) => {
+    [injectNameServerState]: (entries: Record<string, unknown>) => {
       assertInInjectionContext(serverState);
-      if (inputs) {
+      const tokenValue = inject(token); // inject will enable to set inputsKeysSet
+      let hasInputs = false;
+      const inputs = Array.from(inputsKeysSet ?? []).reduce((acc, inputKey) => {
+        if (inputKey in entries) {
+          hasInputs = true;
+          acc[inputKey] = (entries as any)[inputKey];
+          return acc;
+        }
+        return acc;
+      }, {} as Record<string, unknown>);
+      if (hasInputs) {
         pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
       }
-      return inject(token);
+      return tokenValue;
     },
     [`${capitalizedName}ServerState`]: token,
     ...extractedStandaloneOutputs,

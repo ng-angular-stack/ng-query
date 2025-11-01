@@ -10,29 +10,16 @@ export function computedSource<SourceState, ComputedValue>(
     debugName?: string;
   }
 ): ReadonlySource<ComputedValue> {
-  const sourceState = linkedSignal<ComputedValue | undefined>(
-    computedFn(
-      //@ts-expect-error I do not understand why ts is complaining here
-      () => computedFn(signalOrigin()) as ComputedValue
-    ) as Signal<ComputedValue>,
-    {
-      ...(options?.equal && { equal: options?.equal }), // add the equal function here, it may helps to detect changes when using scalar values
-      ...(options?.debugName && {
-        debugName: options?.debugName + '_computedSourceState',
-      }),
-    }
-  );
-
   const listener = (listenerOptions: { nullishFirstValue?: boolean }) =>
-    linkedSignal<ComputedValue, ComputedValue | undefined>({
-      source: sourceState as Signal<ComputedValue>,
+    linkedSignal<SourceState, ComputedValue | undefined>({
+      source: signalOrigin as Signal<SourceState>,
       computation: (currentSourceState, previousData) => {
         // always when first listened return undefined
         if (!previousData && listenerOptions?.nullishFirstValue !== false) {
           return undefined;
         }
 
-        return currentSourceState;
+        return computedFn(currentSourceState);
       },
       ...(options?.equal && { equal: options?.equal }),
       ...(options?.debugName && { debugName: options?.debugName }),
@@ -45,7 +32,6 @@ export function computedSource<SourceState, ComputedValue>(
       preserveLastValue: listener({
         nullishFirstValue: false,
       }),
-      set: sourceState.set,
     }
   ) as ReadonlySource<any>;
 }

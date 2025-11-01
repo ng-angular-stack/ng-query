@@ -4,7 +4,6 @@ import { query } from '../query';
 import { Injectable, InjectionToken, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { usingInject } from './using-inject';
-import { Equal, Expect } from 'test-type';
 
 // todo expose inputs by {inputs, queryParams}
 // todo test injection tokens, geneics

@@ -2,12 +2,14 @@ import { usingQuery } from './using-query';
 import { serverState } from './server-state';
 import { query } from '../query';
 import { usingInputs } from './using-inputs';
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { usingSources } from './using-sources';
 import { source, Source } from './source';
+import { toSource } from './to-source';
+import { computedSource } from './computed-source';
 
-describe('usingInputs', () => {
+describe('usingSources', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -26,7 +28,7 @@ describe('usingInputs', () => {
         }),
         usingQuery('user', (context) => {
           return query({
-            params: context.myParams,
+            params: context.params,
             loader: async ({ params }) => {
               return {
                 id: params,
@@ -39,12 +41,16 @@ describe('usingInputs', () => {
       );
       const myParamsInput = signal('1');
       const paramsSource = signal('1');
-      const resetSource = source<{id: string}>();
-      const store = injectServerState((reset) => ({
+      const resetSource = source<{ id: string }>();
+      const store = injectServerState({
         myParams: myParamsInput, // required
-        params: paramsSource, // not required
-        reset(resetSource, ({id}) => id, { exposeSource: true }),
-    }));
+        connectParamsSourceTo: computedSource(
+          resetSource,
+          (sourceValue) => sourceValue.id
+        ),
+        // params: paramsSource, // not required
+        // connectResetSourceTo: (resetSourceValue) => resetSourceValue.id,
+      });
 
       store.setParams('1');
 

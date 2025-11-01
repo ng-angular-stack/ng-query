@@ -25,7 +25,7 @@ export function toSource<SourceState, ComputedValue>(
   });
 
   const listener = (listenerOptions: { nullishFirstValue?: boolean }) =>
-    linkedSignal<SourceState, SourceState | undefined>({
+    linkedSignal<SourceState, any>({
       source: sourceState as Signal<SourceState>,
       computation: (currentSourceState, previousData) => {
         // always when first listened return undefined
@@ -33,7 +33,9 @@ export function toSource<SourceState, ComputedValue>(
           return undefined;
         }
 
-        return currentSourceState;
+        return options?.computed
+          ? options.computed(currentSourceState)
+          : currentSourceState;
       },
       ...(options?.equal && { equal: options?.equal }),
       ...(options?.debugName && { debugName: options?.debugName }),
@@ -46,7 +48,6 @@ export function toSource<SourceState, ComputedValue>(
       preserveLastValue: listener({
         nullishFirstValue: false,
       }),
-      set: sourceState.set,
     }
   ) as ReadonlySource<any>;
 }

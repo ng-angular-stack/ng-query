@@ -1,21 +1,11 @@
-import { computed, effect, Signal, WritableSignal } from '@angular/core';
+import { effect, Signal, WritableSignal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
-import { Source } from './source';
 import { FilterPrivateFields } from './util/util.type';
+import { ReadonlySource } from './util/source.type';
+import { isSource } from './util/util';
 
-type ToConnectableSource<Sources, State> = {
-  [K in keyof Sources as `connectTo${Capitalize<
-    string & K
-  >}Source`]: Sources[K] extends Source<infer SourceType>
-    ? <Expose extends boolean = false>(
-        reducer: (source: SourceType) => State,
-        options?: {
-          expose?: Expose;
-        }
-      ) => () => State
-    : never;
-};
-
+// todo enable to sync with localStorage or sessionStorage
+// todo sync about async methods that can be used to handle
 type SpecificUsingStateOutputs<
   StateName extends string,
   State,
@@ -45,7 +35,12 @@ export function usingState<
   Context extends ContextConstraints,
   const StateName extends string,
   State,
-  Methods extends Record<string, (...args: any[]) => NoInfer<State>> | undefined
+  Methods extends
+    | Record<
+        string,
+        ((...args: any[]) => NoInfer<State>) | ReadonlySource<State>
+      >
+    | undefined
 >(
   stateName: StateName,
   stateFactory: (
@@ -58,7 +53,7 @@ export function usingState<
     state: Signal<NoInfer<State>>;
     context: Context['inputs'] &
       Context['__injections'] &
-      ToConnectableSource<Context['sources'], NoInfer<State>> &
+      Context['sources'] &
       Context['props'];
   }) => Methods
 ): UsingStateOutputs<Context, StateName, State, Methods> {
@@ -72,42 +67,57 @@ export function usingState<
 
     const state = stateResult;
     const readonlyState = stateResult.asReadonly();
-    const methods = methodsFactory?.({
+    const methodsData = methodsFactory?.({
       state: readonlyState,
       context: {
         ...contextData.context.inputs,
         ...contextData.context.__injections,
         ...contextData.context.props,
-        ...Object.entries(
-          contextData.context.sources as Record<string, Source<unknown>>
-        )?.reduce((acc, [sourceKey, source]) => {
-          const connectableName = `connectTo${unCapitalize(sourceKey)}Source`;
-          //@ts-expect-error Can not find a way to tell to TS that sourceKey is the key of source
-          acc[connectableName] = (
-            reducer: (sourceValue: unknown) => NoInfer<State>
-          ) => {
-            const source = (
-              contextData.context.sources as Record<string, Source<unknown>>
-            )[sourceKey];
-            effect(() => {
-              const sourceValue = source();
-              if (sourceValue !== undefined) {
-                const newState = reducer(sourceValue);
-                state.set(newState);
-              }
-            });
-            return () => {};
-          };
-          return acc;
-        }, {} as ToConnectableSource<Context['sources'], NoInfer<State>>),
+        ...contextData.context.sources,
       },
     });
-    Object.values(methods ?? {}).forEach((method) => {
-      const originalMethod = method as Function;
-      (method as Function) = (...args: any[]) => {
-        const result = originalMethod(...args);
-        state.set(result);
-      };
+    const { methodsConnectedToSource, methods } = Object.entries(
+      methodsData ?? {}
+    ).reduce(
+      (acc, [methodName, methodValue]) => {
+        if (isSource(methodValue)) {
+          acc.methodsConnectedToSource.push(
+            methodValue as ReadonlySource<unknown>
+          );
+          return acc;
+        }
+        acc.methods[methodName] = methodValue as Function;
+        return acc;
+      },
+      {
+        methodsConnectedToSource: [],
+        methods: {},
+      } as {
+        methodsConnectedToSource: ReadonlySource<unknown>[];
+        methods: Record<string, Function>;
+      }
+    );
+
+    const finalMethods = Object.entries(methods ?? {}).reduce(
+      (acc, [methodName, method]) => {
+        acc[methodName] = (...args: any[]) => {
+          console.log('args', args);
+          const result = method(...args);
+          console.log('result', result);
+          state.set(result);
+        };
+        return acc;
+      },
+      {} as Record<string, Function>
+    );
+
+    methodsConnectedToSource.forEach((sourceSignal) => {
+      effect(() => {
+        const newValue = sourceSignal();
+        if (newValue !== undefined) {
+          state.set(newValue as NoInfer<State>);
+        }
+      });
     });
 
     return {
@@ -118,11 +128,7 @@ export function usingState<
       __injections: {},
       __query: {},
       __mutation: {},
-      methods,
+      methods: finalMethods,
     } as unknown as SpecificUsingStateOutputs<StateName, State, Methods>;
   };
-}
-
-function unCapitalize(str: string) {
-  return str.charAt(0).toLowerCase() + str.slice(1);
 }

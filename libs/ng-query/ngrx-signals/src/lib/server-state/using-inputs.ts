@@ -27,6 +27,7 @@ export function usingInputs<
   Context extends ContextConstraints,
   Inputs extends {}
 >(inputs: Inputs): UsingInputsOutputs<Context, Inputs> {
+  // todo expose setXInputs as standalone ?
   return (contextData) => {
     return {
       props: {},

@@ -26,6 +26,7 @@ type UsingInputsOutputs<
 > = ServerStateFactoryUtility<Context, SpecificUsingSourcesOutputs<Inputs>>;
 
 // todo Sources extends Record<string, Source<unknown>>
+// todo expose setXSource as standalone ?
 export function usingSources<
   Context extends ContextConstraints,
   Sources extends Record<string, Source<any>>
