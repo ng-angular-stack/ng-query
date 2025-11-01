@@ -80,6 +80,7 @@ describe('usingSources', () => {
   });
 
   it('2- Should expose a way to call setXSource outside injection context', async () => {
+    const appRef = TestBed.inject(ApplicationRef);
     const { injectServerState, setIncrement } = serverState(
       usingSources({
         increment: source<{}>(),
@@ -88,22 +89,23 @@ describe('usingSources', () => {
         'test',
         () => signal(0),
         ({ context: { increment }, state }) => ({
-          increment: on(increment, () => state() + 1),
+          increment: on(increment, () => {
+            return state() + 1;
+          }),
         })
       )
     );
+
     await TestBed.runInInjectionContext(async () => {
       const store = injectServerState();
 
       expect(store.test()).toEqual(0);
-    });
 
-    setIncrement({});
+      appRef.tick();
+      setIncrement({});
 
-    await TestBed.runInInjectionContext(async () => {
-      const store = injectServerState();
+      appRef.tick();
 
-      await vi.runAllTimersAsync();
       expect(store.test()).toEqual(1);
     });
   });

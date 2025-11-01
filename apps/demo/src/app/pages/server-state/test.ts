@@ -10,7 +10,7 @@ import {
 
 const { injectServerState } = serverState(
   usingSources({
-    increment: source<string>(),
+    increment: source<{}>(),
   }),
   usingState(
     'test',
@@ -26,7 +26,7 @@ const { injectServerState } = serverState(
   standalone: true,
   imports: [CommonModule],
   template: ` {{ store.test() }}
-    <button (click)="store.setIncrement('gp')">Increment</button>`,
+    <button (click)="store.setIncrement({})">Increment</button>`,
 })
 export default class TestComponent {
   store = injectServerState();
