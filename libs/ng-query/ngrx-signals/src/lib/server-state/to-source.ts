@@ -1,6 +1,7 @@
 import {
   linkedSignal,
   Signal,
+  untracked,
   ValueEqualityFn,
   WritableSignal,
 } from '@angular/core';
@@ -32,10 +33,12 @@ export function toSource<SourceState, ComputedValue>(
         if (!previousData && listenerOptions?.nullishFirstValue !== false) {
           return undefined;
         }
-
-        return options?.computed
-          ? options.computed(currentSourceState)
-          : currentSourceState;
+        //! use untracked to avoid computed to be re-evaluated when used inside another effect/computed
+        return untracked(() =>
+          options?.computed
+            ? options?.computed?.(currentSourceState)
+            : currentSourceState
+        );
       },
       ...(options?.equal && { equal: options?.equal }),
       ...(options?.debugName && { debugName: options?.debugName }),

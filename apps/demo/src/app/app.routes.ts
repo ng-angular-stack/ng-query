@@ -53,4 +53,8 @@ export const appRoutes: Route[] = [
       },
     ],
   },
+  {
+    path: 'test',
+    loadComponent: () => import('./pages/server-state/test'),
+  },
 ];
