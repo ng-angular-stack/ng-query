@@ -1,7 +1,15 @@
-import { computed, Injector, linkedSignal, Signal } from '@angular/core';
+import {
+  computed,
+  Injector,
+  linkedSignal,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { Prettify } from '@ngrx/signals';
+import { createMethodHandlers } from './util/util';
+import { ReadonlySource } from './util/source.type';
 
 export interface QueryParamConfig<T = unknown> {
   defaultValue: NoInfer<T>;
@@ -38,13 +46,11 @@ type QueryParamMethods<
     options?: QueryParamNavigationOptions
   ) => void;
 } & {
-  // remove first argument (queryParams)
-  [K in keyof CustomMethods]: CustomMethods[K] extends (
-    first: infer QueryParamsState,
-    ...args: infer Rest
-  ) => any
-    ? (...args: Rest) => void
-    : never;
+  [K in keyof CustomMethods as `${CustomMethods[K] extends ReadonlySource<
+    infer State
+  >
+    ? never
+    : K & string}`]: CustomMethods[K];
 };
 
 type ToState<QueryParamConfigs> = {
@@ -56,17 +62,23 @@ type ToState<QueryParamConfigs> = {
 type UsingQueryParamsConfig<
   QueryParamsConfig,
   MethodKeys extends string,
-  Methods extends Record<
-    MethodKeys,
-    (
-      queryParams: Prettify<ToState<QueryParamsConfig>>,
-      ...args: any[]
-    ) => Prettify<ToState<QueryParamsConfig>>
-  >
+  Methods extends
+    | Record<
+        string,
+        | ((...args: any[]) => NoInfer<Prettify<ToState<QueryParamsConfig>>>)
+        | ReadonlySource<Prettify<ToState<QueryParamsConfig>>>
+      >
+    | undefined,
+  Context extends ContextConstraints
 > = {
   options?: QueryParamNavigationOptions;
-  methods?: Methods;
-  queryParams?: Prettify<ToState<QueryParamsConfig>>;
+  methods?: (state: {
+    queryParams: Signal<ToState<QueryParamsConfig>>;
+    context: Context['inputs'] &
+      Context['__injections'] &
+      Context['sources'] &
+      Context['props'];
+  }) => Methods;
 };
 
 type SpecificUsingQueryParamsOutputs<
@@ -92,6 +104,7 @@ type SpecificUsingQueryStandaloneOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>
 > = {
+  // todo omit methods bind to source
   [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
     T extends Partial<{
       [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
@@ -180,17 +193,22 @@ export function usingQueryParams<
   const QueryParamsName extends string,
   QueryParamsConfig extends Record<string, QueryParamConfig<unknown>>,
   MethodKeys extends string,
-  Methods extends Record<
-    MethodKeys,
-    (
-      queryParams: Prettify<ToState<QueryParamsConfig>>,
-      ...args: any[]
-    ) => Prettify<ToState<QueryParamsConfig>>
-  >
+  Methods extends
+    | Record<
+        string,
+        | ((...args: any[]) => NoInfer<Prettify<ToState<QueryParamsConfig>>>)
+        | ReadonlySource<Prettify<ToState<QueryParamsConfig>>>
+      >
+    | undefined
 >(
   queryParamsName: QueryParamsName,
   queryParamsFactory: () => QueryParamsConfig,
-  config?: UsingQueryParamsConfig<QueryParamsConfig, MethodKeys, Methods>
+  config?: UsingQueryParamsConfig<
+    QueryParamsConfig,
+    MethodKeys,
+    Methods,
+    Context
+  >
 ): UsingQueryParamsOutputs<
   Context,
   QueryParamsName,
@@ -228,7 +246,7 @@ export function usingQueryParams<
           return acc;
         }
       }, {} as Record<string, unknown>)
-    ) as Signal<ToState<QueryParamsConfig>>;
+    ) as WritableSignal<ToState<QueryParamsConfig>>;
 
     const props = Object.entries(queryParamsConfig).reduce(
       (acc, [key, config]) => {
@@ -265,7 +283,6 @@ export function usingQueryParams<
       state: Prettify<ToState<QueryParamsConfig>>,
       options?: QueryParamNavigationOptions
     ) => {
-      queryParamSignals.set(state);
       const serializedParams = serializeQueryParams(state, queryParamsConfig);
 
       navigateWithQueryParams(serializedParams, options);
@@ -313,25 +330,41 @@ export function usingQueryParams<
       },
     };
 
-    const customMethods = config?.methods
-      ? Object.entries(config.methods).reduce((acc, [name, fn]) => {
-          return {
-            ...acc,
-            [name]: (...args: unknown[]) => {
-              const newState = (fn as Function)(
-                queryParamsState() as Prettify<ToState<QueryParamsConfig>>,
-                ...args
-              );
-              // Use parseAndNavigate to apply the new state and navigate
-              serializeAndNavigate(newState);
-            },
-          };
-        }, {})
-      : {};
+    const methodsData = config?.methods?.({
+      queryParams: queryParamsState.asReadonly(),
+      context: {
+        ...contextData.inputs,
+        ...contextData.__injections,
+        ...contextData.props,
+        ...contextData.sources,
+      },
+    });
+
+    const finalMethods = createMethodHandlers(methodsData, queryParamsState, {
+      onStateChange: (newValue) => {
+        serializeAndNavigate(newValue);
+      },
+    });
+
+    // const customMethods = config?.methods
+    //   ? Object.entries(config.methods).reduce((acc, [name, fn]) => {
+    //       return {
+    //         ...acc,
+    //         [name]: (...args: unknown[]) => {
+    //           const newState = (fn as Function)(
+    //             queryParamsState() as Prettify<ToState<QueryParamsConfig>>,
+    //             ...args
+    //           );
+    //           // Use parseAndNavigate to apply the new state and navigate
+    //           serializeAndNavigate(newState);
+    //         },
+    //       };
+    //     }, {})
+    //   : {};
 
     const methods = {
       ...generalMethods,
-      ...customMethods,
+      ...finalMethods,
     } as QueryParamMethods<QueryParamsName, QueryParamsConfig, Methods>;
     console.log('methods', methods);
 

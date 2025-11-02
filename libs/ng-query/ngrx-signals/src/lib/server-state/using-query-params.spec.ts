@@ -5,6 +5,9 @@ import { usingQueryParams } from './using-query-params';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Location } from '@angular/common';
+import { usingSources } from './using-sources';
+import { source } from './source';
+import { on } from './on';
 @Component({
   template: '',
   standalone: true,
@@ -98,16 +101,16 @@ describe('usingQueryParams', () => {
           },
         }),
         {
-          methods: {
-            customMethod: (queryParams, newPage: number) => {
-              expectTypeOf(queryParams).toEqualTypeOf<{ page: number }>();
-              expect(queryParams.page).toBe(2);
+          methods: ({ queryParams }) => ({
+            customMethod: (newPage: number) => {
+              expectTypeOf(queryParams()).toEqualTypeOf<{ page: number }>();
+              expect(queryParams().page).toBe(2);
               return {
-                ...queryParams,
+                ...queryParams(),
                 page: newPage,
               };
             },
-          },
+          }),
         }
       )
     );
@@ -122,7 +125,56 @@ describe('usingQueryParams', () => {
       expect(store.page()).toBe(1);
       store.setPaginationQueryParams({ page: 2 });
       expect(store.page()).toBe(2);
+      expectTypeOf(store.customMethod).toEqualTypeOf<
+        (newPage: number) => { page: number }
+      >();
       store.customMethod(3);
+
+      expect(store.page()).toBe(3);
+    });
+  });
+
+  it('should accept custom methods that rely on source', () => {
+    const { injectServerState } = serverState(
+      usingSources({
+        nextPage: source<{}>(),
+      }),
+      usingQueryParams(
+        'pagination',
+        () => ({
+          page: {
+            defaultValue: 1,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+        }),
+        {
+          methods: ({ context: { nextPage }, queryParams }) => ({
+            nextPage: on(nextPage, (nextPage) => {
+              expectTypeOf(nextPage).toEqualTypeOf<{}>();
+              expectTypeOf(queryParams()).toEqualTypeOf<{ page: number }>();
+              expect(queryParams().page).toBe(2);
+              return {
+                ...queryParams(),
+                page: queryParams().page + 1,
+              };
+            }),
+          }),
+        }
+      )
+    );
+    TestBed.runInInjectionContext(() => {
+      const store = injectServerState();
+
+      expect(typeof store['customMethod']).toBe('function');
+      expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
+      expect(store.pagination().page).toBe(1);
+      expectTypeOf(store.page()).toEqualTypeOf<number>();
+      expect(store.page()).toBe(1);
+      store.setPaginationQueryParams({ page: 2 });
+      expect(store.page()).toBe(2);
+      //@ts-expect-error nextPage is not exposed
+      expectTypeOf(store.nextPage).toEqualTypeOf<unknown>();
       expect(store.page()).toBe(3);
     });
   });

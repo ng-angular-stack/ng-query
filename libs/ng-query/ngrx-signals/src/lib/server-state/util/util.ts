@@ -20,7 +20,10 @@ export function createMethodHandlers<State>(
         ((...args: any[]) => NoInfer<State>) | ReadonlySource<State>
       >
     | undefined,
-  state: WritableSignal<State>
+  state: WritableSignal<State>,
+  options?: {
+    onStateChange?: (newValue: State) => void;
+  }
 ) {
   const { methodsConnectedToSource, methods } = Object.entries(
     methodsData ?? {}
@@ -50,6 +53,7 @@ export function createMethodHandlers<State>(
         console.log('args', args);
         const result = method(...args);
         state.set(result);
+        options?.onStateChange?.(result);
       };
       return acc;
     },
