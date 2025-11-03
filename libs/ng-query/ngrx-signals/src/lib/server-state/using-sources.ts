@@ -21,6 +21,7 @@ type SpecificUsingSourcesOutputs<Sources extends {}> = {
   sources: Sources;
   __query: {};
   __mutation: {};
+  asyncMethods: {};
 };
 
 type UsingInputsOutputs<
@@ -55,6 +56,7 @@ export function usingSources<
       sources,
       __query: {},
       __mutation: {},
+      asyncMethods: {},
       methods,
     } as SpecificUsingSourcesOutputs<Sources>;
   }, methods) as unknown as UsingInputsOutputs<Context, Sources>;

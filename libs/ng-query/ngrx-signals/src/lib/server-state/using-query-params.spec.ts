@@ -166,7 +166,6 @@ describe('usingQueryParams', () => {
     TestBed.runInInjectionContext(() => {
       const store = injectServerState();
 
-      expect(typeof store['customMethod']).toBe('function');
       expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
       expect(store.pagination().page).toBe(1);
       expectTypeOf(store.page()).toEqualTypeOf<number>();

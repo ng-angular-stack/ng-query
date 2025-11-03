@@ -41,7 +41,6 @@ type SpecificUseMutationByIdOutputs<
   inputs: {};
   queryParams: {};
   sources: {};
-
   __injections: {};
   __mutation: {
     [key in ResourceName]: {
@@ -62,6 +61,7 @@ type SpecificUseMutationByIdOutputs<
     };
   };
   __query: {};
+  asyncMethods: {};
 };
 
 type UsingMutationOutputs<
@@ -158,6 +158,7 @@ export function usingMutationById<
       queryParams: {},
       sources: {},
       __query: {},
+      asyncMethods: {},
       methods: method
         ? {
             [`mutate${capitalizedMutationName}ById`]: (data: any) => {

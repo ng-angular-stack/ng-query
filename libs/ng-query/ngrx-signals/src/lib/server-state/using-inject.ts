@@ -21,6 +21,7 @@ type SpecificUsingInjectionsOutputs<Injections extends {}> = {
   };
   __query: {};
   __mutation: {};
+  asyncMethods: {};
 };
 
 type UsingInputsOutputs<
@@ -60,11 +61,11 @@ export function usingInject<
       inputs: {},
       queryParams: {},
       sources: {},
-
       __injections: injectedInjections,
       __query: {},
       __mutation: {},
       methods: {},
+      asyncMethods: {},
     } as SpecificUsingInjectionsOutputs<Injections>;
   };
 }

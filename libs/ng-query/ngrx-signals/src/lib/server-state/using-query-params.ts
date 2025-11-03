@@ -6,7 +6,11 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ContextInput,
+  ServerStateFactoryUtility,
+} from './server-state';
 import { Prettify } from '@ngrx/signals';
 import { createMethodHandlers } from './util/util';
 import { ReadonlySource } from './util/source.type';
@@ -98,13 +102,13 @@ type SpecificUsingQueryParamsOutputs<
   __injections: {};
   __query: {};
   __mutation: {};
+  asyncMethods: {};
 };
 
 type SpecificUsingQueryStandaloneOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>
 > = {
-  // todo omit methods bind to source
   [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
     T extends Partial<{
       [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
@@ -216,7 +220,7 @@ export function usingQueryParams<
   Methods
 > {
   const queryParamsConfig = queryParamsFactory();
-  const context = (contextData: ContextConstraints, injector: Injector) => {
+  const context = (contextData: ContextInput<Context>, injector: Injector) => {
     const router = injector.get(Router);
     const activatedRoute = injector.get(ActivatedRoute);
 
@@ -329,14 +333,14 @@ export function usingQueryParams<
         });
       },
     };
-
+    console.log('contextData', contextData);
     const methodsData = config?.methods?.({
       queryParams: queryParamsState.asReadonly(),
       context: {
-        ...contextData.inputs,
-        ...contextData.__injections,
-        ...contextData.props,
-        ...contextData.sources,
+        ...contextData.context.inputs,
+        ...contextData.context.__injections,
+        ...contextData.context.props,
+        ...contextData.context.sources,
       },
     });
 
@@ -379,6 +383,7 @@ export function usingQueryParams<
       __mutation: {},
       methods,
       sources: {},
+      asyncMethods: {},
       queryParams: {
         ...props,
         [`${queryParamsName}`]: queryParamsState,

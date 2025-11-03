@@ -50,7 +50,6 @@ export function createMethodHandlers<State>(
   const finalMethods = Object.entries(methods ?? {}).reduce(
     (acc, [methodName, method]) => {
       acc[methodName] = (...args: any[]) => {
-        console.log('args', args);
         const result = method(...args);
         state.set(result);
         options?.onStateChange?.(result);

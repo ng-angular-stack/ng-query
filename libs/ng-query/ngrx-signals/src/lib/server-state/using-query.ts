@@ -93,7 +93,7 @@ type SpecificUsingQueryOutputs<
   __injections: {};
   queryParams: {};
   sources: {};
-
+  asyncMethods: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryRef<
@@ -213,7 +213,7 @@ export function usingQuery<
       __injections: {},
       queryParams: {},
       sources: {},
-
+      asyncMethods: {},
       methods: {},
     } as SpecificUsingQueryOutputs<
       ResourceName,

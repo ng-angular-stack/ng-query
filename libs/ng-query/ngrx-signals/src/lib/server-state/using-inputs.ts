@@ -13,9 +13,9 @@ type SpecificUsingInputsOutputs<Inputs extends {}> = {
   __injections: {};
   queryParams: {};
   sources: {};
-
   __query: {};
   __mutation: {};
+  asyncMethods: {};
 };
 
 type UsingInputsOutputs<
@@ -35,10 +35,10 @@ export function usingInputs<
       __injections: {},
       queryParams: {},
       sources: {},
-
       __query: {},
       __mutation: {},
       methods: {},
+      asyncMethods: {},
     } as SpecificUsingInputsOutputs<Inputs>;
   };
 }

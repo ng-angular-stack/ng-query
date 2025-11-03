@@ -27,7 +27,7 @@ type SpecificUseMutationOutputs<
   __injections: {};
   queryParams: {};
   sources: {};
-
+  asyncMethods: {};
   __mutation: {
     [key in ResourceName]: {
       mutationRef: MutationRef<

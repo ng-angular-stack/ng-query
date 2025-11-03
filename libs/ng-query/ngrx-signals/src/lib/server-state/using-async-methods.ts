@@ -1,12 +1,10 @@
-import { Signal, WritableSignal } from '@angular/core';
+import { ResourceRef, Signal, WritableSignal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { FilterPrivateFields } from './util/util.type';
 import { ReadonlySource } from './util/source.type';
 import { createMethodHandlers } from './util/util';
 
-// todo enable to sync with localStorage or sessionStorage
-// todo sync about async methods that can be used to handle
-type SpecificUsingStateOutputs<
+type SpecificUsingAsyncMethodsOutputs<
   StateName extends string,
   State,
   Methods extends Record<string, (...args: any[]) => any> | undefined
@@ -22,42 +20,37 @@ type SpecificUsingStateOutputs<
   asyncMethods: {};
 };
 
-type UsingStateOutputs<
+type UsingAsyncMethodsOutputs<
   Context extends ContextConstraints,
   StateName extends string,
   State,
   Methods extends Record<string, (...args: any[]) => any> | undefined
 > = ServerStateFactoryUtility<
   Context,
-  SpecificUsingStateOutputs<StateName, State, Methods>
+  SpecificUsingAsyncMethodsOutputs<StateName, State, Methods>
 >;
 
-export function usingState<
+export type AsyncMethodRef<Value, Params> = {
+  // used as output to trigger the async method loader
+  method: (params: Params) => void;
+  readonly value: Signal<Value | undefined>;
+  readonly status: Signal<string>;
+  readonly error: Signal<Error | undefined>;
+  readonly isLoading: Signal<boolean>;
+  hasValue(): boolean;
+};
+
+export function usingAsyncMethods<
   Context extends ContextConstraints,
-  const StateName extends string,
-  State,
-  Methods extends
-    | Record<
-        string,
-        ((...args: any[]) => NoInfer<State>) | ReadonlySource<State>
-      >
-    | undefined
+  AsyncMethods extends Record<string, AsyncMethodRef<unknown, unknown>>
 >(
-  stateName: StateName,
-  stateFactory: (
+  asyncMethodsFactory: (
     context: Context['inputs'] &
       Context['__injections'] &
       Context['sources'] &
       Context['props']
-  ) => WritableSignal<State>,
-  methodsFactory?: (state: {
-    state: Signal<NoInfer<State>>;
-    context: Context['inputs'] &
-      Context['__injections'] &
-      Context['sources'] &
-      Context['props'];
-  }) => Methods
-): UsingStateOutputs<Context, StateName, State, Methods> {
+  ) => AsyncMethods
+): UsingAsyncMethodsOutputs<Context, StateName, State, Methods> {
   return (contextData, injector) => {
     const stateResult = stateFactory({
       ...contextData.context.inputs,
@@ -87,8 +80,8 @@ export function usingState<
       __injections: {},
       __query: {},
       __mutation: {},
-      asyncMethods: {},
       methods: finalMethods,
-    } as unknown as SpecificUsingStateOutputs<StateName, State, Methods>;
+      asyncMethods: {},
+    } as unknown as SpecificUsingAsyncMethodsOutputs<StateName, State, Methods>;
   };
 }

@@ -39,6 +39,7 @@ export type QueryDictionary = Record<
   }
 >;
 // todo ajouter standalone ? (s'exporte en plus de l'injection token ?)
+// todo rename __query/__mutation asyncMethods ?  props: publicProps/propsOutputs ?
 export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>; //? (editable in injectServerState/usingServerState)
@@ -48,6 +49,7 @@ export type ContextConstraints = {
   sources: {}; //? (editable in injectServerState/usingServerState)
   __mutation: {};
   __query: {};
+  asyncMethods: {};
 };
 
 type EmptyContext = {
@@ -57,14 +59,14 @@ type EmptyContext = {
   queryParams: {};
   sources: {};
   __injections: {};
-
+  asyncMethods: {};
   __mutation: {};
   __query: {};
 };
 
 type EmptyStandaloneContext = {};
 
-type ContextInput<Context extends ContextConstraints> = {
+export type ContextInput<Context extends ContextConstraints> = {
   context: Context;
 };
 
@@ -151,6 +153,7 @@ type MergeTwoContexts<
   __query: A['__query'] & B['__query'];
   queryParams: A['queryParams'] & B['queryParams'];
   sources: A['sources'] & B['sources'];
+  asyncMethods: A['asyncMethods'] & B['asyncMethods'];
 };
 
 type StandaloneOutputsConstraints = {};
@@ -336,6 +339,7 @@ export function serverState(
             __injections: {},
             __mutation: {},
             __query: {},
+            asyncMethods: {},
           } as EmptyContext,
           propsAndMethods: {},
         } as {
