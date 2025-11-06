@@ -1,28 +1,16 @@
 import { signal } from '@angular/core';
-import { MutationRef } from '../with-mutation';
 import { ResourceWithParamsOrParamsFn } from '../types/resource-with-params-or-params-fn.type';
 import { InsertionsFactory } from '../core/query.core';
 import { AsyncMethodRef } from './using-async-methods';
-import { ResourceMethod } from '../types/shared.type';
 
 // todo return resourceById if identifier is added
 
-type AsyncMethodOutput<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export type AsyncMethodOutput<
+  State extends object | undefined,
+  ArgParams,
+  Params,
   Insertions
-> = {
-  mutationRef: MutationRef<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
-    NoInfer<MutationArgsParams>,
-    Insertions
-  >;
-  resource: AsyncMethodRef<MutationState, MutationParams>;
-  method: ResourceMethod<MutationArgsParams, MutationParams> | undefined;
-  insertionsOutputs: Insertions;
-};
+> = AsyncMethodRef<State, ArgParams, Params, Insertions>;
 
 export function asyncMethod<
   MutationState extends object | undefined,

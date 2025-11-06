@@ -31,6 +31,8 @@ export type ResourceWithParamsOrParamsFn<ResourceState, Params, ParamsArgs> =
         | {
             /**
              * Used to generate a method in the store, when called will trigger the resource loader/stream.
+             *
+             * Only support one parameter which can be an object to pass multiple parameters.
              */
             method: (args: ParamsArgs) => Params;
             loader: (

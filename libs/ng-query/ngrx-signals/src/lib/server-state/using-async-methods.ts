@@ -1,16 +1,19 @@
-import { ResourceRef, Signal, WritableSignal } from '@angular/core';
+import { Signal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
-import { FilterPrivateFields } from './util/util.type';
-import { ReadonlySource } from './util/source.type';
 import { createMethodHandlers } from './util/util';
+import { MergeObject } from '../types/util.type';
 
-type SpecificUsingAsyncMethodsOutputs<
-  StateName extends string,
-  State,
-  Methods extends Record<string, (...args: any[]) => any> | undefined
-> = {
-  props: { [key in StateName]: Signal<State> };
-  methods: Methods extends undefined ? {} : FilterPrivateFields<Methods>;
+type SpecificUsingAsyncMethodsOutputs<AsyncMethods extends {}> = {
+  props: {
+    [key in keyof AsyncMethods]: Omit<AsyncMethods[key], 'method'>;
+  };
+  methods: {
+    [key in keyof AsyncMethods]: AsyncMethods[key] extends { method: infer M }
+      ? [M] extends [Function]
+        ? M
+        : never
+      : never;
+  };
   inputs: {};
   queryParams: {};
   sources: {};
@@ -22,27 +25,28 @@ type SpecificUsingAsyncMethodsOutputs<
 
 type UsingAsyncMethodsOutputs<
   Context extends ContextConstraints,
-  StateName extends string,
-  State,
-  Methods extends Record<string, (...args: any[]) => any> | undefined
+  AsyncMethods extends {}
 > = ServerStateFactoryUtility<
   Context,
-  SpecificUsingAsyncMethodsOutputs<StateName, State, Methods>
+  SpecificUsingAsyncMethodsOutputs<AsyncMethods>
 >;
 
-export type AsyncMethodRef<Value, Params> = {
-  // used as output to trigger the async method loader
-  method: (params: Params) => void;
-  readonly value: Signal<Value | undefined>;
-  readonly status: Signal<string>;
-  readonly error: Signal<Error | undefined>;
-  readonly isLoading: Signal<boolean>;
-  hasValue(): boolean;
-};
+export type AsyncMethodRef<Value, ArgParams, Params, Insertions> = MergeObject<
+  {
+    // used as output to trigger the async method loader
+    method: (args: ArgParams) => Params;
+    readonly value: Signal<Value | undefined>;
+    readonly status: Signal<string>;
+    readonly error: Signal<Error | undefined>;
+    readonly isLoading: Signal<boolean>;
+    hasValue(): boolean;
+  },
+  Insertions
+>;
 
 export function usingAsyncMethods<
   Context extends ContextConstraints,
-  AsyncMethods extends Record<string, AsyncMethodRef<unknown, unknown>>
+  AsyncMethods extends {}
 >(
   asyncMethodsFactory: (
     context: Context['inputs'] &
@@ -50,7 +54,7 @@ export function usingAsyncMethods<
       Context['sources'] &
       Context['props']
   ) => AsyncMethods
-): UsingAsyncMethodsOutputs<Context, StateName, State, Methods> {
+): UsingAsyncMethodsOutputs<Context, AsyncMethods> {
   return (contextData, injector) => {
     const stateResult = stateFactory({
       ...contextData.context.inputs,
