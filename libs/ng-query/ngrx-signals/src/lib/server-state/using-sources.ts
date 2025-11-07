@@ -35,6 +35,39 @@ type UsingInputsOutputs<
 
 // todo Sources extends Record<string, Source<unknown>>
 // todo expose setXSource as standalone ?
+// todo checker si les méthodes bien exposées
+/**
+ * Sources can be plugged into methods by using `on(mySource, (state, payload) => ...)`)`.
+ * Trigger the source:
+ * - store.setMySource(payload)
+ * - outside of injection context:
+ *    const { store, setMySource } = serverState();
+ *    setMySource(payload); // can be called outside of an injection context
+ *
+ * The sources can also be bind to external sources when the store is injected by using:
+ *  - private readonly store = injectServerState({mySource: this.componentSource}), or usingServerState({mySource: this.componentSource}),
+ *
+ * @example
+ * ```ts
+ * const { injectServerState, setIncrement } = serverState(
+ *   usingSources({
+ *     increment: source<{}>(),
+ *   }),
+ *   usingState(
+ *     'test',
+ *     () => signal(0),
+ *     ({ context: { increment }, state }) => ({
+ *       increment: on(increment, () => {
+ *         return state() + 1;
+ *       }),
+ *     })
+ *   )
+ * );
+ *
+ * // somewhere (no need to be in injection context)
+ * setIncrement({}); // trigger increment source
+ * ```
+ */
 export function usingSources<
   Context extends ContextConstraints,
   Sources extends Record<string, Source<any>>
