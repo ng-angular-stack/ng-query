@@ -1,19 +1,42 @@
 import { Signal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { createMethodHandlers } from './util/util';
-import { MergeObject } from '../types/util.type';
+import { MergeObjects, UnionToTuple } from '../types/util.type';
+import { ReadonlySource } from './util/source.type';
+import { Prettify } from '@ngrx/signals';
+
+type FilterMethodsBoundToSources<
+  Methods extends {},
+  Rest,
+  Acc = {}
+> = Rest extends [infer First, ...infer Next]
+  ? First extends keyof Methods
+    ? Methods[First] extends {
+        method: infer Method;
+      }
+      ? [Method] extends [ReadonlySource<infer SourceState>]
+        ? FilterMethodsBoundToSources<Methods, Next, Acc>
+        : FilterMethodsBoundToSources<
+            Methods,
+            Next,
+            Acc & {
+              [K in First & string]: [Method] extends [Function]
+                ? Method
+                : never;
+            }
+          >
+      : FilterMethodsBoundToSources<Methods, Next, Acc>
+    : FilterMethodsBoundToSources<Methods, Next, Acc>
+  : Acc;
 
 type SpecificUsingAsyncMethodsOutputs<AsyncMethods extends {}> = {
   props: {
-    [key in keyof AsyncMethods]: Omit<AsyncMethods[key], 'method'>;
+    [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;
   };
-  methods: {
-    [key in keyof AsyncMethods]: AsyncMethods[key] extends { method: infer M }
-      ? [M] extends [Function]
-        ? M
-        : never
-      : never;
-  };
+  methods: FilterMethodsBoundToSources<
+    AsyncMethods,
+    UnionToTuple<keyof AsyncMethods>
+  >;
   inputs: {};
   queryParams: {};
   sources: {};
@@ -31,17 +54,31 @@ type UsingAsyncMethodsOutputs<
   SpecificUsingAsyncMethodsOutputs<AsyncMethods>
 >;
 
-export type AsyncMethodRef<Value, ArgParams, Params, Insertions> = MergeObject<
-  {
-    // used as output to trigger the async method loader
-    method: (args: ArgParams) => Params;
-    readonly value: Signal<Value | undefined>;
-    readonly status: Signal<string>;
-    readonly error: Signal<Error | undefined>;
-    readonly isLoading: Signal<boolean>;
-    hasValue(): boolean;
-  },
-  Insertions
+export type AsyncMethodRef<
+  Value,
+  ArgParams,
+  Params,
+  Insertions,
+  IsMethod,
+  SourceParams
+> = MergeObjects<
+  [
+    {
+      readonly value: Signal<Value | undefined>;
+      readonly status: Signal<string>;
+      readonly error: Signal<Error | undefined>;
+      readonly isLoading: Signal<boolean>;
+      hasValue(): boolean;
+    },
+    Insertions,
+    IsMethod extends true
+      ? {
+          method: (args: ArgParams) => Params;
+        }
+      : {
+          method: ReadonlySource<SourceParams>;
+        }
+  ]
 >;
 
 export function usingAsyncMethods<
@@ -56,14 +93,16 @@ export function usingAsyncMethods<
   ) => AsyncMethods
 ): UsingAsyncMethodsOutputs<Context, AsyncMethods> {
   return (contextData, injector) => {
-    const stateResult = stateFactory({
+    const asyncMethods = asyncMethodsFactory({
       ...contextData.context.inputs,
       ...contextData.context.__injections,
       ...contextData.context.sources,
       ...contextData.context.props,
-    });
+    }) as Record<
+      string,
+      AsyncMethodRef<unknown, unknown, unknown, unknownx, unknown, unknown>
+    >;
 
-    const state = stateResult;
     const readonlyState = stateResult.asReadonly();
     const methodsData = methodsFactory?.({
       state: readonlyState,

@@ -1,38 +1,100 @@
-import { signal } from '@angular/core';
-import { ResourceWithParamsOrParamsFn } from '../types/resource-with-params-or-params-fn.type';
+import {
+  isSignal,
+  resource,
+  ResourceLoaderParams,
+  ResourceOptions,
+  ResourceRef,
+  ResourceStreamingLoader,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { InsertionsFactory } from '../core/query.core';
 import { AsyncMethodRef } from './using-async-methods';
+import { ResourceMethod } from '../types/shared.type';
+import { ReadonlySource } from './util/source.type';
 
 // todo return resourceById if identifier is added
+
+type AsyncMethodConfig<ResourceState, Params, ParamsArgs, SourceParams> =
+  | Omit<ResourceOptions<NoInfer<ResourceState>, Params>, 'params' | 'loader'> &
+      (
+        | {
+            /**
+             * Used to generate a method in the store, when called will trigger the resource loader/stream.
+             *
+             * Only support one parameter which can be an object to pass multiple parameters.
+             */
+            method:
+              | ((args: ParamsArgs) => Params)
+              | ReadonlySource<SourceParams>;
+            loader: (
+              param: NoInfer<ResourceLoaderParams<Params>>
+            ) => Promise<ResourceState>;
+            params?: never;
+            stream?: never;
+            preservePreviousValue?: () => boolean;
+          }
+        | {
+            method:
+              | ResourceMethod<ParamsArgs, Params>
+              | ReadonlySource<SourceParams>;
+            loader?: never;
+            params?: never;
+            /**
+             * Loading function which returns a `Promise` of a signal of the resource's value for a given
+             * request, which can change over time as new values are received from a stream.
+             */
+            stream: ResourceStreamingLoader<ResourceState, Params>;
+            preservePreviousValue?: () => boolean;
+          }
+      );
 
 export type AsyncMethodOutput<
   State extends object | undefined,
   ArgParams,
   Params,
+  SourceParams,
   Insertions
-> = AsyncMethodRef<State, ArgParams, Params, Insertions>;
+> = AsyncMethodRef<
+  State,
+  ArgParams,
+  Params,
+  Insertions,
+  [unknown] extends [ArgParams] ? false : true,
+  SourceParams
+>;
 
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
-  MutationArgsParams
+  MutationArgsParams,
+  SourceParams
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >
-): AsyncMethodOutput<MutationState, MutationParams, MutationArgsParams, {}>;
+): AsyncMethodOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
+  SourceParams,
+  {}
+>;
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -43,19 +105,22 @@ export function asyncMethod<
   MutationState,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1
 >;
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1,
   Insertion2
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -72,20 +137,23 @@ export function asyncMethod<
   MutationState,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1 & Insertion2
 >;
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1,
   Insertion2,
   Insertion3
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -108,21 +176,24 @@ export function asyncMethod<
   MutationState,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1 & Insertion2 & Insertion3
 >;
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
   Insertion4
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -151,22 +222,25 @@ export function asyncMethod<
   MutationState,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1 & Insertion2 & Insertion3 & Insertion4
 >;
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
   Insertion4,
   Insertion5
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -201,12 +275,14 @@ export function asyncMethod<
   MutationState,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
 >;
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -214,10 +290,11 @@ export function asyncMethod<
   Insertion5,
   Insertion6
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -258,12 +335,14 @@ export function asyncMethod<
   MutationState,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
 >;
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -272,10 +351,11 @@ export function asyncMethod<
   Insertion6,
   Insertion7
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -322,6 +402,7 @@ export function asyncMethod<
   MutationState,
   MutationParams,
   MutationArgsParams,
+  SourceParams,
   Insertion1 &
     Insertion2 &
     Insertion3 &
@@ -333,31 +414,42 @@ export function asyncMethod<
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
-  MutationArgsParams
+  MutationArgsParams,
+  SourceParams
 >(
-  mutationConfig: ResourceWithParamsOrParamsFn<
+  mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
-    MutationArgsParams
+    MutationArgsParams,
+    SourceParams
   >,
   ...insertions: any[]
-): AsyncMethodOutput<MutationState, MutationParams, MutationArgsParams, {}> {
+): AsyncMethodOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
+  SourceParams,
+  {}
+> {
   const mutationResourceParamsFnSignal = signal<MutationParams | undefined>(
     undefined
   );
 
-  const resourceParamsSrc =
-    mutationConfig.params ?? mutationResourceParamsFnSignal;
+  const resourceParamsSrc = isSignal(mutationConfig.method)
+    ? mutationConfig.method
+    : mutationResourceParamsFnSignal;
 
   const mutationResource = resource<MutationState, MutationParams>({
     ...mutationConfig,
     params: resourceParamsSrc,
   } as ResourceOptions<any, any>);
 
-  return {
-    resource: mutationResource,
-    method: mutationConfig.method,
-    insertionsOutputs: (
+  return Object.assign(
+    mutationResource,
+    {
+      method: mutationConfig.method,
+    },
+    (
       insertions as InsertionsFactory<
         NoInfer<MutationState>,
         NoInfer<MutationParams>,
@@ -374,6 +466,12 @@ export function asyncMethod<
           insertions: acc as {},
         }),
       };
-    }, {} as Record<string, unknown>),
-  };
+    }, {} as Record<string, unknown>)
+  ) as unknown as AsyncMethodOutput<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
+    SourceParams,
+    {}
+  >;
 }
