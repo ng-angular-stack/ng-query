@@ -23,6 +23,70 @@ const { injectServerState } = serverState(
   )
 );
 
+// const { usingBasicFeature } = serverState(
+//   usingSources({
+//     reset: source<{}>(),
+//   }),
+//   usingQueryParams(
+//     'pagination',
+//     () => ({
+//       page: {
+//         defaultValue: 1,
+//         parse: (value: string) => parseInt(value, 10),
+//         serialize: (value: unknown) => String(value),
+//       },
+//     }),
+//     {
+//       methods: ({ context: { reset }, queryParams }) => ({
+//         nextPage: () => ({
+//           ...queryParams(),
+//           page: queryParams().page + 1,
+//         }),
+//         _reset: on(reset, () => ({
+//           ...queryParams(),
+//           page: 1,
+//         })),
+//       }),
+//     }
+//   ),
+//   usingState(
+//     'counter',
+//     () => signal(0),
+//     ({ context: { reset }, state }) => ({
+//       increment: () => state() + 1,
+//       decrement: () => state() - 1,
+//       _reset: on(reset, () => 0),
+//     })
+//   ),
+//   {
+//     name: 'basicFeature'
+//   }
+// );
+
+// const {injectStore, setMyReset} = serverState(
+//   usingSources({
+//     myReset: source<{}>(),
+//   }),
+//   usingBasicFeature(({myReset}) => ({
+//     reset: myReset // bind the basicFeature reset source to myReset source
+//   })),
+//   usingState(
+//     'selectedProducts',
+//     () => signal([] as Book[]),
+//     ({ context: { reset }, state }) => ({
+//       addBook: //...,
+//       removeBook://...,
+//       _reset: on(reset, () => []),
+//     })
+//   ),
+//   {
+//     name: 'basicFeature',
+//   }
+// );
+
+// somewhere (no need to be in injection context)
+// setMyReset({}); // trigger myReset source
+
 @Component({
   selector: 'app-test',
   standalone: true,
