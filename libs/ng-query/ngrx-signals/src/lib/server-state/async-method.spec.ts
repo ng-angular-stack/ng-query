@@ -152,7 +152,7 @@ describe('asyncMethod types', () => {
       type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
       expectTypeOf<methods>().toEqualTypeOf<
         {
-          searchChange: (args: {
+          setSearchChange: (args: {
             timeToWait: number;
             searchChange: string;
           }) => {
@@ -160,7 +160,7 @@ describe('asyncMethod types', () => {
             searchChange: string;
           };
         } & {
-          filterChange: (args: { filter: string }) => {
+          setFilterChange: (args: { filter: string }) => {
             filter: string;
           };
         }
@@ -237,7 +237,7 @@ describe('asyncMethod types', () => {
       type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
       //   ^?
       expectTypeOf<methods>().toEqualTypeOf<{
-        filterChange: (args: { filter: string }) => {
+        setFilterChange: (args: { filter: string }) => {
           filter: string;
         };
       }>();

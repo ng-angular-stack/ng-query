@@ -2,10 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { serverState } from './server-state';
 import { usingAsyncMethods } from './using-async-methods';
 import { asyncMethod } from './async-method';
-import { Signal } from '@angular/core';
-import { on } from './on';
-import { source } from './source';
-import { ReadonlySource } from './util/source.type';
 
 // todo async methods and query/mutations should expose source
 // todo penser aux //asyncMethodsById
@@ -42,12 +38,12 @@ describe('usingAsyncMethods', () => {
         }))
       );
       const store = injectServerState();
-
       expect(store.searchChange.status()).toBe('idle');
-      store.searchChange({
+      store.setSearchChange({
         searchChange: 'test',
         timeToWait: 1000,
       });
+      await vi.advanceTimersByTimeAsync(500);
       expect(store.searchChange.status()).toBe('loading');
       await vi.runAllTimersAsync();
       expect(store.searchChange.status()).toBe('resolved');

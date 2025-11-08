@@ -1,9 +1,9 @@
 import { Signal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
-import { createMethodHandlers } from './util/util';
 import { MergeObjects, UnionToTuple } from '../types/util.type';
 import { ReadonlySource } from './util/source.type';
 import { Prettify } from '@ngrx/signals';
+import { capitalize } from './util/util';
 
 type FilterMethodsBoundToSources<
   Methods extends {},
@@ -20,7 +20,9 @@ type FilterMethodsBoundToSources<
             Methods,
             Next,
             Acc & {
-              [K in First & string]: [Method] extends [Function]
+              [K in First as `set${Capitalize<string & K>}`]: [Method] extends [
+                Function
+              ]
                 ? Method
                 : never;
             }
@@ -76,7 +78,7 @@ export type AsyncMethodRef<
           method: (args: ArgParams) => Params;
         }
       : {
-          method: ReadonlySource<SourceParams>;
+          source: ReadonlySource<SourceParams>;
         }
   ]
 >;
@@ -100,31 +102,55 @@ export function usingAsyncMethods<
       ...contextData.context.props,
     }) as Record<
       string,
-      AsyncMethodRef<unknown, unknown, unknown, unknownx, unknown, unknown>
+      AsyncMethodRef<unknown, unknown, unknown, unknown, unknown, unknown>
     >;
 
-    const readonlyState = stateResult.asReadonly();
-    const methodsData = methodsFactory?.({
-      state: readonlyState,
-      context: {
-        ...contextData.context.inputs,
-        ...contextData.context.__injections,
-        ...contextData.context.props,
-        ...contextData.context.sources,
+    const { methods, resourceRefs } = Object.entries(asyncMethods ?? {}).reduce(
+      (acc, [methodName, asyncMethodRef]) => {
+        const methodValue =
+          'method' in asyncMethodRef ? asyncMethodRef.method : undefined;
+        if (!methodValue) {
+          acc.resourceRefs[methodName] = asyncMethodRef;
+          return acc;
+        }
+        acc.resourceRefs[methodName] = {
+          ...asyncMethodRef,
+        };
+        acc.methods[`set${capitalize(methodName)}`] = methodValue as Function;
+        return acc;
       },
-    });
-    const finalMethods = createMethodHandlers<State>(methodsData, state);
+      {
+        methods: {},
+        resourceRefs: {},
+      } as {
+        resourceRefs: Record<
+          string,
+          Omit<
+            AsyncMethodRef<
+              unknown,
+              unknown,
+              unknown,
+              unknown,
+              unknown,
+              unknown
+            >,
+            'method' | 'source'
+          >
+        >;
+        methods: Record<string, Function>;
+      }
+    );
 
     return {
-      props: { [stateName]: readonlyState },
+      props: resourceRefs,
       inputs: {},
       queryParams: {},
       sources: {},
       __injections: {},
       __query: {},
       __mutation: {},
-      methods: finalMethods,
+      methods,
       asyncMethods: {},
-    } as unknown as SpecificUsingAsyncMethodsOutputs<StateName, State, Methods>;
+    } as unknown as SpecificUsingAsyncMethodsOutputs<AsyncMethods>;
   };
 }
