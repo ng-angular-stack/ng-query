@@ -5,8 +5,9 @@ import { on } from './on';
 import { source } from './source';
 import { ReadonlySource } from './util/source.type';
 import { TestBed } from '@angular/core/testing';
+import { Equal, Expect } from 'test-type';
 describe('asyncMethod', () => {
-  it('should enable to define async methods and be called with a method', async () => {
+  it('should enable to define async method and be called with a method', async () => {
     TestBed.runInInjectionContext(async () => {
       const myAsyncMethod = asyncMethod({
         method: ({
@@ -20,6 +21,8 @@ describe('asyncMethod', () => {
           searchChange,
         }),
         loader: async ({ params: { timeToWait, searchChange } }) => {
+          type ExpectTimeToWait = Expect<Equal<typeof timeToWait, number>>;
+          type ExpectSearchChange = Expect<Equal<typeof searchChange, string>>;
           await new Promise((resolve) => setTimeout(resolve, timeToWait));
           return { searchChange };
         },
@@ -27,6 +30,42 @@ describe('asyncMethod', () => {
 
       expect(myAsyncMethod.status()).toBe('idle');
       myAsyncMethod.method({
+        searchChange: 'test',
+        timeToWait: 1000,
+      });
+      expect(myAsyncMethod.status()).toBe('loading');
+      await vi.runAllTimersAsync();
+      expect(myAsyncMethod.status()).toBe('resolved');
+      expect(myAsyncMethod.value()).toBe('test');
+    });
+  });
+
+  it('should enable to define async method bind to a source', async () => {
+    TestBed.runInInjectionContext(async () => {
+      const searchSource = source<{
+        searchChange: string;
+        timeToWait: number;
+      }>();
+      const test = on(searchSource, (searchConfig) => searchConfig);
+      const result = test();
+      const myAsyncMethod = asyncMethod({
+        method: on(searchSource, (searchConfig) => searchConfig),
+        loader: async ({ params: { timeToWait, searchChange } }) => {
+          type ExpectTimeToWait = Expect<Equal<typeof timeToWait, number>>;
+          type ExpectSearchChange = Expect<Equal<typeof searchChange, string>>;
+          await new Promise((resolve) => setTimeout(resolve, timeToWait));
+          return { searchChange };
+        },
+      });
+
+      expect(myAsyncMethod.status()).toBe('idle');
+      expectTypeOf(myAsyncMethod.source).toEqualTypeOf<
+        ReadonlySource<{
+          searchChange: string;
+          timeToWait: number;
+        }>
+      >();
+      searchSource.set({
         searchChange: 'test',
         timeToWait: 1000,
       });
@@ -56,6 +95,10 @@ describe('asyncMethod types', () => {
             searchChange,
           }),
           loader: async ({ params: { timeToWait, searchChange } }) => {
+            type ExpectTimeToWait = Expect<Equal<typeof timeToWait, number>>;
+            type ExpectSearchChange = Expect<
+              Equal<typeof searchChange, string>
+            >;
             await new Promise((resolve) => setTimeout(resolve, timeToWait));
             return { searchChange };
           },
@@ -77,6 +120,7 @@ describe('asyncMethod types', () => {
       }));
 
       type props = ReturnType<typeof asyncMethodsOutput>['props'];
+      type s = props['searchChange'];
       expectTypeOf<props>().toEqualTypeOf<{
         searchChange: {
           readonly value: Signal<
@@ -126,7 +170,7 @@ describe('asyncMethod types', () => {
 
   it('should infer correctly the asyncMethod bind to a source type, and not exposed the method bind to a source', () => {
     TestBed.runInInjectionContext(() => {
-      const searchSource = source<{ searchChange: string }>();
+      const searchSource = source<{ searchChangeText: string }>();
       const asyncMethodsOutput = usingAsyncMethods(() => ({
         // should enable to provide multiples status
         // should provide async method by id
@@ -134,9 +178,12 @@ describe('asyncMethod types', () => {
           method: on(searchSource, (searchChange) => {
             return searchChange;
           }),
-          loader: async ({ params: searchChange }) => {
+          loader: async ({ params: { searchChangeText } }) => {
+            type ExpectSearchChangeText = Expect<
+              Equal<typeof searchChangeText, string>
+            >;
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            return { searchChange };
+            return { searchChangeText };
           },
         }),
         filterChange: asyncMethod(
@@ -158,18 +205,22 @@ describe('asyncMethod types', () => {
       type props = ReturnType<typeof asyncMethodsOutput>['props'];
       expectTypeOf<props>().toEqualTypeOf<{
         searchChange: {
+          readonly error: Signal<Error | undefined>;
           readonly value: Signal<
             | {
-                searchChange: unknown;
+                searchChangeText: string;
               }
             | undefined
           >;
           readonly status: Signal<string>;
-          readonly error: Signal<Error | undefined>;
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
+          source: ReadonlySource<{
+            searchChangeText: string;
+          }>;
         };
         filterChange: {
+          readonly error: Signal<Error | undefined>;
           readonly value: Signal<
             | {
                 filter: string;
@@ -177,7 +228,6 @@ describe('asyncMethod types', () => {
             | undefined
           >;
           readonly status: Signal<string>;
-          readonly error: Signal<Error | undefined>;
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
           additionalInsertion: 'injectedValue';
@@ -206,7 +256,6 @@ describe('asyncMethod types', () => {
         },
       });
       expectTypeOf<typeof _asyncMethodsOutput>().toEqualTypeOf<{
-        method: (args: string) => string;
         readonly value: Signal<
           | {
               searchChange: string;
@@ -216,7 +265,8 @@ describe('asyncMethod types', () => {
         readonly status: Signal<string>;
         readonly error: Signal<Error | undefined>;
         readonly isLoading: Signal<boolean>;
-        hasValue(): boolean;
+        hasValue: () => boolean;
+        method: (args: string) => string;
       }>();
     });
   });
@@ -231,23 +281,23 @@ describe('asyncMethod types', () => {
         }),
         loader: async ({ params: searchChange }) => {
           await new Promise((resolve) => setTimeout(resolve, 1000));
-          return { searchChange };
+          return { searchChangeResult: searchChange.searchChange };
         },
       });
       expectTypeOf<typeof _asyncMethodsOutput>().toEqualTypeOf<{
-        method: ReadonlySource<{
-          searchChange: string;
-        }>;
         readonly value: Signal<
           | {
-              searchChange: unknown;
+              searchChangeResult: string;
             }
           | undefined
         >;
         readonly status: Signal<string>;
         readonly error: Signal<Error | undefined>;
         readonly isLoading: Signal<boolean>;
-        hasValue(): boolean;
+        hasValue: () => boolean;
+        source: ReadonlySource<{
+          searchChange: string;
+        }>;
       }>();
     });
   });

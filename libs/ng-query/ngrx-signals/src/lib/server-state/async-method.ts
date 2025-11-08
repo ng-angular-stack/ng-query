@@ -10,15 +10,39 @@ import {
 } from '@angular/core';
 import { InsertionsFactory } from '../core/query.core';
 import { AsyncMethodRef } from './using-async-methods';
-import { ResourceMethod } from '../types/shared.type';
 import { ReadonlySource } from './util/source.type';
 
 // todo return resourceById if identifier is added
-
 type AsyncMethodConfig<ResourceState, Params, ParamsArgs, SourceParams> =
   | Omit<ResourceOptions<NoInfer<ResourceState>, Params>, 'params' | 'loader'> &
-      (
-        | {
+      // | {
+      //     /**
+      //      * Used to generate a method in the store, when called will trigger the resource loader/stream.
+      //      *
+      //      * Only support one parameter which can be an object to pass multiple parameters.
+      //      */
+      //     method?: never;
+      //     params: ReadonlySource<SourceParams>;
+      //     loader: (
+      //       param: ResourceLoaderParams<
+      //         [unknown] extends [Params] ? NoInfer<SourceParams> : Params
+      //       >
+      //     ) => Promise<ResourceState>;
+      //     stream?: never;
+      //     preservePreviousValue?: () => boolean;
+      //   }
+      // | {
+      //     method?: never;
+      //     params: ReadonlySource<SourceParams>;
+      //     loader?: never;
+      //     /**
+      //      * Loading function which returns a `Promise` of a signal of the resource's value for a given
+      //      * request, which can change over time as new values are received from a stream.
+      //      */
+      //     stream: ResourceStreamingLoader<ResourceState, Params>;
+      //     preservePreviousValue?: () => boolean;
+      //   }
+      (| {
             /**
              * Used to generate a method in the store, when called will trigger the resource loader/stream.
              *
@@ -28,23 +52,36 @@ type AsyncMethodConfig<ResourceState, Params, ParamsArgs, SourceParams> =
               | ((args: ParamsArgs) => Params)
               | ReadonlySource<SourceParams>;
             loader: (
-              param: NoInfer<ResourceLoaderParams<Params>>
+              param: ResourceLoaderParams<
+                NonNullable<
+                  [unknown] extends [Params]
+                    ? NoInfer<SourceParams>
+                    : NoInfer<Params>
+                >
+              >
             ) => Promise<ResourceState>;
-            params?: never;
             stream?: never;
             preservePreviousValue?: () => boolean;
           }
         | {
             method:
-              | ResourceMethod<ParamsArgs, Params>
+              | ((args: ParamsArgs) => Params)
               | ReadonlySource<SourceParams>;
             loader?: never;
-            params?: never;
             /**
              * Loading function which returns a `Promise` of a signal of the resource's value for a given
              * request, which can change over time as new values are received from a stream.
              */
-            stream: ResourceStreamingLoader<ResourceState, Params>;
+            stream: ResourceStreamingLoader<
+              ResourceState,
+              ResourceLoaderParams<
+                NonNullable<
+                  [unknown] extends [Params]
+                    ? NoInfer<SourceParams>
+                    : NoInfer<Params>
+                >
+              >
+            >;
             preservePreviousValue?: () => boolean;
           }
       );
@@ -60,7 +97,7 @@ export type AsyncMethodOutput<
   ArgParams,
   Params,
   Insertions,
-  [unknown] extends [ArgParams] ? false : true,
+  [unknown] extends [Params] ? false : true,
   SourceParams
 >;
 
@@ -435,7 +472,9 @@ export function asyncMethod<
     undefined
   );
 
-  const resourceParamsSrc = isSignal(mutationConfig.method)
+  const isConnectedToSource = isSignal(mutationConfig.method);
+
+  const resourceParamsSrc = isConnectedToSource
     ? mutationConfig.method
     : mutationResourceParamsFnSignal;
 
@@ -447,7 +486,12 @@ export function asyncMethod<
   return Object.assign(
     mutationResource,
     {
-      method: mutationConfig.method,
+      method: isSignal(mutationConfig.method)
+        ? undefined
+        : (arg: MutationArgsParams) => {
+            const result = mutationConfig.method(arg);
+            return result;
+          },
     },
     (
       insertions as InsertionsFactory<
