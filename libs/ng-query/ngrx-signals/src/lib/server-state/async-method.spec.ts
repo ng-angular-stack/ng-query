@@ -303,14 +303,6 @@ describe('asyncMethod types without identifier', () => {
   });
 });
 
-type InferSignalValue<T> = T extends AsyncMethodByIdRef<
-  infer GroupIdentifier,
-  infer Value,
-  infer Params
->
-  ? Value
-  : never;
-
 describe('asyncMethod types with identifier', () => {
   it('should infer correctly the types of asyncMethod', () => {
     TestBed.runInInjectionContext(() => {
@@ -356,8 +348,10 @@ describe('asyncMethod types with identifier', () => {
 
       type props = ReturnType<typeof asyncMethodsOutput>['props'];
       type s = props['searchChange'];
+      //.  ^?
+
       const searchType = {} as s;
-      const signalValue = searchType.asReadonly();
+      const signalValue = searchType();
       expectTypeOf<props>().toEqualTypeOf<{
         searchChange: {
           readonly value: Signal<
@@ -487,11 +481,13 @@ describe('asyncMethod types with identifier', () => {
         method: (searchChange: string) => {
           return searchChange;
         },
+        identifier: (searchChange) => searchChange,
         loader: async ({ params: searchChange }) => {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           return { searchChange };
         },
       });
+      const r = _asyncMethodsOutput()['test']?.value();
       expectTypeOf<typeof _asyncMethodsOutput>().toEqualTypeOf<{
         readonly value: Signal<
           | {

@@ -1,6 +1,6 @@
 import { Signal, WritableSignal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
-import { MergeObjects, UnionToTuple } from '../types/util.type';
+import { MergeObject, MergeObjects, UnionToTuple } from '../types/util.type';
 import { ReadonlySource } from './util/source.type';
 import { Prettify } from '@ngrx/signals';
 import { capitalize } from './util/util';
@@ -58,19 +58,17 @@ type UsingAsyncMethodsOutputs<
 >;
 
 export type AsyncMethodByIdRef<GroupIdentifier, State, ResourceParams> =
-  WritableSignal<
-    Prettify<
-      Partial<
-        Record<
-          GroupIdentifier & string,
-          {
-            readonly value: Signal<State | undefined>;
-            readonly status: Signal<string>;
-            readonly error: Signal<Error | undefined>;
-            readonly isLoading: Signal<boolean>;
-            hasValue(): boolean;
-          }
-        >
+  () => Prettify<
+    Partial<
+      Record<
+        GroupIdentifier & string,
+        {
+          readonly value: Signal<State | undefined>;
+          readonly status: Signal<string>;
+          readonly error: Signal<Error | undefined>;
+          readonly isLoading: Signal<boolean>;
+          hasValue(): boolean;
+        }
       >
     >
   >;
@@ -84,26 +82,31 @@ export type AsyncMethodRef<
   IsMethod,
   SourceParams,
   GroupIdentifier
-> = MergeObjects<
-  [
-    [unknown] extends [GroupIdentifier]
-      ? {
-          readonly value: Signal<Value | undefined>;
-          readonly status: Signal<string>;
-          readonly error: Signal<Error | undefined>;
-          readonly isLoading: Signal<boolean>;
-          hasValue(): boolean;
-        }
-      : AsyncMethodByIdRef<GroupIdentifier, Value, Params>,
-    Insertions,
-    IsMethod extends true
-      ? {
-          method: (args: ArgParams) => Params;
-        }
-      : {
-          source: ReadonlySource<SourceParams>;
-        }
-  ]
+> = MergeObject<
+  MergeObjects<
+    [
+      [unknown] extends [GroupIdentifier]
+        ? {
+            readonly value: Signal<Value | undefined>;
+            readonly status: Signal<string>;
+            readonly error: Signal<Error | undefined>;
+            readonly isLoading: Signal<boolean>;
+            hasValue(): boolean;
+          }
+        : {},
+      Insertions,
+      IsMethod extends true
+        ? {
+            method: (args: ArgParams) => Params;
+          }
+        : {
+            source: ReadonlySource<SourceParams>;
+          }
+    ]
+  >,
+  [unknown] extends [GroupIdentifier]
+    ? {}
+    : AsyncMethodByIdRef<GroupIdentifier, Value, Params>
 >;
 
 export function usingAsyncMethods<

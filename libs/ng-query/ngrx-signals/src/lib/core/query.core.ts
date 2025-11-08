@@ -18,7 +18,6 @@ import {
   createNestedStateUpdate,
 } from './update-state.util';
 import { MergeObjects } from '../types/util.type';
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 
 type UpdateData<
   QueryAndMutationRecord extends QueryAndMutationRecordConstraints
