@@ -11,10 +11,17 @@ import {
 import { InsertionsFactory } from '../core/query.core';
 import { AsyncMethodRef } from './using-async-methods';
 import { ReadonlySource } from './util/source.type';
+import { resourceById, ResourceByIdRef } from '../resource-by-id';
 
 // todo return resourceById if identifier is added
 //todo rename mutation to asyncMethod everywhere
-type AsyncMethodConfig<ResourceState, Params, ParamsArgs, SourceParams> =
+type AsyncMethodConfig<
+  ResourceState,
+  Params,
+  ParamsArgs,
+  SourceParams,
+  GroupIdentifier
+> =
   | Omit<ResourceOptions<NoInfer<ResourceState>, Params>, 'params' | 'loader'> &
       (
         | {
@@ -26,6 +33,13 @@ type AsyncMethodConfig<ResourceState, Params, ParamsArgs, SourceParams> =
             method:
               | ((args: ParamsArgs) => Params)
               | ReadonlySource<SourceParams>;
+            /**
+             * A unique identifier for the resource, derived from the params.
+             * It should be a string that uniquely identifies the resource based on the params.
+             */
+            identifier?: (
+              params: NoInfer<NonNullable<Params>>
+            ) => GroupIdentifier;
             loader: (
               param: ResourceLoaderParams<
                 NonNullable<
@@ -43,6 +57,9 @@ type AsyncMethodConfig<ResourceState, Params, ParamsArgs, SourceParams> =
               | ((args: ParamsArgs) => Params)
               | ReadonlySource<SourceParams>;
             loader?: never;
+            identifier?: (
+              params: NoInfer<NonNullable<Params>>
+            ) => GroupIdentifier;
             /**
              * Loading function which returns a `Promise` of a signal of the resource's value for a given
              * request, which can change over time as new values are received from a stream.
@@ -66,6 +83,7 @@ export type AsyncMethodOutput<
   ArgParams,
   Params,
   SourceParams,
+  GroupIdentifier,
   Insertions
 > = AsyncMethodRef<
   State,
@@ -73,26 +91,30 @@ export type AsyncMethodOutput<
   Params,
   Insertions,
   [unknown] extends [Params] ? false : true,
-  SourceParams
+  SourceParams,
+  GroupIdentifier
 >;
 
 export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  SourceParams
+  SourceParams,
+  GroupIdentifier
 >(
   mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >
 ): AsyncMethodOutput<
   MutationState,
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   {}
 >;
 export function asyncMethod<
@@ -100,13 +122,15 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1
 >(
   mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -118,6 +142,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1
 >;
 export function asyncMethod<
@@ -125,6 +150,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1,
   Insertion2
 >(
@@ -132,7 +158,8 @@ export function asyncMethod<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -150,6 +177,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1 & Insertion2
 >;
 export function asyncMethod<
@@ -157,6 +185,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1,
   Insertion2,
   Insertion3
@@ -165,7 +194,8 @@ export function asyncMethod<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -189,6 +219,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3
 >;
 export function asyncMethod<
@@ -196,6 +227,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -205,7 +237,8 @@ export function asyncMethod<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -235,6 +268,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4
 >;
 export function asyncMethod<
@@ -242,6 +276,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -252,7 +287,8 @@ export function asyncMethod<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -288,6 +324,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
 >;
 export function asyncMethod<
@@ -295,6 +332,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -306,7 +344,8 @@ export function asyncMethod<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -348,6 +387,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
 >;
 export function asyncMethod<
@@ -355,6 +395,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -367,7 +408,8 @@ export function asyncMethod<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -415,6 +457,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   Insertion1 &
     Insertion2 &
     Insertion3 &
@@ -427,13 +470,15 @@ export function asyncMethod<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  SourceParams
+  SourceParams,
+  GroupIdentifier
 >(
   mutationConfig: AsyncMethodConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    SourceParams
+    SourceParams,
+    GroupIdentifier
   >,
   ...insertions: any[]
 ): AsyncMethodOutput<
@@ -441,6 +486,7 @@ export function asyncMethod<
   MutationParams,
   MutationArgsParams,
   SourceParams,
+  GroupIdentifier,
   {}
 > {
   const mutationResourceParamsFnSignal = signal<MutationParams | undefined>(
@@ -448,23 +494,40 @@ export function asyncMethod<
   );
 
   const isConnectedToSource = isSignal(mutationConfig.method);
+  const isUsingIdentifier = 'identifier' in mutationConfig;
 
   const resourceParamsSrc = isConnectedToSource
     ? mutationConfig.method
     : mutationResourceParamsFnSignal;
 
-  const mutationResource = resource<MutationState, MutationParams>({
-    ...mutationConfig,
-    params: resourceParamsSrc,
-  } as ResourceOptions<any, any>);
+  const resourceTarget = isUsingIdentifier
+    ? resourceById<MutationState, MutationParams, GroupIdentifier & string>({
+        ...mutationConfig,
+        params: resourceParamsSrc,
+        identifier: mutationConfig.identifier,
+      } as any)
+    : resource<MutationState, MutationParams>({
+        ...mutationConfig,
+        params: resourceParamsSrc,
+      } as ResourceOptions<any, any>);
 
   return Object.assign(
-    mutationResource,
+    resourceTarget,
     {
       method: isSignal(mutationConfig.method)
         ? undefined
         : (arg: MutationArgsParams) => {
             const result = mutationConfig.method(arg);
+            if (isUsingIdentifier) {
+              const id = mutationConfig.identifier?.(arg as any);
+              (
+                resourceTarget as ResourceByIdRef<
+                  GroupIdentifier & string,
+                  MutationState,
+                  MutationParams
+                >
+              ).addById(id as GroupIdentifier & string);
+            }
             mutationResourceParamsFnSignal.set(result as MutationParams);
             return result;
           },
@@ -479,7 +542,7 @@ export function asyncMethod<
       return {
         ...acc,
         ...insert({
-          resource: mutationResource as ResourceRef<MutationState>,
+          resource: resourceTarget as ResourceRef<MutationState>,
           resourceParams: resourceParamsSrc as WritableSignal<
             NoInfer<MutationParams>
           >,
@@ -492,6 +555,7 @@ export function asyncMethod<
     MutationParams,
     MutationArgsParams,
     SourceParams,
+    GroupIdentifier,
     {}
   >;
 }

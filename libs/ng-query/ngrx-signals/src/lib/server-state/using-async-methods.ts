@@ -1,9 +1,10 @@
-import { Signal } from '@angular/core';
+import { Signal, WritableSignal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 import { MergeObjects, UnionToTuple } from '../types/util.type';
 import { ReadonlySource } from './util/source.type';
 import { Prettify } from '@ngrx/signals';
 import { capitalize } from './util/util';
+import { ResourceByIdHandler } from '../resource-by-id';
 
 type FilterMethodsBoundToSources<
   Methods extends {},
@@ -56,22 +57,44 @@ type UsingAsyncMethodsOutputs<
   SpecificUsingAsyncMethodsOutputs<AsyncMethods>
 >;
 
+export type AsyncMethodByIdRef<GroupIdentifier, State, ResourceParams> =
+  WritableSignal<
+    Prettify<
+      Partial<
+        Record<
+          GroupIdentifier & string,
+          {
+            readonly value: Signal<State | undefined>;
+            readonly status: Signal<string>;
+            readonly error: Signal<Error | undefined>;
+            readonly isLoading: Signal<boolean>;
+            hasValue(): boolean;
+          }
+        >
+      >
+    >
+  >;
+// ResourceByIdHandler<GroupIdentifier & string, State, ResourceParams>;
+
 export type AsyncMethodRef<
   Value,
   ArgParams,
   Params,
   Insertions,
   IsMethod,
-  SourceParams
+  SourceParams,
+  GroupIdentifier
 > = MergeObjects<
   [
-    {
-      readonly value: Signal<Value | undefined>;
-      readonly status: Signal<string>;
-      readonly error: Signal<Error | undefined>;
-      readonly isLoading: Signal<boolean>;
-      hasValue(): boolean;
-    },
+    [unknown] extends [GroupIdentifier]
+      ? {
+          readonly value: Signal<Value | undefined>;
+          readonly status: Signal<string>;
+          readonly error: Signal<Error | undefined>;
+          readonly isLoading: Signal<boolean>;
+          hasValue(): boolean;
+        }
+      : AsyncMethodByIdRef<GroupIdentifier, Value, Params>,
     Insertions,
     IsMethod extends true
       ? {
@@ -102,7 +125,15 @@ export function usingAsyncMethods<
       ...contextData.context.props,
     }) as Record<
       string,
-      AsyncMethodRef<unknown, unknown, unknown, unknown, unknown, unknown>
+      AsyncMethodRef<
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown,
+        unknown
+      >
     >;
 
     const { methods, resourceRefs } = Object.entries(asyncMethods ?? {}).reduce(
@@ -127,6 +158,7 @@ export function usingAsyncMethods<
           string,
           Omit<
             AsyncMethodRef<
+              unknown,
               unknown,
               unknown,
               unknown,
