@@ -47,7 +47,7 @@ describe('usingAsyncMethods', () => {
       expect(store.searchChange.status()).toBe('loading');
       await vi.runAllTimersAsync();
       expect(store.searchChange.status()).toBe('resolved');
-      expect(store.searchChange.value()).toBe('test');
+      expect(store.searchChange.value()).toEqual({ searchChange: 'test' });
     });
   });
 });
