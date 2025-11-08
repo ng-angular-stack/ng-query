@@ -35,24 +35,24 @@ const { injectUserListServerState } = serverState(
         parse: (value: string) => parseInt(value, 10),
         serialize: (value: unknown) => String(value),
       },
-    }),
-    {
-      methods: {
-        nextPage: (state) => ({
-          ...state,
-          page: state.page + 1,
-        }),
-        previousPage: (state) => ({
-          ...state,
-          page: Math.max(1, state.page - 1),
-        }),
-        setPageSize: (state, size: number) => ({
-          ...state,
-          page: 1,
-          pageSize: size,
-        }),
-      },
-    }
+    })
+    // {
+    //   methods: {
+    //     nextPage: (state) => ({
+    //       ...state,
+    //       page: state.page + 1,
+    //     }),
+    //     previousPage: (state) => ({
+    //       ...state,
+    //       page: Math.max(1, state.page - 1),
+    //     }),
+    //     setPageSize: (state, size: number) => ({
+    //       ...state,
+    //       page: 1,
+    //       pageSize: size,
+    //     }),
+    //   },
+    // }
   ),
   usingMutationById('user', ({ apiService }) =>
     rxMutationById({
@@ -89,7 +89,7 @@ export default class ListWithPagination {
 
   updatePageSize(event: Event) {
     const value = Number((event.target as HTMLSelectElement).value);
-    this.store.setPageSize(value);
+    // this.store.setPaginationQueryParams(value);
   }
 
   protected mutateUserName(user: User) {

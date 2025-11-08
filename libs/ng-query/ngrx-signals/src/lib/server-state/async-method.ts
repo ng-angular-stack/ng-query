@@ -13,36 +13,11 @@ import { AsyncMethodRef } from './using-async-methods';
 import { ReadonlySource } from './util/source.type';
 
 // todo return resourceById if identifier is added
+//todo rename mutation to asyncMethod everywhere
 type AsyncMethodConfig<ResourceState, Params, ParamsArgs, SourceParams> =
   | Omit<ResourceOptions<NoInfer<ResourceState>, Params>, 'params' | 'loader'> &
-      // | {
-      //     /**
-      //      * Used to generate a method in the store, when called will trigger the resource loader/stream.
-      //      *
-      //      * Only support one parameter which can be an object to pass multiple parameters.
-      //      */
-      //     method?: never;
-      //     params: ReadonlySource<SourceParams>;
-      //     loader: (
-      //       param: ResourceLoaderParams<
-      //         [unknown] extends [Params] ? NoInfer<SourceParams> : Params
-      //       >
-      //     ) => Promise<ResourceState>;
-      //     stream?: never;
-      //     preservePreviousValue?: () => boolean;
-      //   }
-      // | {
-      //     method?: never;
-      //     params: ReadonlySource<SourceParams>;
-      //     loader?: never;
-      //     /**
-      //      * Loading function which returns a `Promise` of a signal of the resource's value for a given
-      //      * request, which can change over time as new values are received from a stream.
-      //      */
-      //     stream: ResourceStreamingLoader<ResourceState, Params>;
-      //     preservePreviousValue?: () => boolean;
-      //   }
-      (| {
+      (
+        | {
             /**
              * Used to generate a method in the store, when called will trigger the resource loader/stream.
              *
@@ -490,6 +465,7 @@ export function asyncMethod<
         ? undefined
         : (arg: MutationArgsParams) => {
             const result = mutationConfig.method(arg);
+            mutationResourceParamsFnSignal.set(result as MutationParams);
             return result;
           },
     },

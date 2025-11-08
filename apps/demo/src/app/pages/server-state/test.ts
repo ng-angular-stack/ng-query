@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import {
+  asyncMethod,
   on,
   serverState,
   source,
+  usingAsyncMethods,
   usingSources,
   usingState,
 } from '@ng-query/ngrx-signals';
@@ -21,6 +23,32 @@ const { injectServerState } = serverState(
       decrement: on(decrement, () => state() - 1),
     })
   )
+);
+
+const { injectAsyncMethodsFeatureServerState } = serverState(
+  usingAsyncMethods(() => ({
+    // should enable to provide multiples status
+    // should provide async method by id
+    searchChange: asyncMethod({
+      method: ({
+        timeToWait,
+        searchChange,
+      }: {
+        timeToWait: number;
+        searchChange: string;
+      }) => ({
+        timeToWait,
+        searchChange,
+      }),
+      loader: async ({ params: { timeToWait, searchChange } }) => {
+        await new Promise((resolve) => setTimeout(resolve, timeToWait));
+        return { searchChange };
+      },
+    }),
+  })),
+  {
+    name: 'asyncMethodsFeature',
+  }
 );
 
 // const { usingBasicFeature } = serverState(
@@ -109,6 +137,22 @@ const { injectServerState } = serverState(
         </button>
       </div>
     </div>
+    <!-- Display async methods status /value-->
+    <div>
+      <h3>Async Method Status</h3>
+      <p>Status: {{ storeAsyncMethods.searchChange.status() }}</p>
+      <p>Value: {{ storeAsyncMethods.searchChange.value() | json }}</p>
+      <button
+        (click)="
+          storeAsyncMethods.setSearchChange({
+            searchChange: 'demo',
+            timeToWait: 1000,
+          })
+        "
+      >
+        Trigger Async Method
+      </button>
+    </div>
   `,
   styles: [
     `
@@ -186,4 +230,6 @@ const { injectServerState } = serverState(
 })
 export default class TestComponent {
   store = injectServerState();
+
+  storeAsyncMethods = injectAsyncMethodsFeatureServerState();
 }
