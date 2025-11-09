@@ -1,4 +1,5 @@
 import {
+  computed,
   isSignal,
   resource,
   ResourceLoaderParams,
@@ -13,7 +14,6 @@ import { AsyncMethodRef } from './using-async-methods';
 import { ReadonlySource } from './util/source.type';
 import { resourceById, ResourceByIdRef } from '../resource-by-id';
 
-// todo return resourceById if identifier is added
 //todo rename mutation to asyncMethod everywhere
 type AsyncMethodConfig<
   ResourceState,
@@ -513,6 +513,24 @@ export function asyncMethod<
 
   return Object.assign(
     resourceTarget,
+    // byId is used to helps TS to correctly infer the resourceByGroup
+    isUsingIdentifier
+      ? {
+          select: (id: GroupIdentifier) => {
+            return computed(() => {
+              const list = (
+                resourceTarget as ResourceByIdRef<
+                  GroupIdentifier & string,
+                  MutationState,
+                  MutationParams
+                >
+              )();
+              //@ts-expect-error GroupIdentifier & string is not recognized correctly
+              return list[id];
+            })();
+          },
+        }
+      : {},
     {
       method: isSignal(mutationConfig.method)
         ? undefined

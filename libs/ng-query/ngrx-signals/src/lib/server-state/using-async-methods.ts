@@ -1,10 +1,10 @@
-import { Signal, WritableSignal } from '@angular/core';
+import { Signal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
-import { MergeObject, MergeObjects, UnionToTuple } from '../types/util.type';
+import { MergeObjects, UnionToTuple } from '../types/util.type';
 import { ReadonlySource } from './util/source.type';
 import { Prettify } from '@ngrx/signals';
 import { capitalize } from './util/util';
-import { ResourceByIdHandler } from '../resource-by-id';
+import { ResourceByIdRef } from '../resource-by-id';
 
 type FilterMethodsBoundToSources<
   Methods extends {},
@@ -72,6 +72,7 @@ export type AsyncMethodByIdRef<GroupIdentifier, State, ResourceParams> =
       >
     >
   >;
+// ! It looks like TS does not handle to expose the ResourceByIdHandler without erasing the () => ... part
 // ResourceByIdHandler<GroupIdentifier & string, State, ResourceParams>;
 
 export type AsyncMethodRef<
@@ -82,31 +83,46 @@ export type AsyncMethodRef<
   IsMethod,
   SourceParams,
   GroupIdentifier
-> = MergeObject<
-  MergeObjects<
-    [
-      [unknown] extends [GroupIdentifier]
-        ? {
-            readonly value: Signal<Value | undefined>;
-            readonly status: Signal<string>;
-            readonly error: Signal<Error | undefined>;
-            readonly isLoading: Signal<boolean>;
-            hasValue(): boolean;
-          }
-        : {},
-      Insertions,
-      IsMethod extends true
-        ? {
-            method: (args: ArgParams) => Params;
-          }
-        : {
-            source: ReadonlySource<SourceParams>;
-          }
-    ]
-  >,
-  [unknown] extends [GroupIdentifier]
-    ? {}
-    : AsyncMethodByIdRef<GroupIdentifier, Value, Params>
+> = MergeObjects<
+  [
+    [unknown] extends [GroupIdentifier]
+      ? {
+          readonly value: Signal<Value | undefined>;
+          readonly status: Signal<string>;
+          readonly error: Signal<Error | undefined>;
+          readonly isLoading: Signal<boolean>;
+          hasValue(): boolean;
+        }
+      : {},
+    Insertions,
+    IsMethod extends true
+      ? {
+          method: (args: ArgParams) => Params;
+        }
+      : {
+          source: ReadonlySource<SourceParams>;
+        },
+    [unknown] extends [GroupIdentifier]
+      ? {}
+      : ResourceByIdRef<GroupIdentifier & string, Value, ArgParams> & {
+          /**
+           * Get the associated resource by id
+           *
+           * Only added to help TS inference (TS cannot infer ResourceByIdHandler without erasing the signal getter, () => ResourceByIdRef<...>) )
+           *
+           * return the associated resource or undefined if not existing
+           */
+          select: (id: GroupIdentifier) =>
+            | {
+                readonly value: Signal<Value | undefined>;
+                readonly status: Signal<string>;
+                readonly error: Signal<Error | undefined>;
+                readonly isLoading: Signal<boolean>;
+                hasValue(): boolean;
+              }
+            | undefined;
+        }
+  ]
 >;
 
 export function usingAsyncMethods<

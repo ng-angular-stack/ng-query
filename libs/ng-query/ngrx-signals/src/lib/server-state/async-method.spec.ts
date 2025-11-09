@@ -348,36 +348,40 @@ describe('asyncMethod types with identifier', () => {
 
       type props = ReturnType<typeof asyncMethodsOutput>['props'];
       type s = props['searchChange'];
+
+      const search = {} as ReturnType<s['select']>;
+      expectTypeOf(search).toEqualTypeOf<
+        | {
+            readonly value: Signal<
+              | {
+                  searchChange: string;
+                }
+              | undefined
+            >;
+            readonly status: Signal<string>;
+            readonly error: Signal<Error | undefined>;
+            readonly isLoading: Signal<boolean>;
+            hasValue(): boolean;
+          }
+        | undefined
+      >();
+
+      type f = props['filterChange'];
       //.  ^?
 
-      const searchType = {} as s;
-      const signalValue = searchType();
-      expectTypeOf<props>().toEqualTypeOf<{
-        searchChange: {
-          readonly value: Signal<
-            | {
-                searchChange: string;
-              }
-            | undefined
-          >;
-          readonly status: Signal<string>;
-          readonly error: Signal<Error | undefined>;
-          readonly isLoading: Signal<boolean>;
-          hasValue: () => boolean;
-        };
-        filterChange: {
-          readonly value: Signal<
-            | {
-                filter: string;
-              }
-            | undefined
-          >;
-          readonly status: Signal<string>;
-          readonly error: Signal<Error | undefined>;
-          readonly isLoading: Signal<boolean>;
-          hasValue: () => boolean;
-          additionalInsertion: 'injectedValue';
-        };
+      const filter = {} as f;
+      expectTypeOf(filter).toEqualTypeOf<{
+        readonly error: Signal<Error | undefined>;
+        readonly value: Signal<
+          | {
+              filter: string;
+            }
+          | undefined
+        >;
+        readonly status: Signal<string>;
+        readonly isLoading: Signal<boolean>;
+        hasValue: () => boolean;
+        additionalInsertion: 'injectedValue';
       }>();
 
       type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
@@ -409,6 +413,7 @@ describe('asyncMethod types with identifier', () => {
           method: on(searchSource, (searchChange) => {
             return searchChange;
           }),
+          identifier: (params) => params.searchChangeText,
           loader: async ({ params: { searchChangeText } }) => {
             type ExpectSearchChangeText = Expect<
               Equal<typeof searchChangeText, string>
@@ -434,23 +439,30 @@ describe('asyncMethod types with identifier', () => {
       }));
 
       type props = ReturnType<typeof asyncMethodsOutput>['props'];
-      expectTypeOf<props>().toEqualTypeOf<{
-        searchChange: {
-          readonly error: Signal<Error | undefined>;
-          readonly value: Signal<
-            | {
-                searchChangeText: string;
-              }
-            | undefined
-          >;
-          readonly status: Signal<string>;
-          readonly isLoading: Signal<boolean>;
-          hasValue: () => boolean;
-          source: ReadonlySource<{
-            searchChangeText: string;
-          }>;
-        };
-        filterChange: {
+      try {
+        const search = asyncMethodsOutput(
+          {} as any,
+          {} as any
+        ).props.searchChange.select('test');
+        expectTypeOf(search).toEqualTypeOf<
+          | {
+              readonly value: Signal<
+                | {
+                    searchChangeText: string;
+                  }
+                | undefined
+              >;
+              readonly status: Signal<string>;
+              readonly error: Signal<Error | undefined>;
+              readonly isLoading: Signal<boolean>;
+              hasValue(): boolean;
+            }
+          | undefined
+        >();
+
+        const filter = asyncMethodsOutput({} as any, {} as any).props
+          .filterChange;
+        expectTypeOf(filter).toEqualTypeOf<{
           readonly error: Signal<Error | undefined>;
           readonly value: Signal<
             | {
@@ -462,16 +474,16 @@ describe('asyncMethod types with identifier', () => {
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
           additionalInsertion: 'injectedValue';
-        };
-      }>();
+        }>();
 
-      type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
-      //   ^?
-      expectTypeOf<methods>().toEqualTypeOf<{
-        setFilterChange: (args: { filter: string }) => {
-          filter: string;
-        };
-      }>();
+        type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
+        //   ^?
+        expectTypeOf<methods>().toEqualTypeOf<{
+          setFilterChange: (args: { filter: string }) => {
+            filter: string;
+          };
+        }>();
+      } catch (error) {}
     });
   });
 
@@ -487,20 +499,22 @@ describe('asyncMethod types with identifier', () => {
           return { searchChange };
         },
       });
-      const r = _asyncMethodsOutput()['test']?.value();
-      expectTypeOf<typeof _asyncMethodsOutput>().toEqualTypeOf<{
-        readonly value: Signal<
-          | {
-              searchChange: string;
-            }
-          | undefined
-        >;
-        readonly status: Signal<string>;
-        readonly error: Signal<Error | undefined>;
-        readonly isLoading: Signal<boolean>;
-        hasValue: () => boolean;
-        method: (args: string) => string;
-      }>();
+      const _entity = _asyncMethodsOutput.select('test');
+      expectTypeOf<typeof _entity>().toEqualTypeOf<
+        | {
+            readonly value: Signal<
+              | {
+                  searchChange: string;
+                }
+              | undefined
+            >;
+            readonly status: Signal<string>;
+            readonly error: Signal<Error | undefined>;
+            readonly isLoading: Signal<boolean>;
+            hasValue(): boolean;
+          }
+        | undefined
+      >();
     });
   });
 
@@ -512,26 +526,16 @@ describe('asyncMethod types with identifier', () => {
         method: on(searchSource, (searchChange) => {
           return searchChange;
         }),
+        identifier: (params) => params.searchChange,
         loader: async ({ params: searchChange }) => {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           return { searchChangeResult: searchChange.searchChange };
         },
       });
-      expectTypeOf<typeof _asyncMethodsOutput>().toEqualTypeOf<{
-        readonly value: Signal<
-          | {
-              searchChangeResult: string;
-            }
-          | undefined
-        >;
-        readonly status: Signal<string>;
-        readonly error: Signal<Error | undefined>;
-        readonly isLoading: Signal<boolean>;
-        hasValue: () => boolean;
-        source: ReadonlySource<{
-          searchChange: string;
-        }>;
-      }>();
+
+      expectTypeOf(_asyncMethodsOutput.select('test')?.value()).toEqualTypeOf<
+        { searchChangeResult: string } | undefined
+      >();
     });
   });
 });

@@ -40,6 +40,7 @@ const { injectAsyncMethodsFeatureServerState } = serverState(
         timeToWait,
         searchChange,
       }),
+      identifier: (params) => params.searchChange,
       loader: async ({ params: { timeToWait, searchChange } }) => {
         await new Promise((resolve) => setTimeout(resolve, timeToWait));
         return { searchChange };
@@ -140,8 +141,10 @@ const { injectAsyncMethodsFeatureServerState } = serverState(
     <!-- Display async methods status /value-->
     <div>
       <h3>Async Method Status</h3>
-      <p>Status: {{ storeAsyncMethods.searchChange.status() }}</p>
-      <p>Value: {{ storeAsyncMethods.searchChange.value() | json }}</p>
+      <p>Status: {{ storeAsyncMethods.searchChange.byId('demo')?.status() }}</p>
+      <p>
+        Value: {{ storeAsyncMethods.searchChange.byId('demo')?.value() | json }}
+      </p>
       <button
         (click)="
           storeAsyncMethods.setSearchChange({
