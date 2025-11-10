@@ -96,7 +96,11 @@ export function usingMutationById<
 >(
   resourceName: ResourceName,
   mutationFactory: (
-    context: Context['inputs'] & Context['__injections'] & Context['sources']
+    context: Context['inputs'] &
+      Context['__injections'] &
+      Context['sources'] &
+      Context['queryParams'] &
+      Context['asyncMethods']
   ) => {
     // ! avoid to get the MutationRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
@@ -129,6 +133,8 @@ export function usingMutationById<
       ...contextData.context.inputs,
       ...contextData.context.__injections,
       ...contextData.context.queryParams,
+      ...contextData.context.sources,
+      ...contextData.context.asyncMethods,
     });
     const {
       mutationRef: {

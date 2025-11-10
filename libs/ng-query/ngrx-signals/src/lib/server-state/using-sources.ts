@@ -3,6 +3,7 @@ import { Source } from './source';
 import { capitalize } from './util/util';
 
 // todo expose standalone methods
+// todo Context['sources'] & Context['queryParams'] & Context['asyncMethods'];
 
 type InferSourceType<S> = S extends Source<infer T> ? T : never;
 

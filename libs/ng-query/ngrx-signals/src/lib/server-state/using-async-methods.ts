@@ -46,7 +46,9 @@ type SpecificUsingAsyncMethodsOutputs<AsyncMethods extends {}> = {
   __injections: {};
   __query: {};
   __mutation: {};
-  asyncMethods: {};
+  asyncMethods: {
+    [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;
+  };
 };
 
 type UsingAsyncMethodsOutputs<
@@ -201,7 +203,7 @@ export function usingAsyncMethods<
       __query: {},
       __mutation: {},
       methods,
-      asyncMethods: {},
+      asyncMethods: resourceRefs,
     } as unknown as SpecificUsingAsyncMethodsOutputs<AsyncMethods>;
   };
 }

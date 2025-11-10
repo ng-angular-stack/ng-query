@@ -51,6 +51,11 @@ export const appRoutes: Route[] = [
             './pages/server-state/pagination-granular-mutations/pagination-granular-mutations'
           ),
       },
+      {
+        path: 'granular-deletion-with-delay',
+        loadComponent: () =>
+          import('./pages/server-state/demo/granular-delay/granular-delay'),
+      },
     ],
   },
   {

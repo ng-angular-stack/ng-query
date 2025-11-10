@@ -25,6 +25,8 @@ const { injectServerState } = serverState(
   )
 );
 
+const mySource = source<{ test: string }>();
+
 const { injectAsyncMethodsFeatureServerState } = serverState(
   usingAsyncMethods(() => ({
     // should enable to provide multiples status
@@ -46,12 +48,56 @@ const { injectAsyncMethodsFeatureServerState } = serverState(
         return { searchChange };
       },
     }),
+    testSource: asyncMethod({
+      method: on(mySource, (payload) => payload),
+      loader: async ({ params: { test } }) => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return { test };
+      },
+    }),
   })),
   {
     name: 'asyncMethodsFeature',
   }
 );
 
+const myGlobalSource = source<{
+  timeToWait: number;
+  searchChange: string;
+}>();
+const { injectTest2ServerState } = serverState(
+  usingSources({
+    myLocalSource: source<{
+      timeToWait: number;
+      searchChange: string;
+    }>(),
+  }),
+  usingAsyncMethods(({ myLocalSource }) => ({
+    searchGlobalChange: asyncMethod({
+      method: on(myGlobalSource, (payload) => {
+        console.log('payload', payload);
+        return payload;
+      }),
+      identifier: (params) => params.searchChange,
+      loader: async ({ params: { timeToWait, searchChange }, abortSignal }) => {
+        await new Promise((resolve) => setTimeout(resolve, timeToWait));
+        return { searchChange };
+      },
+    }),
+    // searchLocalChange: asyncMethod({
+    //   method: on(myLocalSource, (payload) => payload),
+    //   identifier: (params) => params.searchChange,
+    //   loader: async ({ params: { timeToWait, searchChange } }) => {
+    //     await new Promise((resolve) => setTimeout(resolve, timeToWait));
+    //     console.log('loader', searchChange);
+    //     return { searchChange };
+    //   },
+    // }),
+  })),
+  {
+    name: 'test2',
+  }
+);
 // const { usingBasicFeature } = serverState(
 //   usingSources({
 //     reset: source<{}>(),
@@ -141,13 +187,35 @@ const { injectAsyncMethodsFeatureServerState } = serverState(
     <!-- Display async methods status /value-->
     <div>
       <h3>Async Method Status</h3>
-      <p>Status: {{ storeAsyncMethods.searchChange.byId('demo')?.status() }}</p>
       <p>
-        Value: {{ storeAsyncMethods.searchChange.byId('demo')?.value() | json }}
+        Status: {{ storeAsyncMethods.searchChange.select('demo')?.status() }}
+      </p>
+      <p>
+        Value:
+        {{ storeAsyncMethods.searchChange.select('demo')?.value() | json }}
       </p>
       <button
         (click)="
           storeAsyncMethods.setSearchChange({
+            searchChange: 'demo',
+            timeToWait: 1000,
+          })
+        "
+      >
+        Trigger Async Method
+      </button>
+    </div>
+
+    <div>
+      <h3>Async Method Status</h3>
+      <p>Status: {{ store2.searchGlobalChange.select('demo')?.status() }}</p>
+      <p>
+        Value:
+        {{ store2.searchGlobalChange.select('demo')?.value() | json }}
+      </p>
+      <button
+        (click)="
+          myGlobalSource.set({
             searchChange: 'demo',
             timeToWait: 1000,
           })
@@ -235,4 +303,8 @@ export default class TestComponent {
   store = injectServerState();
 
   storeAsyncMethods = injectAsyncMethodsFeatureServerState();
+
+  store2 = injectTest2ServerState();
+
+  myGlobalSource = myGlobalSource;
 }

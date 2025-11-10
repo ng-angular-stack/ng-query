@@ -22,6 +22,8 @@ import {
 import { ResourceByIdRef } from '../resource-by-id';
 import { nestedEffect } from '../types/util';
 
+// todo Context['sources'] & Context['queryParams'] & Context['asyncMethods'];
+
 type QueryOptions<
   Context extends ContextConstraints,
   ResourceState extends object | undefined,

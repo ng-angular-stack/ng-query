@@ -38,8 +38,10 @@ export type QueryDictionary = Record<
     __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
   }
 >;
-// todo ajouter standalone ? (s'exporte en plus de l'injection token ?)
+
 // todo rename __query/__mutation asyncMethods ?  props: publicProps/propsOutputs ?
+// todo find a way to simplify that, props exposed everywhere, _props only in stores and __props only in current store ?
+
 export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>; //? (editable in injectServerState/usingServerState)
@@ -320,6 +322,10 @@ export function serverState(
               sources: {
                 ...acc.context.sources,
                 ...result.sources,
+              },
+              asyncMethods: {
+                ...acc.context.asyncMethods,
+                ...result.asyncMethods,
               },
             },
             propsAndMethods: {
