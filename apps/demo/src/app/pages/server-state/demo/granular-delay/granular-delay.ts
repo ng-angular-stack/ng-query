@@ -20,6 +20,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
   usingAsyncMethods(() => ({
     delayDeleteWithUndo: asyncMethod({
       method: (payload: { id: string; status: 'delete' | 'cancel' }) => payload,
+      identifier: ({ id }) => id,
       loader: async ({ params: { id, status } }) => {
         if (status === 'cancel') {
           return { id, status };
@@ -27,9 +28,11 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
         await new Promise((resolve) => setTimeout(resolve, 3000));
         return { id, status: 'confirm' as const };
       },
-    }),
+    }), // todo expose lastResolved all ? ça compare la ref
   })),
   usingMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
+    // ! il peut y avoir une désyncrhonisation entre le trigger de params et la delayDeleteWithUndo
+    // ! permettre d'avoir params qui attend une liste de params ? Spécifique pour ce cas d'usage
     mutationById({
       params: () =>
         delayDeleteWithUndo.status() === 'resolved' &&
@@ -44,9 +47,9 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
   ),
   usingQuery('items', ({ apiService }) =>
     query({
-      params: () => true,
-      loader: () => {
-        return apiService.getDataList({ page: 1, pageSize: 10 });
+      params: () => ({ page: 1, pageSize: 10 }),
+      loader: ({ params: pagination }) => {
+        return apiService.getDataList(pagination);
       },
     })
   ),
@@ -59,6 +62,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
   selector: 'app-granular-delay',
   standalone: true,
   imports: [CommonModule, StatusComponent],
+  styleUrl: './granular-delay.css',
   template: `
     <div class="container">
       <main class="content">
@@ -88,6 +92,19 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
                     <td>{{ user.name }}</td>
 
                     <td>
+                      @if(store.delayDeleteWithUndo.status() === 'loading') {
+                      <button
+                        class="action-btn"
+                        (click)="
+                          store.setDelayDeleteWithUndo({
+                            id: user.id,
+                            status: 'cancel'
+                          })
+                        "
+                      >
+                        Cancel deletion
+                      </button>
+                      }@else {
                       <button
                         class="action-btn"
                         (click)="
@@ -99,6 +116,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
                       >
                         Delete
                       </button>
+                      }
                     </td>
                   </tr>
                   } @empty {
