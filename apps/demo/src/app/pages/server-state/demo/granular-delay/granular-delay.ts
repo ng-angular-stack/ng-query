@@ -33,6 +33,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
   usingMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
     // ! il peut y avoir une désyncrhonisation entre le trigger de params et la delayDeleteWithUndo
     // ! permettre d'avoir params qui attend une liste de params ? Spécifique pour ce cas d'usage
+    // todo use a symbol : params: paramsForEach(delayDeleteWithUndo, ...), le params va transmettre le resourceById pour pouvoir appeler le addById
     mutationById({
       params: () =>
         delayDeleteWithUndo.status() === 'resolved' &&

@@ -59,7 +59,7 @@ describe('usingInject', () => {
     class MyService<T> {
       myParams = signal('1');
       getValue(): T {
-        return {} as T;
+        return '1' as T;
       }
     }
     await TestBed.runInInjectionContext(async () => {
@@ -112,7 +112,7 @@ describe('usingInject', () => {
             params: () => myToken,
             loader: async ({ params }) => {
               return {
-                id: params,
+                id: params.id,
                 name: 'John Doe',
                 email: 'test@a.com',
               };
