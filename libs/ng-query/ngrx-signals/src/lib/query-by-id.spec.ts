@@ -5,6 +5,7 @@ import { inject, Injector, runInInjectionContext, signal } from '@angular/core';
 import { queryById } from './query-by-id';
 import { signalStore } from '@ngrx/signals';
 import { withQueryById } from './with-query-by-id';
+import { resourceById } from './resource-by-id';
 
 type User = {
   id: string;
@@ -243,6 +244,55 @@ describe('queryById', () => {
       expect(resource1?.status()).toEqual('resolved');
 
       vi.resetAllMocks();
+    });
+  });
+
+  it('should accepts a resourceById as source', async () => {
+    vi.useFakeTimers();
+
+    await TestBed.runInInjectionContext(async () => {
+      const source = resourceById({
+        params: () => ({ page: 1, pageSize: 10 }),
+        identifier: (params) => '' + params.page,
+        loader: async ({ params }) => {
+          await wait(1);
+          return {
+            id: '' + params.page,
+          };
+        },
+      });
+      source.addById('1', {
+        defaultValue: { id: '1' },
+      });
+      const result = queryById({
+        fromResourceById: source,
+        params: (resource) => {
+          expectTypeOf(resource.value()).toEqualTypeOf<{
+            id: string;
+          }>();
+          return resource.value();
+        },
+        identifier: (params) => '' + params.id,
+        loader: async ({ params }) => {
+          await wait(2000);
+          return {
+            id: '' + params.id,
+            name: 'John Doe',
+            email: 'test@a.com',
+          } satisfies User;
+        },
+      });
+      expect(result.queryRef).toBeDefined();
+
+      await vi.runAllTimersAsync();
+      const resource1 = result.queryRef.resourceById()['1'];
+
+      expect(resource1?.status()).toEqual('resolved');
+      expect(resource1?.value()).toEqual({
+        id: '1',
+        name: 'John Doe',
+        email: 'test@a.com',
+      });
     });
   });
 });

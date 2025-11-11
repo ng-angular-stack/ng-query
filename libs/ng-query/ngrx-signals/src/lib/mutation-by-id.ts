@@ -35,13 +35,19 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string
+  MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >
 ): MutationByIdOutput<
   MutationGroupIdentifier,
@@ -55,13 +61,19 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertions1
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertions1: InsertionsByIdFactory<
     NoInfer<MutationState>,
@@ -81,6 +93,9 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertions1,
   Insertions2
 >(
@@ -88,7 +103,10 @@ export function mutationById<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertions1: InsertionsByIdFactory<
     NoInfer<MutationState>,
@@ -115,6 +133,9 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertions1,
   Insertions2,
   Insertions3
@@ -123,7 +144,10 @@ export function mutationById<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertions1: InsertionsByIdFactory<
     NoInfer<MutationState>,
@@ -157,6 +181,9 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -166,7 +193,10 @@ export function mutationById<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertions1: InsertionsByIdFactory<
     NoInfer<MutationState>,
@@ -207,6 +237,9 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -217,7 +250,10 @@ export function mutationById<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertions1: InsertionsByIdFactory<
     NoInfer<MutationState>,
@@ -265,6 +301,9 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -276,7 +315,10 @@ export function mutationById<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertions1: InsertionsByIdFactory<
     NoInfer<MutationState>,
@@ -336,6 +378,9 @@ export function mutationById<
   MutationParams,
   MutationArgsParams,
   MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertions1,
   Insertions2,
   Insertions3,
@@ -348,7 +393,10 @@ export function mutationById<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertions1: InsertionsByIdFactory<
     NoInfer<MutationState>,
@@ -420,13 +468,19 @@ export function mutationById<
   MutationState extends object | undefined,
   MutationParams,
   MutationArgsParams,
-  MutationGroupIdentifier extends string
+  MutationGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
 >(
   mutationConfig: ResourceByIdConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   ...insertions: any[]
 ): MutationByIdOutput<
@@ -446,7 +500,10 @@ export function mutationById<
   const mutationResourcesById = resourceById<
     MutationState,
     MutationParams,
-    MutationGroupIdentifier
+    MutationGroupIdentifier,
+    string,
+    unknown,
+    unknown
   >({
     ...mutationConfig,
     //@ts-expect-error TS wrong infer

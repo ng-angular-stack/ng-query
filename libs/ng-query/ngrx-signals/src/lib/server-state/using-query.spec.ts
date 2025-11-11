@@ -825,8 +825,8 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
 // Typing test👇
 
 type InferServerStateFeatureReturnedType<
-  T extends ServerStateFactory<[any], any>
-> = T extends ServerStateFactory<any, infer R> ? R : never;
+  T extends ServerStateFactory<[any], any, any>
+> = T extends ServerStateFactory<any, infer R, any> ? R : never;
 
 describe('usingQuery typing', () => {
   it('Should be well typed', () => {

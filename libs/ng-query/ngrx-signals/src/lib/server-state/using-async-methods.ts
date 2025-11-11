@@ -107,6 +107,11 @@ export type AsyncMethodRef<
     [unknown] extends [GroupIdentifier]
       ? {}
       : ResourceByIdRef<GroupIdentifier & string, Value, ArgParams> & {
+          _resourceById: ResourceByIdRef<
+            GroupIdentifier & string,
+            Value,
+            ArgParams
+          >;
           /**
            * Get the associated resource by id
            *

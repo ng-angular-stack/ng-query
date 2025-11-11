@@ -37,6 +37,9 @@ export function queryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   InsertionsOutput
 >(
   queryConfig: Omit<
@@ -44,7 +47,10 @@ export function queryById<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -66,6 +72,9 @@ export function queryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   InsertionsOutput1,
   InsertionsOutput2
 >(
@@ -74,7 +83,10 @@ export function queryById<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -103,6 +115,9 @@ export function queryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3
@@ -112,7 +127,10 @@ export function queryById<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -148,6 +166,9 @@ export function queryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -158,7 +179,10 @@ export function queryById<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -201,6 +225,9 @@ export function queryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -212,7 +239,10 @@ export function queryById<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -269,6 +299,9 @@ export function queryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -281,7 +314,10 @@ export function queryById<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -350,6 +386,9 @@ export function queryById<
   QueryParams,
   QueryArgsParams,
   QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   InsertionsOutput1,
   InsertionsOutput2,
   InsertionsOutput3,
@@ -363,7 +402,10 @@ export function queryById<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -444,14 +486,20 @@ export function queryById<
   QueryState extends object | undefined,
   QueryParams,
   QueryArgsParams,
-  QueryGroupIdentifier extends string
+  QueryGroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
 >(
   queryConfig: Omit<
     ResourceByIdConfig<
       QueryState,
       QueryParams,
       QueryArgsParams,
-      QueryGroupIdentifier
+      QueryGroupIdentifier,
+      FromObjectGroupIdentifier,
+      FromObjectState,
+      FromObjectResourceParams
     >,
     'method'
   >,
@@ -472,7 +520,10 @@ export function queryById<
   const queryResourcesById = resourceById<
     QueryState,
     QueryParams,
-    QueryGroupIdentifier
+    QueryGroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >({
     ...queryConfig,
     //@ts-expect-error TS type error

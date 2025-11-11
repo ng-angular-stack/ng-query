@@ -50,6 +50,7 @@ export type ResourceByIdHandler<
     options?: {
       defaultParam?: ResourceParams;
       defaultValue?: State;
+      paramsFromResourceById?: ResourceRef<unknown>;
     }
   ) => ResourceRef<State>;
 };
@@ -76,22 +77,60 @@ export type EqualParams<ResourceParams, GroupIdentifier extends string> =
       identifierFn: (params: ResourceParams) => GroupIdentifier
     ) => boolean);
 
+type ResourceByIdConfig<
+  State,
+  ResourceParams,
+  GroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
+> = Omit<ResourceOptions<State, ResourceParams>, 'params'> &
+  (
+    | {
+        fromResourceById?: never;
+        params: () => ResourceParams;
+        identifier: Identifier<NoInfer<ResourceParams>, GroupIdentifier>;
+        equalParams?: EqualParams<ResourceParams, GroupIdentifier>;
+      }
+    | {
+        /**
+         * Use it, when you need to bind a ResourceByIdRef to another ResourceByIdRef.
+         * It will kill the fromObject keys syncing when the fromObject resource change.
+         */
+        fromResourceById: ResourceByIdRef<
+          FromObjectGroupIdentifier,
+          FromObjectState,
+          FromObjectResourceParams
+        >;
+        params: (
+          entity: ResourceRef<NoInfer<FromObjectState>>
+        ) => ResourceParams;
+        identifier: Identifier<NoInfer<ResourceParams>, GroupIdentifier>;
+        equalParams?: EqualParams<ResourceParams, GroupIdentifier>;
+      }
+  );
+
 export function resourceById<
   State,
   ResourceParams,
-  GroupIdentifier extends string
->({
-  identifier,
-  params,
-  loader,
-  stream,
-  equalParams,
-}: Omit<ResourceOptions<State, ResourceParams>, 'params'> & {
-  params: () => ResourceParams; // must be a mandatory field
-  identifier: Identifier<NoInfer<ResourceParams>, GroupIdentifier>;
-  equalParams?: EqualParams<ResourceParams, GroupIdentifier>;
-}): ResourceByIdRef<GroupIdentifier, State, ResourceParams> {
+  GroupIdentifier extends string,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
+>(
+  config: ResourceByIdConfig<
+    State,
+    ResourceParams,
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
+  >
+): ResourceByIdRef<GroupIdentifier, State, ResourceParams> {
   const injector = inject(Injector);
+  const { identifier, params, loader, stream, equalParams } = config;
+  const fromResourceById =
+    'fromResourceById' in config ? config.fromResourceById : undefined;
 
   // maybe create a linkedSignal to enable to reset
   const resourceByGroup = signal<
@@ -105,57 +144,60 @@ export function resourceById<
       : equalParams;
 
   // this effect is used to create a mapped ResourceRef instance
-  effect(() => {
-    const requestValue = params();
-    if (!requestValue) {
-      return;
-    }
-    const group = identifier(requestValue);
+  if (!fromResourceById) {
+    effect(() => {
+      //@ts-expect-error TypeScript misinterpreting, params here has no parameter
+      const requestValue = params();
+      if (!requestValue) {
+        return;
+      }
+      const group = identifier(requestValue);
 
-    // The effect should only trigger when the request change
-    const resourceByGroupValue = untracked(() => resourceByGroup());
-    const groupResourceRefExist = resourceByGroupValue[group];
-    if (groupResourceRefExist) {
-      // nothing to do, the resource is already bind with the request
-      return;
-    }
+      // The effect should only trigger when the request change
+      const resourceByGroupValue = untracked(() => resourceByGroup());
+      const groupResourceRefExist = resourceByGroupValue[group];
+      if (groupResourceRefExist) {
+        // nothing to do, the resource is already bind with the request
+        return;
+      }
 
-    const filteredRequestByGroup = linkedSignal({
-      source: params,
-      computation: (incomingRequestValue, previousGroupRequestData) => {
-        if (!incomingRequestValue) {
+      const filteredRequestByGroup = linkedSignal({
+        source: params as () => ResourceParams,
+        computation: (incomingRequestValue, previousGroupRequestData) => {
+          if (!incomingRequestValue) {
+            return incomingRequestValue;
+          }
+          // filter the request push a value by comparing with the current group
+          if (identifier(incomingRequestValue) !== group) {
+            return previousGroupRequestData?.value;
+          }
+          // The request push a value that concerns the current group
           return incomingRequestValue;
-        }
-        // filter the request push a value by comparing with the current group
-        if (identifier(incomingRequestValue) !== group) {
-          return previousGroupRequestData?.value;
-        }
-        // The request push a value that concerns the current group
-        return incomingRequestValue;
-      },
-    });
+        },
+      });
 
-    //@ts-expect-error TypeScript misinterpreting
-    const paramsWithEqualRule = computed(() => filteredRequestByGroup(), {
-      ...(equalParams !== 'default' && { equal: resourceEqualParams }),
-    });
+      //@ts-expect-error TypeScript misinterpreting
+      const paramsWithEqualRule = computed(() => filteredRequestByGroup(), {
+        ...(equalParams !== 'default' && { equal: resourceEqualParams }),
+      });
 
-    const resourceRef = createDynamicResource(injector, {
-      group,
-      //@ts-expect-error stream and loader conflict
-      resourceOptions: {
-        loader,
-        params: paramsWithEqualRule,
-        stream,
-      },
-    });
+      const resourceRef = createDynamicResource(injector, {
+        group,
+        //@ts-expect-error stream and loader conflict
+        resourceOptions: {
+          loader,
+          params: paramsWithEqualRule,
+          stream,
+        },
+      });
 
-    // attach a new instance of ResourceRef to the resourceByGroup
-    resourceByGroup.update((state) => ({
-      ...state,
-      [group]: resourceRef,
-    }));
-  });
+      // attach a new instance of ResourceRef to the resourceByGroup
+      resourceByGroup.update((state) => ({
+        ...state,
+        [group]: resourceRef,
+      }));
+    });
+  }
 
   const resourcesHandler: ResourceByIdHandler<
     GroupIdentifier,
@@ -185,7 +227,7 @@ export function resourceById<
         return resourceByGroup()[group] as ResourceRef<State>;
       }
       const filteredGlobalParamsByGroup = linkedSignal({
-        source: params,
+        source: params as () => ResourceParams,
         computation: (incomingParamsValue, previousGroupParamsData) => {
           if (!incomingParamsValue) {
             return incomingParamsValue;
@@ -227,10 +269,17 @@ export function resourceById<
     },
     addById: (
       group,
-      options?: { defaultValue?: State; defaultParam?: ResourceParams }
+      options?: {
+        defaultValue?: State;
+        defaultParam?: ResourceParams;
+        paramsFromResourceById?: ResourceRef<unknown>;
+      }
     ) => {
       const filteredGlobalParamsByGroup = linkedSignal({
-        source: params,
+        source: () =>
+          params(
+            options?.paramsFromResourceById as ResourceRef<FromObjectState>
+          ),
         computation: (incomingParamsValue, previousGroupParamsData) => {
           if (!incomingParamsValue) {
             return incomingParamsValue ?? options?.defaultParam;
@@ -271,6 +320,31 @@ export function resourceById<
       return resourceRef;
     },
   };
+
+  effect(() => {
+    const fromResourceByIdValue = fromResourceById?.();
+    if (!fromResourceByIdValue) {
+      return;
+    }
+    const resourceByGroupValue = resourceByGroup();
+    Object.entries(fromResourceByIdValue).forEach(([key, resource]) => {
+      const currentParams = params(resource as ResourceRef<FromObjectState>);
+      if (!currentParams) {
+        return;
+      }
+
+      untracked(() => {
+        const group = identifier(currentParams as any);
+        const existingResourceRef = resourceByGroupValue[group];
+        if (existingResourceRef) {
+          return;
+        }
+        resourcesHandler.addById(group, {
+          paramsFromResourceById: resource as ResourceRef<FromObjectState>,
+        });
+      });
+    });
+  });
 
   return Object.assign(resourceByGroup, resourcesHandler);
 }

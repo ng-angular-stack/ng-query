@@ -13,6 +13,13 @@ import {
 import { ApiService } from './api.service';
 import { StatusComponent } from '../../../../ui/status.component';
 
+// Promise/abort
+// fromResourceById limitation de TS
+
+// présenter l'équivalent avec un effect pour trigger un appel API -  utilisation d'un nestedEffect
+
+// suite: usingComputed/rename/inject/usingLocalGlobal
+
 const { injectGranularDeletionWithDelayServerState } = serverState(
   usingInject(() => ({
     ApiService,
@@ -28,31 +35,47 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
         await new Promise((resolve) => setTimeout(resolve, 3000));
         return { id, status: 'confirm' as const };
       },
-    }), // todo expose lastResolved all ? ça compare la ref
+    }),
   })),
   usingMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
-    // ! il peut y avoir une désyncrhonisation entre le trigger de params et la delayDeleteWithUndo
-    // ! permettre d'avoir params qui attend une liste de params ? Spécifique pour ce cas d'usage
-    // todo use a symbol : params: paramsForEach(delayDeleteWithUndo, ...), le params va transmettre le resourceById pour pouvoir appeler le addById
     mutationById({
-      params: () =>
-        delayDeleteWithUndo.status() === 'resolved' &&
-        delayDeleteWithUndo.value()?.status === 'confirm'
-          ? delayDeleteWithUndo.value()?.id
-          : undefined,
+      fromResourceById: delayDeleteWithUndo._resourceById,
+      params: (delayDeleteWithUndoResource) => {
+        return delayDeleteWithUndoResource?.status() === 'resolved' &&
+          delayDeleteWithUndoResource?.value()?.status === 'confirm'
+          ? delayDeleteWithUndoResource?.value()?.id
+          : undefined;
+      },
       identifier: (id) => id,
       loader: ({ params: id }) => {
         return apiService.deleteItem(id);
       },
     })
   ),
-  usingQuery('items', ({ apiService }) =>
-    query({
-      params: () => ({ page: 1, pageSize: 10 }),
-      loader: ({ params: pagination }) => {
-        return apiService.getDataList(pagination);
+  usingQuery(
+    'items',
+    ({ apiService }) =>
+      query({
+        params: () => ({ page: 1, pageSize: 10 }),
+        loader: ({ params: pagination }) => {
+          return apiService.getDataList(pagination);
+        },
+      }),
+    {
+      on: {
+        deleteItemMutationById: {
+          filter: ({ queryResource, mutationIdentifier }) =>
+            queryResource.hasValue() &&
+            queryResource
+              .value()
+              .some((item) => item.id === mutationIdentifier),
+          update: ({ queryResource, mutationIdentifier }) =>
+            queryResource
+              .value()
+              .filter((item) => item.id !== mutationIdentifier),
+        },
       },
-    })
+    }
   ),
   {
     name: 'granularDeletionWithDelay',
@@ -93,7 +116,9 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
                     <td>{{ user.name }}</td>
 
                     <td>
-                      @if(store.delayDeleteWithUndo.status() === 'loading') {
+                      @if(!store.deleteItemMutationById()[user.id]) {
+                      @if(store.delayDeleteWithUndo.select(user.id)?.status()
+                      === 'loading') {
                       <button
                         class="action-btn"
                         (click)="
@@ -117,7 +142,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
                       >
                         Delete
                       </button>
-                      }
+                      } }@else { Deletion... }
                     </td>
                   </tr>
                   } @empty {

@@ -501,7 +501,14 @@ export function asyncMethod<
     : mutationResourceParamsFnSignal;
 
   const resourceTarget = isUsingIdentifier
-    ? resourceById<MutationState, MutationParams, GroupIdentifier & string>({
+    ? resourceById<
+        MutationState,
+        MutationParams,
+        GroupIdentifier & string,
+        string,
+        unknown,
+        unknown
+      >({
         ...mutationConfig,
         params: resourceParamsSrc,
         identifier: mutationConfig.identifier,
@@ -516,6 +523,14 @@ export function asyncMethod<
     // byId is used to helps TS to correctly infer the resourceByGroup
     isUsingIdentifier
       ? {
+          /**
+           * Only added to help TS inference (TS cannot infer ResourceByIdHandler without erasing the signal getter, () => ResourceByIdRef<...>) )
+           */
+          _resourceById: resourceTarget as ResourceByIdRef<
+            GroupIdentifier & string,
+            MutationState,
+            MutationParams
+          >,
           select: (id: GroupIdentifier) => {
             return computed(() => {
               const list = (

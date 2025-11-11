@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { ResourceStatus, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { resourceById } from './resource-by-id';
 
@@ -33,6 +33,62 @@ describe('resourceById', () => {
       await vi.runAllTimersAsync();
 
       const resourceRef123Bis = rxResourceByIdRef()['123Bis'];
+      expect(resourceRef123Bis).toBeDefined();
+      expect(resourceRef123Bis?.value()).toEqual({ id: '123Bis' });
+    });
+  });
+
+  it('should accepts a fromObject, that accepts another ResourceByIdRef', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const sourceParams = signal<{ id: string } | undefined>(undefined);
+      const innerResourceByIdRef = resourceById({
+        params: sourceParams,
+        identifier: (params) => params.id,
+        loader: async ({ params }) => {
+          // Simulate a stream
+          return params;
+        },
+      });
+      innerResourceByIdRef.addById('1', {
+        defaultValue: { id: '1' },
+      });
+      innerResourceByIdRef.addById('2', {
+        defaultValue: { id: '2' },
+      });
+      innerResourceByIdRef.addById('3', {
+        defaultValue: { id: '3' },
+      });
+
+      const resourceByIdRef = resourceById({
+        fromResourceById: innerResourceByIdRef,
+        params: ({ value, status }) => {
+          console.log('params value', value());
+          expectTypeOf(value()).toEqualTypeOf<{
+            id: string;
+          }>();
+          expectTypeOf(status()).toEqualTypeOf<ResourceStatus>();
+          return status() === 'resolved' ? value() : undefined;
+        },
+        identifier: (params) => params.id,
+        loader: async ({ params }) => {
+          // Simulate a stream
+          return params;
+        },
+      });
+      expect(resourceByIdRef).toBeDefined();
+      console.log('resourceByIdRef()', resourceByIdRef());
+      expect(resourceByIdRef()).toEqual({});
+
+      await vi.runAllTimersAsync();
+      console.log('resourceByIdRef()', resourceByIdRef());
+      const resourceRef123 = resourceByIdRef()['1'];
+      expect(resourceRef123).toBeDefined();
+      expect(resourceRef123?.value()).toEqual({ id: '1' });
+
+      sourceParams.set({ id: '123Bis' });
+      await vi.runAllTimersAsync();
+
+      const resourceRef123Bis = resourceByIdRef()['123Bis'];
       expect(resourceRef123Bis).toBeDefined();
       expect(resourceRef123Bis?.value()).toEqual({ id: '123Bis' });
     });

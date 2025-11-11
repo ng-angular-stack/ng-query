@@ -157,7 +157,8 @@ export function triggerQueryReloadFromMutationChange<
           reloadConfig({
             queryResource,
             mutationResource,
-            mutationParams: mutationParamsSrc() as any,
+            //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+            mutationParams: mutationParamsSrc(mutationResource),
             queryIdentifier,
             mutationIdentifier,
             mutationResources,
@@ -252,7 +253,8 @@ export function triggerQueryReloadOnMutationStatusChange<
         ).filter({
           queryResource,
           mutationResource,
-          mutationParams: mutationParamsSrc(),
+          //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+          mutationParams: mutationParamsSrc(mutationResource),
           queryIdentifier,
           queryResources: queryResourceTarget,
           mutationIdentifier,
@@ -331,7 +333,8 @@ export function setAllPatchFromMutationOnQueryValue<
         queryResource,
         queryResources: undefined,
         queryIdentifier: undefined,
-        mutationParams: mutationParamsSrc(),
+        //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+        mutationParams: mutationParamsSrc(mutationResource),
         targetedState: getNestedStateValue({
           state: queryValue,
           keysPath: path.split('.'),
@@ -362,7 +365,8 @@ export function setAllPatchFromMutationOnQueryValue<
       ).filter({
         queryResource,
         mutationResource,
-        mutationParams: mutationParamsSrc(),
+        //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+        mutationParams: mutationParamsSrc(mutationResource),
         queryIdentifier,
         queryResources: queryResourcesById,
         mutationIdentifier,
@@ -381,7 +385,8 @@ export function setAllPatchFromMutationOnQueryValue<
           queryResource,
           queryResources: queryResourcesById,
           queryIdentifier,
-          mutationParams: mutationParamsSrc(),
+          //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+          mutationParams: mutationParamsSrc(mutationResource),
           targetedState: getNestedStateValue({
             state: queryValue,
             keysPath: path.split('.'),
@@ -448,7 +453,8 @@ export function setAllUpdatesFromMutationOnQueryValue<
     const updatedValue = updateTarget({
       queryResource,
       mutationResource,
-      mutationParams: mutationParamsSrc(),
+      //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+      mutationParams: mutationParamsSrc(mutationResource),
       queryIdentifier: undefined,
       queryResources: undefined,
       mutationIdentifier,
@@ -471,7 +477,8 @@ export function setAllUpdatesFromMutationOnQueryValue<
       ).filter({
         queryResource,
         mutationResource,
-        mutationParams: mutationParamsSrc(),
+        //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+        mutationParams: mutationParamsSrc(mutationResource),
         queryIdentifier,
         queryResources: queryResourceTarget,
         mutationIdentifier,
@@ -482,7 +489,8 @@ export function setAllUpdatesFromMutationOnQueryValue<
       const updatedValue = updateTarget({
         queryResource,
         mutationResource,
-        mutationParams: mutationParamsSrc(),
+        //@ts-expect-error the mutationParamsSrc depends if fromResourceById is used, this typing part can be improved
+        mutationParams: mutationParamsSrc(mutationResource),
         queryIdentifier,
         queryResources: queryResourceTarget,
         mutationIdentifier,

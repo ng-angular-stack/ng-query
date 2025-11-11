@@ -62,7 +62,7 @@ export class ApiService {
           }
           return item;
         }),
-        delay(2000)
+        delay(1000)
       )
     );
   }
@@ -83,7 +83,7 @@ export class ApiService {
     this.dataList$.next(
       this.dataList$.value.filter((dataItem) => dataItem.id !== itemId)
     );
-    return firstValueFrom(of(deletedItem).pipe(delay(2000)));
+    return firstValueFrom(of(deletedItem).pipe(delay(1000)));
   }
 
   updateItem(updatedItem: User) {
