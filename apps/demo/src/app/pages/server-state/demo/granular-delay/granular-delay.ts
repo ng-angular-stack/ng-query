@@ -13,10 +13,33 @@ import {
 import { ApiService } from './api.service';
 import { StatusComponent } from '../../../../ui/status.component';
 
+function cancellableTimeout(ms: number) {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  let canceled = false;
+
+  const promise = new Promise<void>((resolve, reject) => {
+    timeoutId = setTimeout(() => {
+      if (!canceled) resolve();
+    }, ms);
+  });
+
+  return {
+    promise,
+    cancel() {
+      canceled = true;
+      clearTimeout(timeoutId);
+    },
+  };
+}
+
+// const { promise, cancel } = cancellableTimeout(3000);
+// abortSignal.addEventListener('abort', () => {
+//   cancel();
+// });
+// await promise;
+
 // Promise/abort
 // fromResourceById limitation de TS
-
-// présenter l'équivalent avec un effect pour trigger un appel API -  utilisation d'un nestedEffect
 
 // suite: usingComputed/rename/inject/usingLocalGlobal
 
@@ -29,6 +52,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
       method: (payload: { id: string; status: 'delete' | 'cancel' }) => payload,
       identifier: ({ id }) => id,
       loader: async ({ params: { id, status } }) => {
+        console.log('loader', id);
         if (status === 'cancel') {
           return { id, status };
         }
@@ -37,6 +61,12 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
       },
     }),
   })),
+  // delayDeleteWithUndo._resourceById:
+  // Signal<{'1': Resource, '2': Resource, '3': Resource ...}>
+
+  // deleteItem:
+  // Signal<{'1': Resource, '2': Resource, '3': Resource ...}>
+
   usingMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
     mutationById({
       fromResourceById: delayDeleteWithUndo._resourceById,
@@ -52,6 +82,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
       },
     })
   ),
+
   usingQuery(
     'items',
     ({ apiService }) =>
@@ -119,6 +150,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
                       @if(!store.deleteItemMutationById()[user.id]) {
                       @if(store.delayDeleteWithUndo.select(user.id)?.status()
                       === 'loading') {
+                      <span>Deleting in 5s...</span>
                       <button
                         class="action-btn"
                         (click)="
