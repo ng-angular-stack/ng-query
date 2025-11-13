@@ -1,13 +1,5 @@
 import { Signal } from '@angular/core';
-import {
-  ContextConstraints,
-  ServerStateFactoryUtility,
-} from './server-state';
-import { MergeObjects, UnionToTuple } from '../types/util.type';
-import { ReadonlySource } from './util/source.type';
-import { Prettify } from '@ngrx/signals';
-import { capitalize } from './util/util';
-import { ResourceByIdRef } from '../resource-by-id';
+import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
 
 type SpecificUsingComputedOutputs<Computed extends {}> = {
   props: Computed;
@@ -24,88 +16,7 @@ type SpecificUsingComputedOutputs<Computed extends {}> = {
 type UsingComputedStatesOutputs<
   Context extends ContextConstraints,
   Computed extends {}
-> = ServerStateFactoryUtility<
-  Context,
-  SpecificUsingComputedOutputs<Computed>
->;
-
-export type AsyncMethodByIdRef<
-  GroupIdentifier,
-  State,
-  ResourceParams
-> = () => Prettify<
-  Partial<
-    Record<
-      GroupIdentifier & string,
-      {
-        readonly value: Signal<State | undefined>;
-        readonly status: Signal<string>;
-        readonly error: Signal<Error | undefined>;
-        readonly isLoading: Signal<boolean>;
-        hasValue(): boolean;
-      }
-    >
-  >
->;
-
-export type AsyncMethodRef<
-  Value,
-  ArgParams,
-  Params,
-  Insertions,
-  IsMethod,
-  SourceParams,
-  GroupIdentifier
-> = MergeObjects<
-  [
-    [unknown] extends [GroupIdentifier]
-      ? {
-          readonly value: Signal<Value | undefined>;
-          readonly status: Signal<string>;
-          readonly error: Signal<Error | undefined>;
-          readonly isLoading: Signal<boolean>;
-          hasValue(): boolean;
-        }
-      : {},
-    Insertions,
-    IsMethod extends true
-      ? {
-          method: (args: ArgParams) => Params;
-        }
-      : {
-          source: ReadonlySource<SourceParams>;
-        },
-    [unknown] extends [GroupIdentifier]
-      ? {}
-      : ResourceByIdRef<
-          GroupIdentifier & string,
-          Value,
-          ArgParams
-        > & {
-          _resourceById: ResourceByIdRef<
-            GroupIdentifier & string,
-            Value,
-            ArgParams
-          >;
-          /**
-           * Get the associated resource by id
-           *
-           * Only added to help TS inference (TS cannot infer ResourceByIdHandler without erasing the signal getter, () => ResourceByIdRef<...>) )
-           *
-           * return the associated resource or undefined if not existing
-           */
-          select: (id: GroupIdentifier) =>
-            | {
-                readonly value: Signal<Value | undefined>;
-                readonly status: Signal<string>;
-                readonly error: Signal<Error | undefined>;
-                readonly isLoading: Signal<boolean>;
-                hasValue(): boolean;
-              }
-            | undefined;
-        }
-  ]
->;
+> = ServerStateFactoryUtility<Context, SpecificUsingComputedOutputs<Computed>>;
 
 export function usingComputedStates<
   Context extends ContextConstraints,

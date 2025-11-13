@@ -8,7 +8,7 @@ describe('usingComputed', () => {
   it('should enable to defined computed states', () => {
     const { injectServerState } = serverState(
       usingComputedStates(() => ({
-        fullName: signal('John Doe').asReadonly(),
+        fullName: signal('John Doe'),
       }))
     );
 

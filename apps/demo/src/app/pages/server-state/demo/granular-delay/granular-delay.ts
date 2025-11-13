@@ -82,7 +82,6 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
       },
     })
   ),
-
   usingQuery(
     'items',
     ({ apiService }) =>
