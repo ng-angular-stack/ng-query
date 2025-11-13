@@ -12,7 +12,10 @@ import {
 import { InsertionsFactory } from '../core/query.core';
 import { AsyncMethodRef } from './using-async-methods';
 import { ReadonlySource } from './util/source.type';
-import { resourceById, ResourceByIdRef } from '../resource-by-id';
+import {
+  resourceById,
+  ResourceByIdRef,
+} from '../resource-by-id';
 
 //todo rename mutation to asyncMethod everywhere
 type AsyncMethodConfig<
@@ -22,7 +25,10 @@ type AsyncMethodConfig<
   SourceParams,
   GroupIdentifier
 > =
-  | Omit<ResourceOptions<NoInfer<ResourceState>, Params>, 'params' | 'loader'> &
+  | Omit<
+      ResourceOptions<NoInfer<ResourceState>, Params>,
+      'params' | 'loader'
+    > &
       (
         | {
             /**
@@ -380,7 +386,11 @@ export function asyncMethod<
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion6,
-    Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
+    Insertion1 &
+      Insertion2 &
+      Insertion3 &
+      Insertion4 &
+      Insertion5
   >
 ): AsyncMethodOutput<
   MutationState,
@@ -388,7 +398,12 @@ export function asyncMethod<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
-  Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
+  Insertion1 &
+    Insertion2 &
+    Insertion3 &
+    Insertion4 &
+    Insertion5 &
+    Insertion6
 >;
 export function asyncMethod<
   MutationState extends object | undefined,
@@ -444,13 +459,22 @@ export function asyncMethod<
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion6,
-    Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
+    Insertion1 &
+      Insertion2 &
+      Insertion3 &
+      Insertion4 &
+      Insertion5
   >,
   insertion7: InsertionsFactory<
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion7,
-    Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
+    Insertion1 &
+      Insertion2 &
+      Insertion3 &
+      Insertion4 &
+      Insertion5 &
+      Insertion6
   >
 ): AsyncMethodOutput<
   MutationState,
@@ -489,9 +513,9 @@ export function asyncMethod<
   GroupIdentifier,
   {}
 > {
-  const mutationResourceParamsFnSignal = signal<MutationParams | undefined>(
-    undefined
-  );
+  const mutationResourceParamsFnSignal = signal<
+    MutationParams | undefined
+  >(undefined);
 
   const isConnectedToSource = isSignal(mutationConfig.method);
   const isUsingIdentifier = 'identifier' in mutationConfig;
@@ -552,7 +576,9 @@ export function asyncMethod<
         : (arg: MutationArgsParams) => {
             const result = mutationConfig.method(arg);
             if (isUsingIdentifier) {
-              const id = mutationConfig.identifier?.(arg as any);
+              const id = mutationConfig.identifier?.(
+                arg as any
+              );
               (
                 resourceTarget as ResourceByIdRef<
                   GroupIdentifier & string,
@@ -561,7 +587,9 @@ export function asyncMethod<
                 >
               ).addById(id as GroupIdentifier & string);
             }
-            mutationResourceParamsFnSignal.set(result as MutationParams);
+            mutationResourceParamsFnSignal.set(
+              result as MutationParams
+            );
             return result;
           },
     },
@@ -575,7 +603,8 @@ export function asyncMethod<
       return {
         ...acc,
         ...insert({
-          resource: resourceTarget as ResourceRef<MutationState>,
+          resource:
+            resourceTarget as ResourceRef<MutationState>,
           resourceParams: resourceParamsSrc as WritableSignal<
             NoInfer<MutationParams>
           >,
