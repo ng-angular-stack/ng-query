@@ -1,7 +1,7 @@
 import { Prettify } from '@ngrx/signals';
 import { __InternalSharedMutationConfig, MutationRef } from '../with-mutation';
 import { QueryRef } from '../with-query';
-import { InternalType } from '../types/util.type';
+import { InternalType, MergeObjects } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
 import {
@@ -12,7 +12,10 @@ import {
   signal,
 } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
-import { ToConnectableSourceFromInject } from './util/util.type';
+import {
+  RemoveIndexSignature,
+  ToConnectableMethodFromInject,
+} from './util/util.type';
 
 // todo rename craft ?
 // todo filter private fields and methods
@@ -107,13 +110,28 @@ type ToServerStateOutputs<
   >,
   StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
   InputsToPlugin = MergeContexts<Context>['inputs'],
-  SourcesToConnect = ToConnectableSourceFromInject<
-    MergeContexts<Context>['sources']
-  >
+  HasInputs = keyof InputsToPlugin extends never ? false : true,
+  MethodsToConnect = ToConnectableMethodFromInject<
+    MergeContexts<Context>['methods']
+  >,
+  HasMethods = keyof MethodsToConnect extends never ? false : true
 > = {
-  [key in `inject${Capitalize<Name>}ServerState`]: keyof InputsToPlugin extends never
-    ? () => Outputs
-    : (inputs: Partial<InputsToPlugin> & Partial<SourcesToConnect>) => Outputs;
+  [key in `inject${Capitalize<Name>}ServerState`]: (
+    pluggableConfig: MergeObjects<
+      [
+        HasInputs extends true
+          ? {
+              inputs: InputsToPlugin;
+            }
+          : {},
+        HasMethods extends true
+          ? {
+              methods: Prettify<MethodsToConnect>;
+            }
+          : {}
+      ]
+    >
+  ) => Outputs;
 } & {
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<Outputs>;
 } & StandaloneOutputs;

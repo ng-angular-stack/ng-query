@@ -6,15 +6,29 @@ export type FilterPrivateFields<T> = {
 };
 
 export type ToConnectableSourceFromInject<Sources> = {
-  [K in keyof Sources as `connect${Capitalize<
-    string & K
-  >}SourceTo`]: Sources[K] extends Source<infer SourceType>
+  [K in keyof Sources]: Sources[K] extends Source<infer SourceType>
     ? ReadonlySource<SourceType>
     : never;
 };
+
+export type ToConnectableMethodFromInject<Methods> = RemoveIndexSignature<{
+  [K in keyof Methods]?: Methods[K] extends (payload: infer Payload) => any
+    ? ReadonlySource<Payload>
+    : never;
+}>;
 
 export type IsUnknown<T> = unknown extends T
   ? [T] extends [unknown]
     ? true
     : false
   : false;
+
+export type RemoveIndexSignature<T> = {
+  [K in keyof T as string extends K
+    ? never
+    : number extends K
+    ? never
+    : symbol extends K
+    ? never
+    : K]: T[K];
+};

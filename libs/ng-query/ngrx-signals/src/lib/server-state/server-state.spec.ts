@@ -8,8 +8,14 @@ import { mutationById } from '../mutation-by-id';
 import { usingMutationById } from './using-mutation-by-id';
 import { usingQueryById } from './using-query-by-id';
 import { queryById } from '../query-by-id';
-import { inject } from '@angular/core';
+import { inject, signal } from '@angular/core';
 import { usingQueryParams } from './using-query-params';
+import { usingInputs } from './using-inputs';
+import { usingState } from './using-state';
+import { source } from './source';
+import { usingSources } from './using-sources';
+import { on } from './on';
+import { ReadonlySource } from './util/source.type';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -253,6 +259,52 @@ describe('serverState', () => {
 
     expect(setPaginationQueryParams).toBeDefined();
   });
+
+  it('should enable to bind the inputs and the outputs of the store when using injectServerState', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { injectServerState } = serverState(
+        usingInputs({
+          myParams: undefined as string | undefined,
+        }),
+        usingSources({
+          reset: source<string>(),
+        }),
+        usingState(
+          'numberList',
+          () => signal([1]),
+          ({ state, context: { reset } }) => {
+            return {
+              addNumber: (numberValue: number) => {
+                console.log('addNumber numberValue', numberValue);
+                const stateValue = state();
+                return [...stateValue, numberValue];
+              },
+              reset: on(reset, () => {
+                return [];
+              }),
+            };
+          }
+        )
+      );
+      // todo why reset is exposed ?
+      const addNumberSource = source<number>();
+      const resetSource = source<string>();
+      const store = injectServerState({
+        inputs: {
+          myParams: signal('testInput'),
+        },
+        methods: {
+          setReset: resetSource,
+          addNumber: addNumberSource,
+          // reset: resetSource,
+          // addNumber: addNumberSource,
+        },
+        // sources: {
+        //   reset: resetSource,
+        // },
+      });
+    });
+  });
 });
 
 describe('serverState options', () => {
@@ -313,7 +365,6 @@ describe('serverState options', () => {
     });
   });
 
-  // todo test shared instance
   it('should provide a shared store  by default', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectUserServerState, UserServerState } = serverState(
