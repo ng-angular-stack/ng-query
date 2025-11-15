@@ -101,23 +101,31 @@ export type ServerStateFactoryUtility<
   standaloneOutputs?: StandaloneOutputs;
 };
 
+type FilterPluggedMethods<Methods, PluggedMethods> = {
+  [key in keyof Methods as key extends keyof PluggedMethods
+    ? never
+    : key]: Methods[key];
+};
+
 type ToServerStateOutputs<
   Context extends ContextConstraints[],
   StandaloneContextOutputs extends StandaloneOutputsConstraints[],
   Name extends string,
-  Outputs = Prettify<
-    MergeContexts<Context>['props'] & MergeContexts<Context>['methods']
-  >,
   StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
   InputsToPlugin = MergeContexts<Context>['inputs'],
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<
     MergeContexts<Context>['methods']
   >,
-  HasMethods = keyof MethodsToConnect extends never ? false : true
+  HasMethods = keyof MethodsToConnect extends never ? false : true,
+  Outputs = Prettify<
+    MergeContexts<Context>['props'] &
+      FilterPluggedMethods<MergeContexts<Context>['methods'], MethodsToConnect>
+  >,
+  MethodsConnected extends MethodsToConnect = MethodsToConnect
 > = {
-  [key in `inject${Capitalize<Name>}ServerState`]: (
-    pluggableConfig: MergeObjects<
+  [key in `inject${Capitalize<Name>}ServerState`]: <
+    Config extends MergeObjects<
       [
         HasInputs extends true
           ? {
@@ -126,12 +134,20 @@ type ToServerStateOutputs<
           : {},
         HasMethods extends true
           ? {
-              methods?: Prettify<MethodsToConnect>;
+              methods?: Prettify<MethodsConnected>;
             }
           : {}
       ]
     >
-  ) => Outputs;
+  >(
+    pluggableConfig: Config
+  ) => Prettify<
+    MergeContexts<Context>['props'] &
+      FilterPluggedMethods<
+        MergeContexts<Context>['methods'],
+        'methods' extends keyof Config ? Config['methods'] : {}
+      >
+  >;
 } & {
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<Outputs>;
 } & StandaloneOutputs;

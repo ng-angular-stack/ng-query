@@ -10,6 +10,7 @@ type FilterConnectedToSourceMethods<Methods> = {
 };
 
 // todo enable to sync with localStorage or sessionStorage
+
 type SpecificUsingStateOutputs<
   StateName extends string,
   State,

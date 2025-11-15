@@ -16,6 +16,7 @@ import { source } from './source';
 import { usingSources } from './using-sources';
 import { on } from './on';
 import { ReadonlySource } from './util/source.type';
+import { Equal, Expect } from 'test-type';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -279,6 +280,10 @@ describe('serverState', () => {
                 const stateValue = state();
                 return [...stateValue, numberValue];
               },
+              filterNumber: (filterValue: number) => {
+                const stateValue = state();
+                return stateValue.filter((num) => num !== filterValue);
+              },
               reset: on(reset, () => {
                 return [];
               }),
@@ -303,6 +308,11 @@ describe('serverState', () => {
         //   reset: resetSource,
         // },
       });
+      type NotAny1 = Expect<Equal<IsAny<typeof store>, false>>;
+
+      expectTypeOf(store.filterNumber).toBeFunction();
+      //@ts-expect-error it should not be exposed, because connected to a Source
+      store.reset;
     });
   });
 });
