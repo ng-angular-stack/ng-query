@@ -34,9 +34,6 @@ type UsingInputsOutputs<
   SourceSetterMethods<Inputs>
 >;
 
-// todo Sources extends Record<string, Source<unknown>>
-// todo expose setXSource as standalone ?
-// todo checker si les méthodes bien exposées
 /**
  * Sources can be plugged into methods by using `on(mySource, (state, payload) => ...)`)`.
  * Trigger the source:

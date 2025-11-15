@@ -126,7 +126,7 @@ type ToServerStateOutputs<
           : {},
         HasMethods extends true
           ? {
-              methods: Prettify<MethodsToConnect>;
+              methods?: Prettify<MethodsToConnect>;
             }
           : {}
       ]

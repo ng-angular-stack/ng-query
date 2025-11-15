@@ -59,7 +59,7 @@ describe('usingSources', () => {
     );
 
     await TestBed.runInInjectionContext(async () => {
-      const store = injectServerState();
+      const store = injectServerState({});
 
       expect(store.test()).toEqual(0);
 

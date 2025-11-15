@@ -1,18 +1,24 @@
 import { Signal, WritableSignal } from '@angular/core';
 import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
-import { FilterPrivateFields } from './util/util.type';
 import { ReadonlySource } from './util/source.type';
 import { createMethodHandlers } from './util/util';
 
+type FilterConnectedToSourceMethods<Methods> = {
+  [K in keyof Methods as Methods[K] extends ReadonlySource<any>
+    ? never
+    : K]: Methods[K];
+};
+
 // todo enable to sync with localStorage or sessionStorage
-// todo sync about async methods that can be used to handle
 type SpecificUsingStateOutputs<
   StateName extends string,
   State,
   Methods extends Record<string, (...args: any[]) => any> | undefined
 > = {
   props: { [key in StateName]: Signal<State> };
-  methods: Methods extends undefined ? {} : FilterPrivateFields<Methods>;
+  methods: Methods extends undefined
+    ? {}
+    : FilterConnectedToSourceMethods<Methods>;
   inputs: {};
   queryParams: {};
   sources: {};
