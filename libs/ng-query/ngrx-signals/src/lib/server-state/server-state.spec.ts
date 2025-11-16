@@ -17,6 +17,7 @@ import { usingSources } from './using-sources';
 import { on } from './on';
 import { ReadonlySource } from './util/source.type';
 import { Equal, Expect } from 'test-type';
+import { IsAny } from '../types/util.type';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -291,7 +292,7 @@ describe('serverState', () => {
           }
         )
       );
-      // todo why reset is exposed ?
+
       const addNumberSource = source<number>();
       const resetSource = source<string>();
       const store = injectServerState({
@@ -308,11 +309,118 @@ describe('serverState', () => {
         //   reset: resetSource,
         // },
       });
-      type NotAny1 = Expect<Equal<IsAny<typeof store>, false>>;
+      expectTypeOf<IsAny<typeof store>>().toEqualTypeOf<false>();
 
       expectTypeOf(store.filterNumber).toBeFunction();
       //@ts-expect-error it should not be exposed, because connected to a Source
-      store.reset;
+      type resetNotExposed = (typeof store)['reset'];
+    });
+  });
+  it('should enable to plug a store to another store', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { usingStore1ServerState, setPaginationQueryParams } = serverState(
+        usingInputs({
+          myParams1: undefined as string | undefined,
+        }),
+        usingSources({
+          reset: source<string>(),
+        }),
+        usingState(
+          'numberList1',
+          () => signal([1]),
+          ({ state, context: { reset } }) => {
+            return {
+              addNumber: (numberValue: number) => {
+                const stateValue = state();
+                return [...stateValue, numberValue];
+              },
+              filterNumber: (filterValue: number) => {
+                const stateValue = state();
+                return stateValue.filter((num) => num !== filterValue);
+              },
+              reset: on(reset, () => {
+                return [];
+              }),
+            };
+          }
+        ),
+        usingQueryParams('pagination', () => ({
+          page: {
+            defaultValue: 1,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+          pageSize: {
+            defaultValue: 10,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+        })),
+        {
+          name: 'store1',
+        }
+      );
+
+      const { injectServerState, setPaginationQueryParams } = serverState(
+        usingInputs({
+          myParams: undefined as string | undefined,
+        }),
+        usingSources({
+          reset: source<string>(),
+        }),
+        usingStore1ServerState(({ myParams, reset }) => ({
+          inputs: {
+            myParams1: myParams,
+          },
+          methods: {
+            setReset: reset,
+          },
+        })),
+        usingState(
+          'numberList2',
+          () => signal([1]),
+          ({ state, context: { reset } }) => {
+            return {
+              addNumber2: (numberValue: number) => {
+                console.log('addNumber numberValue', numberValue);
+                const stateValue = state();
+                return [...stateValue, numberValue];
+              },
+              filterNumber2: (filterValue: number) => {
+                const stateValue = state();
+                return stateValue.filter((num) => num !== filterValue);
+              },
+              reset2: on(reset, () => {
+                return [];
+              }),
+            };
+          }
+        )
+      );
+      // todo why reset is exposed ?
+      const addNumberSource = source<number>();
+      const resetSource = source<string>();
+      const store = injectServerState({
+        inputs: {
+          myParams: signal('testInput'),
+        },
+        methods: {
+          setReset: resetSource,
+          addNumber: addNumberSource,
+          addNumber2: addNumberSource,
+          // reset: resetSource,
+          // addNumber: addNumberSource,
+        },
+        // sources: {
+        //   reset: resetSource,
+        // },
+      });
+      expectTypeOf<IsAny<typeof store>>().toEqualTypeOf<false>();
+
+      expectTypeOf(store.filterNumber).toBeFunction();
+      expectTypeOf(store.filterNumber2).toBeFunction();
+      //@ts-expect-error it should not be exposed, because connected to a Source
+      type resetNotExposed = (typeof store)['reset'];
     });
   });
 });

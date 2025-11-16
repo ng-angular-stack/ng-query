@@ -107,20 +107,20 @@ type FilterPluggedMethods<Methods, PluggedMethods> = {
     : key]: Methods[key];
 };
 
+// ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
 type ToServerStateOutputs<
   Context extends ContextConstraints[],
   StandaloneContextOutputs extends StandaloneOutputsConstraints[],
   Name extends string,
+  MergedContext extends MergeContexts<Context> = MergeContexts<Context>,
   StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
-  InputsToPlugin = MergeContexts<Context>['inputs'],
+  InputsToPlugin = MergedContext['inputs'],
   HasInputs = keyof InputsToPlugin extends never ? false : true,
-  MethodsToConnect = ToConnectableMethodFromInject<
-    MergeContexts<Context>['methods']
-  >,
+  MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
   HasMethods = keyof MethodsToConnect extends never ? false : true,
-  Outputs = Prettify<
-    MergeContexts<Context>['props'] &
-      FilterPluggedMethods<MergeContexts<Context>['methods'], MethodsToConnect>
+  StandardOutputs = Prettify<
+    MergedContext['props'] &
+      FilterPluggedMethods<MergedContext['methods'], MethodsToConnect>
   >,
   MethodsConnected extends MethodsToConnect = MethodsToConnect
 > = {
@@ -142,14 +142,60 @@ type ToServerStateOutputs<
   >(
     pluggableConfig: Config
   ) => Prettify<
-    MergeContexts<Context>['props'] &
-      FilterPluggedMethods<
-        MergeContexts<Context>['methods'],
-        'methods' extends keyof Config ? Config['methods'] : {}
-      >
+    RemoveIndexSignature<
+      MergedContext['props'] &
+        FilterPluggedMethods<
+          MergedContext['methods'],
+          'methods' extends keyof Config ? Config['methods'] : {}
+        >
+    >
   >;
 } & {
-  [key in `${Capitalize<Name>}ServerState`]: InjectionToken<Outputs>;
+  // todo the inputs that are not plugged should be exposed (enable partial plugging)
+  // todo should return ServerStateFactoryUtility
+  [key in `using${Capitalize<Name>}ServerState`]: <
+    Context extends ContextConstraints,
+    Config extends MergeObjects<
+      [
+        HasInputs extends true
+          ? {
+              inputs: InputsToPlugin;
+            }
+          : {},
+        HasMethods extends true
+          ? {
+              methods?: Prettify<MethodsConnected>;
+            }
+          : {}
+      ]
+    >
+  >(
+    pluggableConfig: (
+      configFactory: Context['inputs'] &
+        Context['__injections'] &
+        Context['sources'] &
+        Context['props']
+    ) => Config
+  ) => ServerStateFactoryUtility<
+    Context,
+    {
+      props: MergedContext['props'];
+      methods: FilterPluggedMethods<
+        MergedContext['methods'],
+        'methods' extends keyof Config ? Config['methods'] : {}
+      >;
+      inputs: {}; // for now the inputs are always required to be plugged when using usingServerState
+      queryParams: MergedContext['queryParams'];
+      sources: MergedContext['sources'];
+      __injections: MergedContext['__injections'];
+      asyncMethods: MergedContext['asyncMethods'];
+      __mutation: MergedContext['__mutation'];
+      __query: MergedContext['__query'];
+    },
+    [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
+  >;
+} & {
+  [key in `${Capitalize<Name>}ServerState`]: InjectionToken<StandardOutputs>;
 } & StandaloneOutputs;
 
 type ServerStateOptions<Name> = {
