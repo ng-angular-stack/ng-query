@@ -8,7 +8,7 @@ import { mutationById } from '../mutation-by-id';
 import { usingMutationById } from './using-mutation-by-id';
 import { usingQueryById } from './using-query-by-id';
 import { queryById } from '../query-by-id';
-import { inject, signal } from '@angular/core';
+import { inject, linkedSignal, signal } from '@angular/core';
 import { usingQueryParams } from './using-query-params';
 import { usingInputs } from './using-inputs';
 import { usingState } from './using-state';
@@ -266,14 +266,14 @@ describe('serverState', () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
         usingInputs({
-          myParams: undefined as string | undefined,
+          myParams: undefined as number | undefined,
         }),
         usingSources({
           reset: source<string>(),
         }),
         usingState(
           'numberList',
-          () => signal([1]),
+          ({ myParams }) => linkedSignal(() => [myParams() ?? 0]),
           ({ state, context: { reset } }) => {
             return {
               addNumber: (numberValue: number) => {
@@ -297,7 +297,7 @@ describe('serverState', () => {
       const resetSource = source<string>();
       const store = injectServerState({
         inputs: {
-          myParams: signal('testInput'),
+          myParams: signal(10),
         },
         methods: {
           setReset: resetSource,
@@ -314,6 +314,15 @@ describe('serverState', () => {
       expectTypeOf(store.filterNumber).toBeFunction();
       //@ts-expect-error it should not be exposed, because connected to a Source
       type resetNotExposed = (typeof store)['reset'];
+
+      await vi.runAllTimersAsync();
+      expect(store.numberList()).toEqual([10]);
+
+      addNumberSource.set(2);
+      expect(store.numberList()).toEqual([10, 2]);
+
+      store.filterNumber(10);
+      expect(store.numberList()).toEqual([2]);
     });
   });
   it('should enable to plug a store to another store. Standalone outputs should be transmitted. Inputs that are not bind should be transmitted', async () => {

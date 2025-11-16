@@ -6,10 +6,12 @@ import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
 import {
   assertInInjectionContext,
+  effect,
   inject,
   InjectionToken,
   Injector,
   signal,
+  untracked,
 } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
 import {
@@ -135,7 +137,9 @@ type ToServerStateOutputs<
       ]
     >
   >(
-    pluggableConfig: Config
+    ...args: HasInputs extends true
+      ? [pluggableConfig: Config]
+      : [pluggableConfig?: Config]
   ) => Prettify<
     RemoveIndexSignature<
       MergedContext['props'] &
@@ -440,24 +444,54 @@ export function serverState(
     ? name.charAt(0).toUpperCase() + name.slice(1)
     : '';
   const injectNameServerState = `inject${capitalizedName}ServerState`;
+  const usingNameServerState = `using${capitalizedName}ServerState`;
   return {
-    [injectNameServerState]: (entries: Record<string, unknown>) => {
+    [injectNameServerState]: (entries?: {
+      inputs?: Record<string, unknown>;
+      methods?: Record<string, Function>;
+    }) => {
       assertInInjectionContext(serverState);
       const tokenValue = inject(token); // inject will enable to set inputsKeysSet
-      let hasInputs = false;
-      const inputs = Array.from(inputsKeysSet ?? []).reduce((acc, inputKey) => {
-        if (inputKey in entries) {
-          hasInputs = true;
-          acc[inputKey] = (entries as any)[inputKey];
-          return acc;
+      const entriesInputs = entries?.inputs;
+      if (entriesInputs) {
+        let hasInputs = false;
+        const inputs = Array.from(inputsKeysSet ?? []).reduce(
+          (acc, inputKey) => {
+            if (inputKey in entriesInputs) {
+              hasInputs = true;
+              acc[inputKey] = (entries as any)[inputKey];
+              return acc;
+            }
+            return acc;
+          },
+          {} as Record<string, unknown>
+        );
+        if (hasInputs) {
+          pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
         }
-        return acc;
-      }, {} as Record<string, unknown>);
-      if (hasInputs) {
-        pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
       }
+
+      // for each methods associated to a source, trigger the targeted method when the source change
+      const entriesMethods = entries?.methods;
+      if (entriesMethods) {
+        Object.entries(entriesMethods).forEach(([methodName, source]) => {
+          effect(() => {
+            const newValue = (source as Function)();
+            untracked(() => {
+              if (newValue !== undefined) {
+                (tokenValue as any)[methodName](newValue);
+              }
+            });
+          });
+        });
+      }
+
       return tokenValue;
     },
+    [usingNameServerState]: (pluggableConfig?: unknown) => {
+      return factoriesList;
+    },
+    // todo using
     [`${capitalizedName}ServerState`]: token,
     ...extractedStandaloneOutputs,
   } as ToServerStateOutputs<EmptyContext[], EmptyStandaloneContext[], string>;

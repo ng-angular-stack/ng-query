@@ -244,8 +244,6 @@ const { injectTest2ServerState } = serverState(
         font-size: 3rem;
         font-weight: 300;
         color: #374151;
-        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas,
-          'Courier New', monospace;
         min-width: 60px;
         text-align: center;
       }
