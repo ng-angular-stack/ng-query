@@ -32,3 +32,7 @@ export type RemoveIndexSignature<T> = {
     ? never
     : K]: T[K];
 };
+
+export type ExcludeCommonKeys<Origin, Target> = {
+  [key in keyof Origin as key extends keyof Target ? never : key]: Origin[key];
+};

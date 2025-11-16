@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { createSignalProxy } from '../signal-proxy';
 import {
+  ExcludeCommonKeys,
   RemoveIndexSignature,
   ToConnectableMethodFromInject,
 } from './util/util.type';
@@ -101,12 +102,6 @@ export type ServerStateFactoryUtility<
   standaloneOutputs?: StandaloneOutputs;
 };
 
-type FilterPluggedMethods<Methods, PluggedMethods> = {
-  [key in keyof Methods as key extends keyof PluggedMethods
-    ? never
-    : key]: Methods[key];
-};
-
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
 type ToServerStateOutputs<
   Context extends ContextConstraints[],
@@ -120,7 +115,7 @@ type ToServerStateOutputs<
   HasMethods = keyof MethodsToConnect extends never ? false : true,
   StandardOutputs = Prettify<
     MergedContext['props'] &
-      FilterPluggedMethods<MergedContext['methods'], MethodsToConnect>
+      ExcludeCommonKeys<MergedContext['methods'], MethodsToConnect>
   >,
   MethodsConnected extends MethodsToConnect = MethodsToConnect
 > = {
@@ -144,7 +139,7 @@ type ToServerStateOutputs<
   ) => Prettify<
     RemoveIndexSignature<
       MergedContext['props'] &
-        FilterPluggedMethods<
+        ExcludeCommonKeys<
           MergedContext['methods'],
           'methods' extends keyof Config ? Config['methods'] : {}
         >
@@ -178,11 +173,11 @@ type ToServerStateOutputs<
     Context,
     {
       props: MergedContext['props'];
-      methods: FilterPluggedMethods<
+      methods: ExcludeCommonKeys<
         MergedContext['methods'],
         'methods' extends keyof Config ? Config['methods'] : {}
       >;
-      inputs: FilterPluggedMethods<
+      inputs: ExcludeCommonKeys<
         MergedContext['inputs'],
         'inputs' extends keyof Config ? Config['inputs'] : {}
       >;
