@@ -13,7 +13,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { createSignalProxy } from '../signal-proxy';
+import { createSignalProxy, SignalProxy } from '../signal-proxy';
 import {
   ExcludeCommonKeys,
   RemoveIndexSignature,
@@ -103,6 +103,10 @@ export type ServerStateFactoryUtility<
 ) => ServerStateActionOutputs) & {
   standaloneOutputs?: StandaloneOutputs;
 };
+export const EXTERNALLY_PROVIDED = 'EXTERNALLY_PROVIDED' as const;
+type InputsCanBeExternallyProvided<Inputs> = {
+  [key in keyof Inputs]: Inputs[key] | typeof EXTERNALLY_PROVIDED;
+};
 
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
 type ToServerStateOutputs<
@@ -111,7 +115,7 @@ type ToServerStateOutputs<
   Name extends string,
   MergedContext extends MergeContexts<Context> = MergeContexts<Context>,
   StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
-  InputsToPlugin = MergedContext['inputs'],
+  InputsToPlugin = InputsCanBeExternallyProvided<MergedContext['inputs']>,
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
   HasMethods = keyof MethodsToConnect extends never ? false : true,
@@ -167,7 +171,7 @@ type ToServerStateOutputs<
       ]
     >
   >(
-    pluggableConfig: (
+    pluggableConfig?: (
       configFactory: Context['inputs'] &
         Context['__injections'] &
         Context['sources'] &
@@ -198,8 +202,9 @@ type ToServerStateOutputs<
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<StandardOutputs>;
 } & StandaloneOutputs;
 
+// todo handle feature to not expose the inject and the provide but only the using...
 type ServerStateOptions<Name> = {
-  providedIn?: 'root' | 'scoped' | 'platform';
+  providedIn?: 'root' | 'scoped' | 'feature';
   name?: Name;
 };
 
@@ -331,7 +336,10 @@ export function serverState(
     ? {}
     : (optionsOrFactory as ServerStateOptions<any> | undefined);
   const providedIn =
-    options?.providedIn === 'scoped' ? null : options?.providedIn ?? 'root';
+    options?.providedIn && ['scoped', 'feature'].includes(options.providedIn)
+      ? null
+      : 'root';
+  console.log('optionsName', options?.name);
   const factoriesList = [
     ...factories,
     ...(isLastFactory ? [optionsOrFactory] : []),
@@ -346,96 +354,27 @@ export function serverState(
     },
     {} as Record<string, unknown>
   );
+
+  // used to share context, when providedIn is not root and also used with 'inject' and with 'using'
+  let sharedContext: ContextConstraints | undefined = undefined;
+
   const pluggableInputs = createSignalProxy(signal({}));
   let inputsKeysSet: Set<string> | undefined = undefined;
   const token = new InjectionToken('ServerStateStore', {
     providedIn,
     factory: () => {
+      console.log('optionsName', options?.name);
       const injector = inject(Injector);
-      const { propsAndMethods, context } = factoriesList.reduce(
-        (acc, factory) => {
-          const result = (
-            factory as ServerStateFactory<
-              [ContextConstraints],
-              ContextConstraints,
-              StandaloneOutputsConstraints
-            >
-          )(
-            {
-              context: { ...acc.context, inputs: pluggableInputs },
-            },
-            injector
-          );
-          Object.entries(result.inputs).forEach(([key, value]) => {
-            const hasValue = pluggableInputs.$ref(key as never);
-            if (!hasValue) {
-              pluggableInputs.$patch({ [key]: value } as any);
-            }
-          });
-          return {
-            context: {
-              inputs: { ...acc.context.inputs, ...result.inputs },
-              __injections: {
-                ...acc.context.__injections,
-                ...result.__injections,
-              },
-              props: {
-                ...acc.context.props,
-                ...result.props,
-              },
-              methods: {
-                ...acc.context.methods,
-                ...result.methods,
-              },
-              __query: {
-                ...acc.context.__query,
-                ...result.__query,
-              },
-              __mutation: {
-                ...acc.context.__mutation,
-                ...result.__mutation,
-              },
-              queryParams: {
-                ...acc.context.queryParams,
-                ...result.queryParams,
-              },
-              sources: {
-                ...acc.context.sources,
-                ...result.sources,
-              },
-              asyncMethods: {
-                ...acc.context.asyncMethods,
-                ...result.asyncMethods,
-              },
-            },
-            propsAndMethods: {
-              ...acc.propsAndMethods,
-              ...result.props,
-              ...result.methods,
-            },
-          };
-        },
-        {
-          context: {
-            props: {},
-            methods: {},
-            inputs: {}, // passing pluggableInputs here seems to not works
-            queryParams: {},
-            sources: {},
-            __injections: {},
-            __mutation: {},
-            __query: {},
-            asyncMethods: {},
-          } as EmptyContext,
-          propsAndMethods: {},
-        } as {
-          context: EmptyContext;
-          propsAndMethods: {};
-        }
-      );
+      const { propsAndMethods, context } = mergeContextAndProps({
+        factoriesList,
+        pluggableInputs,
+        injector,
+      });
       inputsKeysSet = new Set(
         Object.keys((context as ContextConstraints).inputs)
       );
+      sharedContext = context;
+
       return propsAndMethods;
     },
   });
@@ -448,7 +387,7 @@ export function serverState(
   return {
     [injectNameServerState]: (entries?: {
       inputs?: Record<string, unknown>;
-      methods?: Record<string, Function>;
+      methods?: Record<string, unknown>;
     }) => {
       assertInInjectionContext(serverState);
       const tokenValue = inject(token); // inject will enable to set inputsKeysSet
@@ -459,7 +398,10 @@ export function serverState(
           (acc, inputKey) => {
             if (inputKey in entriesInputs) {
               hasInputs = true;
-              acc[inputKey] = (entries as any)[inputKey];
+              const value = (entriesInputs as any)[inputKey];
+              if (value !== EXTERNALLY_PROVIDED) {
+                acc[inputKey] = (entries as any)[inputKey];
+              }
               return acc;
             }
             return acc;
@@ -488,11 +430,163 @@ export function serverState(
 
       return tokenValue;
     },
-    [usingNameServerState]: (pluggableConfig?: unknown) => {
-      return factoriesList;
+    [usingNameServerState]: (
+      pluggableConfig?: (context: ContextConstraints) => {
+        inputs?: Record<string, unknown>;
+        methods?: Record<string, Function>;
+      }
+    ) => {
+      return (
+        contextData: ContextInput<ContextConstraints>,
+        injector: Injector
+      ) => {
+        console.log('optionsName using', options?.name);
+        const entries =
+          pluggableConfig?.({
+            ...contextData.context.inputs,
+            ...contextData.context.__injections,
+            ...contextData.context.sources,
+            ...contextData.context.props,
+          } as any) ?? {};
+        const entriesInputs = entries?.inputs;
+
+        let storeContext: ContextConstraints | undefined = undefined;
+
+        if (options?.providedIn !== 'root') {
+          const { context } = mergeContextAndProps({
+            factoriesList,
+            pluggableInputs,
+            injector,
+          });
+          storeContext = context;
+        } else {
+          const _getOrGenerateStore = inject(token);
+          storeContext = sharedContext;
+        }
+
+        inputsKeysSet = new Set(
+          Object.keys((storeContext as ContextConstraints).inputs)
+        );
+        if (entriesInputs) {
+          let hasInputs = false;
+          const inputs = Array.from(inputsKeysSet ?? []).reduce(
+            (acc, inputKey) => {
+              if (inputKey in entriesInputs) {
+                hasInputs = true;
+                const value = (entriesInputs as any)[inputKey];
+                if (value !== EXTERNALLY_PROVIDED) {
+                  acc[inputKey] = (entriesInputs as any)[inputKey];
+                }
+                return acc;
+              }
+              return acc;
+            },
+            {} as Record<string, unknown>
+          );
+          if (hasInputs) {
+            pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
+          }
+        }
+        // todo if provided global use the injected one, otherwise trigger manuually
+        return Object.assign(
+          storeContext as ContextConstraints,
+          extractedStandaloneOutputs
+        );
+      };
     },
-    // todo using
     [`${capitalizedName}ServerState`]: token,
     ...extractedStandaloneOutputs,
   } as ToServerStateOutputs<EmptyContext[], EmptyStandaloneContext[], string>;
+}
+
+function mergeContextAndProps({
+  factoriesList,
+  pluggableInputs,
+  injector,
+}: {
+  factoriesList: ServerStateFactory<[ContextConstraints], any, any>[];
+  pluggableInputs: SignalProxy<{}, true>;
+  injector: Injector;
+}): { propsAndMethods: any; context: any } {
+  return factoriesList.reduce(
+    (acc, factory) => {
+      const result = (
+        factory as ServerStateFactory<
+          [ContextConstraints],
+          ContextConstraints,
+          StandaloneOutputsConstraints
+        >
+      )(
+        {
+          context: { ...acc.context, inputs: pluggableInputs },
+        },
+        injector
+      );
+      Object.entries(result.inputs).forEach(([key, value]) => {
+        const hasValue = pluggableInputs.$ref(key as never);
+        if (!hasValue) {
+          pluggableInputs.$patch({ [key]: value } as any);
+        }
+      });
+      return {
+        context: {
+          inputs: { ...acc.context.inputs, ...result.inputs },
+          __injections: {
+            ...acc.context.__injections,
+            ...result.__injections,
+          },
+          props: {
+            ...acc.context.props,
+            ...result.props,
+          },
+          methods: {
+            ...acc.context.methods,
+            ...result.methods,
+          },
+          __query: {
+            ...acc.context.__query,
+            ...result.__query,
+          },
+          __mutation: {
+            ...acc.context.__mutation,
+            ...result.__mutation,
+          },
+          queryParams: {
+            ...acc.context.queryParams,
+            ...result.queryParams,
+          },
+          sources: {
+            ...acc.context.sources,
+            ...result.sources,
+          },
+          asyncMethods: {
+            ...acc.context.asyncMethods,
+            ...result.asyncMethods,
+          },
+        },
+        propsAndMethods: {
+          ...acc.propsAndMethods,
+          ...result.props,
+          ...result.methods,
+        },
+      };
+    },
+    {
+      context: {
+        props: {},
+        methods: {},
+        inputs: {}, // passing pluggableInputs here seems to not works
+        queryParams: {},
+        sources: {},
+        __injections: {},
+        __mutation: {},
+        __query: {},
+        asyncMethods: {},
+      } as EmptyContext,
+      propsAndMethods: {},
+    } as {
+      context: EmptyContext;
+      propsAndMethods: {};
+    }
+  );
 }

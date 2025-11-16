@@ -444,6 +444,345 @@ describe('serverState', () => {
       expect(setPaginationQueryParams).toBeDefined();
     });
   });
+
+  it('should enable to plug global store to another. The plugged global store will share an unique instance', async () => {
+    const { usingDataPaginationServerState } = serverState(
+      usingState(
+        'numberList',
+        () => signal([1]),
+        ({ state }) => ({
+          addNumber: (numberValue: number) => {
+            const stateValue = state();
+            return [...stateValue, numberValue];
+          },
+          reset: () => {
+            return [];
+          },
+        })
+      ),
+      {
+        name: 'dataPagination',
+        providedIn: 'root',
+      }
+    );
+
+    const { injectHost1ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          defaultNumber: counter,
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host1',
+      }
+    );
+
+    const { injectHost2ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          defaultNumber: counter,
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host2',
+      }
+    );
+    const host1 = injectHost1ServerState();
+    const host2 = injectHost2ServerState();
+
+    host1.addNumber(2);
+    expect(host1.numberList()).toEqual([1, 2]);
+    expect(host2.numberList()).toEqual([1, 2]);
+  });
+
+  it('should enable to plug local store to another. The plugged local store will not share an unique instance', async () => {
+    const { usingDataPaginationServerState } = serverState(
+      usingState(
+        'numberList',
+        () => signal([1]),
+        ({ state }) => ({
+          addNumber: (numberValue: number) => {
+            const stateValue = state();
+            return [...stateValue, numberValue];
+          },
+          reset: () => {
+            return [];
+          },
+        })
+      ),
+      {
+        name: 'dataPagination',
+        providedIn: 'scoped',
+      }
+    );
+
+    const { injectHost1ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          defaultNumber: counter,
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host1',
+      }
+    );
+
+    const { injectHost2ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          defaultNumber: counter,
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host2',
+      }
+    );
+    const host1 = injectHost1ServerState();
+    const host2 = injectHost2ServerState();
+
+    host1.addNumber(2);
+    expect(host1.numberList()).toEqual([1, 2]);
+    expect(host2.numberList()).toEqual([1]);
+  });
+  it('should enable to plug feature store to another. The plugged feature store will not share an unique instance', async () => {
+    const { usingDataPaginationServerState } = serverState(
+      usingState(
+        'numberList',
+        () => signal([1]),
+        ({ state }) => ({
+          addNumber: (numberValue: number) => {
+            const stateValue = state();
+            return [...stateValue, numberValue];
+          },
+          reset: () => {
+            return [];
+          },
+        })
+      ),
+      {
+        name: 'dataPagination',
+        providedIn: 'feature',
+      }
+    );
+
+    const { injectHost1ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          defaultNumber: counter,
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host1',
+      }
+    );
+
+    const { injectHost2ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          defaultNumber: counter,
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host2',
+      }
+    );
+    const host1 = injectHost1ServerState();
+    const host2 = injectHost2ServerState();
+
+    host1.addNumber(2);
+    expect(host1.numberList()).toEqual([1, 2]);
+    expect(host2.numberList()).toEqual([1]);
+  });
+
+  it('should enable to plug global store to another. It is possible to not propagate the non set inputs (because, they can come from another place)', async () => {
+    const { usingDataPaginationServerState } = serverState(
+      usingInputs({
+        shouldNotBeExposed: undefined as number | undefined,
+      }),
+      usingState(
+        'numberList',
+        () => signal([1]),
+        ({ state }) => ({
+          addNumber: (numberValue: number) => {
+            const stateValue = state();
+            return [...stateValue, numberValue];
+          },
+          reset: () => {
+            return [];
+          },
+        })
+      ),
+      {
+        name: 'dataPagination',
+        providedIn: 'root',
+      }
+    );
+
+    const { injectHost1ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          shouldNotBeExposed: counter,
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host1',
+      }
+    );
+
+    const { injectHost2ServerState } = serverState(
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          shouldNotBeExposed: 'EXTERNALLY_PROVIDED',
+        },
+        methods: {
+          reset,
+        },
+      })),
+      {
+        name: 'host2',
+      }
+    );
+    const host1 = injectHost1ServerState();
+    // 👇 no error, because shouldNotBeExposed is not propagated
+    const host2 = injectHost2ServerState();
+
+    host1.addNumber(2);
+    expect(host1.numberList()).toEqual([1, 2]);
+    expect(host2.numberList()).toEqual([1, 2]);
+  });
 });
 
 describe('serverState options', () => {

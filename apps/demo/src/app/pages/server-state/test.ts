@@ -1,19 +1,48 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import {
-  asyncMethod,
   on,
   serverState,
   source,
-  usingAsyncMethods,
+  usingInputs,
   usingSources,
   usingState,
 } from '@ng-query/ngrx-signals';
 
-const { injectServerState } = serverState(
+const { usingDataPaginationServerState } = serverState(
+  usingInputs({
+    defaultNumber: undefined as number | undefined,
+  }),
+  usingState(
+    'numberList',
+    () => signal([1]),
+    ({ state, context: { defaultNumber } }) => {
+      return {
+        addNumber: (numberValue: number) => {
+          const stateValue = state();
+          return [...stateValue, numberValue];
+        },
+        addDefaultNumber: () => {
+          const stateValue = state();
+          return [...stateValue, defaultNumber() ?? 0];
+        },
+        reset: () => {
+          return [];
+        },
+      };
+    }
+  ),
+  {
+    name: 'dataPagination',
+    providedIn: 'root',
+  }
+);
+
+const { injectHost1ServerState } = serverState(
   usingSources({
     increment: source<{}>(),
     decrement: source<{}>(),
+    reset: source<{}>(),
   }),
   usingState(
     'counter',
@@ -21,83 +50,123 @@ const { injectServerState } = serverState(
     ({ context: { increment, decrement }, state }) => ({
       increment: on(increment, () => state() + 1),
       decrement: on(decrement, () => state() - 1),
+      reset: () => 0,
     })
-  )
-);
-
-const mySource = source<{ test: string }>();
-
-const { injectAsyncMethodsFeatureServerState } = serverState(
-  usingAsyncMethods(() => ({
-    // should enable to provide multiples status
-    // should provide async method by id
-    searchChange: asyncMethod({
-      method: ({
-        timeToWait,
-        searchChange,
-      }: {
-        timeToWait: number;
-        searchChange: string;
-      }) => ({
-        timeToWait,
-        searchChange,
-      }),
-      identifier: (params) => params.searchChange,
-      loader: async ({ params: { timeToWait, searchChange } }) => {
-        await new Promise((resolve) => setTimeout(resolve, timeToWait));
-        return { searchChange };
-      },
-    }),
-    testSource: asyncMethod({
-      method: on(mySource, (payload) => payload),
-      loader: async ({ params: { test } }) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { test };
-      },
-    }),
+  ),
+  usingDataPaginationServerState(({ reset, counter }) => ({
+    inputs: {
+      defaultNumber: counter,
+    },
+    methods: {
+      reset,
+    },
   })),
   {
-    name: 'asyncMethodsFeature',
+    name: 'host1',
   }
 );
 
-const myGlobalSource = source<{
-  timeToWait: number;
-  searchChange: string;
-}>();
-const { injectTest2ServerState } = serverState(
+const { injectHost2ServerState } = serverState(
   usingSources({
-    myLocalSource: source<{
-      timeToWait: number;
-      searchChange: string;
-    }>(),
+    increment: source<{}>(),
+    decrement: source<{}>(),
+    reset: source<{}>(),
   }),
-  usingAsyncMethods(({ myLocalSource }) => ({
-    searchGlobalChange: asyncMethod({
-      method: on(myGlobalSource, (payload) => {
-        console.log('payload', payload);
-        return payload;
-      }),
-      identifier: (params) => params.searchChange,
-      loader: async ({ params: { timeToWait, searchChange }, abortSignal }) => {
-        await new Promise((resolve) => setTimeout(resolve, timeToWait));
-        return { searchChange };
-      },
-    }),
-    // searchLocalChange: asyncMethod({
-    //   method: on(myLocalSource, (payload) => payload),
-    //   identifier: (params) => params.searchChange,
-    //   loader: async ({ params: { timeToWait, searchChange } }) => {
-    //     await new Promise((resolve) => setTimeout(resolve, timeToWait));
-    //     console.log('loader', searchChange);
-    //     return { searchChange };
-    //   },
-    // }),
+  usingState(
+    'counter',
+    () => signal(0),
+    ({ context: { increment, decrement }, state }) => ({
+      increment: on(increment, () => state() + 1),
+      decrement: on(decrement, () => state() - 1),
+      reset: () => 0,
+    })
+  ),
+  usingDataPaginationServerState(({ reset, counter }) => ({
+    inputs: {
+      defaultNumber: 'EXTERNALLY_PROVIDED',
+    },
+    methods: {
+      reset,
+    },
   })),
   {
-    name: 'test2',
+    name: 'host2',
   }
 );
+
+// const mySource = source<{ test: string }>();
+
+// const { injectAsyncMethodsFeatureServerState } = serverState(
+//   usingAsyncMethods(() => ({
+//     // should enable to provide multiples status
+//     // should provide async method by id
+//     searchChange: asyncMethod({
+//       method: ({
+//         timeToWait,
+//         searchChange,
+//       }: {
+//         timeToWait: number;
+//         searchChange: string;
+//       }) => ({
+//         timeToWait,
+//         searchChange,
+//       }),
+//       identifier: (params) => params.searchChange,
+//       loader: async ({ params: { timeToWait, searchChange } }) => {
+//         await new Promise((resolve) => setTimeout(resolve, timeToWait));
+//         return { searchChange };
+//       },
+//     }),
+//     testSource: asyncMethod({
+//       method: on(mySource, (payload) => payload),
+//       loader: async ({ params: { test } }) => {
+//         await new Promise((resolve) => setTimeout(resolve, 500));
+//         return { test };
+//       },
+//     }),
+//   })),
+//   {
+//     name: 'asyncMethodsFeature',
+//   }
+// );
+
+// const myGlobalSource = source<{
+//   timeToWait: number;
+//   searchChange: string;
+// }>();
+// const { injectTest2ServerState } = serverState(
+//   usingSources({
+//     myLocalSource: source<{
+//       timeToWait: number;
+//       searchChange: string;
+//     }>(),
+//   }),
+//   usingAsyncMethods(({ myLocalSource }) => ({
+//     searchGlobalChange: asyncMethod({
+//       method: on(myGlobalSource, (payload) => {
+//         console.log('payload', payload);
+//         return payload;
+//       }),
+//       identifier: (params) => params.searchChange,
+//       loader: async ({ params: { timeToWait, searchChange }, abortSignal }) => {
+//         await new Promise((resolve) => setTimeout(resolve, timeToWait));
+//         return { searchChange };
+//       },
+//     }),
+//     // searchLocalChange: asyncMethod({
+//     //   method: on(myLocalSource, (payload) => payload),
+//     //   identifier: (params) => params.searchChange,
+//     //   loader: async ({ params: { timeToWait, searchChange } }) => {
+//     //     await new Promise((resolve) => setTimeout(resolve, timeToWait));
+//     //     console.log('loader', searchChange);
+//     //     return { searchChange };
+//     //   },
+//     // }),
+//   })),
+//   {
+//     name: 'test2',
+//   }
+// );
 // const { usingBasicFeature } = serverState(
 //   usingSources({
 //     reset: source<{}>(),
@@ -184,8 +253,12 @@ const { injectTest2ServerState } = serverState(
         </button>
       </div>
     </div>
+
+    <div>store nested State numberList: {{ store.numberList() }}</div>
+    <div>store2 nested State numberList: {{ store2.numberList() }}</div>
+    <button (click)="store.addDefaultNumber()">Add default number</button>
     <!-- Display async methods status /value-->
-    <div>
+    <!-- <div>
       <h3>Async Method Status</h3>
       <p>
         Status: {{ storeAsyncMethods.searchChange.select('demo')?.status() }}
@@ -223,7 +296,7 @@ const { injectTest2ServerState } = serverState(
       >
         Trigger Async Method
       </button>
-    </div>
+    </div> -->
   `,
   styles: [
     `
@@ -298,11 +371,12 @@ const { injectTest2ServerState } = serverState(
   ],
 })
 export default class TestComponent {
-  store = injectServerState();
+  store = injectHost1ServerState();
+  store2 = injectHost2ServerState();
 
-  storeAsyncMethods = injectAsyncMethodsFeatureServerState();
+  // storeAsyncMethods = injectAsyncMethodsFeatureServerState();
 
-  store2 = injectTest2ServerState();
+  // store2 = injectTest2ServerState();
 
-  myGlobalSource = myGlobalSource;
+  // myGlobalSource = myGlobalSource;
 }
