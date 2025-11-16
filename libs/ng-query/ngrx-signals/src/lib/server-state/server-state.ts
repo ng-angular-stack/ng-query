@@ -151,15 +151,13 @@ type ToServerStateOutputs<
     >
   >;
 } & {
-  // todo the inputs that are not plugged should be exposed (enable partial plugging)
-  // todo should return ServerStateFactoryUtility
   [key in `using${Capitalize<Name>}ServerState`]: <
     Context extends ContextConstraints,
     Config extends MergeObjects<
       [
         HasInputs extends true
           ? {
-              inputs: InputsToPlugin;
+              inputs: Partial<InputsToPlugin>;
             }
           : {},
         HasMethods extends true
@@ -184,7 +182,10 @@ type ToServerStateOutputs<
         MergedContext['methods'],
         'methods' extends keyof Config ? Config['methods'] : {}
       >;
-      inputs: {}; // for now the inputs are always required to be plugged when using usingServerState
+      inputs: FilterPluggedMethods<
+        MergedContext['inputs'],
+        'inputs' extends keyof Config ? Config['inputs'] : {}
+      >;
       queryParams: MergedContext['queryParams'];
       sources: MergedContext['sources'];
       __injections: MergedContext['__injections'];

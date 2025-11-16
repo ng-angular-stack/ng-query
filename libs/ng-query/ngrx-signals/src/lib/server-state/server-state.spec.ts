@@ -316,11 +316,12 @@ describe('serverState', () => {
       type resetNotExposed = (typeof store)['reset'];
     });
   });
-  it('should enable to plug a store to another store', async () => {
+  it('should enable to plug a store to another store. Standalone outputs should be transmitted. Inputs that are not bind should be transmitted', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { usingStore1ServerState, setPaginationQueryParams } = serverState(
+      const { usingStore1ServerState } = serverState(
         usingInputs({
           myParams1: undefined as string | undefined,
+          myParams2: undefined as string | undefined,
         }),
         usingSources({
           reset: source<string>(),
@@ -369,6 +370,7 @@ describe('serverState', () => {
           reset: source<string>(),
         }),
         usingStore1ServerState(({ myParams, reset }) => ({
+          // here myParams2 is not required, but required when injecting the hist store
           inputs: {
             myParams1: myParams,
           },
@@ -397,12 +399,13 @@ describe('serverState', () => {
           }
         )
       );
-      // todo why reset is exposed ?
       const addNumberSource = source<number>();
       const resetSource = source<string>();
       const store = injectServerState({
         inputs: {
-          myParams: signal('testInput'),
+          myParams: signal('PassMyParam'),
+          // myParams2 must be provided here
+          myParams2: signal('PassMyParam2'),
         },
         methods: {
           setReset: resetSource,
@@ -421,6 +424,15 @@ describe('serverState', () => {
       expectTypeOf(store.filterNumber2).toBeFunction();
       //@ts-expect-error it should not be exposed, because connected to a Source
       type resetNotExposed = (typeof store)['reset'];
+
+      // verify setPaginationQueryParams is exposed
+      expectTypeOf<
+        Parameters<typeof setPaginationQueryParams>[0]
+      >().toEqualTypeOf<{
+        page?: number | undefined;
+        pageSize?: number | undefined;
+      }>();
+      expect(setPaginationQueryParams).toBeDefined();
     });
   });
 });
