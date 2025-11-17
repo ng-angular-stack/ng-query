@@ -34,6 +34,7 @@ const { usingDataPaginationServerState } = serverState(
   ),
   {
     name: 'dataPagination',
+    providedIn: 'feature',
   }
 );
 
@@ -82,7 +83,7 @@ const { injectHost2ServerState } = serverState(
   ),
   usingDataPaginationServerState(({ reset, counter }) => ({
     inputs: {
-      defaultNumber: 'EXTERNALLY_PROVIDED',
+      defaultNumber: counter,
     },
     methods: {
       reset,

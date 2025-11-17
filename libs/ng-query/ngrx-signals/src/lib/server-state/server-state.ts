@@ -104,7 +104,6 @@ export type ServerStateFactoryUtility<
   standaloneOutputs?: StandaloneOutputs;
 };
 export const EXTERNALLY_PROVIDED = 'EXTERNALLY_PROVIDED' as const;
-// todo ProvidedIn, the EXTERNALLY_PROVIDED is not possible for inputs provided by the feature
 // todo expose setAllXQueryParams
 type EnableInputsToBeExternallyProvided<Inputs, Enable> = {
   [key in keyof Inputs]: Enable extends true
@@ -112,12 +111,8 @@ type EnableInputsToBeExternallyProvided<Inputs, Enable> = {
     : Inputs[key];
 };
 
-type IsProvidedInRoot<ProvidedIn extends ProvidedInOption> =
-  ProvidedIn extends 'root'
-    ? true
-    : [unknown] extends [ProvidedIn]
-    ? true
-    : false;
+type IsNotFeature<ProvidedIn extends ProvidedInOption> =
+  ProvidedIn extends 'feature' ? false : true;
 
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
 type ToServerStateOutputs<
@@ -129,7 +124,7 @@ type ToServerStateOutputs<
   StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
   InputsToPlugin = EnableInputsToBeExternallyProvided<
     MergedContext['inputs'],
-    IsProvidedInRoot<ProvidedIn>
+    IsNotFeature<ProvidedIn>
   >,
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
@@ -217,7 +212,7 @@ type ToServerStateOutputs<
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<StandardOutputs>;
 } & StandaloneOutputs;
 
-type ProvidedInOption = 'root' | 'scoped' | 'feature' | unknown;
+type ProvidedInOption = 'root' | 'scoped' | 'feature';
 // todo handle feature to not expose the inject and the provide but only the using...
 type ServerStateOptions<Name, ProvidedIn extends ProvidedInOption> = {
   providedIn?: ProvidedIn;
