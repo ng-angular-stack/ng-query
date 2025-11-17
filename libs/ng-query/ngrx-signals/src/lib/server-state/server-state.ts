@@ -104,18 +104,33 @@ export type ServerStateFactoryUtility<
   standaloneOutputs?: StandaloneOutputs;
 };
 export const EXTERNALLY_PROVIDED = 'EXTERNALLY_PROVIDED' as const;
-type InputsCanBeExternallyProvided<Inputs> = {
-  [key in keyof Inputs]: Inputs[key] | typeof EXTERNALLY_PROVIDED;
+// todo ProvidedIn, the EXTERNALLY_PROVIDED is not possible for inputs provided by the feature
+// todo expose setAllXQueryParams
+type EnableInputsToBeExternallyProvided<Inputs, Enable> = {
+  [key in keyof Inputs]: Enable extends true
+    ? Inputs[key] | typeof EXTERNALLY_PROVIDED
+    : Inputs[key];
 };
+
+type IsProvidedInRoot<ProvidedIn extends ProvidedInOption> =
+  ProvidedIn extends 'root'
+    ? true
+    : [unknown] extends [ProvidedIn]
+    ? true
+    : false;
 
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
 type ToServerStateOutputs<
   Context extends ContextConstraints[],
   StandaloneContextOutputs extends StandaloneOutputsConstraints[],
   Name extends string,
+  ProvidedIn extends ProvidedInOption,
   MergedContext extends MergeContexts<Context> = MergeContexts<Context>,
   StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
-  InputsToPlugin = InputsCanBeExternallyProvided<MergedContext['inputs']>,
+  InputsToPlugin = EnableInputsToBeExternallyProvided<
+    MergedContext['inputs'],
+    IsProvidedInRoot<ProvidedIn>
+  >,
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
   HasMethods = keyof MethodsToConnect extends never ? false : true,
@@ -202,9 +217,10 @@ type ToServerStateOutputs<
   [key in `${Capitalize<Name>}ServerState`]: InjectionToken<StandardOutputs>;
 } & StandaloneOutputs;
 
+type ProvidedInOption = 'root' | 'scoped' | 'feature' | unknown;
 // todo handle feature to not expose the inject and the provide but only the using...
-type ServerStateOptions<Name> = {
-  providedIn?: 'root' | 'scoped' | 'feature';
+type ServerStateOptions<Name, ProvidedIn extends ProvidedInOption> = {
+  providedIn?: ProvidedIn;
   name?: Name;
 };
 
@@ -254,6 +270,7 @@ export function serverState<
   standaloneOutputs2 extends StandaloneOutputsConstraints,
   standaloneOutputs3 extends StandaloneOutputsConstraints,
   standaloneOutputs4 extends StandaloneOutputsConstraints,
+  const ProvidedIn extends ProvidedInOption,
   const Name extends string = ''
 >(
   factory1: ServerStateFactory<[EmptyContext], outputs1, standaloneOutputs1>,
@@ -268,7 +285,7 @@ export function serverState<
     outputs4,
     standaloneOutputs4
   >,
-  options?: ServerStateOptions<Name>
+  options?: ServerStateOptions<Name, ProvidedIn>
 ): ToServerStateOutputs<
   [outputs1, outputs2, outputs3, outputs4],
   [
@@ -277,7 +294,8 @@ export function serverState<
     standaloneOutputs3,
     standaloneOutputs4
   ],
-  Name
+  Name,
+  ProvidedIn
 >;
 export function serverState<
   outputs1 extends ContextConstraints,
@@ -286,7 +304,8 @@ export function serverState<
   standaloneOutputs1 extends StandaloneOutputsConstraints,
   standaloneOutputs2 extends StandaloneOutputsConstraints,
   standaloneOutputs3 extends StandaloneOutputsConstraints,
-  const Name extends string = ''
+  const Name extends string = '',
+  const ProvidedIn extends ProvidedInOption = 'root'
 >(
   factory1: ServerStateFactory<[EmptyContext], outputs1, standaloneOutputs1>,
   factory2: ServerStateFactory<[outputs1], outputs2, standaloneOutputs2>,
@@ -295,38 +314,47 @@ export function serverState<
     outputs3,
     standaloneOutputs3
   >,
-  options?: ServerStateOptions<Name>
+  options?: ServerStateOptions<Name, ProvidedIn>
 ): ToServerStateOutputs<
   [outputs1, outputs2, outputs3],
   [standaloneOutputs1, standaloneOutputs2, standaloneOutputs3],
-  Name
+  Name,
+  ProvidedIn
 >;
 export function serverState<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
   standaloneOutputs1 extends StandaloneOutputsConstraints,
   standaloneOutputs2 extends StandaloneOutputsConstraints,
+  const ProvidedIn extends ProvidedInOption,
   const Name extends string = ''
 >(
   factory1: ServerStateFactory<[EmptyContext], outputs1, standaloneOutputs1>,
   factory2: ServerStateFactory<[outputs1], outputs2, standaloneOutputs2>,
-  options?: ServerStateOptions<Name>
+  options?: ServerStateOptions<Name, ProvidedIn>
 ): ToServerStateOutputs<
   [outputs1, outputs2],
   [standaloneOutputs1, standaloneOutputs2],
-  Name
+  Name,
+  ProvidedIn
 >;
 export function serverState<
   outputs1 extends ContextConstraints,
   standaloneOutputs1 extends StandaloneOutputsConstraints,
+  const ProvidedIn extends ProvidedInOption,
   const Name extends string = ''
 >(
   factory1: ServerStateFactory<[EmptyContext], outputs1, standaloneOutputs1>,
-  options?: ServerStateOptions<Name>
-): ToServerStateOutputs<[outputs1], [standaloneOutputs1], Name>;
+  options?: ServerStateOptions<Name, ProvidedIn>
+): ToServerStateOutputs<[outputs1], [standaloneOutputs1], Name, ProvidedIn>;
 export function serverState(
   ...data: any[]
-): ToServerStateOutputs<EmptyContext[], EmptyStandaloneContext[], string> {
+): ToServerStateOutputs<
+  EmptyContext[],
+  EmptyStandaloneContext[],
+  string,
+  'root'
+> {
   const factories = data.slice(0, -1);
   const [optionsOrFactory] = data.slice(-1);
 
@@ -334,7 +362,7 @@ export function serverState(
 
   const options = isLastFactory
     ? {}
-    : (optionsOrFactory as ServerStateOptions<any> | undefined);
+    : (optionsOrFactory as ServerStateOptions<any, any> | undefined);
   const providedIn =
     options?.providedIn && ['scoped', 'feature'].includes(options.providedIn)
       ? null
@@ -496,7 +524,12 @@ export function serverState(
     },
     [`${capitalizedName}ServerState`]: token,
     ...extractedStandaloneOutputs,
-  } as ToServerStateOutputs<EmptyContext[], EmptyStandaloneContext[], string>;
+  } as ToServerStateOutputs<
+    EmptyContext[],
+    EmptyStandaloneContext[],
+    string,
+    'root'
+  >;
 }
 
 function mergeContextAndProps({

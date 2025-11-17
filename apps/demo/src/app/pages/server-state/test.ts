@@ -34,7 +34,6 @@ const { usingDataPaginationServerState } = serverState(
   ),
   {
     name: 'dataPagination',
-    providedIn: 'root',
   }
 );
 
