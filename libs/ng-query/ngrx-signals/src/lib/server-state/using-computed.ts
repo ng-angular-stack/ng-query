@@ -1,5 +1,9 @@
 import { Signal } from '@angular/core';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 
 type SpecificUsingComputedOutputs<Computed extends {}> = {
   props: Computed;
@@ -15,11 +19,17 @@ type SpecificUsingComputedOutputs<Computed extends {}> = {
 
 type UsingComputedStatesOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Computed extends {}
-> = ServerStateFactoryUtility<Context, SpecificUsingComputedOutputs<Computed>>;
+> = ServerStateFactoryUtility<
+  Context,
+  StoreConfig,
+  SpecificUsingComputedOutputs<Computed>
+>;
 
 export function usingComputedStates<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Computed extends {}
 >(
   computedFactory: (
@@ -28,7 +38,7 @@ export function usingComputedStates<
       Context['sources'] &
       Context['props']
   ) => Computed
-): UsingComputedStatesOutputs<Context, Computed> {
+): UsingComputedStatesOutputs<Context, StoreConfig, Computed> {
   return (contextData, injector) => {
     const computedValues = computedFactory({
       ...contextData.context.inputs,

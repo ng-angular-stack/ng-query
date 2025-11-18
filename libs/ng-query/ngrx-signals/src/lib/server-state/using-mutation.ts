@@ -1,5 +1,9 @@
 import { InternalType, MergeObject } from '../types/util.type';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 import { ResourceRef } from '@angular/core';
 import { MutationRef } from '../with-mutation';
 
@@ -49,6 +53,7 @@ type SpecificUseMutationOutputs<
 
 type UseMutationOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
   ResourceState extends object | undefined,
   InsertionsOutputs,
@@ -56,6 +61,7 @@ type UseMutationOutputs<
   ResourceArgsParams
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUseMutationOutputs<
     ResourceName,
     ResourceState,
@@ -67,6 +73,7 @@ type UseMutationOutputs<
 
 export function usingMutation<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -95,6 +102,7 @@ export function usingMutation<
   }
 ): UseMutationOutputs<
   Context,
+  StoreConfig,
   ResourceName,
   ResourceState,
   InsertionsOutputs,

@@ -24,7 +24,12 @@ describe('usingQueryParams', () => {
   });
 
   it('should create query params configuration', () => {
+    // todo forcer à mettre à chaque fois le providedIn (le name éviter)
     const { injectServerState } = serverState(
+      {
+        providedIn: 'root',
+        name: '',
+      },
       usingQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
@@ -67,6 +72,10 @@ describe('usingQueryParams', () => {
 
   it('should use default values when query params are missing', () => {
     const { injectServerState } = serverState(
+      {
+        providedIn: 'root',
+        name: '',
+      },
       usingQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
@@ -91,6 +100,10 @@ describe('usingQueryParams', () => {
 
   it('should accept custom methods configuration', () => {
     const { injectServerState } = serverState(
+      {
+        providedIn: 'root',
+        name: '',
+      },
       usingQueryParams(
         'pagination',
         () => ({
@@ -136,6 +149,10 @@ describe('usingQueryParams', () => {
 
   it('should accept custom methods that rely on source', () => {
     const { injectServerState } = serverState(
+      {
+        providedIn: 'root',
+        name: '',
+      },
       usingSources({
         nextPage: source<{}>(),
       }),
@@ -180,6 +197,10 @@ describe('usingQueryParams', () => {
 });
 
 const { injectServerState } = serverState(
+  {
+    providedIn: 'root',
+    name: '',
+  },
   usingQueryParams('pagination', () => ({
     page: {
       defaultValue: 1,
@@ -252,6 +273,10 @@ describe('usingQueryParams standalone methods', () => {
   it('should navigate to the target URL with specified query params', async () => {
     const harness = await RouterTestingHarness.create('');
     const { injectServerState, setPaginationQueryParams } = serverState(
+      {
+        providedIn: 'root',
+        name: '',
+      },
       usingQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
@@ -289,6 +314,10 @@ describe('usingQueryParams standalone methods', () => {
   it('should navigateByUrl to the target URL with specified query params', async () => {
     const harness = await RouterTestingHarness.create();
     const { injectServerState, setPaginationQueryParams } = serverState(
+      {
+        providedIn: 'root',
+        name: '',
+      },
       usingQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,

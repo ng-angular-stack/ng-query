@@ -29,6 +29,10 @@ describe('serverState', () => {
 
   it('should enable creating queries and mutations', async () => {
     const { injectServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutation('save', () =>
         mutation({
           method: (data: { id: number; name: string }) => data,
@@ -77,6 +81,10 @@ describe('serverState', () => {
   it('a query can react to a mutation change', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('save', () =>
           mutation({
             method: (data: { id: number; name: string }) => data,
@@ -129,6 +137,10 @@ describe('serverState', () => {
   it('should enable declaring useMutationById and useQuery', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutationById('save', () =>
           mutationById({
             method: (data: { id: string; name: string }) => data,
@@ -184,6 +196,10 @@ describe('serverState', () => {
   it('should enable declaring useMutationById and usingQueryById', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutationById('save', () =>
           mutationById({
             method: (data: { id: string; name: string }) => data,
@@ -245,6 +261,10 @@ describe('serverState', () => {
 
   it('should enable exporting standalone outputs', async () => {
     const { injectServerState, setPaginationQueryParams } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
@@ -265,6 +285,10 @@ describe('serverState', () => {
   it('should enable to bind the inputs and the outputs of the store when using injectServerState', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingInputs({
           myParams: undefined as number | undefined,
         }),
@@ -328,6 +352,10 @@ describe('serverState', () => {
   it('should enable to plug a store to another store. Standalone outputs should be transmitted. Inputs that are not bind should be transmitted', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { usingStore1ServerState } = serverState(
+        {
+          name: 'store1',
+          providedIn: 'root',
+        },
         usingInputs({
           myParams1: undefined as string | undefined,
           myParams2: undefined as string | undefined,
@@ -365,13 +393,14 @@ describe('serverState', () => {
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
-        })),
-        {
-          name: 'store1',
-        }
+        }))
       );
 
       const { injectServerState, setPaginationQueryParams } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingInputs({
           myParams: undefined as string | undefined,
         }),
@@ -447,6 +476,10 @@ describe('serverState', () => {
 
   it('should enable to plug global store to another. The plugged global store will share an unique instance', async () => {
     const { usingDataPaginationServerState } = serverState(
+      {
+        name: 'dataPagination',
+        providedIn: 'root',
+      },
       usingState(
         'numberList',
         () => signal([1]),
@@ -459,14 +492,14 @@ describe('serverState', () => {
             return [];
           },
         })
-      ),
-      {
-        name: 'dataPagination',
-        providedIn: 'root',
-      }
+      )
     );
 
     const { injectHost1ServerState } = serverState(
+      {
+        name: 'host1',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -488,13 +521,14 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host1',
-      }
+      }))
     );
 
     const { injectHost2ServerState } = serverState(
+      {
+        name: 'host2',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -516,10 +550,7 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host2',
-      }
+      }))
     );
     const host1 = injectHost1ServerState();
     const host2 = injectHost2ServerState();
@@ -531,6 +562,10 @@ describe('serverState', () => {
 
   it('should enable to plug local store to another. The plugged local store will not share an unique instance', async () => {
     const { usingDataPaginationServerState } = serverState(
+      {
+        name: 'dataPagination',
+        providedIn: 'scoped',
+      },
       usingState(
         'numberList',
         () => signal([1]),
@@ -543,14 +578,14 @@ describe('serverState', () => {
             return [];
           },
         })
-      ),
-      {
-        name: 'dataPagination',
-        providedIn: 'scoped',
-      }
+      )
     );
 
     const { injectHost1ServerState } = serverState(
+      {
+        name: 'host1',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -572,13 +607,14 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host1',
-      }
+      }))
     );
 
     const { injectHost2ServerState } = serverState(
+      {
+        name: 'host2',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -600,10 +636,7 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host2',
-      }
+      }))
     );
     const host1 = injectHost1ServerState();
     const host2 = injectHost2ServerState();
@@ -614,6 +647,10 @@ describe('serverState', () => {
   });
   it('should enable to plug feature store to another. The plugged feature store will not share an unique instance', async () => {
     const { usingDataPaginationServerState } = serverState(
+      {
+        name: 'dataPagination',
+        providedIn: 'feature',
+      },
       usingState(
         'numberList',
         () => signal([1]),
@@ -626,14 +663,14 @@ describe('serverState', () => {
             return [];
           },
         })
-      ),
-      {
-        name: 'dataPagination',
-        providedIn: 'feature',
-      }
+      )
     );
 
     const { injectHost1ServerState } = serverState(
+      {
+        name: 'host1',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -655,13 +692,14 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host1',
-      }
+      }))
     );
 
     const { injectHost2ServerState } = serverState(
+      {
+        name: 'host2',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -683,10 +721,7 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host2',
-      }
+      }))
     );
     const host1 = injectHost1ServerState();
     const host2 = injectHost2ServerState();
@@ -698,6 +733,10 @@ describe('serverState', () => {
 
   it('should enable to plug global store to another. It is possible to not propagate the non set inputs (because, they can come from another place)', async () => {
     const { usingDataPaginationServerState } = serverState(
+      {
+        name: 'dataPagination',
+        providedIn: 'root',
+      },
       usingInputs({
         shouldNotBeExposed: undefined as number | undefined,
       }),
@@ -713,14 +752,14 @@ describe('serverState', () => {
             return [];
           },
         })
-      ),
-      {
-        name: 'dataPagination',
-        providedIn: 'root',
-      }
+      )
     );
 
     const { injectHost1ServerState } = serverState(
+      {
+        name: 'host1',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -742,13 +781,14 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host1',
-      }
+      }))
     );
 
     const { injectHost2ServerState } = serverState(
+      {
+        name: 'host2',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
         decrement: source<{}>(),
@@ -770,10 +810,7 @@ describe('serverState', () => {
         methods: {
           reset,
         },
-      })),
-      {
-        name: 'host2',
-      }
+      }))
     );
     const host1 = injectHost1ServerState();
     // 👇 no error, because shouldNotBeExposed is not propagated
@@ -796,6 +833,10 @@ describe('serverState options', () => {
   it('should provide the store in the root injector when providedIn is "root"', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectUserServerState } = serverState(
+        {
+          name: 'user',
+          providedIn: 'root',
+        },
         usingMutation('save', () =>
           mutation({
             method: (data: { id: number; name: string }) => data,
@@ -813,10 +854,7 @@ describe('serverState options', () => {
             params: () => 3,
             loader: async ({ params: id }) => ({ id, name: 'test2' }),
           })
-        ),
-        {
-          name: 'user',
-        }
+        )
       );
       const userServerState = injectUserServerState();
       // todo fix exposed functions
@@ -846,6 +884,10 @@ describe('serverState options', () => {
   it('should provide a shared store  by default', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectUserServerState, UserServerState } = serverState(
+        {
+          name: 'user',
+          providedIn: 'root',
+        },
         usingMutation('save', () =>
           mutation({
             method: (data: { id: number; name: string }) => data,
@@ -863,10 +905,7 @@ describe('serverState options', () => {
             params: () => 3,
             loader: async ({ params: id }) => ({ id, name: 'test2' }),
           })
-        ),
-        {
-          name: 'user',
-        }
+        )
       );
       const userServerState = injectUserServerState();
       const sameUserServerState = inject(UserServerState);
@@ -896,6 +935,47 @@ describe('serverState options', () => {
         id: 3,
         name: 'test',
       });
+    });
+  });
+});
+
+describe('Expose standalone setter all query params function', () => {
+  it('should expose setAllXQueryParams in standalone outputs', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { injectTestServerState, setAllQueryParams } = serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        usingQueryParams('pagination', () => ({
+          page: {
+            defaultValue: 1,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+          pageSize: {
+            defaultValue: 10,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+        })),
+        usingQueryParams('activeId', () => ({
+          active: {
+            defaultValue: undefined,
+            parse: (value: string) => value,
+            serialize: (value) => String(value),
+          },
+        }))
+      );
+      setAllQueryParams;
+
+      expect(setAllTestQueryParams).toBeDefined();
+      expectTypeOf<
+        Parameters<typeof setAllTestQueryParams>[0]
+      >().toEqualTypeOf<{
+        pagination?: { page?: number; pageSize?: number } | undefined;
+        activeId?: { active?: string | undefined } | undefined;
+      }>();
     });
   });
 });

@@ -1,5 +1,9 @@
 import { Signal } from '@angular/core';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 import { Prettify } from '@ngrx/signals';
 
 type ToSignalObject<T> = {
@@ -20,13 +24,19 @@ type SpecificUsingInputsOutputs<Inputs extends {}> = {
 
 type UsingInputsOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
-> = ServerStateFactoryUtility<Context, SpecificUsingInputsOutputs<Inputs>>;
+> = ServerStateFactoryUtility<
+  Context,
+  StoreConfig,
+  SpecificUsingInputsOutputs<Inputs>
+>;
 
 export function usingInputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
->(inputs: Inputs): UsingInputsOutputs<Context, Inputs> {
+>(inputs: Inputs): UsingInputsOutputs<Context, StoreConfig, Inputs> {
   // todo expose setXInputs as standalone ?
   return (contextData) => {
     return {

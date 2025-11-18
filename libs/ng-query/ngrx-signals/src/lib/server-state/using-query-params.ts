@@ -10,6 +10,7 @@ import {
   ContextConstraints,
   ContextInput,
   ServerStateFactoryUtility,
+  StoreConfigConstraints,
 } from './server-state';
 import { Prettify } from '@ngrx/signals';
 import { createMethodHandlers } from './util/util';
@@ -95,8 +96,11 @@ type SpecificUsingQueryParamsOutputs<
   };
   methods: QueryParamMethods<QueryParamsName, QueryParams, CustomMethods>;
   inputs: {};
-  queryParams: QueryParamProps<QueryParams> & {
-    [K in QueryParamsName]: Signal<Prettify<ToState<QueryParams>>>;
+  queryParams: {
+    [K in QueryParamsName]: {
+      config: QueryParams;
+      state: WritableSignal<ToState<QueryParams>>;
+    };
   };
   sources: {};
   __injections: {};
@@ -120,11 +124,13 @@ type SpecificUsingQueryStandaloneOutputs<
 
 type UsingQueryParamsOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>,
   CustomMethods
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUsingQueryParamsOutputs<QueryParamsName, QueryParams, CustomMethods>,
   SpecificUsingQueryStandaloneOutputs<QueryParamsName, QueryParams>
 >;
@@ -194,6 +200,7 @@ type UsingQueryParamsOutputs<
  */
 export function usingQueryParams<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   const QueryParamsName extends string,
   QueryParamsConfig extends Record<string, QueryParamConfig<unknown>>,
   MethodKeys extends string,
@@ -215,12 +222,17 @@ export function usingQueryParams<
   >
 ): UsingQueryParamsOutputs<
   Context,
+  StoreConfig,
   QueryParamsName,
   QueryParamsConfig,
   Methods
 > {
   const queryParamsConfig = queryParamsFactory();
-  const context = (contextData: ContextInput<Context>, injector: Injector) => {
+  const context = (
+    contextData: ContextInput<Context>,
+    injector: Injector,
+    _storeConfig: StoreConfig
+  ) => {
     const router = injector.get(Router);
     const activatedRoute = injector.get(ActivatedRoute);
 
@@ -333,7 +345,6 @@ export function usingQueryParams<
         });
       },
     };
-    console.log('contextData', contextData);
     const methodsData = config?.methods?.({
       queryParams: queryParamsState.asReadonly(),
       context: {
@@ -385,8 +396,10 @@ export function usingQueryParams<
       sources: {},
       asyncMethods: {},
       queryParams: {
-        ...props,
-        [`${queryParamsName}`]: queryParamsState,
+        [`${queryParamsName}`]: {
+          config: queryParamsConfig,
+          state: queryParamsState,
+        },
       },
     } as SpecificUsingQueryParamsOutputs<
       QueryParamsName,
@@ -403,6 +416,7 @@ export function usingQueryParams<
     ) => serializeQueryParams(params, queryParamsConfig),
   }) as unknown as UsingQueryParamsOutputs<
     Context,
+    StoreConfig,
     QueryParamsName,
     QueryParamsConfig,
     Methods

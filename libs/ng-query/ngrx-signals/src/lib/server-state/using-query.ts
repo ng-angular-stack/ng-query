@@ -9,6 +9,7 @@ import {
   ContextConstraints,
   MutationDictionary,
   ServerStateFactoryUtility,
+  StoreConfigConstraints,
 } from './server-state';
 import { QueryRef } from '../with-query';
 import {
@@ -116,6 +117,7 @@ type SpecificUsingQueryOutputs<
 
 type UseQueryOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -123,6 +125,7 @@ type UseQueryOutputs<
   InsertionsOutputs
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUsingQueryOutputs<
     ResourceName,
     ResourceState,
@@ -134,6 +137,7 @@ type UseQueryOutputs<
 
 export function usingQuery<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -168,6 +172,7 @@ export function usingQuery<
   >
 ): UseQueryOutputs<
   Context,
+  StoreConfig,
   ResourceName,
   ResourceState,
   ResourceParams,

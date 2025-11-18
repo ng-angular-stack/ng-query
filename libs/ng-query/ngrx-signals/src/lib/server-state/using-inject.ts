@@ -1,5 +1,9 @@
 import { InjectionToken, Type } from '@angular/core';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 
 type ProviderTokenWithoutAbstract<T> = Type<T> | InjectionToken<T>;
 
@@ -26,9 +30,11 @@ type SpecificUsingInjectionsOutputs<Injections extends {}> = {
 
 type UsingInputsOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Injections extends {}
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUsingInjectionsOutputs<Injections>
 >;
 
@@ -36,12 +42,13 @@ type UsingInputsOutputs<
 
 export function usingInject<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Injections extends {}
 >(
   injections: (
     entries: Context['inputs'] & Context['__injections'] & Context['sources']
   ) => Injections
-): UsingInputsOutputs<Context, Injections> {
+): UsingInputsOutputs<Context, StoreConfig, Injections> {
   return (contextData, injector) => {
     const injectedInjections = Object.entries(
       injections({

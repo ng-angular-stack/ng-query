@@ -1,5 +1,9 @@
 import { Signal, WritableSignal } from '@angular/core';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 import { ReadonlySource } from './util/source.type';
 import { createMethodHandlers } from './util/util';
 
@@ -31,16 +35,19 @@ type SpecificUsingStateOutputs<
 
 type UsingStateOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   StateName extends string,
   State,
   Methods extends Record<string, (...args: any[]) => any> | undefined
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUsingStateOutputs<StateName, State, Methods>
 >;
 
 export function usingState<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   const StateName extends string,
   State,
   Methods extends
@@ -64,7 +71,7 @@ export function usingState<
       Context['sources'] &
       Context['props'];
   }) => Methods
-): UsingStateOutputs<Context, StateName, State, Methods> {
+): UsingStateOutputs<Context, StoreConfig, StateName, State, Methods> {
   return (contextData, injector) => {
     const stateResult = stateFactory({
       ...contextData.context.inputs,

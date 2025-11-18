@@ -1,5 +1,9 @@
 import { InternalType, MergeObject } from '../types/util.type';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { ResourceByIdRef } from '../resource-by-id';
 
@@ -66,6 +70,7 @@ type SpecificUseMutationByIdOutputs<
 
 type UsingMutationOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
   ResourceState extends object | undefined,
   InsertionsOutputs,
@@ -74,6 +79,7 @@ type UsingMutationOutputs<
   GroupIdentifier extends string
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUseMutationByIdOutputs<
     ResourceName,
     ResourceState,
@@ -86,6 +92,7 @@ type UsingMutationOutputs<
 
 export function usingMutationById<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -121,6 +128,7 @@ export function usingMutationById<
   }
 ): UsingMutationOutputs<
   Context,
+  StoreConfig,
   ResourceName,
   ResourceState,
   InsertionsOutputs,

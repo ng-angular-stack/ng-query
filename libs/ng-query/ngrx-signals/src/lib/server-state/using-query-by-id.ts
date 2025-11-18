@@ -21,6 +21,7 @@ import {
   ContextConstraints,
   MutationDictionary,
   ServerStateFactoryUtility,
+  StoreConfigConstraints,
 } from './server-state';
 
 // todo Context['sources'] & Context['queryParams'] & Context['asyncMethods'];
@@ -78,6 +79,7 @@ type SpecificUsingQueryOutputs<
 
 type UsingQueryOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -86,6 +88,7 @@ type UsingQueryOutputs<
   InsertionsOutputs
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUsingQueryOutputs<
     GroupIdentifier,
     ResourceName,
@@ -173,6 +176,7 @@ withQuery(
  */
 export function usingQueryById<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -212,6 +216,7 @@ export function usingQueryById<
   >
 ): UsingQueryOutputs<
   Context,
+  StoreConfig,
   ResourceName,
   ResourceState,
   ResourceParams,

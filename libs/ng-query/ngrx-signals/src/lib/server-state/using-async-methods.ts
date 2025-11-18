@@ -1,5 +1,9 @@
 import { Signal } from '@angular/core';
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 import { MergeObjects, UnionToTuple } from '../types/util.type';
 import { ReadonlySource } from './util/source.type';
 import { Prettify } from '@ngrx/signals';
@@ -53,9 +57,11 @@ type SpecificUsingAsyncMethodsOutputs<AsyncMethods extends {}> = {
 
 type UsingAsyncMethodsOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   AsyncMethods extends {}
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUsingAsyncMethodsOutputs<AsyncMethods>
 >;
 
@@ -134,6 +140,7 @@ export type AsyncMethodRef<
 
 export function usingAsyncMethods<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   AsyncMethods extends {}
 >(
   asyncMethodsFactory: (
@@ -142,7 +149,7 @@ export function usingAsyncMethods<
       Context['sources'] &
       Context['props']
   ) => AsyncMethods
-): UsingAsyncMethodsOutputs<Context, AsyncMethods> {
+): UsingAsyncMethodsOutputs<Context, StoreConfig, AsyncMethods> {
   return (contextData, injector) => {
     const asyncMethods = asyncMethodsFactory({
       ...contextData.context.inputs,

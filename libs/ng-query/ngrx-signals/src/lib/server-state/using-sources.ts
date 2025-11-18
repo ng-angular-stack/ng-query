@@ -1,4 +1,8 @@
-import { ContextConstraints, ServerStateFactoryUtility } from './server-state';
+import {
+  ContextConstraints,
+  ServerStateFactoryUtility,
+  StoreConfigConstraints,
+} from './server-state';
 import { Source } from './source';
 import { capitalize } from './util/util';
 
@@ -25,11 +29,13 @@ type SpecificUsingSourcesOutputs<Sources extends {}> = {
   asyncMethods: {};
 };
 
-type UsingInputsOutputs<
+type UsingSourcesOutputs<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
 > = ServerStateFactoryUtility<
   Context,
+  StoreConfig,
   SpecificUsingSourcesOutputs<Inputs>,
   SourceSetterMethods<Inputs>
 >;
@@ -68,8 +74,9 @@ type UsingInputsOutputs<
  */
 export function usingSources<
   Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
   Sources extends Record<string, Source<any>>
->(sources: Sources): UsingInputsOutputs<Context, Sources> {
+>(sources: Sources): UsingSourcesOutputs<Context, StoreConfig, Sources> {
   const methods = Object.entries(sources).reduce((acc, [key, source]) => {
     return {
       ...acc,
@@ -90,5 +97,5 @@ export function usingSources<
       asyncMethods: {},
       methods,
     } as SpecificUsingSourcesOutputs<Sources>;
-  }, methods) as unknown as UsingInputsOutputs<Context, Sources>;
+  }, methods) as unknown as UsingSourcesOutputs<Context, StoreConfig, Sources>;
 }
