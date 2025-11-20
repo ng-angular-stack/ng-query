@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
-import { serverState } from './server-state';
+import { EmptyContext, serverState } from './server-state';
 import { usingQuery } from './using-query';
 import { usingMutation } from './using-mutation';
 import { mutation } from '../mutation';
@@ -18,6 +18,7 @@ import { on } from './on';
 import { ReadonlySource } from './util/source.type';
 import { Equal, Expect } from 'test-type';
 import { IsAny } from '../types/util.type';
+import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -561,19 +562,19 @@ describe('serverState', () => {
   });
 
   it('should enable to plug local store to another. The plugged local store will not share an unique instance', async () => {
-    const { usingDataPaginationServerState } = serverState(
+    const { usingSharedFeatureServerState } = serverState(
       {
-        name: 'dataPagination',
+        name: 'sharedFeature',
         providedIn: 'scoped',
       },
+      usingInputs({
+        defaultNumber: undefined as number | undefined,
+      }),
       usingState(
         'numberList',
-        () => signal([1]),
-        ({ state }) => ({
-          addNumber: (numberValue: number) => {
-            const stateValue = state();
-            return [...stateValue, numberValue];
-          },
+        ({ defaultNumber }) => linkedSignal(() => [defaultNumber() ?? 1]),
+        ({ state, context: { defaultNumber } }) => ({
+          addNumber: () => [...state(), defaultNumber() ?? 1],
           reset: () => {
             return [];
           },
@@ -600,7 +601,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      usingSharedFeatureServerState(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -629,7 +630,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      usingSharedFeatureServerState(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -641,7 +642,7 @@ describe('serverState', () => {
     const host1 = injectHost1ServerState();
     const host2 = injectHost2ServerState();
 
-    host1.addNumber(2);
+    host1.addNumber();
     expect(host1.numberList()).toEqual([1, 2]);
     expect(host2.numberList()).toEqual([1]);
   });
@@ -820,6 +821,77 @@ describe('serverState', () => {
     expect(host1.numberList()).toEqual([1, 2]);
     expect(host2.numberList()).toEqual([1, 2]);
   });
+
+  it('should enable to plug global store to another. It is possible to not propagate the non set inputs (because, they can come from another place)', async () => {
+    const {
+      usingDataPaginationServerState,
+      _DATAPAGINATION_META_STORE_CONTEXT,
+    } = serverState(
+      {
+        name: 'dataPagination',
+        providedIn: 'root',
+      },
+      usingInputs({
+        shouldNotBeExposed: undefined as number | undefined,
+      }),
+      usingState(
+        'numberList',
+        () => signal([1]),
+        ({ state }) => ({
+          addNumber: (numberValue: number) => {
+            const stateValue = state();
+            return [...stateValue, numberValue];
+          },
+          reset: () => {
+            return [];
+          },
+        })
+      )
+    );
+
+    expectTypeOf(_DATAPAGINATION_META_STORE_CONTEXT).toEqualTypeOf<{
+      providedIn: 'root';
+      name: 'dataPagination';
+    }>();
+
+    const { injectHost1ServerState, _HOST1_META_STORE_CONTEXT } = serverState(
+      {
+        name: 'host1',
+        providedIn: 'root',
+      },
+      usingSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      usingState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: on(increment, () => state() + 1),
+          decrement: on(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      usingDataPaginationServerState(({ reset, counter }) => ({
+        inputs: {
+          shouldNotBeExposed: counter,
+        },
+        methods: {
+          reset,
+        },
+      }))
+    );
+    expectTypeOf(_HOST1_META_STORE_CONTEXT).toEqualTypeOf<{
+      providedIn: 'root';
+      name: 'host1';
+    }>();
+
+    const host1 = injectHost1ServerState();
+
+    host1.addNumber(2);
+    expect(host1.numberList()).toEqual([1, 2]);
+  });
 });
 
 describe('serverState options', () => {
@@ -939,13 +1011,144 @@ describe('serverState options', () => {
   });
 });
 
-describe('Expose standalone setter all query params function', () => {
-  it('should expose setAllXQueryParams in standalone outputs', async () => {
+describe('serverState preserve all context', () => {
+  it('should preserve the context when using serverState', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectTestServerState, setAllQueryParams } = serverState(
+      serverState(
         {
           name: 'test',
           providedIn: 'root',
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        }
+      );
+      serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        }
+      );
+      serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        }
+      );
+      serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        }
+      );
+    });
+  });
+
+  it('should preserve the context when using serverState', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { _TEST_META_STORE_CONTEXT } = serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        usingQueryParams('activeId', () => ({
+          active: {
+            defaultValue: undefined,
+            parse: (value: string) => value,
+            serialize: (value) => String(value),
+          },
+        })),
+        (contextData, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        }
+      );
+      expectTypeOf(_TEST_META_STORE_CONTEXT).toEqualTypeOf<{
+        providedIn: 'root';
+        name: 'test';
+      }>();
+    });
+  });
+
+  it('should preserve the context when used with `usingServerState`', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const {
+        usingMySharedFeatureServerState,
+        _MYSHAREDFEATURE_META_STORE_CONTEXT,
+      } = serverState(
+        {
+          name: 'mySharedFeature',
+          providedIn: 'feature',
         },
         usingQueryParams('pagination', () => ({
           page: {
@@ -958,16 +1161,78 @@ describe('Expose standalone setter all query params function', () => {
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
-        })),
-        usingQueryParams('activeId', () => ({
-          active: {
-            defaultValue: undefined,
-            parse: (value: string) => value,
-            serialize: (value) => String(value),
-          },
         }))
       );
-      setAllQueryParams;
+      expectTypeOf(_MYSHAREDFEATURE_META_STORE_CONTEXT).toEqualTypeOf<{
+        providedIn: 'feature';
+        name: 'mySharedFeature';
+      }>();
+      const { _TEST_META_STORE_CONTEXT } = serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        // ({ context }, injector, storeConfig) => {
+        //   expectTypeOf(storeConfig).toEqualTypeOf<{
+        //     name: 'test';
+        //     providedIn: 'root';
+        //   }>();
+        //   return {} as EmptyContext;
+        // },
+        usingMySharedFeatureServerState(),
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return {} as EmptyContext;
+        }
+      );
+      expectTypeOf(_TEST_META_STORE_CONTEXT).toEqualTypeOf<{
+        providedIn: 'root';
+        name: 'test';
+      }>();
+    });
+  });
+});
+
+describe('Expose standalone setter all query params function', () => {
+  it('should expose setAllXQueryParams in standalone outputs', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { injectTestServerState, setAllTestQueryParams, testconf } =
+        serverState(
+          {
+            name: 'test',
+            providedIn: 'root',
+          },
+          usingQueryParams('pagination', () => ({
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              defaultValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+          })),
+          usingQueryParams('activeId', () => ({
+            active: {
+              defaultValue: undefined,
+              parse: (value: string) => value,
+              serialize: (value) => String(value),
+            },
+          })),
+          craftSetAllQueriesParamsStandalone()
+          // ({ context }, injector, storeConfig) => {
+          //   expectTypeOf(storeConfig).toEqualTypeOf<{
+          //     name: 'test';
+          //     providedIn: 'root';
+          //   }>();
+          //   return {} as EmptyContext;
+          // }
+        );
 
       expect(setAllTestQueryParams).toBeDefined();
       expectTypeOf<

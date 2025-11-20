@@ -24,7 +24,6 @@ describe('usingQueryParams', () => {
   });
 
   it('should create query params configuration', () => {
-    // todo forcer à mettre à chaque fois le providedIn (le name éviter)
     const { injectServerState } = serverState(
       {
         providedIn: 'root',

@@ -187,9 +187,12 @@ export function usingQueryById<
 >(
   resourceName: ResourceName,
   queryFactory: (
+    // todo export a generic type for context
     context: Context['inputs'] &
       Context['__injections'] &
-      Context['queryParams']
+      Context['sources'] &
+      Context['queryParams'] &
+      Context['asyncMethods']
   ) => {
     queryRef: QueryByIdRef<
       NoInfer<GroupIdentifier>,

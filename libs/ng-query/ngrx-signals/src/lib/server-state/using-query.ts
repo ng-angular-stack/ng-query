@@ -147,7 +147,11 @@ export function usingQuery<
 >(
   resourceName: ResourceName,
   queryFactory: (
-    context: Context['inputs'] & Context['__injections'] & Context['sources']
+    context: Context['inputs'] &
+      Context['__injections'] &
+      Context['sources'] &
+      Context['queryParams'] &
+      Context['asyncMethods']
   ) => {
     // ! avoid to get the QueryRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function

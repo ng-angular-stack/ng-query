@@ -113,7 +113,8 @@ type SpecificUsingQueryStandaloneOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>
 > = {
-  [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
+  [K in `setAll_STORE_NAME_QueryParams`]: <
+    // todo create an export token from serverState
     T extends Partial<{
       [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
     }>

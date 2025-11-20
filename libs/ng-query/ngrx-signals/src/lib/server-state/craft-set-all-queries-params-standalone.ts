@@ -1,22 +1,30 @@
+import { WritableSignal } from '@angular/core';
 import {
   ContextConstraints,
   EmptyContext,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
 } from './server-state';
-import { QueryParamConfig } from './using-query-params';
+import { Prettify } from '@ngrx/signals';
+
+type InferQueryParamsState<T> = T extends WritableSignal<infer U> ? U : never;
 
 type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints
 > = {
-  [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
-    T extends Partial<{
-      [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
-    }>
+  [K in `setAll${Capitalize<StoreConfig['name']>}QueryParams`]: <
+    AllQueriesParamsState extends {
+      [K in keyof Context['queryParams']]: Context['queryParams'][K];
+      // | InferQueryParamsState<Context['queryParams'][K]>
+      // | 'default';
+    }
   >(
-    params: T
-  ) => T;
+    params: Prettify<AllQueriesParamsState>
+  ) => AllQueriesParamsState;
+} & {
+  testName: StoreConfig['name'];
+  testconf: StoreConfig;
 };
 
 type CraftSetAllQueriesParamsStandaloneOutputs<

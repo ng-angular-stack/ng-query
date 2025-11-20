@@ -1,7 +1,7 @@
 import { Prettify } from '@ngrx/signals';
 import { __InternalSharedMutationConfig, MutationRef } from '../with-mutation';
 import { QueryRef } from '../with-query';
-import { InternalType, MergeObjects } from '../types/util.type';
+import { InternalType, MergeObject, MergeObjects } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
 import {
@@ -20,8 +20,11 @@ import {
   ToConnectableMethodFromInject,
 } from './util/util.type';
 
+//todo using inouts should not accepts other params
+// todo inputs query&queryParams
 // todo rename craft ?
-// todo filter private fields and methods
+// todo filter private fields and methods ?
+// todo keep each state dependencies (will enable to use some functionalities that will require to know the dependencies of other states, like setQueryParamsAnPrefetch (that can only works for root stores/states))
 
 // ! when adding standalone outputs make sure to assign like this: const c = Object.assign(() => true, {a: 5}) (function first)
 
@@ -45,7 +48,7 @@ export type QueryDictionary = Record<
   }
 >;
 
-// todo rename __query/__mutation asyncMethods ?  props: publicProps/propsOutputs ?
+// todo rename __query/__mutation asyncMethods ?
 // todo find a way to simplify that, props exposed everywhere, _props only in stores and __props only in current store ?
 
 export type ContextConstraints = {
@@ -58,6 +61,8 @@ export type ContextConstraints = {
   __mutation: {};
   __query: {};
   asyncMethods: {};
+  // _generatedDeps: {[name]: {propsKeys: string[], methodsKeys: string[]}};
+  // _usedDeps: {[storeAlias]: {[storeName]: {[props]: string[]; [methods]: string[], [inputs]: string[], [sources]: string[]...};}}
 };
 
 // ! do not expose it
@@ -73,17 +78,19 @@ type _EmptyContext = {
   __query: {};
 };
 
-export type EmptyContext = {
-  props: {};
-  methods: {};
-  inputs: {};
-  queryParams: {};
-  sources: {};
-  __injections: {};
-  asyncMethods: {};
-  __mutation: {};
-  __query: {};
+export const EmptyContext = {
+  props: {},
+  methods: {},
+  inputs: {},
+  queryParams: {},
+  sources: {},
+  __injections: {},
+  asyncMethods: {},
+  __mutation: {},
+  __query: {},
 };
+
+export type EmptyContext = typeof EmptyContext;
 
 type EmptyStandaloneContext = {};
 
@@ -97,20 +104,20 @@ export type ContextInput<Context extends ContextConstraints> = {
  */
 export type ServerStateFactory<
   Context extends ContextConstraints[],
-  StoreConfig extends StoreConfigConstraints,
+  StoreConfig,
   ServerStateActionOutputs extends ContextConstraints,
   StandaloneContextOutputs extends {}
-> = ((
+> = (<HostStoreConfig extends StoreConfigConstraints>( // todo add HostStoreConfig to deps
   contextData: ContextInput<MergeContexts<Context>>,
   injector: Injector,
-  storeConfig: StoreConfig
+  storeConfig: StoreConfig // do not use HostStoreConfig
 ) => ServerStateActionOutputs) & {
   standaloneOutputs?: StandaloneContextOutputs;
 };
 
 export type ServerStateFactoryUtility<
   Context extends ContextConstraints,
-  StoreConfig extends StoreConfigConstraints, // todo valoriser cette info via un tree ?
+  StoreConfig extends StoreConfigConstraints, // todo try to keep this info
   ServerStateActionOutputs extends ContextConstraints,
   StandaloneOutputs extends {} = {}
 > = (<HostStoreConfig extends StoreConfigConstraints>(
@@ -131,13 +138,32 @@ type EnableInputsToBeExternallyProvided<Inputs, Enable> = {
 type IsNotFeature<ProvidedIn extends ProvidedInOption> =
   ProvidedIn extends 'feature' ? false : true;
 
+type ReplaceNameToken<
+  StandaloneOutputName extends string,
+  StoreName extends string
+> = StandaloneOutputName extends `${infer Prefix}_STORE_NAME_${infer Suffix}`
+  ? `${Prefix}${Capitalize<StoreName>}${Suffix}`
+  : StandaloneOutputName;
+
+type ReplaceStandaloneStoreToken<
+  StandaloneOutputs extends StandaloneOutputsConstraints,
+  StoreConfig extends StoreConfigConstraints
+> = {
+  [K in keyof StandaloneOutputs as ReplaceNameToken<
+    K & string,
+    StoreConfig['name']
+  >]: StandaloneOutputs[K];
+};
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
 type ToServerStateOutputs<
   Context extends ContextConstraints[],
   StandaloneContextOutputs extends StandaloneOutputsConstraints[],
   StoreConfig extends StoreConfigConstraints,
   MergedContext extends MergeContexts<Context> = MergeContexts<Context>,
-  StandaloneOutputs = MergeStandaloneContexts<StandaloneContextOutputs>,
+  StandaloneOutputs = ReplaceStandaloneStoreToken<
+    MergeStandaloneContexts<StandaloneContextOutputs>,
+    StoreConfig
+  >,
   StandaloneSetAllQueryParams = StandaloneOutputs, // todo
   InputsToPlugin = EnableInputsToBeExternallyProvided<
     MergedContext['inputs'],
@@ -197,7 +223,7 @@ type ToServerStateOutputs<
           : {}
       ]
     >
-  >(
+  >( // todo user should not be able to add not expected inputs/methods
     pluggableConfig?: (
       configFactory: Context['inputs'] &
         Context['__injections'] &
@@ -224,7 +250,12 @@ type ToServerStateOutputs<
       __mutation: MergedContext['__mutation'];
       __query: MergedContext['__query'];
     },
-    [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
+    MergeObject<
+      [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {},
+      {
+        testUsing: StoreConfig;
+      }
+    >
   >;
 } & {
   [key in `${Capitalize<
@@ -232,6 +263,12 @@ type ToServerStateOutputs<
   >}ServerState`]: InjectionToken<StandardOutputs>;
 } & StandaloneOutputs & {
     setAllQueryParams: StandaloneSetAllQueryParams;
+  } & {
+    /**
+     * Mainly used for debug and testing purposes
+     * Not instantiated at runtime
+     */
+    [k in `_${Uppercase<StoreConfig['name']>}_META_STORE_CONTEXT`]: StoreConfig;
   };
 
 type ProvidedInOption = 'root' | 'scoped' | 'feature';
@@ -277,7 +314,7 @@ type MergeTwoContexts<
 };
 
 type StandaloneOutputsConstraints = {};
-
+// todo make storeconfig to accumulate
 export function serverState<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
@@ -288,11 +325,7 @@ export function serverState<
   standaloneOutputs3 extends StandaloneOutputsConstraints,
   standaloneOutputs4 extends StandaloneOutputsConstraints,
   const ProvidedIn extends ProvidedInOption,
-  const Name extends string,
-  const StoreConfig extends StoreConfigConstraints = {
-    providedIn: ProvidedIn;
-    name: Name;
-  }
+  const Name extends string
 >(
   options: {
     providedIn: ProvidedIn;
@@ -300,25 +333,37 @@ export function serverState<
   },
   factory1: ServerStateFactory<
     [_EmptyContext],
-    StoreConfig,
+    {
+      providedIn: NoInfer<ProvidedIn>;
+      name: NoInfer<Name>;
+    },
     outputs1,
     standaloneOutputs1
   >,
   factory2: ServerStateFactory<
     [outputs1],
-    StoreConfig,
+    {
+      providedIn: NoInfer<ProvidedIn>;
+      name: NoInfer<Name>;
+    },
     outputs2,
     standaloneOutputs2
   >,
   factory3: ServerStateFactory<
     [outputs1, outputs2],
-    StoreConfig,
+    {
+      providedIn: NoInfer<ProvidedIn>;
+      name: NoInfer<Name>;
+    },
     outputs3,
     standaloneOutputs3
   >,
   factory4: ServerStateFactory<
     [outputs1, outputs2, outputs3],
-    StoreConfig,
+    {
+      providedIn: NoInfer<ProvidedIn>;
+      name: NoInfer<Name>;
+    },
     outputs4,
     standaloneOutputs4
   >
@@ -330,7 +375,10 @@ export function serverState<
     standaloneOutputs3,
     standaloneOutputs4
   ],
-  StoreConfig
+  {
+    providedIn: NoInfer<ProvidedIn>;
+    name: NoInfer<Name>;
+  }
 >;
 export function serverState<
   outputs1 extends ContextConstraints,
@@ -570,7 +618,7 @@ export function serverState(
     ) => {
       return (
         contextData: ContextInput<ContextConstraints>,
-        injector: Injector
+        injector: Injector // todo add store config
       ) => {
         console.log('optionsName using', options?.name);
         const entries =
