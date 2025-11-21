@@ -1,3 +1,4 @@
+import { StoreConfigConstraints } from '../server-state';
 import { Source } from '../source';
 import { ReadonlySource } from './source.type';
 
@@ -36,3 +37,26 @@ export type RemoveIndexSignature<T> = {
 export type ExcludeCommonKeys<Origin, Target> = {
   [key in keyof Origin as key extends keyof Target ? never : key]: Origin[key];
 };
+
+export const STORE_CONFIG_TOKEN = {
+  NAME: '_STORE_NAME_',
+  PROVIDED_IN: '_STORE_PROVIDED_IN_',
+} as const;
+export type StoreConfigToken = typeof STORE_CONFIG_TOKEN;
+
+export type ReplaceStoreConfigToken<
+  StandaloneOutputName extends string,
+  StoreConfig extends StoreConfigConstraints
+> = StandaloneOutputName extends `${infer StoreNamePrefix}${typeof STORE_CONFIG_TOKEN.NAME}${infer StoreNameSuffix}`
+  ? ReplaceStoreConfigToken<
+      `${StoreNamePrefix}${Capitalize<StoreConfig['name']>}${StoreNameSuffix}`,
+      StoreConfig
+    >
+  : StandaloneOutputName extends `${infer StoreProvidedInPrefix}${typeof STORE_CONFIG_TOKEN.PROVIDED_IN}${infer StoreProvidedInSuffix}`
+  ? ReplaceStoreConfigToken<
+      `${StoreProvidedInPrefix}${Capitalize<
+        StoreConfig['providedIn']
+      >}${StoreProvidedInSuffix}`,
+      StoreConfig
+    >
+  : StandaloneOutputName;

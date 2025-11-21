@@ -17,8 +17,10 @@ import { createSignalProxy, SignalProxy } from '../signal-proxy';
 import {
   ExcludeCommonKeys,
   RemoveIndexSignature,
+  ReplaceStoreConfigToken,
   ToConnectableMethodFromInject,
 } from './util/util.type';
+import { Equal, Expect } from 'test-type';
 
 //todo using inouts should not accepts other params
 // todo inputs query&queryParams
@@ -61,6 +63,7 @@ export type ContextConstraints = {
   __mutation: {};
   __query: {};
   asyncMethods: {};
+  // todo cloud: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
   // _generatedDeps: {[name]: {propsKeys: string[], methodsKeys: string[]}};
   // _usedDeps: {[storeAlias]: {[storeName]: {[props]: string[]; [methods]: string[], [inputs]: string[], [sources]: string[]...};}}
 };
@@ -138,20 +141,13 @@ type EnableInputsToBeExternallyProvided<Inputs, Enable> = {
 type IsNotFeature<ProvidedIn extends ProvidedInOption> =
   ProvidedIn extends 'feature' ? false : true;
 
-type ReplaceNameToken<
-  StandaloneOutputName extends string,
-  StoreName extends string
-> = StandaloneOutputName extends `${infer Prefix}_STORE_NAME_${infer Suffix}`
-  ? `${Prefix}${Capitalize<StoreName>}${Suffix}`
-  : StandaloneOutputName;
-
 type ReplaceStandaloneStoreToken<
   StandaloneOutputs extends StandaloneOutputsConstraints,
   StoreConfig extends StoreConfigConstraints
 > = {
-  [K in keyof StandaloneOutputs as ReplaceNameToken<
+  [K in keyof StandaloneOutputs as ReplaceStoreConfigToken<
     K & string,
-    StoreConfig['name']
+    StoreConfig
   >]: StandaloneOutputs[K];
 };
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
@@ -232,7 +228,7 @@ type ToServerStateOutputs<
     ) => Config
   ) => ServerStateFactoryUtility<
     Context,
-    StoreConfig, // todo should infer from host not the current
+    StoreConfig,
     {
       props: MergedContext['props'];
       methods: ExcludeCommonKeys<
