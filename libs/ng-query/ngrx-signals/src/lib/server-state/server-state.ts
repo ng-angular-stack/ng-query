@@ -20,7 +20,6 @@ import {
   ReplaceStoreConfigToken,
   ToConnectableMethodFromInject,
 } from './util/util.type';
-import { Equal, Expect } from 'test-type';
 
 //todo using inouts should not accepts other params
 // todo inputs query&queryParams
