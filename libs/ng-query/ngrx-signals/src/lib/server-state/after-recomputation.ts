@@ -2,7 +2,7 @@ import { Source } from './source';
 import { toSource } from './to-source';
 import { ReadonlySource } from './util/source.type';
 
-export function on<State, SourceType>(
+export function afterRecomputation<State, SourceType>(
   source: Source<SourceType>,
   reducer: (source: SourceType) => State
 ): ReadonlySource<State> {

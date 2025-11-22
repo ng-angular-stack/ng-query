@@ -7,7 +7,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { Location } from '@angular/common';
 import { usingSources } from './using-sources';
 import { source } from './source';
-import { on } from './on';
+import { afterRecomputation } from './after-recomputation';
 @Component({
   template: '',
   standalone: true,
@@ -166,7 +166,7 @@ describe('usingQueryParams', () => {
         }),
         {
           methods: ({ context: { nextPage }, queryParams }) => ({
-            nextPage: on(nextPage, (nextPage) => {
+            nextPage: afterRecomputation(nextPage, (nextPage) => {
               expectTypeOf(nextPage).toEqualTypeOf<{}>();
               expectTypeOf(queryParams()).toEqualTypeOf<{ page: number }>();
               expect(queryParams().page).toBe(2);

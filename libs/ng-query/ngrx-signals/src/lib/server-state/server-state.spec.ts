@@ -14,11 +14,12 @@ import { usingInputs } from './using-inputs';
 import { usingState } from './using-state';
 import { source } from './source';
 import { usingSources } from './using-sources';
-import { on } from './on';
+import { afterRecomputation } from './after-recomputation';
 import { ReadonlySource } from './util/source.type';
 import { Equal, Expect } from 'test-type';
 import { IsAny } from '../types/util.type';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
+import { Prettify } from '@ngrx/signals';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -310,7 +311,7 @@ describe('serverState', () => {
                 const stateValue = state();
                 return stateValue.filter((num) => num !== filterValue);
               },
-              reset: on(reset, () => {
+              reset: afterRecomputation(reset, () => {
                 return [];
               }),
             };
@@ -377,7 +378,7 @@ describe('serverState', () => {
                 const stateValue = state();
                 return stateValue.filter((num) => num !== filterValue);
               },
-              reset: on(reset, () => {
+              reset: afterRecomputation(reset, () => {
                 return [];
               }),
             };
@@ -431,7 +432,7 @@ describe('serverState', () => {
                 const stateValue = state();
                 return stateValue.filter((num) => num !== filterValue);
               },
-              reset2: on(reset, () => {
+              reset2: afterRecomputation(reset, () => {
                 return [];
               }),
             };
@@ -510,8 +511,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -539,8 +540,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -596,8 +597,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -625,8 +626,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -681,8 +682,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -710,8 +711,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -770,8 +771,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -799,8 +800,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -868,8 +869,8 @@ describe('serverState', () => {
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
-          increment: on(increment, () => state() + 1),
-          decrement: on(decrement, () => state() - 1),
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
         })
       ),
@@ -1199,47 +1200,41 @@ describe('serverState preserve all context', () => {
 describe('Expose standalone setter all query params function', () => {
   it('should expose setAllXQueryParams in standalone outputs', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectTestServerState, setAllTestQueryParams, testconf } =
-        serverState(
-          {
-            name: 'test',
-            providedIn: 'root',
+      const { injectTestServerState, setAllTestQueryParams } = serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        usingQueryParams('pagination', () => ({
+          page: {
+            defaultValue: 1,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
           },
-          usingQueryParams('pagination', () => ({
-            page: {
-              defaultValue: 1,
-              parse: (value: string) => parseInt(value, 10),
-              serialize: (value: unknown) => String(value),
-            },
-            pageSize: {
-              defaultValue: 10,
-              parse: (value: string) => parseInt(value, 10),
-              serialize: (value: unknown) => String(value),
-            },
-          })),
-          usingQueryParams('activeId', () => ({
-            active: {
-              defaultValue: undefined,
-              parse: (value: string) => value,
-              serialize: (value) => String(value),
-            },
-          })),
-          craftSetAllQueriesParamsStandalone()
-          // ({ context }, injector, storeConfig) => {
-          //   expectTypeOf(storeConfig).toEqualTypeOf<{
-          //     name: 'test';
-          //     providedIn: 'root';
-          //   }>();
-          //   return {} as EmptyContext;
-          // }
-        );
-
+          pageSize: {
+            defaultValue: 10,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+        })),
+        usingQueryParams('activeId', () => ({
+          active: {
+            defaultValue: undefined,
+            parse: (value: string) => value as string | undefined,
+            serialize: (value) => String(value),
+          },
+        })),
+        craftSetAllQueriesParamsStandalone()
+      );
+      type t = Prettify<
+        Parameters<typeof setAllTestQueryParams>[0]
+      >['activeId'];
       expect(setAllTestQueryParams).toBeDefined();
       expectTypeOf<
         Parameters<typeof setAllTestQueryParams>[0]
       >().toEqualTypeOf<{
-        pagination?: { page?: number; pageSize?: number } | undefined;
-        activeId?: { active?: string | undefined } | undefined;
+        pagination: { page: number; pageSize: number };
+        activeId: { active: string | undefined };
       }>();
     });
   });

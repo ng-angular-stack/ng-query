@@ -4,7 +4,7 @@ import { serverState } from './server-state';
 import { usingSources } from './using-sources';
 import { source } from './source';
 import { usingState } from './using-state';
-import { on } from './on';
+import { afterRecomputation } from './after-recomputation';
 
 describe('usingState', () => {
   beforeEach(() => {
@@ -30,11 +30,11 @@ describe('usingState', () => {
                 const stateValue = state();
                 return [...stateValue, numberValue];
               },
-              reset: on(reset, (resetValue) => {
+              reset: afterRecomputation(reset, (resetValue) => {
                 expectTypeOf(resetValue).toEqualTypeOf<string>();
                 return [];
               }),
-              globalReset: on(globalReset, (resetValue) => {
+              globalReset: afterRecomputation(globalReset, (resetValue) => {
                 expectTypeOf(resetValue).toEqualTypeOf<{}>();
                 return [42];
               }),

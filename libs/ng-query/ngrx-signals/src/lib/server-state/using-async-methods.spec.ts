@@ -3,7 +3,7 @@ import { serverState } from './server-state';
 import { usingAsyncMethods } from './using-async-methods';
 import { asyncMethod } from './async-method';
 import { source } from './source';
-import { on } from './on';
+import { afterRecomputation } from './after-recomputation';
 import { usingSources } from './using-sources';
 
 describe('usingAsyncMethods', () => {
@@ -66,14 +66,14 @@ describe('usingAsyncMethods', () => {
         }),
         usingAsyncMethods(({ myLocalSource }) => ({
           searchGlobalChange: asyncMethod({
-            method: on(myGlobalSource, (payload) => payload),
+            method: afterRecomputation(myGlobalSource, (payload) => payload),
             loader: async ({ params: { timeToWait, searchChange } }) => {
               await new Promise((resolve) => setTimeout(resolve, timeToWait));
               return { searchChange };
             },
           }),
           searchLocalChange: asyncMethod({
-            method: on(myLocalSource, (payload) => payload),
+            method: afterRecomputation(myLocalSource, (payload) => payload),
             loader: async ({ params: { timeToWait, searchChange } }) => {
               await new Promise((resolve) => setTimeout(resolve, timeToWait));
               return { searchChange };
@@ -174,7 +174,7 @@ describe('usingAsyncMethods with identifier', () => {
         }),
         usingAsyncMethods(({ myLocalSource }) => ({
           searchGlobalChange: asyncMethod({
-            method: on(myGlobalSource, (payload) => {
+            method: afterRecomputation(myGlobalSource, (payload) => {
               console.log('payload', payload);
               return payload;
             }),

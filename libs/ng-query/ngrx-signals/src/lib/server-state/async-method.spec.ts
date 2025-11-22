@@ -1,7 +1,7 @@
-import { AsyncMethodByIdRef, usingAsyncMethods } from './using-async-methods';
+import { usingAsyncMethods } from './using-async-methods';
 import { asyncMethod } from './async-method';
 import { Signal } from '@angular/core';
-import { on } from './on';
+import { afterRecomputation } from './after-recomputation';
 import { source } from './source';
 import { ReadonlySource } from './util/source.type';
 import { TestBed } from '@angular/core/testing';
@@ -46,10 +46,16 @@ describe('asyncMethod', () => {
         searchChange: string;
         timeToWait: number;
       }>();
-      const test = on(searchSource, (searchConfig) => searchConfig);
+      const test = afterRecomputation(
+        searchSource,
+        (searchConfig) => searchConfig
+      );
       const result = test();
       const myAsyncMethod = asyncMethod({
-        method: on(searchSource, (searchConfig) => searchConfig),
+        method: afterRecomputation(
+          searchSource,
+          (searchConfig) => searchConfig
+        ),
         loader: async ({ params: { timeToWait, searchChange } }) => {
           type ExpectTimeToWait = Expect<Equal<typeof timeToWait, number>>;
           type ExpectSearchChange = Expect<Equal<typeof searchChange, string>>;
@@ -175,7 +181,7 @@ describe('asyncMethod types without identifier', () => {
         // should enable to provide multiples status
         // should provide async method by id
         searchChange: asyncMethod({
-          method: on(searchSource, (searchChange) => {
+          method: afterRecomputation(searchSource, (searchChange) => {
             return searchChange;
           }),
           loader: async ({ params: { searchChangeText } }) => {
@@ -276,7 +282,7 @@ describe('asyncMethod types without identifier', () => {
       const searchSource = source<{ searchChange: string }>();
 
       const _asyncMethodsOutput = asyncMethod({
-        method: on(searchSource, (searchChange) => {
+        method: afterRecomputation(searchSource, (searchChange) => {
           return searchChange;
         }),
         loader: async ({ params: searchChange }) => {
@@ -410,7 +416,7 @@ describe('asyncMethod types with identifier', () => {
         // should enable to provide multiples status
         // should provide async method by id
         searchChange: asyncMethod({
-          method: on(searchSource, (searchChange) => {
+          method: afterRecomputation(searchSource, (searchChange) => {
             return searchChange;
           }),
           identifier: (params) => params.searchChangeText,
@@ -442,6 +448,7 @@ describe('asyncMethod types with identifier', () => {
       try {
         const search = asyncMethodsOutput(
           {} as any,
+          {} as any,
           {} as any
         ).props.searchChange.select('test');
         expectTypeOf(search).toEqualTypeOf<
@@ -460,7 +467,7 @@ describe('asyncMethod types with identifier', () => {
           | undefined
         >();
 
-        const filter = asyncMethodsOutput({} as any, {} as any).props
+        const filter = asyncMethodsOutput({} as any, {} as any, {} as any).props
           .filterChange;
         expectTypeOf(filter).toEqualTypeOf<{
           readonly error: Signal<Error | undefined>;
@@ -523,7 +530,7 @@ describe('asyncMethod types with identifier', () => {
       const searchSource = source<{ searchChange: string }>();
 
       const _asyncMethodsOutput = asyncMethod({
-        method: on(searchSource, (searchChange) => {
+        method: afterRecomputation(searchSource, (searchChange) => {
           return searchChange;
         }),
         identifier: (params) => params.searchChange,

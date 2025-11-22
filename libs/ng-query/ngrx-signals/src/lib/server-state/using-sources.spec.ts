@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { usingSources } from './using-sources';
 import { source } from './source';
 import { usingState } from './using-state';
-import { on } from './on';
+import { afterRecomputation } from './after-recomputation';
 
 describe('usingSources', () => {
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe('usingSources', () => {
           'test',
           () => signal(0),
           ({ context: { increment }, state }) => ({
-            increment: on(increment, () => state() + 1),
+            increment: afterRecomputation(increment, () => state() + 1),
           })
         )
       );
@@ -51,7 +51,7 @@ describe('usingSources', () => {
         'test',
         () => signal(0),
         ({ context: { increment }, state }) => ({
-          increment: on(increment, () => {
+          increment: afterRecomputation(increment, () => {
             return state() + 1;
           }),
         })

@@ -11,23 +11,19 @@ import { STORE_CONFIG_TOKEN } from './util/util.type';
 type InferQueryParamsState<T> = T extends WritableSignal<infer U> ? U : never;
 
 type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
-  Context extends ContextConstraints,
-  StoreConfig extends StoreConfigConstraints
+  Context extends ContextConstraints
 > = {
   [K in `setAll${Capitalize<
     (typeof STORE_CONFIG_TOKEN)['NAME']
   >}QueryParams`]: <
     AllQueriesParamsState extends {
-      [K in keyof Context['queryParams']]: Context['queryParams'][K];
-      // | InferQueryParamsState<Context['queryParams'][K]>
-      // | 'default';
+      [K in keyof Context['queryParams']]: 'state' extends keyof Context['queryParams'][K]
+        ? InferQueryParamsState<Context['queryParams'][K]['state']>
+        : 'STORE_CONFIG_ERROR: When using craftSetAllQueriesParamsStandalone, each query param configuration must define a state';
     }
   >(
     params: Prettify<AllQueriesParamsState>
   ) => AllQueriesParamsState;
-} & {
-  testName: StoreConfig['name'];
-  testconf: StoreConfig;
 };
 
 type CraftSetAllQueriesParamsStandaloneOutputs<
@@ -37,7 +33,7 @@ type CraftSetAllQueriesParamsStandaloneOutputs<
   Context,
   StoreConfig,
   EmptyContext,
-  SpecificCraftSetAllQueriesParamsStandaloneOutputs<Context, StoreConfig>
+  SpecificCraftSetAllQueriesParamsStandaloneOutputs<Context>
 >;
 
 /**

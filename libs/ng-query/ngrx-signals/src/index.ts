@@ -47,7 +47,7 @@ export { usingSources } from './lib/server-state/using-sources';
 export { source } from './lib/server-state/source';
 export { toSource } from './lib/server-state/to-source';
 export { computedSource } from './lib/server-state/computed-source';
-export { on } from './lib/server-state/on';
+export { afterRecomputation } from './lib/server-state/after-recomputation';
 export { asyncMethod } from './lib/server-state/async-method';
 export { usingAsyncMethods } from './lib/server-state/using-async-methods';
 export type { AsyncMethodRef } from './lib/server-state/using-async-methods';
