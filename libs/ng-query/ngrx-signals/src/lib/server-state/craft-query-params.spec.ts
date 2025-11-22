@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { Component, inject } from '@angular/core';
-import { serverState } from './server-state';
-import { usingQueryParams } from './using-query-params';
+import { serverState } from './craft';
+import { craftQueryParams } from './craft-query-params';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Location } from '@angular/common';
-import { usingSources } from './using-sources';
+import { craftSources } from './craft-sources';
 import { source } from './source';
 import { afterRecomputation } from './after-recomputation';
 @Component({
@@ -16,7 +16,7 @@ class TestComponent {
   route = inject(ActivatedRoute);
 }
 
-describe('usingQueryParams', () => {
+describe('craftQueryParams', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideRouter([{ path: '', component: TestComponent }])],
@@ -29,7 +29,7 @@ describe('usingQueryParams', () => {
         providedIn: 'root',
         name: '',
       },
-      usingQueryParams('pagination', () => ({
+      craftQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
           parse: (value: string) => parseInt(value, 10),
@@ -75,7 +75,7 @@ describe('usingQueryParams', () => {
         providedIn: 'root',
         name: '',
       },
-      usingQueryParams('pagination', () => ({
+      craftQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
           parse: (value: string) => parseInt(value, 10),
@@ -103,7 +103,7 @@ describe('usingQueryParams', () => {
         providedIn: 'root',
         name: '',
       },
-      usingQueryParams(
+      craftQueryParams(
         'pagination',
         () => ({
           page: {
@@ -152,10 +152,10 @@ describe('usingQueryParams', () => {
         providedIn: 'root',
         name: '',
       },
-      usingSources({
+      craftSources({
         nextPage: source<{}>(),
       }),
-      usingQueryParams(
+      craftQueryParams(
         'pagination',
         () => ({
           page: {
@@ -200,7 +200,7 @@ const { injectServerState } = serverState(
     providedIn: 'root',
     name: '',
   },
-  usingQueryParams('pagination', () => ({
+  craftQueryParams('pagination', () => ({
     page: {
       defaultValue: 1,
       parse: (value: string) => parseInt(value, 10),
@@ -214,7 +214,7 @@ const { injectServerState } = serverState(
   }))
 );
 
-describe('usingQueryParams integration', () => {
+describe('craftQueryParams integration', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideRouter([{ path: 'test', component: TestComponent }])],
@@ -263,7 +263,7 @@ describe('usingQueryParams integration', () => {
   });
 });
 
-describe('usingQueryParams standalone methods', () => {
+describe('craftQueryParams standalone methods', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideRouter([{ path: 'test', component: TestComponent }])],
@@ -276,7 +276,7 @@ describe('usingQueryParams standalone methods', () => {
         providedIn: 'root',
         name: '',
       },
-      usingQueryParams('pagination', () => ({
+      craftQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
           parse: (value: string) => parseInt(value, 10),
@@ -317,7 +317,7 @@ describe('usingQueryParams standalone methods', () => {
         providedIn: 'root',
         name: '',
       },
-      usingQueryParams('pagination', () => ({
+      craftQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
           parse: (value: string) => parseInt(value, 10),

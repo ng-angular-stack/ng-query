@@ -1,12 +1,12 @@
 import { Signal, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { serverState } from './server-state';
-import { usingSources } from './using-sources';
+import { serverState } from './craft';
+import { craftSources } from './craft-sources';
 import { source } from './source';
-import { usingState } from './using-state';
+import { craftState } from './craft-state';
 import { afterRecomputation } from './after-recomputation';
 
-describe('usingState', () => {
+describe('craftState', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -21,10 +21,10 @@ describe('usingState', () => {
           name: '',
           providedIn: 'root',
         },
-        usingSources({
+        craftSources({
           reset: source<string>(),
         }),
-        usingState(
+        craftState(
           'numberList',
           () => signal([1]),
           ({ state, context: { reset } }) => {

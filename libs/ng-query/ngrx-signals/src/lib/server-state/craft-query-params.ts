@@ -11,7 +11,7 @@ import {
   ContextInput,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { Prettify } from '@ngrx/signals';
 import { createMethodHandlers } from './util/util';
 import { ReadonlySource } from './util/source.type';
@@ -64,7 +64,7 @@ type ToState<QueryParamConfigs> = {
   >;
 };
 
-type UsingQueryParamsConfig<
+type CraftQueryParamsConfig<
   QueryParamsConfig,
   MethodKeys extends string,
   Methods extends
@@ -86,7 +86,7 @@ type UsingQueryParamsConfig<
   }) => Methods;
 };
 
-type SpecificUsingQueryParamsOutputs<
+type SpecificCraftQueryParamsOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>,
   CustomMethods
@@ -109,7 +109,7 @@ type SpecificUsingQueryParamsOutputs<
   asyncMethods: {};
 };
 
-type SpecificUsingQueryStandaloneOutputs<
+type SpecificCraftQueryStandaloneOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>
 > = {
@@ -122,7 +122,7 @@ type SpecificUsingQueryStandaloneOutputs<
   ) => T;
 };
 
-type UsingQueryParamsOutputs<
+type craftQueryParamsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   QueryParamsName extends string,
@@ -131,13 +131,13 @@ type UsingQueryParamsOutputs<
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingQueryParamsOutputs<QueryParamsName, QueryParams, CustomMethods>,
-  SpecificUsingQueryStandaloneOutputs<QueryParamsName, QueryParams>
+  SpecificCraftQueryParamsOutputs<QueryParamsName, QueryParams, CustomMethods>,
+  SpecificCraftQueryStandaloneOutputs<QueryParamsName, QueryParams>
 >;
 
 // todo expose an alias to concatenate all queryprams
-// todo rename usingPersistedParams ? usingParam(..., {persister: queryParamPersister(...navigation extras)})
-// todo  usingParam(..., {persister: localStorageParamPersister(...navigation extras)})
+// todo rename craftPersistedParams ? craftParam(..., {persister: queryParamPersister(...navigation extras)})
+// todo  craftParam(..., {persister: localStorageParamPersister(...navigation extras)})
 
 // todo tester quand on a des queryParams dans l'url au demarrage, puis on change de page et on revient
 
@@ -153,7 +153,7 @@ type UsingQueryParamsOutputs<
  * @example
  * ```ts
  * const { injectServerState, setPaginationQueryParams } = serverState(
- *   usingQueryParams('pagination', () => ({
+ *   craftQueryParams('pagination', () => ({
  *     page: {
  *       defaultValue: 1,
  *       parse: (value: string) => parseInt(value, 10),
@@ -198,7 +198,7 @@ type UsingQueryParamsOutputs<
  * }
  * ```
  */
-export function usingQueryParams<
+export function craftQueryParams<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   const QueryParamsName extends string,
@@ -214,13 +214,13 @@ export function usingQueryParams<
 >(
   queryParamsName: QueryParamsName,
   queryParamsFactory: () => QueryParamsConfig,
-  config?: UsingQueryParamsConfig<
+  config?: CraftQueryParamsConfig<
     QueryParamsConfig,
     MethodKeys,
     Methods,
     Context
   >
-): UsingQueryParamsOutputs<
+): craftQueryParamsOutputs<
   Context,
   StoreConfig,
   QueryParamsName,
@@ -401,7 +401,7 @@ export function usingQueryParams<
           state: queryParamsState,
         },
       },
-    } as SpecificUsingQueryParamsOutputs<
+    } as SpecificCraftQueryParamsOutputs<
       QueryParamsName,
       QueryParamsConfig,
       Methods
@@ -414,7 +414,7 @@ export function usingQueryParams<
         [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
       }>
     ) => serializeQueryParams(params, queryParamsConfig),
-  }) as unknown as UsingQueryParamsOutputs<
+  }) as unknown as craftQueryParamsOutputs<
     Context,
     StoreConfig,
     QueryParamsName,

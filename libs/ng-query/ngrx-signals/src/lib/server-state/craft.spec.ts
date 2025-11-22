@@ -1,25 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
-import { EmptyContext, serverState } from './server-state';
-import { usingQuery } from './using-query';
-import { usingMutation } from './using-mutation';
+import { EmptyContext, serverState } from './craft';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
-import { usingMutationById } from './using-mutation-by-id';
-import { usingQueryById } from './using-query-by-id';
 import { queryById } from '../query-by-id';
 import { inject, linkedSignal, signal } from '@angular/core';
-import { usingQueryParams } from './using-query-params';
-import { usingInputs } from './using-inputs';
-import { usingState } from './using-state';
+import { craftQueryParams } from './craft-query-params';
+import { craftInputs } from './craft-inputs';
+import { craftState } from './craft-state';
 import { source } from './source';
-import { usingSources } from './using-sources';
+import { craftSources } from './craft-sources';
 import { afterRecomputation } from './after-recomputation';
-import { ReadonlySource } from './util/source.type';
-import { Equal, Expect } from 'test-type';
 import { IsAny } from '../types/util.type';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
 import { Prettify } from '@ngrx/signals';
+import { craftMutation } from './craft-mutation';
+import { craftQuery } from './craft-query';
+import { craftMutationById } from './craft-mutation-by-id';
+import { craftQueryById } from './craft-query-by-id';
 
 describe('serverState', () => {
   beforeEach(() => {
@@ -35,19 +33,19 @@ describe('serverState', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutation('save', () =>
+      craftMutation('save', () =>
         mutation({
           method: (data: { id: number; name: string }) => data,
           loader: async ({ params }) => params,
         })
       ),
-      usingQuery('test', () =>
+      craftQuery('test', () =>
         query({
           params: () => 5,
           loader: async ({ params: id }) => ({ id, name: 'test' }),
         })
       ),
-      usingQuery('test2', () =>
+      craftQuery('test2', () =>
         query({
           params: () => 3,
           loader: async ({ params: id }) => ({ id, name: 'test2' }),
@@ -87,7 +85,7 @@ describe('serverState', () => {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('save', () =>
+        craftMutation('save', () =>
           mutation({
             method: (data: { id: number; name: string }) => data,
             loader: async ({ params }) => {
@@ -98,7 +96,7 @@ describe('serverState', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'test',
           () =>
             query({
@@ -143,7 +141,7 @@ describe('serverState', () => {
           name: '',
           providedIn: 'root',
         },
-        usingMutationById('save', () =>
+        craftMutationById('save', () =>
           mutationById({
             method: (data: { id: string; name: string }) => data,
             identifier: (params) => params.id,
@@ -155,7 +153,7 @@ describe('serverState', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'test',
           () =>
             query({
@@ -195,14 +193,14 @@ describe('serverState', () => {
     });
   });
 
-  it('should enable declaring useMutationById and usingQueryById', async () => {
+  it('should enable declaring useMutationById and craftQueryById', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
         {
           name: '',
           providedIn: 'root',
         },
-        usingMutationById('save', () =>
+        craftMutationById('save', () =>
           mutationById({
             method: (data: { id: string; name: string }) => data,
             identifier: (params) => '' + params.id,
@@ -214,7 +212,7 @@ describe('serverState', () => {
             },
           })
         ),
-        usingQueryById(
+        craftQueryById(
           'test',
           () =>
             queryById({
@@ -267,7 +265,7 @@ describe('serverState', () => {
         name: '',
         providedIn: 'root',
       },
-      usingQueryParams('pagination', () => ({
+      craftQueryParams('pagination', () => ({
         page: {
           defaultValue: 1,
           parse: (value: string) => parseInt(value, 10),
@@ -291,13 +289,13 @@ describe('serverState', () => {
           name: '',
           providedIn: 'root',
         },
-        usingInputs({
+        craftInputs({
           myParams: undefined as number | undefined,
         }),
-        usingSources({
+        craftSources({
           reset: source<string>(),
         }),
-        usingState(
+        craftState(
           'numberList',
           ({ myParams }) => linkedSignal(() => [myParams() ?? 0]),
           ({ state, context: { reset } }) => {
@@ -358,14 +356,14 @@ describe('serverState', () => {
           name: 'store1',
           providedIn: 'root',
         },
-        usingInputs({
+        craftInputs({
           myParams1: undefined as string | undefined,
           myParams2: undefined as string | undefined,
         }),
-        usingSources({
+        craftSources({
           reset: source<string>(),
         }),
-        usingState(
+        craftState(
           'numberList1',
           () => signal([1]),
           ({ state, context: { reset } }) => {
@@ -384,7 +382,7 @@ describe('serverState', () => {
             };
           }
         ),
-        usingQueryParams('pagination', () => ({
+        craftQueryParams('pagination', () => ({
           page: {
             defaultValue: 1,
             parse: (value: string) => parseInt(value, 10),
@@ -403,10 +401,10 @@ describe('serverState', () => {
           name: '',
           providedIn: 'root',
         },
-        usingInputs({
+        craftInputs({
           myParams: undefined as string | undefined,
         }),
-        usingSources({
+        craftSources({
           reset: source<string>(),
         }),
         usingStore1ServerState(({ myParams, reset }) => ({
@@ -418,7 +416,7 @@ describe('serverState', () => {
             setReset: reset,
           },
         })),
-        usingState(
+        craftState(
           'numberList2',
           () => signal([1]),
           ({ state, context: { reset } }) => {
@@ -482,7 +480,7 @@ describe('serverState', () => {
         name: 'dataPagination',
         providedIn: 'root',
       },
-      usingState(
+      craftState(
         'numberList',
         () => signal([1]),
         ({ state }) => ({
@@ -502,12 +500,12 @@ describe('serverState', () => {
         name: 'host1',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -531,12 +529,12 @@ describe('serverState', () => {
         name: 'host2',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -568,10 +566,10 @@ describe('serverState', () => {
         name: 'sharedFeature',
         providedIn: 'scoped',
       },
-      usingInputs({
+      craftInputs({
         defaultNumber: undefined as number | undefined,
       }),
-      usingState(
+      craftState(
         'numberList',
         ({ defaultNumber }) => linkedSignal(() => [defaultNumber() ?? 1]),
         ({ state, context: { defaultNumber } }) => ({
@@ -588,12 +586,12 @@ describe('serverState', () => {
         name: 'host1',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -617,12 +615,12 @@ describe('serverState', () => {
         name: 'host2',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -653,7 +651,7 @@ describe('serverState', () => {
         name: 'dataPagination',
         providedIn: 'feature',
       },
-      usingState(
+      craftState(
         'numberList',
         () => signal([1]),
         ({ state }) => ({
@@ -673,12 +671,12 @@ describe('serverState', () => {
         name: 'host1',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -702,12 +700,12 @@ describe('serverState', () => {
         name: 'host2',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -739,10 +737,10 @@ describe('serverState', () => {
         name: 'dataPagination',
         providedIn: 'root',
       },
-      usingInputs({
+      craftInputs({
         shouldNotBeExposed: undefined as number | undefined,
       }),
-      usingState(
+      craftState(
         'numberList',
         () => signal([1]),
         ({ state }) => ({
@@ -762,12 +760,12 @@ describe('serverState', () => {
         name: 'host1',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -791,12 +789,12 @@ describe('serverState', () => {
         name: 'host2',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -832,10 +830,10 @@ describe('serverState', () => {
         name: 'dataPagination',
         providedIn: 'root',
       },
-      usingInputs({
+      craftInputs({
         shouldNotBeExposed: undefined as number | undefined,
       }),
-      usingState(
+      craftState(
         'numberList',
         () => signal([1]),
         ({ state }) => ({
@@ -860,12 +858,12 @@ describe('serverState', () => {
         name: 'host1',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      usingState(
+      craftState(
         'counter',
         () => signal(0),
         ({ context: { increment, decrement }, state }) => ({
@@ -910,19 +908,19 @@ describe('serverState options', () => {
           name: 'user',
           providedIn: 'root',
         },
-        usingMutation('save', () =>
+        craftMutation('save', () =>
           mutation({
             method: (data: { id: number; name: string }) => data,
             loader: async ({ params }) => params,
           })
         ),
-        usingQuery('test', () =>
+        craftQuery('test', () =>
           query({
             params: () => 5,
             loader: async ({ params: id }) => ({ id, name: 'test' }),
           })
         ),
-        usingQuery('test2', () =>
+        craftQuery('test2', () =>
           query({
             params: () => 3,
             loader: async ({ params: id }) => ({ id, name: 'test2' }),
@@ -961,19 +959,19 @@ describe('serverState options', () => {
           name: 'user',
           providedIn: 'root',
         },
-        usingMutation('save', () =>
+        craftMutation('save', () =>
           mutation({
             method: (data: { id: number; name: string }) => data,
             loader: async ({ params }) => params,
           })
         ),
-        usingQuery('test', () =>
+        craftQuery('test', () =>
           query({
             params: () => 5,
             loader: async ({ params: id }) => ({ id, name: 'test' }),
           })
         ),
-        usingQuery('test2', () =>
+        craftQuery('test2', () =>
           query({
             params: () => 3,
             loader: async ({ params: id }) => ({ id, name: 'test2' }),
@@ -1119,7 +1117,7 @@ describe('serverState preserve all context', () => {
           name: 'test',
           providedIn: 'root',
         },
-        usingQueryParams('activeId', () => ({
+        craftQueryParams('activeId', () => ({
           active: {
             defaultValue: undefined,
             parse: (value: string) => value,
@@ -1151,7 +1149,7 @@ describe('serverState preserve all context', () => {
           name: 'mySharedFeature',
           providedIn: 'feature',
         },
-        usingQueryParams('pagination', () => ({
+        craftQueryParams('pagination', () => ({
           page: {
             defaultValue: 1,
             parse: (value: string) => parseInt(value, 10),
@@ -1205,7 +1203,7 @@ describe('Expose standalone setter all query params function', () => {
           name: 'test',
           providedIn: 'root',
         },
-        usingQueryParams('pagination', () => ({
+        craftQueryParams('pagination', () => ({
           page: {
             defaultValue: 1,
             parse: (value: string) => parseInt(value, 10),
@@ -1217,7 +1215,7 @@ describe('Expose standalone setter all query params function', () => {
             serialize: (value: unknown) => String(value),
           },
         })),
-        usingQueryParams('activeId', () => ({
+        craftQueryParams('activeId', () => ({
           active: {
             defaultValue: undefined,
             parse: (value: string) => value as string | undefined,

@@ -5,10 +5,10 @@ import {
   mutationById,
   query,
   serverState,
-  usingAsyncMethods,
-  usingInject,
-  usingMutationById,
-  usingQuery,
+  craftAsyncMethods,
+  craftInject,
+  craftMutationById,
+  craftQuery,
 } from '@ng-query/ngrx-signals';
 import { ApiService } from './api.service';
 import { StatusComponent } from '../../../../ui/status.component';
@@ -41,13 +41,13 @@ function cancellableTimeout(ms: number) {
 // Promise/abort
 // fromResourceById limitation de TS
 
-// suite: usingComputed/rename/inject/usingLocalGlobal
+// suite: craftComputed/rename/inject/craftLocalGlobal
 
 const { injectGranularDeletionWithDelayServerState } = serverState(
-  usingInject(() => ({
+  craftInject(() => ({
     ApiService,
   })),
-  usingAsyncMethods(() => ({
+  craftAsyncMethods(() => ({
     delayDeleteWithUndo: asyncMethod({
       method: (payload: { id: string; status: 'delete' | 'cancel' }) => payload,
       identifier: ({ id }) => id,
@@ -67,7 +67,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
   // deleteItem:
   // Signal<{'1': Resource, '2': Resource, '3': Resource ...}>
 
-  usingMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
+  craftMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
     mutationById({
       fromResourceById: delayDeleteWithUndo._resourceById,
       params: (delayDeleteWithUndoResource) => {
@@ -82,7 +82,7 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
       },
     })
   ),
-  usingQuery(
+  craftQuery(
     'items',
     ({ apiService }) =>
       query({

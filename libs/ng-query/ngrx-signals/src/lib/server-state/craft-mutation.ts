@@ -3,11 +3,11 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { ResourceRef } from '@angular/core';
 import { MutationRef } from '../with-mutation';
 
-type SpecificUseMutationOutputs<
+type SpecificCraftMutationOutputs<
   ResourceName extends string,
   ResourceState extends object | undefined,
   InsertionsOutputs,
@@ -51,7 +51,7 @@ type SpecificUseMutationOutputs<
   __query: {};
 };
 
-type UseMutationOutputs<
+type CraftMutationOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
@@ -62,7 +62,7 @@ type UseMutationOutputs<
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUseMutationOutputs<
+  SpecificCraftMutationOutputs<
     ResourceName,
     ResourceState,
     InsertionsOutputs,
@@ -71,7 +71,7 @@ type UseMutationOutputs<
   >
 >;
 
-export function usingMutation<
+export function craftMutation<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
@@ -100,7 +100,7 @@ export function usingMutation<
       false
     >;
   }
-): UseMutationOutputs<
+): CraftMutationOutputs<
   Context,
   StoreConfig,
   ResourceName,
@@ -154,7 +154,7 @@ export function usingMutation<
             },
           }
         : {},
-    } as SpecificUseMutationOutputs<
+    } as SpecificCraftMutationOutputs<
       ResourceName,
       ResourceState,
       InsertionsOutputs,

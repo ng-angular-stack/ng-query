@@ -3,11 +3,11 @@ import { delay, lastValueFrom, of } from 'rxjs';
 import { Expect, Equal } from 'test-type';
 import { inject, InjectionToken } from '@angular/core';
 import { vi } from 'vitest';
-import { serverState } from './server-state';
-import { usingMutationById } from './using-mutation-by-id';
+import { serverState } from './craft';
+import { craftMutationById } from './craft-mutation-by-id';
 import { mutationById } from '../mutation-by-id';
 import { ResourceByIdRef } from '../resource-by-id';
-import { usingQueryById } from './using-query-by-id';
+import { craftQueryById } from './craft-query-by-id';
 import { queryById } from '../query-by-id';
 import { MergeObject } from '../types/util.type';
 
@@ -17,7 +17,7 @@ type User = {
   email: string;
 };
 
-describe('usingMutationById', () => {
+describe('craftMutationById', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -35,7 +35,7 @@ describe('usingMutationById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutationById('user', () =>
+      craftMutationById('user', () =>
         mutationById({
           params: () => '5',
           loader: ({ params }) => {
@@ -74,7 +74,7 @@ describe('usingMutationById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutationById('user', () =>
+      craftMutationById('user', () =>
         mutationById({
           method: (user: User) => user,
           loader: ({ params: user }) => {
@@ -138,7 +138,7 @@ describe('usingMutationById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingQueryById('user', () =>
+      craftQueryById('user', () =>
         queryById({
           params: () => '5',
           loader: ({ params }) => {

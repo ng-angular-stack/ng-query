@@ -1,4 +1,4 @@
-import { StoreConfigConstraints } from '../server-state';
+import { StoreConfigConstraints } from '../craft';
 import { Source } from '../source';
 import { ReadonlySource } from './source.type';
 

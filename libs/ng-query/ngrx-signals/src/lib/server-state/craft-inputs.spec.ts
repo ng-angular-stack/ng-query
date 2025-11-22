@@ -1,11 +1,11 @@
-import { usingQuery } from './using-query';
-import { serverState } from './server-state';
+import { craftQuery } from './craft-query';
+import { serverState } from './craft';
 import { query } from '../query';
-import { usingInputs } from './using-inputs';
+import { craftInputs } from './craft-inputs';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-describe('usingInputs', () => {
+describe('craftInputs', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -19,11 +19,11 @@ describe('usingInputs', () => {
           name: '',
           providedIn: 'root',
         },
-        usingInputs({
+        craftInputs({
           myParams: undefined as string | undefined,
         }),
-        usingQuery('user', (inputs) => {
-          console.log('inputs', inputs.);
+        craftQuery('user', (inputs) => {
+          console.log('inputs', inputs);
           return query({
             params: inputs.myParams,
             loader: async ({ params }) => {
@@ -60,7 +60,7 @@ describe('usingInputs', () => {
           name: 'test',
           providedIn: 'root',
         },
-        usingQuery('user', (inputs) => {
+        craftQuery('user', (inputs) => {
           console.log('inputs', inputs);
           return query({
             params: () => '1',

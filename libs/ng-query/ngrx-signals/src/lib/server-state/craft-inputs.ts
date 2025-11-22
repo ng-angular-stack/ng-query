@@ -3,14 +3,14 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { Prettify } from '@ngrx/signals';
 
 type ToSignalObject<T> = {
   [K in keyof T]: Signal<T[K]>;
 };
 
-type SpecificUsingInputsOutputs<Inputs extends {}> = {
+type SpecificCraftInputsOutputs<Inputs extends {}> = {
   props: {};
   methods: {};
   inputs: Prettify<ToSignalObject<Inputs>>;
@@ -22,21 +22,21 @@ type SpecificUsingInputsOutputs<Inputs extends {}> = {
   asyncMethods: {};
 };
 
-type UsingInputsOutputs<
+type CraftInputsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingInputsOutputs<Inputs>
+  SpecificCraftInputsOutputs<Inputs>
 >;
 
-export function usingInputs<
+export function craftInputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
->(inputs: Inputs): UsingInputsOutputs<Context, StoreConfig, Inputs> {
+>(inputs: Inputs): CraftInputsOutputs<Context, StoreConfig, Inputs> {
   // todo expose setXInputs as standalone ?
   return (contextData) => {
     return {
@@ -49,6 +49,6 @@ export function usingInputs<
       __mutation: {},
       methods: {},
       asyncMethods: {},
-    } as SpecificUsingInputsOutputs<Inputs>;
+    } as SpecificCraftInputsOutputs<Inputs>;
   };
 }

@@ -17,7 +17,7 @@
 ## Other
 
 - Merge query and queryById... to only query that accepts an identifier and if set, it will return a ResourceByIdRef instead of a resourceRef
-- Enable to use `query`, `mutation` in standalone without using `withQuery` or `usingQuery`... (maybe using a symbol to pass the metda data ?)
+- Enable to use `query`, `mutation` in standalone without craft `withQuery` or `craftQuery`... (maybe craft a symbol to pass the metda data ?)
 - reused the same function/logic in withQuery adn useQuery
 - A Chrome Dev tool to track queries and mutations requests
 - A page that compare Angular TanStackQuery and other solutions with @ng-query

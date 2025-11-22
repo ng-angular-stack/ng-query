@@ -3,7 +3,7 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 
 type ProviderTokenWithoutAbstract<T> = Type<T> | InjectionToken<T>;
 
@@ -11,7 +11,7 @@ type InferProvidedType<T> = T extends ProviderTokenWithoutAbstract<infer U>
   ? U
   : never;
 
-type SpecificUsingInjectionsOutputs<Injections extends {}> = {
+type SpecificCraftInjectionsOutputs<Injections extends {}> = {
   props: {};
   methods: {};
   inputs: {};
@@ -28,19 +28,19 @@ type SpecificUsingInjectionsOutputs<Injections extends {}> = {
   asyncMethods: {};
 };
 
-type UsingInputsOutputs<
+type CraftInputsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Injections extends {}
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingInjectionsOutputs<Injections>
+  SpecificCraftInjectionsOutputs<Injections>
 >;
 
 // todo checker si ok avec les token si valeur bien infer / service / token et générics
 
-export function usingInject<
+export function craftInject<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Injections extends {}
@@ -48,7 +48,7 @@ export function usingInject<
   injections: (
     entries: Context['inputs'] & Context['__injections'] & Context['sources']
   ) => Injections
-): UsingInputsOutputs<Context, StoreConfig, Injections> {
+): CraftInputsOutputs<Context, StoreConfig, Injections> {
   return (contextData, injector) => {
     const injectedInjections = Object.entries(
       injections({
@@ -73,7 +73,7 @@ export function usingInject<
       __mutation: {},
       methods: {},
       asyncMethods: {},
-    } as SpecificUsingInjectionsOutputs<Injections>;
+    } as SpecificCraftInjectionsOutputs<Injections>;
   };
 }
 

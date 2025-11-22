@@ -4,10 +4,10 @@ import { ApiService } from './api.service';
 import {
   queryById,
   serverState,
-  usingInject,
-  usingMutationById,
-  usingQueryById,
-  usingQueryParams,
+  craftInject,
+  craftMutationById,
+  craftQueryById,
+  craftQueryParams,
 } from '@ng-query/ngrx-signals';
 import { rxMutationById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
@@ -19,10 +19,10 @@ export type User = {
 };
 
 const { injectUserListServerState } = serverState(
-  usingInject(() => ({
+  craftInject(() => ({
     ApiService,
   })),
-  usingQueryParams(
+  craftQueryParams(
     'pagination',
     () => ({
       page: {
@@ -54,14 +54,14 @@ const { injectUserListServerState } = serverState(
     //   },
     // }
   ),
-  usingMutationById('user', ({ apiService }) =>
+  craftMutationById('user', ({ apiService }) =>
     rxMutationById({
       method: (user: User) => user,
       identifier: ({ id }) => id,
       stream: ({ params: user }) => apiService.updateItem(user),
     })
   ),
-  usingQueryById('users', ({ pagination, apiService }) =>
+  craftQueryById('users', ({ pagination, apiService }) =>
     queryById(
       {
         params: pagination,

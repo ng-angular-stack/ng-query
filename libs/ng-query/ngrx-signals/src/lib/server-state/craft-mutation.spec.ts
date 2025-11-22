@@ -2,9 +2,9 @@ import { Expect, Equal } from 'test-type';
 import { inject, InjectionToken, ResourceRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { mutation } from '../mutation';
-import { usingMutation } from './using-mutation';
-import { serverState } from './server-state';
-import { usingInputs } from './using-inputs';
+import { craftMutation } from './craft-mutation';
+import { serverState } from './craft';
+import { craftInputs } from './craft-inputs';
 
 type User = {
   id: string;
@@ -15,14 +15,14 @@ type User = {
   };
 };
 
-describe('usingMutation', () => {
+describe('craftMutation', () => {
   it('#1 The serverState should expose a mutation resource and mutation method', () => {
     const { ServerState } = serverState(
       {
         name: '',
         providedIn: 'root',
       },
-      usingMutation('updateUser', () =>
+      craftMutation('updateUser', () =>
         mutation({
           method: (id: string) => ({ id }),
           loader: async ({ params }) => {
@@ -54,7 +54,7 @@ it('Should expose a method', () => {
       name: '',
       providedIn: 'root',
     },
-    usingMutation('user', () =>
+    craftMutation('user', () =>
       mutation({
         method: (data: { page: string }) => data.page,
         loader: async ({ params }) => {
@@ -82,7 +82,7 @@ it('Should expose a method', () => {
     >
   >;
 
-  type ExpectPropsToHaveARecordusingMutationNameusingMutationState = Expect<
+  type ExpectPropsToHaveARecordcraftMutationNamecraftMutationState = Expect<
     Equal<
       // paramsSource is tested in another test (I did not find the way to satisfy it here)
       MutationProps['userMutation'],
@@ -103,12 +103,12 @@ it('Should expose the mutation resource and mutation method', () => {
       name: '',
       providedIn: 'root',
     },
-    usingInputs({
+    craftInputs({
       sourceId: {
         id: '4',
       },
     }),
-    usingMutation('user', (context) =>
+    craftMutation('user', (context) =>
       mutation({
         params: context.sourceId,
         loader: async ({ params }) => {
@@ -123,7 +123,7 @@ it('Should expose the mutation resource and mutation method', () => {
         },
       })
     ),
-    usingMutation('testExposeMutationMethod', () =>
+    craftMutation('testExposeMutationMethod', () =>
       mutation({
         method: ({ id }: { id: string }) => ({
           id,
@@ -172,7 +172,7 @@ it('it should expose the mutation params source, that will be reused by query', 
       name: '',
       providedIn: 'root',
     },
-    usingMutation('updateUser', () =>
+    craftMutation('updateUser', () =>
       mutation({
         method: (user: User) => user,
         loader: async ({ params: user }) => {

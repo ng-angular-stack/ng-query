@@ -1,4 +1,4 @@
-import { usingAsyncMethods } from './using-async-methods';
+import { craftAsyncMethods } from './craft-async-methods';
 import { asyncMethod } from './async-method';
 import { Signal } from '@angular/core';
 import { afterRecomputation } from './after-recomputation';
@@ -86,7 +86,7 @@ describe('asyncMethod', () => {
 describe('asyncMethod types without identifier', () => {
   it('should infer correctly the types of asyncMethod', () => {
     TestBed.runInInjectionContext(() => {
-      const asyncMethodsOutput = usingAsyncMethods(() => ({
+      const asyncMethodsOutput = craftAsyncMethods(() => ({
         // should enable to provide multiples status
         // should provide async method by id
         searchChange: asyncMethod({
@@ -177,7 +177,7 @@ describe('asyncMethod types without identifier', () => {
   it('should infer correctly the asyncMethod bind to a source type, and not exposed the method bind to a source', () => {
     TestBed.runInInjectionContext(() => {
       const searchSource = source<{ searchChangeText: string }>();
-      const asyncMethodsOutput = usingAsyncMethods(() => ({
+      const asyncMethodsOutput = craftAsyncMethods(() => ({
         // should enable to provide multiples status
         // should provide async method by id
         searchChange: asyncMethod({
@@ -312,7 +312,7 @@ describe('asyncMethod types without identifier', () => {
 describe('asyncMethod types with identifier', () => {
   it('should infer correctly the types of asyncMethod', () => {
     TestBed.runInInjectionContext(() => {
-      const asyncMethodsOutput = usingAsyncMethods(() => ({
+      const asyncMethodsOutput = craftAsyncMethods(() => ({
         // should enable to provide multiples status
         // should provide async method by id
         searchChange: asyncMethod({
@@ -412,7 +412,7 @@ describe('asyncMethod types with identifier', () => {
   it('should infer correctly the asyncMethod bind to a source type, and not exposed the method bind to a source', () => {
     TestBed.runInInjectionContext(() => {
       const searchSource = source<{ searchChangeText: string }>();
-      const asyncMethodsOutput = usingAsyncMethods(() => ({
+      const asyncMethodsOutput = craftAsyncMethods(() => ({
         // should enable to provide multiples status
         // should provide async method by id
         searchChange: asyncMethod({

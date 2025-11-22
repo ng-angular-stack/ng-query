@@ -3,9 +3,9 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 
-type SpecificUsingComputedOutputs<Computed extends {}> = {
+type SpecificCraftComputedOutputs<Computed extends {}> = {
   props: Computed;
   methods: {};
   inputs: {};
@@ -17,17 +17,17 @@ type SpecificUsingComputedOutputs<Computed extends {}> = {
   asyncMethods: {};
 };
 
-type UsingComputedStatesOutputs<
+type CraftComputedStatesOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Computed extends {}
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingComputedOutputs<Computed>
+  SpecificCraftComputedOutputs<Computed>
 >;
 
-export function usingComputedStates<
+export function craftComputedStates<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Computed extends {}
@@ -38,7 +38,7 @@ export function usingComputedStates<
       Context['sources'] &
       Context['props']
   ) => Computed
-): UsingComputedStatesOutputs<Context, StoreConfig, Computed> {
+): CraftComputedStatesOutputs<Context, StoreConfig, Computed> {
   return (contextData, injector) => {
     const computedValues = computedFactory({
       ...contextData.context.inputs,
@@ -57,6 +57,6 @@ export function usingComputedStates<
       __mutation: {},
       methods: {},
       asyncMethods: {},
-    } as unknown as SpecificUsingComputedOutputs<Computed>;
+    } as unknown as SpecificCraftComputedOutputs<Computed>;
   };
 }

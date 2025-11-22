@@ -2,11 +2,11 @@ import { Expect, Equal } from 'test-type';
 import { inject, ResourceRef, ResourceStreamItem, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { expectTypeOf, vi } from 'vitest';
-import { usingQuery } from './using-query';
+import { craftQuery } from './craft-query';
 import { query } from '../query';
-import { serverState, ServerStateFactory } from './server-state';
-import { usingMutation } from './using-mutation';
-import { usingMutationById } from './using-mutation-by-id';
+import { serverState, ServerStateFactory } from './craft';
+import { craftMutation } from './craft-mutation';
+import { craftMutationById } from './craft-mutation-by-id';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 
@@ -16,7 +16,7 @@ type User = {
   email: string;
 };
 
-describe('usingQuery', () => {
+describe('craftQuery', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -30,7 +30,7 @@ describe('usingQuery', () => {
           name: '',
           providedIn: 'root',
         },
-        usingQuery('user', () =>
+        craftQuery('user', () =>
           query({
             params: () => '5',
             loader: async ({ params }) => {
@@ -57,7 +57,7 @@ describe('usingQuery', () => {
           name: '',
           providedIn: 'root',
         },
-        usingQuery('user', () =>
+        craftQuery('user', () =>
           query({
             params: () => undefined,
             loader: async ({ params }) => {
@@ -84,7 +84,7 @@ describe('usingQuery', () => {
           name: '',
           providedIn: 'root',
         },
-        usingQuery('user', () =>
+        craftQuery('user', () =>
           query({
             params: () => '5',
             loader: async ({ params }) => {
@@ -112,7 +112,7 @@ describe('usingQuery', () => {
           name: '',
           providedIn: 'root',
         },
-        usingQuery('user', () =>
+        craftQuery('user', () =>
           query({
             params: () => '5',
             loader: async ({ params }) => {
@@ -150,7 +150,7 @@ describe('usingQuery', () => {
           name: '',
           providedIn: 'root',
         },
-        usingQuery('user', () =>
+        craftQuery('user', () =>
           query({
             params: () => '5',
             stream: async ({ params }) => {
@@ -204,21 +204,21 @@ describe('usingQuery', () => {
   });
 });
 
-describe('Declarative server state, usingQuery and usingMutation', () => {
+describe('Declarative server state, craftQuery and craftMutation', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
   afterEach(() => {
     vi.restoreAllMocks();
   });
-  it('1- usingQuery should handle optimistic updates', async () => {
+  it('1- craftQuery should handle optimistic updates', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
         {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('userEmail', () =>
+        craftMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
@@ -233,7 +233,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -279,14 +279,14 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
     });
   });
 
-  it('2- usingQuery should reload on mutation error', async () => {
+  it('2- craftQuery should reload on mutation error', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
         {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('userEmail', () =>
+        craftMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
@@ -302,7 +302,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -345,14 +345,14 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
       expect(store.userQuery.status()).toBe('reloading');
     });
   });
-  it('3- usingQuery should reload on mutation error if mutation params id is "error"', async () => {
+  it('3- craftQuery should reload on mutation error if mutation params id is "error"', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
         {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('userEmail', () =>
+        craftMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
@@ -372,7 +372,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -429,14 +429,14 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
     });
   });
 
-  it('4- usingQuery should handle optimisticPatch', async () => {
+  it('4- craftQuery should handle optimisticPatch', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
         {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('userEmail', () =>
+        craftMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
@@ -451,7 +451,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -496,7 +496,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
     });
   });
 
-  it('5- Should handle usingMutationById reactions effect', async () => {
+  it('5- Should handle craftMutationById reactions effect', async () => {
     await TestBed.runInInjectionContext(async () => {
       const returnedUser = (id: string) => ({
         id: `${id}`,
@@ -508,7 +508,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        usingMutationById('user', () =>
+        craftMutationById('user', () =>
           mutationById({
             method(user: User) {
               return user;
@@ -520,7 +520,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -564,14 +564,14 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
     });
   });
 
-  it('6- usingQuery should handle updates', async () => {
+  it('6- craftQuery should handle updates', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
         {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('userEmail', () =>
+        craftMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
@@ -586,7 +586,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -632,14 +632,14 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
       expect(store.userQuery.value().email).toBe('mutated@test.com');
     });
   });
-  it('7- usingQuery should handle patch', async () => {
+  it('7- craftQuery should handle patch', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
         {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('userEmail', () =>
+        craftMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
@@ -654,7 +654,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -697,7 +697,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
       expect(store.userQuery.value().email).toBe('mutated@test.com');
     });
   });
-  it('8- Should handle usingMutationById update', async () => {
+  it('8- Should handle craftMutationById update', async () => {
     await TestBed.runInInjectionContext(async () => {
       const returnedUser = (id: string) => ({
         id: `${id}`,
@@ -709,7 +709,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        usingMutationById('user', () =>
+        craftMutationById('user', () =>
           mutationById({
             method(user: User) {
               return user;
@@ -721,7 +721,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -769,7 +769,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
       vi.restoreAllMocks();
     });
   });
-  it('9- Should handle usingMutationById patch', async () => {
+  it('9- Should handle craftMutationById patch', async () => {
     await TestBed.runInInjectionContext(async () => {
       const returnedUser = (id: string) => ({
         id: `${id}`,
@@ -781,7 +781,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        usingMutationById('user', () =>
+        craftMutationById('user', () =>
           mutationById({
             method(user: User) {
               return user;
@@ -793,7 +793,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({
@@ -847,7 +847,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        usingQuery('user', () =>
+        craftQuery('user', () =>
           query(
             {
               params: () => '5',
@@ -885,10 +885,10 @@ type InferServerStateFeatureReturnedType<
   T extends ServerStateFactory<[any], any, any, any>
 > = T extends ServerStateFactory<any, any, infer R, any> ? R : never;
 
-describe('usingQuery typing', () => {
+describe('craftQuery typing', () => {
   it('Should be well typed', () => {
     TestBed.runInInjectionContext(() => {
-      const queryByIdTest = usingQuery('user', () =>
+      const queryByIdTest = craftQuery('user', () =>
         query({
           params: () => '5',
           loader: async ({ params }) => {
@@ -913,7 +913,7 @@ describe('usingQuery typing', () => {
         Equal<ResultType['props']['userQuery'], ResourceRef<User>>
       >;
 
-      type _ExpectThePropsToHaveARecordusingQueryNameAndHistype = Expect<
+      type _ExpectThePropsToHaveARecordcraftQueryNameAndHistype = Expect<
         Equal<
           ResultType['props'],
           {
@@ -937,7 +937,7 @@ describe('usingQuery typing', () => {
           name: '',
           providedIn: 'root',
         },
-        usingMutation('userName', () =>
+        craftMutation('userName', () =>
           mutation({
             method: (id: string) => ({ id }),
             loader: async ({ params }) => {
@@ -949,7 +949,7 @@ describe('usingQuery typing', () => {
             },
           })
         ),
-        usingMutation('userEmail', () =>
+        craftMutation('userEmail', () =>
           mutation({
             method: (id: string) => ({ id }),
             loader: async ({ params }) => {
@@ -962,7 +962,7 @@ describe('usingQuery typing', () => {
             },
           })
         ),
-        usingMutation('userTest', () =>
+        craftMutation('userTest', () =>
           mutation({
             method: (id: string) => ({ id }),
             loader: async ({ params }) => {
@@ -975,7 +975,7 @@ describe('usingQuery typing', () => {
             },
           })
         ),
-        usingQuery(
+        craftQuery(
           'user',
           () =>
             query({

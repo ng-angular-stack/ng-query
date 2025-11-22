@@ -3,7 +3,7 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { ResourceByIdRef } from '../resource-by-id';
 
@@ -20,7 +20,7 @@ type MutationByIdPropsOutput<
   >;
 };
 
-type SpecificUseMutationByIdOutputs<
+type SpecificCraftMutationByIdOutputs<
   ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -68,7 +68,7 @@ type SpecificUseMutationByIdOutputs<
   asyncMethods: {};
 };
 
-type UsingMutationOutputs<
+type CraftMutationOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
@@ -80,7 +80,7 @@ type UsingMutationOutputs<
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUseMutationByIdOutputs<
+  SpecificCraftMutationByIdOutputs<
     ResourceName,
     ResourceState,
     ResourceParams,
@@ -90,7 +90,7 @@ type UsingMutationOutputs<
   >
 >;
 
-export function usingMutationById<
+export function craftMutationById<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
@@ -126,7 +126,7 @@ export function usingMutationById<
       GroupIdentifier
     >;
   }
-): UsingMutationOutputs<
+): CraftMutationOutputs<
   Context,
   StoreConfig,
   ResourceName,
@@ -187,7 +187,7 @@ export function usingMutationById<
             },
           }
         : {},
-    } as SpecificUseMutationByIdOutputs<
+    } as SpecificCraftMutationByIdOutputs<
       ResourceName,
       ResourceState,
       ResourceParams,

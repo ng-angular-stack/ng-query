@@ -3,7 +3,7 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { ReadonlySource } from './util/source.type';
 import { createMethodHandlers } from './util/util';
 
@@ -15,7 +15,7 @@ type FilterConnectedToSourceMethods<Methods> = {
 
 // todo enable to sync with localStorage or sessionStorage
 
-type SpecificUsingStateOutputs<
+type SpecificCraftStateOutputs<
   StateName extends string,
   State,
   Methods extends Record<string, (...args: any[]) => any> | undefined
@@ -33,7 +33,7 @@ type SpecificUsingStateOutputs<
   asyncMethods: {};
 };
 
-type UsingStateOutputs<
+type CraftStateOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   StateName extends string,
@@ -42,10 +42,10 @@ type UsingStateOutputs<
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingStateOutputs<StateName, State, Methods>
+  SpecificCraftStateOutputs<StateName, State, Methods>
 >;
 
-export function usingState<
+export function craftState<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   const StateName extends string,
@@ -71,7 +71,7 @@ export function usingState<
       Context['sources'] &
       Context['props'];
   }) => Methods
-): UsingStateOutputs<Context, StoreConfig, StateName, State, Methods> {
+): CraftStateOutputs<Context, StoreConfig, StateName, State, Methods> {
   return (contextData, injector) => {
     const stateResult = stateFactory({
       ...contextData.context.inputs,
@@ -103,6 +103,6 @@ export function usingState<
       __mutation: {},
       asyncMethods: {},
       methods: finalMethods,
-    } as unknown as SpecificUsingStateOutputs<StateName, State, Methods>;
+    } as unknown as SpecificCraftStateOutputs<StateName, State, Methods>;
   };
 }

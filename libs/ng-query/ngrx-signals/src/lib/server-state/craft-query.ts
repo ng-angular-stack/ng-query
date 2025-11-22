@@ -10,7 +10,7 @@ import {
   MutationDictionary,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { QueryRef } from '../with-query';
 import {
   effect,
@@ -23,8 +23,6 @@ import {
 import { ResourceByIdRef } from '../resource-by-id';
 import { nestedEffect } from '../types/util';
 
-// todo Context['sources'] & Context['queryParams'] & Context['asyncMethods'];
-
 type QueryOptions<
   Context extends ContextConstraints,
   ResourceState extends object | undefined,
@@ -32,7 +30,6 @@ type QueryOptions<
   ResourceArgsParams,
   OtherProperties
 > = {
-  testOn?: Context['__mutation'] extends infer Mutations ? Mutations : never;
   on?: Context['__mutation'] extends infer Mutations
     ? {
         [key in keyof Mutations as `${key &
@@ -78,7 +75,7 @@ type QueryOptions<
   [key in keyof OtherProperties]: OtherProperties[key];
 };
 
-type SpecificUsingQueryOutputs<
+type SpecificCraftQueryOutputs<
   ResourceName extends string,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -115,7 +112,7 @@ type SpecificUsingQueryOutputs<
   __mutation: {};
 };
 
-type UseQueryOutputs<
+type CraftQueryOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
@@ -126,7 +123,7 @@ type UseQueryOutputs<
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingQueryOutputs<
+  SpecificCraftQueryOutputs<
     ResourceName,
     ResourceState,
     ResourceParams,
@@ -135,7 +132,7 @@ type UseQueryOutputs<
   >
 >;
 
-export function usingQuery<
+export function craftQuery<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
@@ -174,7 +171,7 @@ export function usingQuery<
     ResourceArgsParams,
     OtherProperties
   >
-): UseQueryOutputs<
+): CraftQueryOutputs<
   Context,
   StoreConfig,
   ResourceName,
@@ -226,7 +223,7 @@ export function usingQuery<
       sources: {},
       asyncMethods: {},
       methods: {},
-    } as SpecificUsingQueryOutputs<
+    } as SpecificCraftQueryOutputs<
       ResourceName,
       ResourceState,
       ResourceParams,

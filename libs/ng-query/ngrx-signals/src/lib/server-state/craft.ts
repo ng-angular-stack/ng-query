@@ -21,7 +21,7 @@ import {
   ToConnectableMethodFromInject,
 } from './util/util.type';
 
-//todo using inouts should not accepts other params
+//todo craft inouts should not accepts other params
 // todo inputs query&queryParams
 // todo rename craft ?
 // todo filter private fields and methods ?
@@ -54,11 +54,11 @@ export type QueryDictionary = Record<
 
 export type ContextConstraints = {
   props: {};
-  methods: Record<string, Function>; //? (editable in injectServerState/usingServerState)
-  inputs: {}; //? (editable in injectServerState/usingServerState)
+  methods: Record<string, Function>; //? (editable in injectServerState/craftServerState)
+  inputs: {}; //? (editable in injectServerState/craftServerState)
   __injections: {};
   queryParams: {};
-  sources: {}; //? (editable in injectServerState/usingServerState)
+  sources: {}; //? (editable in injectServerState/craftServerState)
   __mutation: {};
   __query: {};
   asyncMethods: {};
@@ -101,7 +101,7 @@ export type ContextInput<Context extends ContextConstraints> = {
 };
 
 /**
- * ! Do not use it to generate the output of utilities like (usingQuery, usingMutation, etc..),
+ * ! Do not use it to generate the output of utilities like (craftQuery, craftMutation, etc..),
  * ! the context is not correctly inferred (use ServerStateFactoryUtility instead)
  */
 export type ServerStateFactory<
@@ -202,7 +202,7 @@ type ToServerStateOutputs<
     >
   >;
 } & {
-  [key in `using${Capitalize<StoreConfig['name']>}ServerState`]: <
+  [key in `craft${Capitalize<StoreConfig['name']>}ServerState`]: <
     Context extends ContextConstraints,
     Config extends MergeObjects<
       [
@@ -555,7 +555,7 @@ export function serverState(
     ? name.charAt(0).toUpperCase() + name.slice(1)
     : '';
   const injectNameServerState = `inject${capitalizedName}ServerState`;
-  const usingNameServerState = `using${capitalizedName}ServerState`;
+  const craftNameServerState = `craft${capitalizedName}ServerState`;
   return {
     [injectNameServerState]: (entries?: {
       inputs?: Record<string, unknown>;
@@ -602,7 +602,7 @@ export function serverState(
 
       return tokenValue;
     },
-    [usingNameServerState]: (
+    [craftNameServerState]: (
       pluggableConfig?: (context: ContextConstraints) => {
         inputs?: Record<string, unknown>;
         methods?: Record<string, Function>;
@@ -612,7 +612,7 @@ export function serverState(
         contextData: ContextInput<ContextConstraints>,
         injector: Injector // todo add store config
       ) => {
-        console.log('optionsName using', options?.name);
+        console.log('optionsName craft', options?.name);
         const entries =
           pluggableConfig?.({
             ...contextData.context.inputs,

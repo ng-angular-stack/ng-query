@@ -3,13 +3,13 @@ import { Expect, Equal } from 'test-type';
 import { inject, InjectionToken } from '@angular/core';
 import { vi } from 'vitest';
 import { queryById } from '../query-by-id';
-import { usingQueryById } from './using-query-by-id';
-import { serverState } from './server-state';
+import { craftQueryById } from './craft-query-by-id';
+import { serverState } from './craft';
 import { MergeObject } from '../types/util.type';
 import { ResourceByIdRef } from '../resource-by-id';
-import { usingMutation } from './using-mutation';
+import { craftMutation } from './craft-mutation';
 import { mutation } from '../mutation';
-import { usingMutationById } from './using-mutation-by-id';
+import { craftMutationById } from './craft-mutation-by-id';
 import { mutationById } from '../mutation-by-id';
 
 type User = {
@@ -59,7 +59,7 @@ describe('queryById', () => {
     });
   });
 });
-describe('usingQueryById', () => {
+describe('craftQueryById', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -77,7 +77,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingQueryById('user', () =>
+      craftQueryById('user', () =>
         queryById({
           params: () => '5',
           loader: async ({ params }) => {
@@ -126,7 +126,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutation('user', () =>
+      craftMutation('user', () =>
         mutation({
           method(user: User) {
             return user;
@@ -136,7 +136,7 @@ describe('usingQueryById', () => {
           },
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -188,7 +188,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutation('user', () =>
+      craftMutation('user', () =>
         mutation({
           method(user: User) {
             return user;
@@ -198,7 +198,7 @@ describe('usingQueryById', () => {
           },
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -252,7 +252,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutation('user', () =>
+      craftMutation('user', () =>
         mutation({
           method(user: User) {
             return user;
@@ -263,7 +263,7 @@ describe('usingQueryById', () => {
           },
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -316,7 +316,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutationById('user', () =>
+      craftMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -328,7 +328,7 @@ describe('usingQueryById', () => {
           },
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -383,7 +383,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutationById('user', () =>
+      craftMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -394,7 +394,7 @@ describe('usingQueryById', () => {
           identifier: (params) => params.id,
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -446,7 +446,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutationById('user', () =>
+      craftMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -457,7 +457,7 @@ describe('usingQueryById', () => {
           identifier: (params) => params.id,
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -510,7 +510,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutationById('user', () =>
+      craftMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -521,7 +521,7 @@ describe('usingQueryById', () => {
           identifier: (params) => params.id,
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -574,7 +574,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutationById('user', () =>
+      craftMutationById('user', () =>
         mutationById({
           method(user: User) {
             return user;
@@ -585,7 +585,7 @@ describe('usingQueryById', () => {
           identifier: (params) => params.id,
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -637,7 +637,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutation('user', () =>
+      craftMutation('user', () =>
         mutation({
           method(user: User) {
             return user;
@@ -647,7 +647,7 @@ describe('usingQueryById', () => {
           },
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -699,7 +699,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingMutation('user', () =>
+      craftMutation('user', () =>
         mutation({
           method(user: User) {
             return user;
@@ -709,7 +709,7 @@ describe('usingQueryById', () => {
           },
         })
       ),
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({
@@ -767,7 +767,7 @@ describe('usingQueryById', () => {
         name: '',
         providedIn: 'root',
       },
-      usingQueryById(
+      craftQueryById(
         'user',
         () =>
           queryById({

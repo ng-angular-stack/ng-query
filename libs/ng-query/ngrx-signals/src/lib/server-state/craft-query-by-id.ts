@@ -22,7 +22,7 @@ import {
   MutationDictionary,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 
 // todo Context['sources'] & Context['queryParams'] & Context['asyncMethods'];
 
@@ -37,7 +37,7 @@ export type QueryByIdRef<
   insertionsOutputs: InsertionsOutput;
 };
 
-type SpecificUsingQueryOutputs<
+type SpecificCraftQueryOutputs<
   GroupIdentifier extends string,
   ResourceName extends string,
   ResourceState extends object | undefined,
@@ -77,7 +77,7 @@ type SpecificUsingQueryOutputs<
   __mutation: {};
 };
 
-type UsingQueryOutputs<
+type CraftQueryOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   ResourceName extends string,
@@ -89,7 +89,7 @@ type UsingQueryOutputs<
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingQueryOutputs<
+  SpecificCraftQueryOutputs<
     GroupIdentifier,
     ResourceName,
     ResourceState,
@@ -174,7 +174,7 @@ withQuery(
  * ```
  * @returns
  */
-export function usingQueryById<
+export function craftQueryById<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   const ResourceName extends string,
@@ -217,7 +217,7 @@ export function usingQueryById<
     ResourceArgsParams,
     OtherProperties
   >
-): UsingQueryOutputs<
+): CraftQueryOutputs<
   Context,
   StoreConfig,
   ResourceName,
@@ -274,7 +274,7 @@ export function usingQueryById<
       },
       __mutation: {},
       methods: {},
-    } as SpecificUsingQueryOutputs<
+    } as SpecificCraftQueryOutputs<
       GroupIdentifier,
       ResourceName,
       ResourceState,

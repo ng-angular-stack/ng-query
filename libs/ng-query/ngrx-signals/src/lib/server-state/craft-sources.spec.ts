@@ -1,12 +1,12 @@
-import { serverState } from './server-state';
+import { serverState } from './craft';
 import { ApplicationRef, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { usingSources } from './using-sources';
+import { craftSources } from './craft-sources';
 import { source } from './source';
-import { usingState } from './using-state';
+import { craftState } from './craft-state';
 import { afterRecomputation } from './after-recomputation';
 
-describe('usingSources', () => {
+describe('craftSources', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -21,10 +21,10 @@ describe('usingSources', () => {
           name: '',
           providedIn: 'root',
         },
-        usingSources({
+        craftSources({
           increment: source<{}>(),
         }),
-        usingState(
+        craftState(
           'test',
           () => signal(0),
           ({ context: { increment }, state }) => ({
@@ -52,10 +52,10 @@ describe('usingSources', () => {
         name: '',
         providedIn: 'root',
       },
-      usingSources({
+      craftSources({
         increment: source<{}>(),
       }),
-      usingState(
+      craftState(
         'test',
         () => signal(0),
         ({ context: { increment }, state }) => ({

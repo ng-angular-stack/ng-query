@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { serverState } from './server-state';
-import { usingQueryParams } from './using-query-params';
+import { serverState } from './craft';
+import { craftQueryParams } from './craft-query-params';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
 
 describe('craftSetAllQueriesParamsStandalone', () => {
@@ -12,7 +12,7 @@ describe('craftSetAllQueriesParamsStandalone', () => {
           providedIn: 'root',
           name: 'TestStore',
         },
-        usingQueryParams('pagination', () => ({
+        craftQueryParams('pagination', () => ({
           page: {
             defaultValue: 1,
             parse: (value: string) => parseInt(value, 10),
@@ -24,7 +24,7 @@ describe('craftSetAllQueriesParamsStandalone', () => {
             serialize: (value: unknown) => String(value),
           },
         })),
-        usingQueryParams('filter', () => ({
+        craftQueryParams('filter', () => ({
           active: {
             defaultValue: false,
             parse: (value: string) => value === 'true',

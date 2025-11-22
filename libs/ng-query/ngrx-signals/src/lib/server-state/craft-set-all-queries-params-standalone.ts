@@ -4,7 +4,7 @@ import {
   EmptyContext,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { Prettify } from '@ngrx/signals';
 import { STORE_CONFIG_TOKEN } from './util/util.type';
 
@@ -37,7 +37,7 @@ type CraftSetAllQueriesParamsStandaloneOutputs<
 >;
 
 /**
- * Order matters: this function must be declared after `usingQueryParams` to ensure types are properly inferred.
+ * Order matters: this function must be declared after `craftQueryParams` to ensure types are properly inferred.
  */
 export function craftSetAllQueriesParamsStandalone<
   Context extends ContextConstraints,

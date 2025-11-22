@@ -4,16 +4,16 @@ import {
   on,
   serverState,
   source,
-  usingInputs,
-  usingSources,
-  usingState,
+  craftInputs,
+  craftSources,
+  craftState,
 } from '@ng-query/ngrx-signals';
 
-const { usingDataPaginationServerState } = serverState(
-  usingInputs({
+const { craftDataPaginationServerState } = serverState(
+  craftInputs({
     defaultNumber: undefined as number | undefined,
   }),
-  usingState(
+  craftState(
     'numberList',
     () => signal([1]),
     ({ state, context: { defaultNumber } }) => {
@@ -39,12 +39,12 @@ const { usingDataPaginationServerState } = serverState(
 );
 
 const { injectHost1ServerState } = serverState(
-  usingSources({
+  craftSources({
     increment: source<{}>(),
     decrement: source<{}>(),
     reset: source<{}>(),
   }),
-  usingState(
+  craftState(
     'counter',
     () => signal(0),
     ({ context: { increment, decrement }, state }) => ({
@@ -53,7 +53,7 @@ const { injectHost1ServerState } = serverState(
       reset: () => 0,
     })
   ),
-  usingDataPaginationServerState(({ reset, counter }) => ({
+  craftDataPaginationServerState(({ reset, counter }) => ({
     inputs: {
       defaultNumber: counter,
     },
@@ -67,12 +67,12 @@ const { injectHost1ServerState } = serverState(
 );
 
 const { injectHost2ServerState } = serverState(
-  usingSources({
+  craftSources({
     increment: source<{}>(),
     decrement: source<{}>(),
     reset: source<{}>(),
   }),
-  usingState(
+  craftState(
     'counter',
     () => signal(0),
     ({ context: { increment, decrement }, state }) => ({
@@ -81,7 +81,7 @@ const { injectHost2ServerState } = serverState(
       reset: () => 0,
     })
   ),
-  usingDataPaginationServerState(({ reset, counter }) => ({
+  craftDataPaginationServerState(({ reset, counter }) => ({
     inputs: {
       defaultNumber: counter,
     },
@@ -97,7 +97,7 @@ const { injectHost2ServerState } = serverState(
 // const mySource = source<{ test: string }>();
 
 // const { injectAsyncMethodsFeatureServerState } = serverState(
-//   usingAsyncMethods(() => ({
+//   craftAsyncMethods(() => ({
 //     // should enable to provide multiples status
 //     // should provide async method by id
 //     searchChange: asyncMethod({
@@ -135,13 +135,13 @@ const { injectHost2ServerState } = serverState(
 //   searchChange: string;
 // }>();
 // const { injectTest2ServerState } = serverState(
-//   usingSources({
+//   craftSources({
 //     myLocalSource: source<{
 //       timeToWait: number;
 //       searchChange: string;
 //     }>(),
 //   }),
-//   usingAsyncMethods(({ myLocalSource }) => ({
+//   craftAsyncMethods(({ myLocalSource }) => ({
 //     searchGlobalChange: asyncMethod({
 //       method: on(myGlobalSource, (payload) => {
 //         console.log('payload', payload);
@@ -167,11 +167,11 @@ const { injectHost2ServerState } = serverState(
 //     name: 'test2',
 //   }
 // );
-// const { usingBasicFeature } = serverState(
-//   usingSources({
+// const { craftBasicFeature } = serverState(
+//   craftSources({
 //     reset: source<{}>(),
 //   }),
-//   usingQueryParams(
+//   craftQueryParams(
 //     'pagination',
 //     () => ({
 //       page: {
@@ -193,7 +193,7 @@ const { injectHost2ServerState } = serverState(
 //       }),
 //     }
 //   ),
-//   usingState(
+//   craftState(
 //     'counter',
 //     () => signal(0),
 //     ({ context: { reset }, state }) => ({
@@ -208,13 +208,13 @@ const { injectHost2ServerState } = serverState(
 // );
 
 // const {injectStore, setMyReset} = serverState(
-//   usingSources({
+//   craftSources({
 //     myReset: source<{}>(),
 //   }),
-//   usingBasicFeature(({myReset}) => ({
+//   craftBasicFeature(({myReset}) => ({
 //     reset: myReset // bind the basicFeature reset source to myReset source
 //   })),
-//   usingState(
+//   craftState(
 //     'selectedProducts',
 //     () => signal([] as Book[]),
 //     ({ context: { reset }, state }) => ({

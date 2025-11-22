@@ -3,7 +3,7 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { MergeObjects, UnionToTuple } from '../types/util.type';
 import { ReadonlySource } from './util/source.type';
 import { Prettify } from '@ngrx/signals';
@@ -36,7 +36,7 @@ type FilterMethodsBoundToSources<
     : FilterMethodsBoundToSources<Methods, Next, Acc>
   : Acc;
 
-type SpecificUsingAsyncMethodsOutputs<AsyncMethods extends {}> = {
+type SpecificCraftAsyncMethodsOutputs<AsyncMethods extends {}> = {
   props: {
     [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;
   };
@@ -55,14 +55,14 @@ type SpecificUsingAsyncMethodsOutputs<AsyncMethods extends {}> = {
   };
 };
 
-type UsingAsyncMethodsOutputs<
+type CraftAsyncMethodsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   AsyncMethods extends {}
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingAsyncMethodsOutputs<AsyncMethods>
+  SpecificCraftAsyncMethodsOutputs<AsyncMethods>
 >;
 
 export type AsyncMethodByIdRef<GroupIdentifier, State, ResourceParams> =
@@ -138,7 +138,7 @@ export type AsyncMethodRef<
   ]
 >;
 
-export function usingAsyncMethods<
+export function craftAsyncMethods<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   AsyncMethods extends {}
@@ -149,7 +149,7 @@ export function usingAsyncMethods<
       Context['sources'] &
       Context['props']
   ) => AsyncMethods
-): UsingAsyncMethodsOutputs<Context, StoreConfig, AsyncMethods> {
+): CraftAsyncMethodsOutputs<Context, StoreConfig, AsyncMethods> {
   return (contextData, injector) => {
     const asyncMethods = asyncMethodsFactory({
       ...contextData.context.inputs,
@@ -216,6 +216,6 @@ export function usingAsyncMethods<
       __mutation: {},
       methods,
       asyncMethods: resourceRefs,
-    } as unknown as SpecificUsingAsyncMethodsOutputs<AsyncMethods>;
+    } as unknown as SpecificCraftAsyncMethodsOutputs<AsyncMethods>;
   };
 }

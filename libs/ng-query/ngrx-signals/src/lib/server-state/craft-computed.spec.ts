@@ -1,17 +1,17 @@
 import { computed, signal } from '@angular/core';
-import { serverState } from './server-state';
-import { usingComputedStates } from './using-computed';
+import { serverState } from './craft';
+import { craftComputedStates } from './craft-computed';
 import { TestBed } from '@angular/core/testing';
-import { usingState } from './using-state';
+import { craftState } from './craft-state';
 
-describe('usingComputed', () => {
+describe('craftComputed', () => {
   it('should enable to defined computed states', () => {
     const { injectServerState } = serverState(
       {
         name: '',
         providedIn: 'root',
       },
-      usingComputedStates(() => ({
+      craftComputedStates(() => ({
         fullName: signal('John Doe'),
       }))
     );
@@ -29,8 +29,8 @@ describe('usingComputed', () => {
         name: '',
         providedIn: 'root',
       },
-      usingState('firstName', () => signal('John')),
-      usingComputedStates(({ firstName }) => ({
+      craftState('firstName', () => signal('John')),
+      craftComputedStates(({ firstName }) => ({
         fullName: computed(() => `${firstName()} Doe`),
         nameLength: computed(() => firstName().length),
       }))

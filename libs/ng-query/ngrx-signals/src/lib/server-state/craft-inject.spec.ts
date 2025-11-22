@@ -1,14 +1,14 @@
-import { usingQuery } from './using-query';
-import { serverState } from './server-state';
+import { craftQuery } from './craft-query';
+import { serverState } from './craft';
 import { query } from '../query';
 import { Injectable, InjectionToken, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { usingInject } from './using-inject';
+import { craftInject } from './craft-inject';
 
 // todo expose inputs by {inputs, queryParams}
 // todo test injection tokens, geneics
 
-describe('usingInject', () => {
+describe('craftInject', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -28,10 +28,10 @@ describe('usingInject', () => {
           name: '',
           providedIn: 'root',
         },
-        usingInject(() => ({
+        craftInject(() => ({
           MyService,
         })),
-        usingQuery('user', ({ myService }) => {
+        craftQuery('user', ({ myService }) => {
           return query({
             params: myService.myParams,
             loader: async ({ params }) => {
@@ -72,10 +72,10 @@ describe('usingInject', () => {
           name: '',
           providedIn: 'root',
         },
-        usingInject(() => ({
+        craftInject(() => ({
           MyService: MyService<{ id: string }>,
         })),
-        usingQuery('user', ({ myService }) => {
+        craftQuery('user', ({ myService }) => {
           expectTypeOf<typeof myService>().toEqualTypeOf<
             MyService<{ id: string }>
           >();
@@ -115,10 +115,10 @@ describe('usingInject', () => {
           name: '',
           providedIn: 'root',
         },
-        usingInject(() => ({
+        craftInject(() => ({
           MyToken: MyToken,
         })),
-        usingQuery('user', ({ myToken }) => {
+        craftQuery('user', ({ myToken }) => {
           expectTypeOf<typeof myToken>().toEqualTypeOf<{ id: string }>();
           return query({
             params: () => myToken,

@@ -2,7 +2,7 @@ import {
   ContextConstraints,
   ServerStateFactoryUtility,
   StoreConfigConstraints,
-} from './server-state';
+} from './craft';
 import { Source } from './source';
 import { capitalize } from './util/util';
 
@@ -17,7 +17,7 @@ type SourceSetterMethods<Sources extends {}> = {
   ) => void;
 };
 
-type SpecificUsingSourcesOutputs<Sources extends {}> = {
+type SpecificCraftSourcesOutputs<Sources extends {}> = {
   props: {};
   methods: SourceSetterMethods<Sources>;
   inputs: {};
@@ -29,14 +29,14 @@ type SpecificUsingSourcesOutputs<Sources extends {}> = {
   asyncMethods: {};
 };
 
-type UsingSourcesOutputs<
+type CraftSourcesOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
 > = ServerStateFactoryUtility<
   Context,
   StoreConfig,
-  SpecificUsingSourcesOutputs<Inputs>,
+  SpecificCraftSourcesOutputs<Inputs>,
   SourceSetterMethods<Inputs>
 >;
 
@@ -54,10 +54,10 @@ type UsingSourcesOutputs<
  * @example
  * ```ts
  * const { injectServerState, setIncrement } = serverState(
- *   usingSources({
+ *   craftSources({
  *     increment: source<{}>(),
  *   }),
- *   usingState(
+ *   craftState(
  *     'test',
  *     () => signal(0),
  *     ({ context: { increment }, state }) => ({
@@ -72,11 +72,11 @@ type UsingSourcesOutputs<
  * setIncrement({}); // trigger increment source
  * ```
  */
-export function usingSources<
+export function craftSources<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Sources extends Record<string, Source<any>>
->(sources: Sources): UsingSourcesOutputs<Context, StoreConfig, Sources> {
+>(sources: Sources): CraftSourcesOutputs<Context, StoreConfig, Sources> {
   const methods = Object.entries(sources).reduce((acc, [key, source]) => {
     return {
       ...acc,
@@ -96,6 +96,6 @@ export function usingSources<
       __mutation: {},
       asyncMethods: {},
       methods,
-    } as SpecificUsingSourcesOutputs<Sources>;
-  }, methods) as unknown as UsingSourcesOutputs<Context, StoreConfig, Sources>;
+    } as SpecificCraftSourcesOutputs<Sources>;
+  }, methods) as unknown as CraftSourcesOutputs<Context, StoreConfig, Sources>;
 }

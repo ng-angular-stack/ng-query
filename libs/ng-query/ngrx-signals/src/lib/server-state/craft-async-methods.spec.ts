@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { serverState } from './server-state';
-import { usingAsyncMethods } from './using-async-methods';
+import { serverState } from './craft';
+import { craftAsyncMethods } from './craft-async-methods';
 import { asyncMethod } from './async-method';
 import { source } from './source';
 import { afterRecomputation } from './after-recomputation';
-import { usingSources } from './using-sources';
+import { craftSources } from './craft-sources';
 
-describe('usingAsyncMethods', () => {
+describe('craftAsyncMethods', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -20,7 +20,7 @@ describe('usingAsyncMethods', () => {
           name: '',
           providedIn: 'root',
         },
-        usingAsyncMethods(() => ({
+        craftAsyncMethods(() => ({
           // should enable to provide multiples status
           // should provide async method by id
           searchChange: asyncMethod({
@@ -66,13 +66,13 @@ describe('usingAsyncMethods', () => {
           name: '',
           providedIn: 'root',
         },
-        usingSources({
+        craftSources({
           myLocalSource: source<{
             timeToWait: number;
             searchChange: string;
           }>(),
         }),
-        usingAsyncMethods(({ myLocalSource }) => ({
+        craftAsyncMethods(({ myLocalSource }) => ({
           searchGlobalChange: asyncMethod({
             method: afterRecomputation(myGlobalSource, (payload) => payload),
             loader: async ({ params: { timeToWait, searchChange } }) => {
@@ -133,7 +133,7 @@ describe('usingAsyncMethods with identifier', () => {
           name: '',
           providedIn: 'root',
         },
-        usingAsyncMethods(() => ({
+        craftAsyncMethods(() => ({
           // should enable to provide multiples status
           // should provide async method by id
           searchChange: asyncMethod({
@@ -182,13 +182,13 @@ describe('usingAsyncMethods with identifier', () => {
           name: '',
           providedIn: 'root',
         },
-        usingSources({
+        craftSources({
           myLocalSource: source<{
             timeToWait: number;
             searchChange: string;
           }>(),
         }),
-        usingAsyncMethods(({ myLocalSource }) => ({
+        craftAsyncMethods(({ myLocalSource }) => ({
           searchGlobalChange: asyncMethod({
             method: afterRecomputation(myGlobalSource, (payload) => {
               console.log('payload', payload);
