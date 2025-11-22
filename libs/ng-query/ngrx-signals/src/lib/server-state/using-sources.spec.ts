@@ -17,6 +17,10 @@ describe('usingSources', () => {
     const appRef = TestBed.inject(ApplicationRef);
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingSources({
           increment: source<{}>(),
         }),
@@ -44,6 +48,10 @@ describe('usingSources', () => {
   it('2- Should expose a way to call setXSource outside injection context', async () => {
     const appRef = TestBed.inject(ApplicationRef);
     const { injectServerState, setIncrement } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingSources({
         increment: source<{}>(),
       }),

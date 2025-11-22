@@ -18,6 +18,10 @@ type User = {
 describe('usingMutation', () => {
   it('#1 The serverState should expose a mutation resource and mutation method', () => {
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutation('updateUser', () =>
         mutation({
           method: (id: string) => ({ id }),
@@ -46,6 +50,10 @@ type InferServerStateResult<T> = T extends InjectionToken<infer U> ? U : never;
 
 it('Should expose a method', () => {
   const { ServerState } = serverState(
+    {
+      name: '',
+      providedIn: 'root',
+    },
     usingMutation('user', () =>
       mutation({
         method: (data: { page: string }) => data.page,
@@ -91,6 +99,10 @@ it('Should expose a method', () => {
 
 it('Should expose the mutation resource and mutation method', () => {
   const { ServerState } = serverState(
+    {
+      name: '',
+      providedIn: 'root',
+    },
     usingInputs({
       sourceId: {
         id: '4',
@@ -156,6 +168,10 @@ it('Should expose the mutation resource and mutation method', () => {
 
 it('it should expose the mutation params source, that will be reused by query', async () => {
   const { ServerState } = serverState(
+    {
+      name: '',
+      providedIn: 'root',
+    },
     usingMutation('updateUser', () =>
       mutation({
         method: (user: User) => user,

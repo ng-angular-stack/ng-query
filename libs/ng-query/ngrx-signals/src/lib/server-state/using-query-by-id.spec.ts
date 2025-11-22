@@ -73,6 +73,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingQueryById('user', () =>
         queryById({
           params: () => '5',
@@ -118,6 +122,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutation('user', () =>
         mutation({
           method(user: User) {
@@ -176,6 +184,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutation('user', () =>
         mutation({
           method(user: User) {
@@ -236,6 +248,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutation('user', () =>
         mutation({
           method(user: User) {
@@ -296,6 +312,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutationById('user', () =>
         mutationById({
           method(user: User) {
@@ -359,6 +379,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutationById('user', () =>
         mutationById({
           method(user: User) {
@@ -418,6 +442,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutationById('user', () =>
         mutationById({
           method(user: User) {
@@ -478,6 +506,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutationById('user', () =>
         mutationById({
           method(user: User) {
@@ -538,6 +570,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutationById('user', () =>
         mutationById({
           method(user: User) {
@@ -597,6 +633,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutation('user', () =>
         mutation({
           method(user: User) {
@@ -655,6 +695,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutation('user', () =>
         mutation({
           method(user: User) {
@@ -719,6 +763,10 @@ describe('usingQueryById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingQueryById(
         'user',
         () =>

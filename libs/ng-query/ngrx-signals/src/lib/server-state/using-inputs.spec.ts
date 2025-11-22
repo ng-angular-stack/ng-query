@@ -15,6 +15,10 @@ describe('usingInputs', () => {
   it('1- Should expose a way to set serverState inputs', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingInputs({
           myParams: undefined as string | undefined,
         }),
@@ -34,7 +38,9 @@ describe('usingInputs', () => {
       );
       const myParams = signal('1');
       const store = injectServerState({
-        myParams,
+        inputs: {
+          myParams,
+        },
       });
 
       expect(store.userQuery).toBeDefined();
@@ -49,6 +55,10 @@ describe('usingInputs', () => {
   it('2- It should not require inputs if no inputs are requested', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectTestServerState } = serverState(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
         usingQuery('user', (inputs) => {
           console.log('inputs', inputs);
           return query({
@@ -61,10 +71,7 @@ describe('usingInputs', () => {
               };
             },
           });
-        }),
-        {
-          name: 'test',
-        }
+        })
       );
       const myParams = signal('1');
       const store = injectTestServerState();

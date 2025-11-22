@@ -31,6 +31,10 @@ describe('usingMutationById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutationById('user', () =>
         mutationById({
           params: () => '5',
@@ -65,7 +69,11 @@ describe('usingMutationById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { ServerState, injectServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingMutationById('user', () =>
         mutationById({
           method: (user: User) => user,
@@ -77,6 +85,12 @@ describe('usingMutationById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
+      const c = injectServerState();
+      c.mutateUserById({
+        id: '5',
+        name: 'Updated User',
+        email: 'updated.doe@example.com',
+      });
       const store = inject(ServerState);
 
       await vi.runAllTimersAsync();
@@ -120,6 +134,10 @@ describe('usingMutationById', () => {
       email: 'test@a.com',
     };
     const { ServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingQueryById('user', () =>
         queryById({
           params: () => '5',
@@ -137,7 +155,6 @@ describe('usingMutationById', () => {
       Equal<
         StoreFeatureQueryType,
         {
-          [x: string]: Function;
           userQueryById: MergeObject<
             ResourceByIdRef<string, NoInfer<User>, string>,
             unknown

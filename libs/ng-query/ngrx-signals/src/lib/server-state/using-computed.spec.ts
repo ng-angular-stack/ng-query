@@ -7,6 +7,10 @@ import { usingState } from './using-state';
 describe('usingComputed', () => {
   it('should enable to defined computed states', () => {
     const { injectServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingComputedStates(() => ({
         fullName: signal('John Doe'),
       }))
@@ -21,6 +25,10 @@ describe('usingComputed', () => {
 
   it('should enable to defined computed states based on store states', () => {
     const { injectServerState } = serverState(
+      {
+        name: '',
+        providedIn: 'root',
+      },
       usingState('firstName', () => signal('John')),
       usingComputedStates(({ firstName }) => ({
         fullName: computed(() => `${firstName()} Doe`),

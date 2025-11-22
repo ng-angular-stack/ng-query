@@ -26,6 +26,10 @@ describe('usingQuery', () => {
   it('1- Should expose a query resource', () => {
     TestBed.runInInjectionContext(() => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingQuery('user', () =>
           query({
             params: () => '5',
@@ -49,6 +53,10 @@ describe('usingQuery', () => {
   it('2- should have idle state when query params are undefined', () => {
     TestBed.runInInjectionContext(() => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingQuery('user', () =>
           query({
             params: () => undefined,
@@ -72,6 +80,10 @@ describe('usingQuery', () => {
   it('3 should have loading state when query params are defined', () => {
     TestBed.runInInjectionContext(() => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingQuery('user', () =>
           query({
             params: () => '5',
@@ -96,6 +108,10 @@ describe('usingQuery', () => {
   it('4 should have resolved status when loader completes successfully', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingQuery('user', () =>
           query({
             params: () => '5',
@@ -130,6 +146,10 @@ describe('usingQuery', () => {
   it('5 should handle query with resource stream', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingQuery('user', () =>
           query({
             params: () => '5',
@@ -194,6 +214,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
   it('1- usingQuery should handle optimistic updates', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
@@ -258,6 +282,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
   it('2- usingQuery should reload on mutation error', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
@@ -320,6 +348,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
   it('3- usingQuery should reload on mutation error if mutation params id is "error"', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
@@ -400,6 +432,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
   it('4- usingQuery should handle optimisticPatch', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
@@ -468,6 +504,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
         email: 'test@a.com',
       });
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutationById('user', () =>
           mutationById({
             method(user: User) {
@@ -527,6 +567,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
   it('6- usingQuery should handle updates', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
@@ -591,6 +635,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
   it('7- usingQuery should handle patch', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('userEmail', () =>
           mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
@@ -657,6 +705,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
         email: 'test@a.com',
       });
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutationById('user', () =>
           mutationById({
             method(user: User) {
@@ -725,6 +777,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
         email: 'test@a.com',
       });
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutationById('user', () =>
           mutationById({
             method(user: User) {
@@ -787,6 +843,10 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
   it('should accept an Insertions output, that appear in the store', () => {
     TestBed.runInInjectionContext(() => {
       const { ServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingQuery('user', () =>
           query(
             {
@@ -808,10 +868,7 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
               };
             }
           )
-        ),
-        {
-          providedIn: 'root',
-        }
+        )
       );
       const store = inject(ServerState);
       expectTypeOf(store.userQuery.pagination).toEqualTypeOf<{
@@ -825,8 +882,8 @@ describe('Declarative server state, usingQuery and usingMutation', () => {
 // Typing test👇
 
 type InferServerStateFeatureReturnedType<
-  T extends ServerStateFactory<[any], any, any>
-> = T extends ServerStateFactory<any, infer R, any> ? R : never;
+  T extends ServerStateFactory<[any], any, any, any>
+> = T extends ServerStateFactory<any, any, infer R, any> ? R : never;
 
 describe('usingQuery typing', () => {
   it('Should be well typed', () => {
@@ -876,6 +933,10 @@ describe('usingQuery typing', () => {
   it('Should react to mutation changes', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingMutation('userName', () =>
           mutation({
             method: (id: string) => ({ id }),

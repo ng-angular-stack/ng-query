@@ -24,6 +24,10 @@ describe('usingInject', () => {
     }
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingInject(() => ({
           MyService,
         })),
@@ -64,6 +68,10 @@ describe('usingInject', () => {
     }
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingInject(() => ({
           MyService: MyService<{ id: string }>,
         })),
@@ -103,6 +111,10 @@ describe('usingInject', () => {
 
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingInject(() => ({
           MyToken: MyToken,
         })),

@@ -248,9 +248,11 @@ type ToServerStateOutputs<
     [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
   >;
 } & {
-  [key in `${Capitalize<
-    StoreConfig['name']
-  >}ServerState`]: InjectionToken<StandardOutputs>;
+  [key in `${Capitalize<StoreConfig['name']>}ServerState`]: InjectionToken<
+    Prettify<
+      RemoveIndexSignature<MergedContext['props'] & MergedContext['methods']>
+    >
+  >;
 } & StandaloneOutputs & {
     setAllQueryParams: StandaloneSetAllQueryParams;
   } & {

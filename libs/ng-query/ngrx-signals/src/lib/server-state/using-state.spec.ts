@@ -17,6 +17,10 @@ describe('usingState', () => {
     await TestBed.runInInjectionContext(async () => {
       const globalReset = source<{}>();
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingSources({
           reset: source<string>(),
         }),

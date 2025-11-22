@@ -16,6 +16,10 @@ describe('usingAsyncMethods', () => {
   it('should enable to define async method', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingAsyncMethods(() => ({
           // should enable to provide multiples status
           // should provide async method by id
@@ -58,6 +62,10 @@ describe('usingAsyncMethods', () => {
         searchChange: string;
       }>();
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingSources({
           myLocalSource: source<{
             timeToWait: number;
@@ -121,6 +129,10 @@ describe('usingAsyncMethods with identifier', () => {
   it('should enable to define async method', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingAsyncMethods(() => ({
           // should enable to provide multiples status
           // should provide async method by id
@@ -166,6 +178,10 @@ describe('usingAsyncMethods with identifier', () => {
         searchChange: string;
       }>();
       const { injectServerState } = serverState(
+        {
+          name: '',
+          providedIn: 'root',
+        },
         usingSources({
           myLocalSource: source<{
             timeToWait: number;
