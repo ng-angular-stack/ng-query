@@ -23,10 +23,11 @@ describe('usingInputs', () => {
           myParams: undefined as string | undefined,
         }),
         usingQuery('user', (inputs) => {
-          console.log('inputs', inputs);
+          console.log('inputs', inputs.);
           return query({
             params: inputs.myParams,
             loader: async ({ params }) => {
+              console.log('query params', params);
               return {
                 id: params,
                 name: 'John Doe',

@@ -71,16 +71,17 @@ describe('resourceById', () => {
         },
         identifier: (params) => params.id,
         loader: async ({ params }) => {
+          console.log('loader params', params);
           // Simulate a stream
           return params;
         },
       });
       expect(resourceByIdRef).toBeDefined();
-      console.log('resourceByIdRef()', resourceByIdRef());
+      console.log('1 - resourceByIdRef()', resourceByIdRef());
       expect(resourceByIdRef()).toEqual({});
 
       await vi.runAllTimersAsync();
-      console.log('resourceByIdRef()', resourceByIdRef());
+      console.log('2 - resourceByIdRef() ', resourceByIdRef());
       const resourceRef123 = resourceByIdRef()['1'];
       expect(resourceRef123).toBeDefined();
       expect(resourceRef123?.value()).toEqual({ id: '1' });
