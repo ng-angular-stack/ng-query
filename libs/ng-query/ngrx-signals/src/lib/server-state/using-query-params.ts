@@ -15,7 +15,6 @@ import {
 import { Prettify } from '@ngrx/signals';
 import { createMethodHandlers } from './util/util';
 import { ReadonlySource } from './util/source.type';
-import { STORE_CONFIG_TOKEN } from './util/util.type';
 
 export interface QueryParamConfig<T = unknown> {
   defaultValue: NoInfer<T>;
@@ -114,8 +113,7 @@ type SpecificUsingQueryStandaloneOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>
 > = {
-  [K in `setAll${(typeof STORE_CONFIG_TOKEN)['NAME']}QueryParams`]: <
-    // todo create an export token from serverState
+  [K in QueryParamsName as `set${Capitalize<K>}QueryParams`]: <
     T extends Partial<{
       [K in keyof QueryParams]: ReturnType<QueryParams[K]['parse']>;
     }>

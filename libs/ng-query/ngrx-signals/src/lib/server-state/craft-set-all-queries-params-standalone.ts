@@ -6,6 +6,7 @@ import {
   StoreConfigConstraints,
 } from './server-state';
 import { Prettify } from '@ngrx/signals';
+import { STORE_CONFIG_TOKEN } from './util/util.type';
 
 type InferQueryParamsState<T> = T extends WritableSignal<infer U> ? U : never;
 
@@ -13,7 +14,9 @@ type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints
 > = {
-  [K in `setAll${Capitalize<StoreConfig['name']>}QueryParams`]: <
+  [K in `setAll${Capitalize<
+    (typeof STORE_CONFIG_TOKEN)['NAME']
+  >}QueryParams`]: <
     AllQueriesParamsState extends {
       [K in keyof Context['queryParams']]: Context['queryParams'][K];
       // | InferQueryParamsState<Context['queryParams'][K]>

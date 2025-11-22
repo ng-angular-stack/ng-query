@@ -245,12 +245,7 @@ type ToServerStateOutputs<
       __mutation: MergedContext['__mutation'];
       __query: MergedContext['__query'];
     },
-    MergeObject<
-      [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {},
-      {
-        testUsing: StoreConfig;
-      }
-    >
+    [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
   >;
 } & {
   [key in `${Capitalize<
