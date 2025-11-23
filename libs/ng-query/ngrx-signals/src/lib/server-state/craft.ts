@@ -55,41 +55,46 @@ export type QueryDictionary = Record<
 export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>; //? (editable in injectCraft/craftCraft)
-  inputs: {}; //? (editable in injectCraft/craftCraft)
-  __injections: {};
-  queryParams: {};
-  sources: {}; //? (editable in injectCraft/craftCraft)
-  __mutation: {};
-  __query: {};
-  asyncMethods: {};
-  // todo cloud: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
-  // _generatedDeps: {[name]: {propsKeys: string[], methodsKeys: string[]}};
-  // _usedDeps: {[storeAlias]: {[storeName]: {[props]: string[]; [methods]: string[], [inputs]: string[], [sources]: string[]...};}}
+  _inputs: {}; //? (editable in injectCraft/craftCraft)
+  _injections: {};
+  _queryParams: {};
+  _sources: {}; //? (editable in injectCraft/craftCraft)
+  _mutation: {};
+  _query: {};
+  _asyncMethods: {};
+  _cloud: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
+  // _generatedDeps: {[name]: {propsKeys: string[], methodsKeys: string[]}}; // ? may be useful to generate interface that may be used for inversion of dependency
+  // 👇 Filled when adding a nested craft
+  _dependencies: {}; // {[craftName]: {[aliasName]: ContextConstraints;}}
 };
 
 // ! do not expose it
 type _EmptyContext = {
   props: {};
   methods: Record<string, Function>;
-  inputs: {};
-  queryParams: {};
-  sources: {};
-  __injections: {};
-  asyncMethods: {};
-  __mutation: {};
-  __query: {};
+  _inputs: {};
+  _queryParams: {};
+  _sources: {};
+  _injections: {};
+  _asyncMethods: {};
+  _mutation: {};
+  _query: {};
+  _cloud: {};
+  _dependencies: {};
 };
 
 export const EmptyContext = {
   props: {},
   methods: {},
-  inputs: {},
-  queryParams: {},
-  sources: {},
-  __injections: {},
-  asyncMethods: {},
-  __mutation: {},
-  __query: {},
+  _inputs: {},
+  _queryParams: {},
+  _sources: {},
+  _injections: {},
+  _asyncMethods: {},
+  _mutation: {},
+  _query: {},
+  _cloud: {},
+  _dependencies: {},
 };
 
 export type EmptyContext = typeof EmptyContext;
@@ -161,7 +166,7 @@ type ToCraftOutputs<
   >,
   StandaloneSetAllQueryParams = StandaloneOutputs, // todo
   InputsToPlugin = EnableInputsToBeExternallyProvided<
-    MergedContext['inputs'],
+    MergedContext['_inputs'],
     IsNotFeature<StoreConfig['providedIn']>
   >,
   HasInputs = keyof InputsToPlugin extends never ? false : true,
@@ -216,9 +221,9 @@ type ToCraftOutputs<
     >
   >( // todo user should not be able to add not expected inputs/methods
     pluggableConfig?: (
-      configFactory: Context['inputs'] &
-        Context['__injections'] &
-        Context['sources'] &
+      configFactory: Context['_inputs'] &
+        Context['_injections'] &
+        Context['_sources'] &
         Context['props']
     ) => Config
   ) => CraftFactoryUtility<
@@ -230,16 +235,18 @@ type ToCraftOutputs<
         MergedContext['methods'],
         'methods' extends keyof Config ? Config['methods'] : {}
       >;
-      inputs: ExcludeCommonKeys<
-        MergedContext['inputs'],
-        'inputs' extends keyof Config ? Config['inputs'] : {}
+      _inputs: ExcludeCommonKeys<
+        MergedContext['_inputs'],
+        '_inputs' extends keyof Config ? Config['_inputs'] : {}
       >;
-      queryParams: MergedContext['queryParams'];
-      sources: MergedContext['sources'];
-      __injections: MergedContext['__injections'];
-      asyncMethods: MergedContext['asyncMethods'];
-      __mutation: MergedContext['__mutation'];
-      __query: MergedContext['__query'];
+      _queryParams: MergedContext['_queryParams'];
+      _sources: MergedContext['_sources'];
+      _injections: MergedContext['_injections'];
+      _asyncMethods: MergedContext['_asyncMethods'];
+      _mutation: MergedContext['_mutation'];
+      _query: MergedContext['_query'];
+      _cloud: MergedContext['_cloud'];
+      _dependencies: MergedContext['_dependencies'];
     },
     [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
   >;
@@ -292,13 +299,15 @@ type MergeTwoContexts<
 > = {
   methods: A['methods'] & B['methods'];
   props: A['props'] & B['props'];
-  inputs: A['inputs'] & B['inputs'];
-  __injections: A['__injections'] & B['__injections'];
-  __mutation: A['__mutation'] & B['__mutation'];
-  __query: A['__query'] & B['__query'];
-  queryParams: A['queryParams'] & B['queryParams'];
-  sources: A['sources'] & B['sources'];
-  asyncMethods: A['asyncMethods'] & B['asyncMethods'];
+  _inputs: A['_inputs'] & B['_inputs'];
+  _injections: A['_injections'] & B['_injections'];
+  _mutation: A['_mutation'] & B['_mutation'];
+  _query: A['_query'] & B['_query'];
+  _queryParams: A['_queryParams'] & B['_queryParams'];
+  _sources: A['_sources'] & B['_sources'];
+  _asyncMethods: A['_asyncMethods'] & B['_asyncMethods'];
+  _cloud: A['_cloud'] & B['_cloud'];
+  _dependencies: A['_dependencies'] & B['_dependencies'];
 };
 
 type StandaloneOutputsConstraints = {};
@@ -538,7 +547,7 @@ export function craft(
         storeConfig,
       });
       inputsKeysSet = new Set(
-        Object.keys((context as ContextConstraints).inputs)
+        Object.keys((context as ContextConstraints)._inputs)
       );
       sharedContext = context;
 
@@ -576,7 +585,7 @@ export function craft(
           {} as Record<string, unknown>
         );
         if (hasInputs) {
-          pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
+          pluggableInputs.$patch(inputs as ContextConstraints['_inputs']);
         }
       }
 
@@ -610,9 +619,9 @@ export function craft(
         console.log('optionsName craft', options?.name);
         const entries =
           pluggableConfig?.({
-            ...contextData.context.inputs,
-            ...contextData.context.__injections,
-            ...contextData.context.sources,
+            ...contextData.context._inputs,
+            ...contextData.context._injections,
+            ...contextData.context._sources,
             ...contextData.context.props,
           } as any) ?? {};
         const entriesInputs = entries?.inputs;
@@ -633,7 +642,7 @@ export function craft(
         }
 
         inputsKeysSet = new Set(
-          Object.keys((storeContext as ContextConstraints).inputs)
+          Object.keys((storeContext as ContextConstraints)._inputs)
         );
         if (entriesInputs) {
           let hasInputs = false;
@@ -652,7 +661,7 @@ export function craft(
             {} as Record<string, unknown>
           );
           if (hasInputs) {
-            pluggableInputs.$patch(inputs as ContextConstraints['inputs']);
+            pluggableInputs.$patch(inputs as ContextConstraints['_inputs']);
           }
         }
         // todo if provided global use the injected one, otherwise trigger manuually
@@ -701,12 +710,12 @@ function mergeContextAndProps({
         >
       )(
         {
-          context: { ...acc.context, inputs: pluggableInputs },
+          context: { ...acc.context, _inputs: pluggableInputs },
         },
         injector,
         storeConfig
       );
-      Object.entries(result.inputs).forEach(([key, value]) => {
+      Object.entries(result._inputs).forEach(([key, value]) => {
         const hasValue = pluggableInputs.$ref(key as never);
         if (!hasValue) {
           pluggableInputs.$patch({ [key]: value } as any);
@@ -714,10 +723,10 @@ function mergeContextAndProps({
       });
       return {
         context: {
-          inputs: { ...acc.context.inputs, ...result.inputs },
-          __injections: {
-            ...acc.context.__injections,
-            ...result.__injections,
+          _inputs: { ...acc.context._inputs, ...result._inputs },
+          _injections: {
+            ...acc.context._injections,
+            ...result._injections,
           },
           props: {
             ...acc.context.props,
@@ -727,25 +736,33 @@ function mergeContextAndProps({
             ...acc.context.methods,
             ...result.methods,
           },
-          __query: {
-            ...acc.context.__query,
-            ...result.__query,
+          _query: {
+            ...acc.context._query,
+            ...result._query,
           },
-          __mutation: {
-            ...acc.context.__mutation,
-            ...result.__mutation,
+          _mutation: {
+            ...acc.context._mutation,
+            ...result._mutation,
           },
-          queryParams: {
-            ...acc.context.queryParams,
-            ...result.queryParams,
+          _queryParams: {
+            ...acc.context._queryParams,
+            ...result._queryParams,
           },
-          sources: {
-            ...acc.context.sources,
-            ...result.sources,
+          _sources: {
+            ...acc.context._sources,
+            ...result._sources,
           },
-          asyncMethods: {
-            ...acc.context.asyncMethods,
-            ...result.asyncMethods,
+          _asyncMethods: {
+            ...acc.context._asyncMethods,
+            ...result._asyncMethods,
+          },
+          _cloud: {
+            ...acc.context._cloud,
+            ...result._cloud,
+          },
+          _dependencies: {
+            ...acc.context._dependencies,
+            ...result._dependencies,
           },
         },
         propsAndMethods: {
@@ -759,13 +776,15 @@ function mergeContextAndProps({
       context: {
         props: {},
         methods: {},
-        inputs: {}, // passing pluggableInputs here seems to not works
-        queryParams: {},
-        sources: {},
-        __injections: {},
-        __mutation: {},
-        __query: {},
-        asyncMethods: {},
+        _inputs: {}, // passing pluggableInputs here seems to not works
+        _queryParams: {},
+        _sources: {},
+        _injections: {},
+        _mutation: {},
+        _query: {},
+        _asyncMethods: {},
+        _cloud: {},
+        _dependencies: {},
       } as _EmptyContext,
       propsAndMethods: {},
     } as {
