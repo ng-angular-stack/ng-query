@@ -302,7 +302,6 @@ type MergeTwoContexts<
 };
 
 type StandaloneOutputsConstraints = {};
-// todo make storeconfig to accumulate
 export function craft<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
