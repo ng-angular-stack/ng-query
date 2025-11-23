@@ -1,5 +1,4 @@
-import { computed, signal } from '@angular/core';
-import { toSource } from './to-source';
+import { computed } from '@angular/core';
 import { ReadonlySource } from './util/source.type';
 import { source } from './source';
 import { computedSource } from './computed-source';

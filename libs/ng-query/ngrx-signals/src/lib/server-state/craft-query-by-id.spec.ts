@@ -4,7 +4,7 @@ import { inject, InjectionToken } from '@angular/core';
 import { vi } from 'vitest';
 import { queryById } from '../query-by-id';
 import { craftQueryById } from './craft-query-by-id';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { MergeObject } from '../types/util.type';
 import { ResourceByIdRef } from '../resource-by-id';
 import { craftMutation } from './craft-mutation';
@@ -72,7 +72,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -88,7 +88,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       expect(store.userQueryById).toBeDefined();
 
@@ -121,7 +121,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -158,7 +158,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -183,7 +183,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -222,7 +222,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -247,7 +247,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -288,7 +288,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -311,7 +311,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -353,7 +353,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       await vi.runAllTimersAsync();
@@ -378,7 +378,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -416,7 +416,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -441,7 +441,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -481,7 +481,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -505,7 +505,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -545,7 +545,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -569,7 +569,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -607,7 +607,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -632,7 +632,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -669,7 +669,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -694,7 +694,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -733,7 +733,7 @@ describe('craftQueryById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       await vi.runAllTimersAsync();
       const userQuery5 = store.userQueryById()['5'];
       expect(userQuery5?.value()).toBe(returnedUser);
@@ -762,7 +762,7 @@ describe('craftQueryById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -782,7 +782,7 @@ describe('craftQueryById', () => {
       )
     );
 
-    type StoreFeatureQueryType = InferServerStateResult<typeof ServerState>;
+    type StoreFeatureQueryType = InferServerStateResult<typeof Craft>;
 
     type ExpectStoreFeatureQueryTypeToBeFullyRetrieved = Expect<
       Equal<

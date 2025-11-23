@@ -1,7 +1,7 @@
 import { InternalType, MergeObject } from '../types/util.type';
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { MutationByIdRef } from '../with-mutation-by-id';
@@ -77,7 +77,7 @@ type CraftMutationOutputs<
   ResourceParams,
   ResourceArgsParams,
   GroupIdentifier extends string
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftMutationByIdOutputs<

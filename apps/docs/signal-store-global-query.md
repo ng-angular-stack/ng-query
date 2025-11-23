@@ -211,7 +211,7 @@ const { withUserQuery, injectUserQuery, withUserMutation, injectUserMutation } =
         // ... react on the user mutation
       })
     ),
-  withUsersServerState()
+  withUsersCraft()
 );
 ```
 

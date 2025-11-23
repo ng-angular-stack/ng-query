@@ -1,7 +1,7 @@
 import { Signal, WritableSignal } from '@angular/core';
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { ReadonlySource } from './util/source.type';
@@ -39,7 +39,7 @@ type CraftStateOutputs<
   StateName extends string,
   State,
   Methods extends Record<string, (...args: any[]) => any> | undefined
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftStateOutputs<StateName, State, Methods>

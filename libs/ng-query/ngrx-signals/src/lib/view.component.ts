@@ -30,7 +30,7 @@ import { mutation } from './mutation';
 import { withQuery } from './with-query';
 import { rxQuery } from './rx-query';
 import { rxMutation } from './rx-mutation';
-import { ServerStateStore } from './server-state-store';
+import { craftStore } from './server-state-store';
 import { SignalProxy } from './signal-proxy';
 import { query } from './query';
 import { globalQueries } from './global-query/global-queries';
@@ -331,11 +331,11 @@ export default class ViewComponent {
   // );
   protected readonly miniStore = inject(MiniServerStateStore);
 
-  // protected readonly user2ServerStateStore = injectPluggableUserServerState({
+  // protected readonly user2ServerStateStore = injectPluggableUserCraft({
   //   selectedId: this.userSelectedId,
   // });
   // protected readonly user2ServerStateStore =
-  //   injectPluggablePluggableUserServerState({
+  //   injectPluggablePluggableUserCraft({
   //     selectedId: this.userSelectedId,
   //   });
   mutationUserQueryById() {

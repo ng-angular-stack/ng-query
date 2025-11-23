@@ -9,7 +9,7 @@ import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import {
   ContextConstraints,
   ContextInput,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
@@ -128,7 +128,7 @@ type craftQueryParamsOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>,
   CustomMethods
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftQueryParamsOutputs<QueryParamsName, QueryParams, CustomMethods>,
@@ -152,7 +152,7 @@ type craftQueryParamsOutputs<
  *
  * @example
  * ```ts
- * const { injectServerState, setPaginationQueryParams } = serverState(
+ * const { injectCraft, setPaginationQueryParams } = craft(
  *   craftQueryParams('pagination', () => ({
  *     page: {
  *       defaultValue: 1,
@@ -170,7 +170,7 @@ type craftQueryParamsOutputs<
  *
  * Usage in a component:
  * ```ts
- * const store = injectServerState();
+ * const store = injectCraft();
  *
  * // Accessing query param values
  * const page = store.page();                 // Signal for 'page' query param

@@ -1,7 +1,6 @@
 import {
   effect,
   EffectRef,
-  inject,
   Injector,
   linkedSignal,
   untracked,
@@ -20,7 +19,7 @@ import { MergeObject, InternalType } from '../types/util.type';
 import {
   ContextConstraints,
   MutationDictionary,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 
@@ -86,7 +85,7 @@ type CraftQueryOutputs<
   ResourceArgsParams,
   GroupIdentifier extends string,
   InsertionsOutputs
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftQueryOutputs<

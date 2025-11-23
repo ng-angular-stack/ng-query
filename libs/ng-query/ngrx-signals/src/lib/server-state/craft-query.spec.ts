@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { expectTypeOf, vi } from 'vitest';
 import { craftQuery } from './craft-query';
 import { query } from '../query';
-import { serverState, ServerStateFactory } from './craft';
+import { craft, CraftFactory } from './craft';
 import { craftMutation } from './craft-mutation';
 import { craftMutationById } from './craft-mutation-by-id';
 import { mutation } from '../mutation';
@@ -25,7 +25,7 @@ describe('craftQuery', () => {
   });
   it('1- Should expose a query resource', () => {
     TestBed.runInInjectionContext(() => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -44,7 +44,7 @@ describe('craftQuery', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       expect(store.userQuery).toBeDefined();
     });
@@ -52,7 +52,7 @@ describe('craftQuery', () => {
 
   it('2- should have idle state when query params are undefined', () => {
     TestBed.runInInjectionContext(() => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -71,7 +71,7 @@ describe('craftQuery', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       expect(store.userQuery.status()).toBe('idle');
     });
@@ -79,7 +79,7 @@ describe('craftQuery', () => {
 
   it('3 should have loading state when query params are defined', () => {
     TestBed.runInInjectionContext(() => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -99,7 +99,7 @@ describe('craftQuery', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       expect(store.userQuery.status()).toBe('loading');
     });
@@ -107,7 +107,7 @@ describe('craftQuery', () => {
 
   it('4 should have resolved status when loader completes successfully', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -127,7 +127,7 @@ describe('craftQuery', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       expect(store.userQuery.value()).toEqual(undefined);
 
@@ -145,7 +145,7 @@ describe('craftQuery', () => {
 
   it('5 should handle query with resource stream', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -184,7 +184,7 @@ describe('craftQuery', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       expect(store.userQuery.value()).toEqual(undefined);
       expect(store.userQuery.status()).toEqual('loading');
@@ -213,7 +213,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
   });
   it('1- craftQuery should handle optimistic updates', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -264,7 +264,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('resolved');
@@ -281,7 +281,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
 
   it('2- craftQuery should reload on mutation error', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -331,7 +331,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('resolved');
@@ -347,7 +347,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
   });
   it('3- craftQuery should reload on mutation error if mutation params id is "error"', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -402,7 +402,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('resolved');
@@ -431,7 +431,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
 
   it('4- craftQuery should handle optimisticPatch', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -480,7 +480,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('resolved');
@@ -503,7 +503,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         name: 'John Doe',
         email: 'test@a.com',
       });
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -547,7 +547,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
       const userQuery = store.userQuery;
       await vi.runAllTimersAsync();
       expect(userQuery?.value()).toEqual(returnedUser('5'));
@@ -566,7 +566,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
 
   it('6- craftQuery should handle updates', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -618,7 +618,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('resolved');
@@ -634,7 +634,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
   });
   it('7- craftQuery should handle patch', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -683,7 +683,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('resolved');
@@ -704,7 +704,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         name: 'John Doe',
         email: 'test@a.com',
       });
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -750,7 +750,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
       const userQuery = store.userQuery;
       await vi.runAllTimersAsync();
       expect(userQuery?.value()).toEqual(returnedUser('5'));
@@ -776,7 +776,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         name: 'John Doe',
         email: 'test@a.com',
       });
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -820,7 +820,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
 
-      const store = inject(ServerState);
+      const store = inject(Craft);
       const userQuery = store.userQuery;
       await vi.runAllTimersAsync();
       expect(userQuery?.value()).toEqual(returnedUser('5'));
@@ -842,7 +842,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
 
   it('should accept an Insertions output, that appear in the store', () => {
     TestBed.runInInjectionContext(() => {
-      const { ServerState } = serverState(
+      const { Craft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -870,7 +870,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           )
         )
       );
-      const store = inject(ServerState);
+      const store = inject(Craft);
       expectTypeOf(store.userQuery.pagination).toEqualTypeOf<{
         page: number;
       }>();
@@ -882,8 +882,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
 // Typing test👇
 
 type InferServerStateFeatureReturnedType<
-  T extends ServerStateFactory<[any], any, any, any>
-> = T extends ServerStateFactory<any, any, infer R, any> ? R : never;
+  T extends CraftFactory<[any], any, any, any>
+> = T extends CraftFactory<any, any, infer R, any> ? R : never;
 
 describe('craftQuery typing', () => {
   it('Should be well typed', () => {
@@ -932,7 +932,7 @@ describe('craftQuery typing', () => {
 
   it('Should react to mutation changes', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -1054,7 +1054,7 @@ describe('craftQuery typing', () => {
           }
         )
       );
-      const result = injectServerState();
+      const result = injectCraft();
       result.mutateUserEmail('newEmail');
       result.mutateUserName('newName');
       result.mutateUserTest('newName');

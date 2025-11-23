@@ -1,7 +1,7 @@
 import { Signal } from '@angular/core';
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { MergeObjects, UnionToTuple } from '../types/util.type';
@@ -59,7 +59,7 @@ type CraftAsyncMethodsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   AsyncMethods extends {}
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftAsyncMethodsOutputs<AsyncMethods>

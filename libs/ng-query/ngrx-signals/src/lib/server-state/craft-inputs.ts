@@ -1,7 +1,7 @@
 import { Signal } from '@angular/core';
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
@@ -26,7 +26,7 @@ type CraftInputsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftInputsOutputs<Inputs>

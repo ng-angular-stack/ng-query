@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
-import { EmptyContext, serverState } from './craft';
+import { craft, EmptyContext } from './craft';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 import { queryById } from '../query-by-id';
@@ -19,7 +19,7 @@ import { craftQuery } from './craft-query';
 import { craftMutationById } from './craft-mutation-by-id';
 import { craftQueryById } from './craft-query-by-id';
 
-describe('serverState', () => {
+describe('craft', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -28,7 +28,7 @@ describe('serverState', () => {
   });
 
   it('should enable creating queries and mutations', async () => {
-    const { injectServerState } = serverState(
+    const { injectCraft, __META_STORE_CONTEXT } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -53,7 +53,7 @@ describe('serverState', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const testServerState = injectServerState();
+      const testServerState = injectCraft();
 
       await vi.runAllTimersAsync();
       expect(testServerState).toBeDefined();
@@ -80,7 +80,7 @@ describe('serverState', () => {
 
   it('a query can react to a mutation change', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -118,7 +118,7 @@ describe('serverState', () => {
           }
         )
       );
-      const state = injectServerState();
+      const state = injectCraft();
       await vi.runAllTimersAsync();
       expect(state).toBeDefined();
       expect(state.testQuery.value).toBeDefined();
@@ -136,7 +136,7 @@ describe('serverState', () => {
 
   it('should enable declaring useMutationById and useQuery', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -177,7 +177,7 @@ describe('serverState', () => {
           }
         )
       );
-      const q = injectServerState();
+      const q = injectCraft();
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
       expect(q.testQuery.value).toBeDefined();
@@ -195,7 +195,7 @@ describe('serverState', () => {
 
   it('should enable declaring useMutationById and craftQueryById', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -237,7 +237,7 @@ describe('serverState', () => {
           }
         )
       );
-      const q = injectServerState();
+      const q = injectCraft();
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
       expect(q.testQueryById()['3']?.value).toBeDefined();
@@ -260,7 +260,7 @@ describe('serverState', () => {
   });
 
   it('should enable exporting standalone outputs', async () => {
-    const { injectServerState, setPaginationQueryParams } = serverState(
+    const { injectCraft, setPaginationQueryParams } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -282,9 +282,9 @@ describe('serverState', () => {
     expect(setPaginationQueryParams).toBeDefined();
   });
 
-  it('should enable to bind the inputs and the outputs of the store when using injectServerState', async () => {
+  it('should enable to bind the inputs and the outputs of the store when using injectCraft', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -319,7 +319,7 @@ describe('serverState', () => {
 
       const addNumberSource = source<number>();
       const resetSource = source<string>();
-      const store = injectServerState({
+      const store = injectCraft({
         inputs: {
           myParams: signal(10),
         },
@@ -351,7 +351,7 @@ describe('serverState', () => {
   });
   it('should enable to plug a store to another store. Standalone outputs should be transmitted. Inputs that are not bind should be transmitted', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { usingStore1ServerState } = serverState(
+      const { craftStore1 } = craft(
         {
           name: 'store1',
           providedIn: 'root',
@@ -396,7 +396,7 @@ describe('serverState', () => {
         }))
       );
 
-      const { injectServerState, setPaginationQueryParams } = serverState(
+      const { injectCraft, setPaginationQueryParams } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -407,7 +407,7 @@ describe('serverState', () => {
         craftSources({
           reset: source<string>(),
         }),
-        usingStore1ServerState(({ myParams, reset }) => ({
+        craftStore1(({ myParams, reset }) => ({
           // here myParams2 is not required, but required when injecting the hist store
           inputs: {
             myParams1: myParams,
@@ -439,7 +439,7 @@ describe('serverState', () => {
       );
       const addNumberSource = source<number>();
       const resetSource = source<string>();
-      const store = injectServerState({
+      const store = injectCraft({
         inputs: {
           myParams: signal('PassMyParam'),
           // myParams2 must be provided here
@@ -475,7 +475,7 @@ describe('serverState', () => {
   });
 
   it('should enable to plug global store to another. The plugged global store will share an unique instance', async () => {
-    const { usingDataPaginationServerState } = serverState(
+    const { craftDataPagination } = craft(
       {
         name: 'dataPagination',
         providedIn: 'root',
@@ -495,7 +495,7 @@ describe('serverState', () => {
       )
     );
 
-    const { injectHost1ServerState } = serverState(
+    const { injectHost1Craft } = craft(
       {
         name: 'host1',
         providedIn: 'root',
@@ -514,7 +514,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      craftDataPagination(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -524,7 +524,7 @@ describe('serverState', () => {
       }))
     );
 
-    const { injectHost2ServerState } = serverState(
+    const { injectHost2Craft } = craft(
       {
         name: 'host2',
         providedIn: 'root',
@@ -543,7 +543,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      craftDataPagination(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -552,8 +552,8 @@ describe('serverState', () => {
         },
       }))
     );
-    const host1 = injectHost1ServerState();
-    const host2 = injectHost2ServerState();
+    const host1 = injectHost1Craft();
+    const host2 = injectHost2Craft();
 
     host1.addNumber(2);
     expect(host1.numberList()).toEqual([1, 2]);
@@ -561,7 +561,7 @@ describe('serverState', () => {
   });
 
   it('should enable to plug local store to another. The plugged local store will not share an unique instance', async () => {
-    const { usingSharedFeatureServerState } = serverState(
+    const { craftSharedFeature } = craft(
       {
         name: 'sharedFeature',
         providedIn: 'scoped',
@@ -581,7 +581,7 @@ describe('serverState', () => {
       )
     );
 
-    const { injectHost1ServerState } = serverState(
+    const { injectHost1Craft } = craft(
       {
         name: 'host1',
         providedIn: 'root',
@@ -600,7 +600,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingSharedFeatureServerState(({ reset, counter }) => ({
+      craftSharedFeature(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -610,7 +610,7 @@ describe('serverState', () => {
       }))
     );
 
-    const { injectHost2ServerState } = serverState(
+    const { injectHost2Craft } = craft(
       {
         name: 'host2',
         providedIn: 'root',
@@ -629,7 +629,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingSharedFeatureServerState(({ reset, counter }) => ({
+      craftSharedFeature(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -638,15 +638,15 @@ describe('serverState', () => {
         },
       }))
     );
-    const host1 = injectHost1ServerState();
-    const host2 = injectHost2ServerState();
+    const host1 = injectHost1Craft();
+    const host2 = injectHost2Craft();
 
     host1.addNumber();
     expect(host1.numberList()).toEqual([1, 2]);
     expect(host2.numberList()).toEqual([1]);
   });
   it('should enable to plug feature store to another. The plugged feature store will not share an unique instance', async () => {
-    const { usingDataPaginationServerState } = serverState(
+    const { craftDataPagination } = craft(
       {
         name: 'dataPagination',
         providedIn: 'feature',
@@ -666,7 +666,7 @@ describe('serverState', () => {
       )
     );
 
-    const { injectHost1ServerState } = serverState(
+    const { injectHost1Craft } = craft(
       {
         name: 'host1',
         providedIn: 'root',
@@ -685,7 +685,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      craftDataPagination(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -695,7 +695,7 @@ describe('serverState', () => {
       }))
     );
 
-    const { injectHost2ServerState } = serverState(
+    const { injectHost2Craft } = craft(
       {
         name: 'host2',
         providedIn: 'root',
@@ -714,7 +714,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      craftDataPagination(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
@@ -723,8 +723,8 @@ describe('serverState', () => {
         },
       }))
     );
-    const host1 = injectHost1ServerState();
-    const host2 = injectHost2ServerState();
+    const host1 = injectHost1Craft();
+    const host2 = injectHost2Craft();
 
     host1.addNumber(2);
     expect(host1.numberList()).toEqual([1, 2]);
@@ -732,7 +732,7 @@ describe('serverState', () => {
   });
 
   it('should enable to plug global store to another. It is possible to not propagate the non set inputs (because, they can come from another place)', async () => {
-    const { usingDataPaginationServerState } = serverState(
+    const { craftDataPagination } = craft(
       {
         name: 'dataPagination',
         providedIn: 'root',
@@ -755,7 +755,7 @@ describe('serverState', () => {
       )
     );
 
-    const { injectHost1ServerState } = serverState(
+    const { injectHost1Craft } = craft(
       {
         name: 'host1',
         providedIn: 'root',
@@ -774,7 +774,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      craftDataPagination(({ reset, counter }) => ({
         inputs: {
           shouldNotBeExposed: counter,
         },
@@ -784,7 +784,7 @@ describe('serverState', () => {
       }))
     );
 
-    const { injectHost2ServerState } = serverState(
+    const { injectHost2Craft } = craft(
       {
         name: 'host2',
         providedIn: 'root',
@@ -803,7 +803,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      craftDataPagination(({ reset, counter }) => ({
         inputs: {
           shouldNotBeExposed: 'EXTERNALLY_PROVIDED',
         },
@@ -812,9 +812,9 @@ describe('serverState', () => {
         },
       }))
     );
-    const host1 = injectHost1ServerState();
+    const host1 = injectHost1Craft();
     // 👇 no error, because shouldNotBeExposed is not propagated
-    const host2 = injectHost2ServerState();
+    const host2 = injectHost2Craft();
 
     host1.addNumber(2);
     expect(host1.numberList()).toEqual([1, 2]);
@@ -822,10 +822,7 @@ describe('serverState', () => {
   });
 
   it('should enable to plug global store to another. It is possible to not propagate the non set inputs (because, they can come from another place)', async () => {
-    const {
-      usingDataPaginationServerState,
-      _DATAPAGINATION_META_STORE_CONTEXT,
-    } = serverState(
+    const { craftDataPagination, _DATAPAGINATION_META_STORE_CONTEXT } = craft(
       {
         name: 'dataPagination',
         providedIn: 'root',
@@ -853,7 +850,7 @@ describe('serverState', () => {
       name: 'dataPagination';
     }>();
 
-    const { injectHost1ServerState, _HOST1_META_STORE_CONTEXT } = serverState(
+    const { injectHost1Craft, _HOST1_META_STORE_CONTEXT } = craft(
       {
         name: 'host1',
         providedIn: 'root',
@@ -872,7 +869,7 @@ describe('serverState', () => {
           reset: () => 0,
         })
       ),
-      usingDataPaginationServerState(({ reset, counter }) => ({
+      craftDataPagination(({ reset, counter }) => ({
         inputs: {
           shouldNotBeExposed: counter,
         },
@@ -886,14 +883,14 @@ describe('serverState', () => {
       name: 'host1';
     }>();
 
-    const host1 = injectHost1ServerState();
+    const host1 = injectHost1Craft();
 
     host1.addNumber(2);
     expect(host1.numberList()).toEqual([1, 2]);
   });
 });
 
-describe('serverState options', () => {
+describe('craft options', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -903,7 +900,7 @@ describe('serverState options', () => {
 
   it('should provide the store in the root injector when providedIn is "root"', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectUserServerState } = serverState(
+      const { injectUserCraft } = craft(
         {
           name: 'user',
           providedIn: 'root',
@@ -927,7 +924,7 @@ describe('serverState options', () => {
           })
         )
       );
-      const userServerState = injectUserServerState();
+      const userServerState = injectUserCraft();
       // todo fix exposed functions
       await vi.runAllTimersAsync();
       expect(userServerState).toBeDefined();
@@ -954,7 +951,7 @@ describe('serverState options', () => {
 
   it('should provide a shared store  by default', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectUserServerState, UserServerState } = serverState(
+      const { injectUserCraft, UserCraft } = craft(
         {
           name: 'user',
           providedIn: 'root',
@@ -978,8 +975,8 @@ describe('serverState options', () => {
           })
         )
       );
-      const userServerState = injectUserServerState();
-      const sameUserServerState = inject(UserServerState);
+      const userServerState = injectUserCraft();
+      const sameUserServerState = inject(UserCraft);
       await vi.runAllTimersAsync();
       expect(userServerState).toBeDefined();
       expect(userServerState.testQuery.value).toBeDefined();
@@ -1010,10 +1007,10 @@ describe('serverState options', () => {
   });
 });
 
-describe('serverState preserve all context', () => {
+describe('craft preserve all context', () => {
   it('should preserve the context when using serverState', async () => {
     await TestBed.runInInjectionContext(async () => {
-      serverState(
+      craft(
         {
           name: 'test',
           providedIn: 'root',
@@ -1026,27 +1023,7 @@ describe('serverState preserve all context', () => {
           return EmptyContext;
         }
       );
-      serverState(
-        {
-          name: 'test',
-          providedIn: 'root',
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        }
-      );
-      serverState(
+      craft(
         {
           name: 'test',
           providedIn: 'root',
@@ -1064,6 +1041,26 @@ describe('serverState preserve all context', () => {
             providedIn: 'root';
           }>();
           return EmptyContext;
+        }
+      );
+      craft(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
+        },
+        ({ context }, injector, storeConfig) => {
+          expectTypeOf(storeConfig).toEqualTypeOf<{
+            name: 'test';
+            providedIn: 'root';
+          }>();
+          return EmptyContext;
         },
         ({ context }, injector, storeConfig) => {
           expectTypeOf(storeConfig).toEqualTypeOf<{
@@ -1073,7 +1070,7 @@ describe('serverState preserve all context', () => {
           return EmptyContext;
         }
       );
-      serverState(
+      craft(
         {
           name: 'test',
           providedIn: 'root',
@@ -1112,7 +1109,7 @@ describe('serverState preserve all context', () => {
 
   it('should preserve the context when using serverState', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { _TEST_META_STORE_CONTEXT } = serverState(
+      const { _TEST_META_STORE_CONTEXT } = craft(
         {
           name: 'test',
           providedIn: 'root',
@@ -1141,32 +1138,30 @@ describe('serverState preserve all context', () => {
 
   it('should preserve the context when used with `usingServerState`', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const {
-        usingMySharedFeatureServerState,
-        _MYSHAREDFEATURE_META_STORE_CONTEXT,
-      } = serverState(
-        {
-          name: 'mySharedFeature',
-          providedIn: 'feature',
-        },
-        craftQueryParams('pagination', () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
+      const { craftMySharedFeature, _MYSHAREDFEATURE_META_STORE_CONTEXT } =
+        craft(
+          {
+            name: 'mySharedFeature',
+            providedIn: 'feature',
           },
-          pageSize: {
-            defaultValue: 10,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-        }))
-      );
+          craftQueryParams('pagination', () => ({
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              defaultValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+          }))
+        );
       expectTypeOf(_MYSHAREDFEATURE_META_STORE_CONTEXT).toEqualTypeOf<{
         providedIn: 'feature';
         name: 'mySharedFeature';
       }>();
-      const { _TEST_META_STORE_CONTEXT } = serverState(
+      const { _TEST_META_STORE_CONTEXT } = craft(
         {
           name: 'test',
           providedIn: 'root',
@@ -1178,7 +1173,7 @@ describe('serverState preserve all context', () => {
         //   }>();
         //   return {} as EmptyContext;
         // },
-        usingMySharedFeatureServerState(),
+        craftMySharedFeature(),
         ({ context }, injector, storeConfig) => {
           expectTypeOf(storeConfig).toEqualTypeOf<{
             name: 'test';
@@ -1198,7 +1193,7 @@ describe('serverState preserve all context', () => {
 describe('Expose standalone setter all query params function', () => {
   it('should expose setAllXQueryParams in standalone outputs', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectTestServerState, setAllTestQueryParams } = serverState(
+      const { setAllTestQueryParams } = craft(
         {
           name: 'test',
           providedIn: 'root',

@@ -1,4 +1,4 @@
-import { serverState } from './craft';
+import { craft } from './craft';
 import { ApplicationRef, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { craftSources } from './craft-sources';
@@ -16,7 +16,7 @@ describe('craftSources', () => {
   it('1- Should expose a way to use local sources', async () => {
     const appRef = TestBed.inject(ApplicationRef);
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -33,7 +33,7 @@ describe('craftSources', () => {
         )
       );
 
-      const store = injectServerState();
+      const store = injectCraft();
       appRef.tick();
 
       expect(store.test()).toEqual(0);
@@ -47,7 +47,7 @@ describe('craftSources', () => {
 
   it('2- Should expose a way to call setXSource outside injection context', async () => {
     const appRef = TestBed.inject(ApplicationRef);
-    const { injectServerState, setIncrement } = serverState(
+    const { injectCraft, setIncrement } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -67,7 +67,7 @@ describe('craftSources', () => {
     );
 
     await TestBed.runInInjectionContext(async () => {
-      const store = injectServerState({});
+      const store = injectCraft({});
 
       expect(store.test()).toEqual(0);
 

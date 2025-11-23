@@ -1,7 +1,7 @@
 import { Prettify } from '@ngrx/signals';
 import { __InternalSharedMutationConfig, MutationRef } from '../with-mutation';
 import { QueryRef } from '../with-query';
-import { InternalType, MergeObject, MergeObjects } from '../types/util.type';
+import { InternalType, MergeObjects } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
 import {
@@ -54,11 +54,11 @@ export type QueryDictionary = Record<
 
 export type ContextConstraints = {
   props: {};
-  methods: Record<string, Function>; //? (editable in injectServerState/craftServerState)
-  inputs: {}; //? (editable in injectServerState/craftServerState)
+  methods: Record<string, Function>; //? (editable in injectCraft/craftCraft)
+  inputs: {}; //? (editable in injectCraft/craftCraft)
   __injections: {};
   queryParams: {};
-  sources: {}; //? (editable in injectServerState/craftServerState)
+  sources: {}; //? (editable in injectCraft/craftCraft)
   __mutation: {};
   __query: {};
   asyncMethods: {};
@@ -102,31 +102,31 @@ export type ContextInput<Context extends ContextConstraints> = {
 
 /**
  * ! Do not use it to generate the output of utilities like (craftQuery, craftMutation, etc..),
- * ! the context is not correctly inferred (use ServerStateFactoryUtility instead)
+ * ! the context is not correctly inferred (use CraftFactoryUtility instead)
  */
-export type ServerStateFactory<
+export type CraftFactory<
   Context extends ContextConstraints[],
   StoreConfig,
-  ServerStateActionOutputs extends ContextConstraints,
+  CraftActionOutputs extends ContextConstraints,
   StandaloneContextOutputs extends {}
 > = (<HostStoreConfig extends StoreConfigConstraints>( // todo add HostStoreConfig to deps
   contextData: ContextInput<MergeContexts<Context>>,
   injector: Injector,
   storeConfig: StoreConfig // do not use HostStoreConfig
-) => ServerStateActionOutputs) & {
+) => CraftActionOutputs) & {
   standaloneOutputs?: StandaloneContextOutputs;
 };
 
-export type ServerStateFactoryUtility<
+export type CraftFactoryUtility<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints, // todo try to keep this info
-  ServerStateActionOutputs extends ContextConstraints,
+  CraftActionOutputs extends ContextConstraints,
   StandaloneOutputs extends {} = {}
 > = (<HostStoreConfig extends StoreConfigConstraints>(
   contextData: ContextInput<Context>,
   injector: Injector,
   storeConfig: HostStoreConfig
-) => ServerStateActionOutputs) & {
+) => CraftActionOutputs) & {
   standaloneOutputs?: StandaloneOutputs;
 };
 export const EXTERNALLY_PROVIDED = 'EXTERNALLY_PROVIDED' as const;
@@ -150,7 +150,7 @@ type ReplaceStandaloneStoreToken<
   >]: StandaloneOutputs[K];
 };
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
-type ToServerStateOutputs<
+type ToCraftOutputs<
   Context extends ContextConstraints[],
   StandaloneContextOutputs extends StandaloneOutputsConstraints[],
   StoreConfig extends StoreConfigConstraints,
@@ -167,13 +167,9 @@ type ToServerStateOutputs<
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
   HasMethods = keyof MethodsToConnect extends never ? false : true,
-  StandardOutputs = Prettify<
-    MergedContext['props'] &
-      ExcludeCommonKeys<MergedContext['methods'], MethodsToConnect>
-  >,
   MethodsConnected extends MethodsToConnect = MethodsToConnect
 > = {
-  [key in `inject${Capitalize<StoreConfig['name']>}ServerState`]: <
+  [key in `inject${Capitalize<StoreConfig['name']>}Craft`]: <
     Config extends MergeObjects<
       [
         HasInputs extends true
@@ -202,7 +198,7 @@ type ToServerStateOutputs<
     >
   >;
 } & {
-  [key in `craft${Capitalize<StoreConfig['name']>}ServerState`]: <
+  [key in `craft${Capitalize<StoreConfig['name']>}`]: <
     Context extends ContextConstraints,
     Config extends MergeObjects<
       [
@@ -225,7 +221,7 @@ type ToServerStateOutputs<
         Context['sources'] &
         Context['props']
     ) => Config
-  ) => ServerStateFactoryUtility<
+  ) => CraftFactoryUtility<
     Context,
     StoreConfig,
     {
@@ -248,7 +244,7 @@ type ToServerStateOutputs<
     [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
   >;
 } & {
-  [key in `${Capitalize<StoreConfig['name']>}ServerState`]: InjectionToken<
+  [key in `${Capitalize<StoreConfig['name']>}Craft`]: InjectionToken<
     Prettify<
       RemoveIndexSignature<MergedContext['props'] & MergedContext['methods']>
     >
@@ -307,7 +303,7 @@ type MergeTwoContexts<
 
 type StandaloneOutputsConstraints = {};
 // todo make storeconfig to accumulate
-export function serverState<
+export function craft<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
   outputs3 extends ContextConstraints,
@@ -323,7 +319,7 @@ export function serverState<
     providedIn: ProvidedIn;
     name: Name;
   },
-  factory1: ServerStateFactory<
+  factory1: CraftFactory<
     [_EmptyContext],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -332,7 +328,7 @@ export function serverState<
     outputs1,
     standaloneOutputs1
   >,
-  factory2: ServerStateFactory<
+  factory2: CraftFactory<
     [outputs1],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -341,7 +337,7 @@ export function serverState<
     outputs2,
     standaloneOutputs2
   >,
-  factory3: ServerStateFactory<
+  factory3: CraftFactory<
     [outputs1, outputs2],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -350,7 +346,7 @@ export function serverState<
     outputs3,
     standaloneOutputs3
   >,
-  factory4: ServerStateFactory<
+  factory4: CraftFactory<
     [outputs1, outputs2, outputs3],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -359,7 +355,7 @@ export function serverState<
     outputs4,
     standaloneOutputs4
   >
-): ToServerStateOutputs<
+): ToCraftOutputs<
   [outputs1, outputs2, outputs3, outputs4],
   [
     standaloneOutputs1,
@@ -372,7 +368,7 @@ export function serverState<
     name: NoInfer<Name>;
   }
 >;
-export function serverState<
+export function craft<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
   outputs3 extends ContextConstraints,
@@ -386,7 +382,7 @@ export function serverState<
     providedIn: ProvidedIn;
     name: Name;
   },
-  factory1: ServerStateFactory<
+  factory1: CraftFactory<
     [_EmptyContext],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -395,7 +391,7 @@ export function serverState<
     outputs1,
     standaloneOutputs1
   >,
-  factory2: ServerStateFactory<
+  factory2: CraftFactory<
     [outputs1],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -404,7 +400,7 @@ export function serverState<
     outputs2,
     standaloneOutputs2
   >,
-  factory3: ServerStateFactory<
+  factory3: CraftFactory<
     [outputs1, outputs2],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -413,7 +409,7 @@ export function serverState<
     outputs3,
     standaloneOutputs3
   >
-): ToServerStateOutputs<
+): ToCraftOutputs<
   [outputs1, outputs2, outputs3],
   [standaloneOutputs1, standaloneOutputs2, standaloneOutputs3],
   {
@@ -421,7 +417,7 @@ export function serverState<
     name: NoInfer<Name>;
   }
 >;
-export function serverState<
+export function craft<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
   standaloneOutputs1 extends StandaloneOutputsConstraints,
@@ -433,7 +429,7 @@ export function serverState<
     providedIn: ProvidedIn;
     name: Name;
   },
-  factory1: ServerStateFactory<
+  factory1: CraftFactory<
     [_EmptyContext],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -442,7 +438,7 @@ export function serverState<
     outputs1,
     standaloneOutputs1
   >,
-  factory2: ServerStateFactory<
+  factory2: CraftFactory<
     [outputs1],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -451,7 +447,7 @@ export function serverState<
     outputs2,
     standaloneOutputs2
   >
-): ToServerStateOutputs<
+): ToCraftOutputs<
   [outputs1, outputs2],
   [standaloneOutputs1, standaloneOutputs2],
   {
@@ -459,7 +455,7 @@ export function serverState<
     name: NoInfer<Name>;
   }
 >;
-export function serverState<
+export function craft<
   outputs1 extends ContextConstraints,
   standaloneOutputs1 extends StandaloneOutputsConstraints,
   const ProvidedIn extends ProvidedInOption,
@@ -469,7 +465,7 @@ export function serverState<
     providedIn: ProvidedIn;
     name: Name;
   },
-  factory1: ServerStateFactory<
+  factory1: CraftFactory<
     [_EmptyContext],
     {
       providedIn: NoInfer<ProvidedIn>;
@@ -478,7 +474,7 @@ export function serverState<
     outputs1,
     standaloneOutputs1
   >
-): ToServerStateOutputs<
+): ToCraftOutputs<
   [outputs1],
   [standaloneOutputs1],
   {
@@ -486,9 +482,9 @@ export function serverState<
     name: NoInfer<Name>;
   }
 >;
-export function serverState(
+export function craft(
   options: StoreConfigConstraints,
-  ...factoriesList: ServerStateFactory<
+  ...factoriesList: CraftFactory<
     [_EmptyContext],
     {
       providedIn: ProvidedInOption;
@@ -497,7 +493,7 @@ export function serverState(
     ContextConstraints,
     {}
   >[]
-): ToServerStateOutputs<
+): ToCraftOutputs<
   _EmptyContext[],
   EmptyStandaloneContext[],
   {
@@ -531,7 +527,7 @@ export function serverState(
 
   const pluggableInputs = createSignalProxy(signal({}));
   let inputsKeysSet: Set<string> | undefined = undefined;
-  const token = new InjectionToken('ServerStateStore', {
+  const token = new InjectionToken('CraftStore', {
     providedIn,
     factory: () => {
       console.log('optionsName', options?.name);
@@ -554,14 +550,14 @@ export function serverState(
   const capitalizedName = name
     ? name.charAt(0).toUpperCase() + name.slice(1)
     : '';
-  const injectNameServerState = `inject${capitalizedName}ServerState`;
-  const craftNameServerState = `craft${capitalizedName}ServerState`;
+  const injectNameCraft = `inject${capitalizedName}Craft`;
+  const craftNameCraft = `craft${capitalizedName}Craft`;
   return {
-    [injectNameServerState]: (entries?: {
+    [injectNameCraft]: (entries?: {
       inputs?: Record<string, unknown>;
       methods?: Record<string, unknown>;
     }) => {
-      assertInInjectionContext(serverState);
+      assertInInjectionContext(craft);
       const tokenValue = inject(token); // inject will enable to set inputsKeysSet
       const entriesInputs = entries?.inputs;
       if (entriesInputs) {
@@ -602,7 +598,7 @@ export function serverState(
 
       return tokenValue;
     },
-    [craftNameServerState]: (
+    [craftNameCraft]: (
       pluggableConfig?: (context: ContextConstraints) => {
         inputs?: Record<string, unknown>;
         methods?: Record<string, Function>;
@@ -667,9 +663,9 @@ export function serverState(
         );
       };
     },
-    [`${capitalizedName}ServerState`]: token,
+    [`${capitalizedName}Craft`]: token,
     ...extractedStandaloneOutputs,
-  } as ToServerStateOutputs<
+  } as ToCraftOutputs<
     _EmptyContext[],
     EmptyStandaloneContext[],
     {
@@ -685,7 +681,7 @@ function mergeContextAndProps({
   injector,
   storeConfig,
 }: {
-  factoriesList: ServerStateFactory<
+  factoriesList: CraftFactory<
     [ContextConstraints],
     StoreConfigConstraints,
     any,
@@ -698,7 +694,7 @@ function mergeContextAndProps({
   return factoriesList.reduce(
     (acc, factory) => {
       const result = (
-        factory as ServerStateFactory<
+        factory as CraftFactory<
           [ContextConstraints],
           StoreConfigConstraints,
           ContextConstraints,

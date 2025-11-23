@@ -4,7 +4,7 @@ import {
   withProps,
   withState,
 } from '@ngrx/signals';
-import { ServerStateStore } from './server-state-store';
+import { craftStore } from './server-state-store';
 import { withMutation } from './with-mutation';
 import { withQuery } from './with-query';
 import { TestBed } from '@angular/core/testing';
@@ -58,7 +58,7 @@ describe('SignalServerState', () => {
       withState({
         selectedId: '1',
       }),
-      withUserServerState()
+      withUserCraft()
     );
   });
 
@@ -139,7 +139,7 @@ describe('SignalServerState', () => {
       withState({
         selectedId: '1',
       }),
-      withUserServerState()
+      withUserCraft()
     );
 
     TestBed.configureTestingModule({
@@ -198,7 +198,7 @@ describe('SignalServerState', () => {
       withState({
         selectedId: '1',
       }),
-      withUserServerState()
+      withUserCraft()
     );
 
     TestBed.configureTestingModule({
@@ -248,7 +248,7 @@ describe('SignalServerState', () => {
 
     TestBed.runInInjectionContext(async () => {
       const selectedId = signal('1');
-      const userServerStateStore = injectUserServerState({
+      const userServerStateStore = injectUserCraft({
         selectedId,
       });
       await vi.runAllTimersAsync();

@@ -43,7 +43,7 @@ function cancellableTimeout(ms: number) {
 
 // suite: craftComputed/rename/inject/craftLocalGlobal
 
-const { injectGranularDeletionWithDelayServerState } = serverState(
+const { injectGranularDeletionWithDelayServerState } = craft(
   craftInject(() => ({
     ApiService,
   })),
@@ -193,5 +193,5 @@ const { injectGranularDeletionWithDelayServerState } = serverState(
   `,
 })
 export default class GranularDeletionWithDelayComponent {
-  protected readonly store = injectGranularDeletionWithDelayServerState();
+  protected readonly store = injectGranularDeletionWithDelayCraft();
 }

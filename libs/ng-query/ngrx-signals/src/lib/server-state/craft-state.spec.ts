@@ -1,6 +1,6 @@
 import { Signal, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { craftSources } from './craft-sources';
 import { source } from './source';
 import { craftState } from './craft-state';
@@ -16,7 +16,7 @@ describe('craftState', () => {
   it('should enable to defined a state that react on sources and inputs and other states', async () => {
     await TestBed.runInInjectionContext(async () => {
       const globalReset = source<{}>();
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -46,7 +46,7 @@ describe('craftState', () => {
           }
         )
       );
-      const store = injectServerState();
+      const store = injectCraft();
       await vi.runAllTimersAsync();
       store.addNumber(2);
 

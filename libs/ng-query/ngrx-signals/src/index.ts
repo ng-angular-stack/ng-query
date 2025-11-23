@@ -34,7 +34,7 @@ export type {
 } from './lib/resource-by-id';
 export { globalQueries } from './lib/global-query/global-queries';
 export * from './lib/persister/persister.type';
-export { serverState } from './lib/server-state/craft';
+export { craft } from './lib/server-state/craft';
 export { craftInputs } from './lib/server-state/craft-inputs';
 export { craftMutation } from './lib/server-state/craft-mutation';
 export { craftMutationById } from './lib/server-state/craft-mutation-by-id';

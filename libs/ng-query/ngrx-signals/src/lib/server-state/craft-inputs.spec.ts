@@ -1,5 +1,5 @@
 import { craftQuery } from './craft-query';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { query } from '../query';
 import { craftInputs } from './craft-inputs';
 import { signal } from '@angular/core';
@@ -14,7 +14,7 @@ describe('craftInputs', () => {
   });
   it('1- Should expose a way to set serverState inputs', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -38,7 +38,7 @@ describe('craftInputs', () => {
         })
       );
       const myParams = signal('1');
-      const store = injectServerState({
+      const store = injectCraft({
         inputs: {
           myParams,
         },
@@ -55,7 +55,7 @@ describe('craftInputs', () => {
   });
   it('2- It should not require inputs if no inputs are requested', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectTestServerState } = serverState(
+      const { injectTestCraft } = craft(
         {
           name: 'test',
           providedIn: 'root',
@@ -75,7 +75,7 @@ describe('craftInputs', () => {
         })
       );
       const myParams = signal('1');
-      const store = injectTestServerState();
+      const store = injectTestCraft();
 
       expect(store.userQuery).toBeDefined();
       await vi.runAllTimersAsync();

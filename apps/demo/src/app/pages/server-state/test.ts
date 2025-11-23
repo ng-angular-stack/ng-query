@@ -9,7 +9,7 @@ import {
   craftState,
 } from '@ng-query/ngrx-signals';
 
-const { craftDataPaginationServerState } = serverState(
+const { craftDataPaginationServerState } = craft(
   craftInputs({
     defaultNumber: undefined as number | undefined,
   }),
@@ -38,7 +38,7 @@ const { craftDataPaginationServerState } = serverState(
   }
 );
 
-const { injectHost1ServerState } = serverState(
+const { injectHost1ServerState } = craft(
   craftSources({
     increment: source<{}>(),
     decrement: source<{}>(),
@@ -53,7 +53,7 @@ const { injectHost1ServerState } = serverState(
       reset: () => 0,
     })
   ),
-  craftDataPaginationServerState(({ reset, counter }) => ({
+  craftDataPaginationCraft(({ reset, counter }) => ({
     inputs: {
       defaultNumber: counter,
     },
@@ -66,7 +66,7 @@ const { injectHost1ServerState } = serverState(
   }
 );
 
-const { injectHost2ServerState } = serverState(
+const { injectHost2ServerState } = craft(
   craftSources({
     increment: source<{}>(),
     decrement: source<{}>(),
@@ -81,7 +81,7 @@ const { injectHost2ServerState } = serverState(
       reset: () => 0,
     })
   ),
-  craftDataPaginationServerState(({ reset, counter }) => ({
+  craftDataPaginationCraft(({ reset, counter }) => ({
     inputs: {
       defaultNumber: counter,
     },
@@ -96,7 +96,7 @@ const { injectHost2ServerState } = serverState(
 
 // const mySource = source<{ test: string }>();
 
-// const { injectAsyncMethodsFeatureServerState } = serverState(
+// const { injectAsyncMethodsFeatureServerState } = craft(
 //   craftAsyncMethods(() => ({
 //     // should enable to provide multiples status
 //     // should provide async method by id
@@ -134,7 +134,7 @@ const { injectHost2ServerState } = serverState(
 //   timeToWait: number;
 //   searchChange: string;
 // }>();
-// const { injectTest2ServerState } = serverState(
+// const { injectTest2ServerState } = craft(
 //   craftSources({
 //     myLocalSource: source<{
 //       timeToWait: number;
@@ -167,7 +167,7 @@ const { injectHost2ServerState } = serverState(
 //     name: 'test2',
 //   }
 // );
-// const { craftBasicFeature } = serverState(
+// const { craftBasicFeature } = craft(
 //   craftSources({
 //     reset: source<{}>(),
 //   }),
@@ -207,7 +207,7 @@ const { injectHost2ServerState } = serverState(
 //   }
 // );
 
-// const {injectStore, setMyReset} = serverState(
+// const {injectStore, setMyReset} = craft(
 //   craftSources({
 //     myReset: source<{}>(),
 //   }),
@@ -371,12 +371,12 @@ const { injectHost2ServerState } = serverState(
   ],
 })
 export default class TestComponent {
-  store = injectHost1ServerState();
-  store2 = injectHost2ServerState();
+  store = injectHost1Craft();
+  store2 = injectHost2Craft();
 
-  // storeAsyncMethods = injectAsyncMethodsFeatureServerState();
+  // storeAsyncMethods = injectAsyncMethodsFeatureCraft();
 
-  // store2 = injectTest2ServerState();
+  // store2 = injectTest2Craft();
 
   // myGlobalSource = myGlobalSource;
 }

@@ -1,7 +1,7 @@
 import { InjectionToken, Type } from '@angular/core';
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 
@@ -32,7 +32,7 @@ type CraftInputsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Injections extends {}
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftInjectionsOutputs<Injections>

@@ -1,7 +1,7 @@
 import { InternalType, MergeObject } from '../types/util.type';
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { ResourceRef } from '@angular/core';
@@ -59,7 +59,7 @@ type CraftMutationOutputs<
   InsertionsOutputs,
   ResourceParams,
   ResourceArgsParams
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftMutationOutputs<

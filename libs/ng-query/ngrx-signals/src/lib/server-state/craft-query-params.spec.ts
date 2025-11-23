@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Component, inject } from '@angular/core';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { craftQueryParams } from './craft-query-params';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -24,7 +24,7 @@ describe('craftQueryParams', () => {
   });
 
   it('should create query params configuration', () => {
-    const { injectServerState } = serverState(
+    const { injectCraft } = craft(
       {
         providedIn: 'root',
         name: '',
@@ -44,7 +44,7 @@ describe('craftQueryParams', () => {
     );
 
     TestBed.runInInjectionContext(() => {
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.page()).toBe(1);
       expect(store.pageSize()).toBe(10);
@@ -70,7 +70,7 @@ describe('craftQueryParams', () => {
   });
 
   it('should use default values when query params are missing', () => {
-    const { injectServerState } = serverState(
+    const { injectCraft } = craft(
       {
         providedIn: 'root',
         name: '',
@@ -90,7 +90,7 @@ describe('craftQueryParams', () => {
     );
 
     TestBed.runInInjectionContext(() => {
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.page()).toBe(1);
       expect(store.active()).toBe(false);
@@ -98,7 +98,7 @@ describe('craftQueryParams', () => {
   });
 
   it('should accept custom methods configuration', () => {
-    const { injectServerState } = serverState(
+    const { injectCraft } = craft(
       {
         providedIn: 'root',
         name: '',
@@ -128,7 +128,7 @@ describe('craftQueryParams', () => {
     );
 
     TestBed.runInInjectionContext(() => {
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(typeof store['customMethod']).toBe('function');
       expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
@@ -147,7 +147,7 @@ describe('craftQueryParams', () => {
   });
 
   it('should accept custom methods that rely on source', () => {
-    const { injectServerState } = serverState(
+    const { injectCraft } = craft(
       {
         providedIn: 'root',
         name: '',
@@ -180,7 +180,7 @@ describe('craftQueryParams', () => {
       )
     );
     TestBed.runInInjectionContext(() => {
-      const store = injectServerState();
+      const store = injectCraft();
 
       expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
       expect(store.pagination().page).toBe(1);
@@ -195,7 +195,7 @@ describe('craftQueryParams', () => {
   });
 });
 
-const { injectServerState } = serverState(
+const { injectCraft } = craft(
   {
     providedIn: 'root',
     name: '',
@@ -228,7 +228,7 @@ describe('craftQueryParams integration', () => {
     );
 
     TestBed.runInInjectionContext(() => {
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.pagination()).toEqual({
         page: 2,
@@ -244,7 +244,7 @@ describe('craftQueryParams integration', () => {
     await harness.navigateByUrl('/test', TestComponent);
 
     await TestBed.runInInjectionContext(async () => {
-      const store = injectServerState();
+      const store = injectCraft();
       const location = inject(Location);
 
       expect(store.pagination()).toEqual({
@@ -271,7 +271,7 @@ describe('craftQueryParams standalone methods', () => {
   });
   it('should navigate to the target URL with specified query params', async () => {
     const harness = await RouterTestingHarness.create('');
-    const { injectServerState, setPaginationQueryParams } = serverState(
+    const { injectCraft, setPaginationQueryParams } = craft(
       {
         providedIn: 'root',
         name: '',
@@ -302,7 +302,7 @@ describe('craftQueryParams standalone methods', () => {
     });
     await TestBed.runInInjectionContext(() => {
       const loation = inject(Location);
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.pagination()).toEqual({
         page: 4,
@@ -312,7 +312,7 @@ describe('craftQueryParams standalone methods', () => {
   });
   it('should navigateByUrl to the target URL with specified query params', async () => {
     const harness = await RouterTestingHarness.create();
-    const { injectServerState, setPaginationQueryParams } = serverState(
+    const { injectCraft, setPaginationQueryParams } = craft(
       {
         providedIn: 'root',
         name: '',
@@ -349,7 +349,7 @@ describe('craftQueryParams standalone methods', () => {
       );
     });
     await TestBed.runInInjectionContext(() => {
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.pagination()).toEqual({
         page: 4,

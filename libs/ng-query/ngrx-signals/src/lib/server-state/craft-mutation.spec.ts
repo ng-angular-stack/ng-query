@@ -3,7 +3,7 @@ import { inject, InjectionToken, ResourceRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { mutation } from '../mutation';
 import { craftMutation } from './craft-mutation';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { craftInputs } from './craft-inputs';
 
 type User = {
@@ -17,7 +17,7 @@ type User = {
 
 describe('craftMutation', () => {
   it('#1 The serverState should expose a mutation resource and mutation method', () => {
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -36,7 +36,7 @@ describe('craftMutation', () => {
       )
     );
     TestBed.runInInjectionContext(() => {
-      const store = inject(ServerState);
+      const store = inject(Craft);
       expect(store.updateUserMutation).toBeDefined();
       expect(store.updateUserMutation.hasValue()).toBe(false);
       expect(store.mutateUpdateUser).toBeDefined();
@@ -49,7 +49,7 @@ describe('craftMutation', () => {
 type InferServerStateResult<T> = T extends InjectionToken<infer U> ? U : never;
 
 it('Should expose a method', () => {
-  const { ServerState } = serverState(
+  const { Craft } = craft(
     {
       name: '',
       providedIn: 'root',
@@ -68,7 +68,7 @@ it('Should expose a method', () => {
     )
   );
 
-  type ResultTypeMutation = InferServerStateResult<typeof ServerState>;
+  type ResultTypeMutation = InferServerStateResult<typeof Craft>;
   type MutationProps = ResultTypeMutation;
 
   type ExpectPropsToHaveMutationNameWithResourceRef = Expect<
@@ -98,7 +98,7 @@ it('Should expose a method', () => {
 });
 
 it('Should expose the mutation resource and mutation method', () => {
-  const { ServerState } = serverState(
+  const { Craft } = craft(
     {
       name: '',
       providedIn: 'root',
@@ -142,7 +142,7 @@ it('Should expose the mutation resource and mutation method', () => {
     )
   );
 
-  type MutationStoreOutputType = InferServerStateResult<typeof ServerState>;
+  type MutationStoreOutputType = InferServerStateResult<typeof Craft>;
 
   type ExpectMutationStoreOutputTypeToHaveMutationResource = Expect<
     Equal<
@@ -167,7 +167,7 @@ it('Should expose the mutation resource and mutation method', () => {
 });
 
 it('it should expose the mutation params source, that will be reused by query', async () => {
-  const { ServerState } = serverState(
+  const { Craft } = craft(
     {
       name: '',
       providedIn: 'root',
@@ -183,7 +183,7 @@ it('it should expose the mutation params source, that will be reused by query', 
     )
   );
 
-  type ReturnInternalStoreType = InferServerStateResult<typeof ServerState>;
+  type ReturnInternalStoreType = InferServerStateResult<typeof Craft>;
   type ExpectMutationParamsSourceToBeDefined = Expect<
     Equal<ReturnInternalStoreType['updateUserMutation'], ResourceRef<User>>
   >;

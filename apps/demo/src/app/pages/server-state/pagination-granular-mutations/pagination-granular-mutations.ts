@@ -18,7 +18,7 @@ export type User = {
   name: string;
 };
 
-const { injectUserListServerState } = serverState(
+const { injectUserListServerState } = craft(
   craftInject(() => ({
     ApiService,
   })),
@@ -85,7 +85,7 @@ const { injectUserListServerState } = serverState(
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ListWithPagination {
-  protected readonly store = injectUserListServerState();
+  protected readonly store = injectUserListCraft();
 
   updatePageSize(event: Event) {
     const value = Number((event.target as HTMLSelectElement).value);

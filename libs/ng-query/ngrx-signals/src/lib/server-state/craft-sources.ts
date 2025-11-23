@@ -1,6 +1,6 @@
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { Source } from './source';
@@ -33,7 +33,7 @@ type CraftSourcesOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Inputs extends {}
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftSourcesOutputs<Inputs>,
@@ -45,15 +45,15 @@ type CraftSourcesOutputs<
  * Trigger the source:
  * - store.setMySource(payload)
  * - outside of injection context:
- *    const { store, setMySource } = serverState();
+ *    const { store, setMySource } = craft();
  *    setMySource(payload); // can be called outside of an injection context
  *
  * The sources can also be bind to external sources when the store is injected by using:
- *  - private readonly store = injectServerState({mySource: this.componentSource}), or usingServerState({mySource: this.componentSource}),
+ *  - private readonly store = injectCraft({mySource: this.componentSource}), or usingCraft({mySource: this.componentSource}),
  *
  * @example
  * ```ts
- * const { injectServerState, setIncrement } = serverState(
+ * const { injectCraft, setIncrement } = craft(
  *   craftSources({
  *     increment: source<{}>(),
  *   }),

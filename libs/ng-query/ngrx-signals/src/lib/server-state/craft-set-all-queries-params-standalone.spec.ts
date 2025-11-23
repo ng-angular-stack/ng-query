@@ -1,41 +1,39 @@
 import { TestBed } from '@angular/core/testing';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { craftQueryParams } from './craft-query-params';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
 
 describe('craftSetAllQueriesParamsStandalone', () => {
   it('should create query params configuration', () => {
-    // todo testName not found du to HostStoreConfig
-    const { injectTestStoreServerState, setAllTestStoreQueryParams } =
-      serverState(
-        {
-          providedIn: 'root',
-          name: 'TestStore',
+    const { injectTestStoreCraft, setAllTestStoreQueryParams } = craft(
+      {
+        providedIn: 'root',
+        name: 'TestStore',
+      },
+      craftQueryParams('pagination', () => ({
+        page: {
+          defaultValue: 1,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
         },
-        craftQueryParams('pagination', () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-          pageSize: {
-            defaultValue: 10,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-        })),
-        craftQueryParams('filter', () => ({
-          active: {
-            defaultValue: false,
-            parse: (value: string) => value === 'true',
-            serialize: (value: unknown) => String(value),
-          },
-        })),
-        craftSetAllQueriesParamsStandalone()
-      );
+        pageSize: {
+          defaultValue: 10,
+          parse: (value: string) => parseInt(value, 10),
+          serialize: (value: unknown) => String(value),
+        },
+      })),
+      craftQueryParams('filter', () => ({
+        active: {
+          defaultValue: false,
+          parse: (value: string) => value === 'true',
+          serialize: (value: unknown) => String(value),
+        },
+      })),
+      craftSetAllQueriesParamsStandalone()
+    );
 
     TestBed.runInInjectionContext(() => {
-      const store = injectTestStoreServerState();
+      const store = injectTestStoreCraft();
 
       expect(store.page()).toBe(1);
       expect(store.pageSize()).toBe(10);

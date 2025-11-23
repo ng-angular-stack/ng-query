@@ -3,7 +3,7 @@ import { delay, lastValueFrom, of } from 'rxjs';
 import { Expect, Equal } from 'test-type';
 import { inject, InjectionToken } from '@angular/core';
 import { vi } from 'vitest';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { craftMutationById } from './craft-mutation-by-id';
 import { mutationById } from '../mutation-by-id';
 import { ResourceByIdRef } from '../resource-by-id';
@@ -30,7 +30,7 @@ describe('craftMutationById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -47,7 +47,7 @@ describe('craftMutationById', () => {
     );
 
     await TestBed.runInInjectionContext(async () => {
-      const store = TestBed.inject(ServerState);
+      const store = TestBed.inject(Craft);
 
       expect(store.userMutationById).toBeDefined();
 
@@ -69,7 +69,7 @@ describe('craftMutationById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState, injectServerState } = serverState(
+    const { Craft, injectCraft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -85,13 +85,13 @@ describe('craftMutationById', () => {
       )
     );
     await TestBed.runInInjectionContext(async () => {
-      const c = injectServerState();
+      const c = injectCraft();
       c.mutateUserById({
         id: '5',
         name: 'Updated User',
         email: 'updated.doe@example.com',
       });
-      const store = inject(ServerState);
+      const store = inject(Craft);
 
       await vi.runAllTimersAsync();
 
@@ -133,7 +133,7 @@ describe('craftMutationById', () => {
       name: 'John Doe',
       email: 'test@a.com',
     };
-    const { ServerState } = serverState(
+    const { Craft } = craft(
       {
         name: '',
         providedIn: 'root',
@@ -149,7 +149,7 @@ describe('craftMutationById', () => {
       )
     );
 
-    type StoreFeatureQueryType = InferServerStateResult<typeof ServerState>;
+    type StoreFeatureQueryType = InferServerStateResult<typeof Craft>;
 
     type ExpectStoreFeatureQueryTypeToBeFullyRetrieved = Expect<
       Equal<

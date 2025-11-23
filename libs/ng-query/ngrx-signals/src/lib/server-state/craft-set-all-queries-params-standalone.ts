@@ -2,7 +2,7 @@ import { WritableSignal } from '@angular/core';
 import {
   ContextConstraints,
   EmptyContext,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
@@ -29,7 +29,7 @@ type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
 type CraftSetAllQueriesParamsStandaloneOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   EmptyContext,

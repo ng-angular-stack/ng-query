@@ -1,5 +1,5 @@
 import { craftQuery } from './craft-query';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { query } from '../query';
 import { Injectable, InjectionToken, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -23,7 +23,7 @@ describe('craftInject', () => {
       myParams = signal('1');
     }
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -44,7 +44,7 @@ describe('craftInject', () => {
           });
         })
       );
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.userQuery).toBeDefined();
       await vi.runAllTimersAsync();
@@ -67,7 +67,7 @@ describe('craftInject', () => {
       }
     }
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -91,7 +91,7 @@ describe('craftInject', () => {
           });
         })
       );
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.userQuery).toBeDefined();
       await vi.runAllTimersAsync();
@@ -110,7 +110,7 @@ describe('craftInject', () => {
     });
 
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -132,7 +132,7 @@ describe('craftInject', () => {
           });
         })
       );
-      const store = injectServerState();
+      const store = injectCraft();
 
       expect(store.userQuery).toBeDefined();
       await vi.runAllTimersAsync();

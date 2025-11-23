@@ -1,7 +1,7 @@
 import { Signal } from '@angular/core';
 import {
   ContextConstraints,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 
@@ -21,7 +21,7 @@ type CraftComputedStatesOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   Computed extends {}
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftComputedOutputs<Computed>

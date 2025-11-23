@@ -8,7 +8,7 @@ import { InternalType, MergeObject } from '../types/util.type';
 import {
   ContextConstraints,
   MutationDictionary,
-  ServerStateFactoryUtility,
+  CraftFactoryUtility,
   StoreConfigConstraints,
 } from './craft';
 import { QueryRef } from '../with-query';
@@ -120,7 +120,7 @@ type CraftQueryOutputs<
   ResourceParams,
   ResourceArgsParams,
   InsertionsOutputs
-> = ServerStateFactoryUtility<
+> = CraftFactoryUtility<
   Context,
   StoreConfig,
   SpecificCraftQueryOutputs<

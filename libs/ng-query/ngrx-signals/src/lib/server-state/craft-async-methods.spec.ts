@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { serverState } from './craft';
+import { craft } from './craft';
 import { craftAsyncMethods } from './craft-async-methods';
 import { asyncMethod } from './async-method';
 import { source } from './source';
@@ -15,7 +15,7 @@ describe('craftAsyncMethods', () => {
   });
   it('should enable to define async method', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -41,7 +41,7 @@ describe('craftAsyncMethods', () => {
           }),
         }))
       );
-      const store = injectServerState();
+      const store = injectCraft();
       expect(store.searchChange.status()).toBe('idle');
       store.setSearchChange({
         searchChange: 'test',
@@ -61,7 +61,7 @@ describe('craftAsyncMethods', () => {
         timeToWait: number;
         searchChange: string;
       }>();
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -89,7 +89,7 @@ describe('craftAsyncMethods', () => {
           }),
         }))
       );
-      const store = injectServerState();
+      const store = injectCraft();
       expect(store.searchGlobalChange.status()).toBe('idle');
       myGlobalSource.set({
         searchChange: 'global',
@@ -128,7 +128,7 @@ describe('usingAsyncMethods with identifier', () => {
   });
   it('should enable to define async method', async () => {
     await TestBed.runInInjectionContext(async () => {
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -155,7 +155,7 @@ describe('usingAsyncMethods with identifier', () => {
           }),
         }))
       );
-      const store = injectServerState();
+      const store = injectCraft();
       store.setSearchChange({
         searchChange: 'test',
         timeToWait: 1000,
@@ -177,7 +177,7 @@ describe('usingAsyncMethods with identifier', () => {
         timeToWait: number;
         searchChange: string;
       }>();
-      const { injectServerState } = serverState(
+      const { injectCraft } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -210,7 +210,7 @@ describe('usingAsyncMethods with identifier', () => {
           // }),
         }))
       );
-      const store = injectServerState();
+      const store = injectCraft();
       await vi.runAllTimersAsync();
 
       expect(store.searchGlobalChange.select('global')?.status()).toBe(
