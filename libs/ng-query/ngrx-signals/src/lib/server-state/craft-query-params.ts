@@ -9,7 +9,11 @@ import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import {
   ContextConstraints,
   ContextInput,
+  craftFactoryEntries,
+  CraftFactoryEntries,
   CraftFactoryUtility,
+  partialContext,
+  PartialContext,
   StoreConfigConstraints,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
@@ -79,10 +83,7 @@ type CraftQueryParamsConfig<
   options?: QueryParamNavigationOptions;
   methods?: (state: {
     queryParams: Signal<ToState<QueryParamsConfig>>;
-    context: Context['inputs'] &
-      Context['__injections'] &
-      Context['sources'] &
-      Context['props'];
+    context: CraftFactoryEntries<Context>;
   }) => Methods;
 };
 
@@ -90,24 +91,18 @@ type SpecificCraftQueryParamsOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>,
   CustomMethods
-> = {
+> = PartialContext<{
   props: QueryParamProps<QueryParams> & {
     [K in QueryParamsName]: Signal<Prettify<ToState<QueryParams>>>;
   };
   methods: QueryParamMethods<QueryParamsName, QueryParams, CustomMethods>;
-  inputs: {};
   queryParams: {
     [K in QueryParamsName]: {
       config: QueryParams;
       state: WritableSignal<ToState<QueryParams>>;
     };
   };
-  sources: {};
-  __injections: {};
-  __query: {};
-  __mutation: {};
-  asyncMethods: {};
-};
+}>;
 
 type SpecificCraftQueryStandaloneOutputs<
   QueryParamsName extends string,
@@ -347,12 +342,7 @@ export function craftQueryParams<
     };
     const methodsData = config?.methods?.({
       queryParams: queryParamsState.asReadonly(),
-      context: {
-        ...contextData.context.inputs,
-        ...contextData.context.__injections,
-        ...contextData.context.props,
-        ...contextData.context.sources,
-      },
+      context: craftFactoryEntries(contextData),
     });
 
     const finalMethods = createMethodHandlers(methodsData, queryParamsState, {
@@ -383,25 +373,18 @@ export function craftQueryParams<
     } as QueryParamMethods<QueryParamsName, QueryParamsConfig, Methods>;
     console.log('methods', methods);
 
-    return {
+    return partialContext({
       props: {
         ...props,
         [`${queryParamsName}`]: queryParamsState,
       },
-      inputs: {},
-      __injections: {},
-      __query: {},
-      __mutation: {},
-      methods,
-      sources: {},
-      asyncMethods: {},
-      queryParams: {
+      _queryParams: {
         [`${queryParamsName}`]: {
           config: queryParamsConfig,
           state: queryParamsState,
         },
       },
-    } as SpecificCraftQueryParamsOutputs<
+    }) as SpecificCraftQueryParamsOutputs<
       QueryParamsName,
       QueryParamsConfig,
       Methods

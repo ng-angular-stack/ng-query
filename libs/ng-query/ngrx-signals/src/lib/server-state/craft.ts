@@ -101,6 +101,63 @@ export type EmptyContext = typeof EmptyContext;
 
 type EmptyStandaloneContext = {};
 
+export function partialContext(
+  context: Partial<ContextConstraints>
+): ContextConstraints {
+  return {
+    props: context.props ?? {},
+    methods: context.methods ?? {},
+    _inputs: context._inputs ?? {},
+    _injections: context._injections ?? {},
+    _queryParams: context._queryParams ?? {},
+    _sources: context._sources ?? {},
+    _asyncMethods: context._asyncMethods ?? {},
+    _mutation: context._mutation ?? {},
+    _query: context._query ?? {},
+    _cloud: context._cloud ?? {},
+    _dependencies: context._dependencies ?? {},
+  };
+}
+
+export type PartialContext<Context extends Partial<ContextConstraints>> = {
+  props: [unknown] extends Context['props'] ? {} : Context['props'];
+  methods: [unknown] extends Context['methods'] ? {} : Context['methods'];
+  _inputs: [unknown] extends Context['_inputs'] ? {} : Context['_inputs'];
+  _injections: [unknown] extends Context['_injections']
+    ? {}
+    : Context['_injections'];
+  _queryParams: [unknown] extends Context['_queryParams']
+    ? {}
+    : Context['_queryParams'];
+  _sources: [unknown] extends Context['_sources'] ? {} : Context['_sources'];
+  _asyncMethods: [unknown] extends Context['_asyncMethods']
+    ? {}
+    : Context['_asyncMethods'];
+  _mutation: [unknown] extends Context['_mutation'] ? {} : Context['_mutation'];
+  _query: [unknown] extends Context['_query'] ? {} : Context['_query'];
+  _cloud: [unknown] extends Context['_cloud'] ? {} : Context['_cloud'];
+  _dependencies: [unknown] extends Context['_dependencies']
+    ? {}
+    : Context['_dependencies'];
+};
+
+export type CraftFactoryEntries<Context extends ContextConstraints> =
+  Context['_inputs'] &
+    Context['_injections'] &
+    Context['_sources'] &
+    Context['props'] &
+    Context['_asyncMethods'];
+
+export const craftFactoryEntries = (contextData: {
+  context: ContextConstraints;
+}) => ({
+  ...contextData.context._inputs,
+  ...contextData.context._injections,
+  ...contextData.context._sources,
+  ...contextData.context.props,
+  ...contextData.context._asyncMethods,
+});
+
 export type ContextInput<Context extends ContextConstraints> = {
   context: Context;
 };
@@ -220,12 +277,7 @@ type ToCraftOutputs<
       ]
     >
   >( // todo user should not be able to add not expected inputs/methods
-    pluggableConfig?: (
-      configFactory: Context['_inputs'] &
-        Context['_injections'] &
-        Context['_sources'] &
-        Context['props']
-    ) => Config
+    pluggableConfig?: (configFactory: CraftFactoryEntries<Context>) => Config
   ) => CraftFactoryUtility<
     Context,
     StoreConfig,

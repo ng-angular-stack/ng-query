@@ -1,7 +1,11 @@
 import { InjectionToken, Type } from '@angular/core';
 import {
   ContextConstraints,
+  craftFactoryEntries,
+  CraftFactoryEntries,
   CraftFactoryUtility,
+  partialContext,
+  PartialContext,
   StoreConfigConstraints,
 } from './craft';
 
@@ -11,22 +15,13 @@ type InferProvidedType<T> = T extends ProviderTokenWithoutAbstract<infer U>
   ? U
   : never;
 
-type SpecificCraftInjectionsOutputs<Injections extends {}> = {
-  props: {};
-  methods: {};
-  inputs: {};
-  queryParams: {};
-  sources: {};
-
-  __injections: {
+type SpecificCraftInjectionsOutputs<Injections extends {}> = PartialContext<{
+  _injections: {
     [key in keyof Injections as Uncapitalize<key & string>]: InferProvidedType<
       Injections[key]
     >;
   };
-  __query: {};
-  __mutation: {};
-  asyncMethods: {};
-};
+}>;
 
 type CraftInputsOutputs<
   Context extends ContextConstraints,
@@ -45,17 +40,11 @@ export function craftInject<
   StoreConfig extends StoreConfigConstraints,
   Injections extends {}
 >(
-  injections: (
-    entries: Context['inputs'] & Context['__injections'] & Context['sources']
-  ) => Injections
+  injections: (entries: CraftFactoryEntries<Context>) => Injections
 ): CraftInputsOutputs<Context, StoreConfig, Injections> {
   return (contextData, injector) => {
     const injectedInjections = Object.entries(
-      injections({
-        ...contextData.context.inputs,
-        ...contextData.context.__injections,
-        ...contextData.context.sources,
-      })
+      injections(craftFactoryEntries(contextData))
     ).reduce(
       (acc, [key, injection]) => ({
         ...acc,
@@ -63,17 +52,9 @@ export function craftInject<
       }),
       {}
     );
-    return {
-      props: {},
-      inputs: {},
-      queryParams: {},
-      sources: {},
-      __injections: injectedInjections,
-      __query: {},
-      __mutation: {},
-      methods: {},
-      asyncMethods: {},
-    } as SpecificCraftInjectionsOutputs<Injections>;
+    return partialContext({
+      _injections: injectedInjections,
+    }) as SpecificCraftInjectionsOutputs<Injections>;
   };
 }
 

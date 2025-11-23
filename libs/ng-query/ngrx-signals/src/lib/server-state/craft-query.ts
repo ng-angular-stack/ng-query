@@ -10,6 +10,10 @@ import {
   MutationDictionary,
   CraftFactoryUtility,
   StoreConfigConstraints,
+  PartialContext,
+  CraftFactoryEntries,
+  craftFactoryEntries,
+  partialContext,
 } from './craft';
 import { QueryRef } from '../with-query';
 import {
@@ -30,7 +34,7 @@ type QueryOptions<
   ResourceArgsParams,
   OtherProperties
 > = {
-  on?: Context['__mutation'] extends infer Mutations
+  on?: Context['_mutation'] extends infer Mutations
     ? {
         [key in keyof Mutations as `${key &
           string}${'__types' extends keyof Mutations[key]
@@ -81,19 +85,13 @@ type SpecificCraftQueryOutputs<
   ResourceParams,
   ResourceArgsParams,
   InsertionsOutputs
-> = {
+> = PartialContext<{
   props: {
     [key in `${ResourceName & string}Query`]: MergeObject<
       ResourceRef<ResourceState>,
       InsertionsOutputs
     >;
   };
-  methods: {};
-  inputs: {};
-  __injections: {};
-  queryParams: {};
-  sources: {};
-  asyncMethods: {};
   __query: {
     [key in ResourceName & string]: {
       queryRef: QueryRef<
@@ -109,8 +107,7 @@ type SpecificCraftQueryOutputs<
       >;
     };
   };
-  __mutation: {};
-};
+}>;
 
 type CraftQueryOutputs<
   Context extends ContextConstraints,
@@ -143,13 +140,7 @@ export function craftQuery<
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory: (
-    context: Context['inputs'] &
-      Context['__injections'] &
-      Context['sources'] &
-      Context['queryParams'] &
-      Context['asyncMethods']
-  ) => {
+  queryFactory: (context: CraftFactoryEntries<Context>) => {
     // ! avoid to get the QueryRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
     queryRef: QueryRef<
@@ -181,11 +172,7 @@ export function craftQuery<
   InsertionsOutputs
 > {
   return (contextData, injector) => {
-    const queryResult = queryFactory({
-      ...contextData.context.inputs,
-      ...contextData.context.__injections,
-      ...contextData.context.queryParams,
-    });
+    const queryResult = queryFactory(craftFactoryEntries(contextData));
     const {
       queryRef: { resource: queryResource, insertionsOutputs },
     } = queryResult;
@@ -206,24 +193,17 @@ export function craftQuery<
       injector
     );
 
-    return {
+    return partialContext({
       props: {
         [`${resourceName as ResourceName}Query`]: Object.assign(
           queryResource,
           insertionsOutputs ?? {}
         ) as MergeObject<ResourceRef<ResourceState>, InsertionsOutputs>,
       },
-      __query: {
+      _query: {
         [resourceName as ResourceName]: queryResult,
       },
-      __mutation: {},
-      inputs: {},
-      __injections: {},
-      queryParams: {},
-      sources: {},
-      asyncMethods: {},
-      methods: {},
-    } as SpecificCraftQueryOutputs<
+    }) as SpecificCraftQueryOutputs<
       ResourceName,
       ResourceState,
       ResourceParams,
@@ -249,7 +229,7 @@ function handleQueryMutationsReactions<
     const formattedMutationName = mutationName
       .replace('Mutation', '')
       .replace('ById', '');
-    const mutationTargeted = (context.__mutation as MutationDictionary)[
+    const mutationTargeted = (context._mutation as MutationDictionary)[
       formattedMutationName
     ]?.mutationRef;
     console.log('formattedMutationName', formattedMutationName);
@@ -261,9 +241,9 @@ function handleQueryMutationsReactions<
         [`_on${formattedMutationName}${resourceName}QueryEffect`]: effect(
           () => {
             const mutationStatus = mutationResource.status();
-            const mutationParamsSrc = (
-              context.__mutation as MutationDictionary
-            )[formattedMutationName].mutationRef.resourceParamsSrc;
+            const mutationParamsSrc = (context._mutation as MutationDictionary)[
+              formattedMutationName
+            ].mutationRef.resourceParamsSrc;
             // use to track the value of the mutation
             const _mutationValueChanged = mutationResource.hasValue()
               ? mutationResource.value()
@@ -360,7 +340,7 @@ function handleQueryMutationsReactions<
               }
               const mutationStatus = mutationResource.status();
               const mutationParamsSrc = (
-                context.__mutation as MutationDictionary
+                context._mutation as MutationDictionary
               )[formattedMutationName].mutationRef.resourceParamsSrc;
               // use to track the value of the mutation
               const _mutationValueChanged = mutationResource.hasValue()

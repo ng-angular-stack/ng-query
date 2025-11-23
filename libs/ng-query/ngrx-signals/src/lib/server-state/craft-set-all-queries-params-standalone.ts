@@ -4,6 +4,7 @@ import {
   EmptyContext,
   CraftFactoryUtility,
   StoreConfigConstraints,
+  partialContext,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
 import { STORE_CONFIG_TOKEN } from './util/util.type';
@@ -17,8 +18,8 @@ type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
     (typeof STORE_CONFIG_TOKEN)['NAME']
   >}QueryParams`]: <
     AllQueriesParamsState extends {
-      [K in keyof Context['queryParams']]: 'state' extends keyof Context['queryParams'][K]
-        ? InferQueryParamsState<Context['queryParams'][K]['state']>
+      [K in keyof Context['_queryParams']]: 'state' extends keyof Context['_queryParams'][K]
+        ? InferQueryParamsState<Context['_queryParams'][K]['state']>
         : 'STORE_CONFIG_ERROR: When using craftSetAllQueriesParamsStandalone, each query param configuration must define a state';
     }
   >(
@@ -44,16 +45,6 @@ export function craftSetAllQueriesParamsStandalone<
   StoreConfig extends StoreConfigConstraints
 >(): CraftSetAllQueriesParamsStandaloneOutputs<Context, StoreConfig> {
   return () => {
-    return {
-      props: {},
-      inputs: {},
-      __injections: {},
-      queryParams: {},
-      sources: {},
-      __query: {},
-      __mutation: {},
-      methods: {},
-      asyncMethods: {},
-    } as EmptyContext;
+    return partialContext({});
   };
 }

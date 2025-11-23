@@ -1,7 +1,11 @@
 import { Signal } from '@angular/core';
 import {
   ContextConstraints,
+  craftFactoryEntries,
+  CraftFactoryEntries,
   CraftFactoryUtility,
+  PartialContext,
+  partialContext,
   StoreConfigConstraints,
 } from './craft';
 import { MergeObjects, UnionToTuple } from '../types/util.type';
@@ -36,24 +40,19 @@ type FilterMethodsBoundToSources<
     : FilterMethodsBoundToSources<Methods, Next, Acc>
   : Acc;
 
-type SpecificCraftAsyncMethodsOutputs<AsyncMethods extends {}> = {
-  props: {
-    [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;
-  };
-  methods: FilterMethodsBoundToSources<
-    AsyncMethods,
-    UnionToTuple<keyof AsyncMethods>
-  >;
-  inputs: {};
-  queryParams: {};
-  sources: {};
-  __injections: {};
-  __query: {};
-  __mutation: {};
-  asyncMethods: {
-    [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;
-  };
-};
+type SpecificCraftAsyncMethodsOutputs<AsyncMethods extends {}> =
+  PartialContext<{
+    props: {
+      [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;
+    };
+    methods: FilterMethodsBoundToSources<
+      AsyncMethods,
+      UnionToTuple<keyof AsyncMethods>
+    >;
+    _asyncMethods: {
+      [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;
+    };
+  }>;
 
 type CraftAsyncMethodsOutputs<
   Context extends ContextConstraints,
@@ -143,20 +142,12 @@ export function craftAsyncMethods<
   StoreConfig extends StoreConfigConstraints,
   AsyncMethods extends {}
 >(
-  asyncMethodsFactory: (
-    context: Context['inputs'] &
-      Context['__injections'] &
-      Context['sources'] &
-      Context['props']
-  ) => AsyncMethods
+  asyncMethodsFactory: (context: CraftFactoryEntries<Context>) => AsyncMethods
 ): CraftAsyncMethodsOutputs<Context, StoreConfig, AsyncMethods> {
   return (contextData, injector) => {
-    const asyncMethods = asyncMethodsFactory({
-      ...contextData.context.inputs,
-      ...contextData.context.__injections,
-      ...contextData.context.sources,
-      ...contextData.context.props,
-    }) as Record<
+    const asyncMethods = asyncMethodsFactory(
+      craftFactoryEntries(contextData)
+    ) as Record<
       string,
       AsyncMethodRef<
         unknown,
@@ -206,16 +197,10 @@ export function craftAsyncMethods<
       }
     );
 
-    return {
+    return partialContext({
       props: resourceRefs,
-      inputs: {},
-      queryParams: {},
-      sources: {},
-      __injections: {},
-      __query: {},
-      __mutation: {},
       methods,
-      asyncMethods: resourceRefs,
-    } as unknown as SpecificCraftAsyncMethodsOutputs<AsyncMethods>;
+      _asyncMethods: resourceRefs,
+    }) as unknown as SpecificCraftAsyncMethodsOutputs<AsyncMethods>;
   };
 }

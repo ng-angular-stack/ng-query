@@ -2,6 +2,8 @@ import { Signal } from '@angular/core';
 import {
   ContextConstraints,
   CraftFactoryUtility,
+  partialContext,
+  PartialContext,
   StoreConfigConstraints,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
@@ -10,17 +12,9 @@ type ToSignalObject<T> = {
   [K in keyof T]: Signal<T[K]>;
 };
 
-type SpecificCraftInputsOutputs<Inputs extends {}> = {
-  props: {};
-  methods: {};
-  inputs: Prettify<ToSignalObject<Inputs>>;
-  __injections: {};
-  queryParams: {};
-  sources: {};
-  __query: {};
-  __mutation: {};
-  asyncMethods: {};
-};
+type SpecificCraftInputsOutputs<Inputs extends {}> = PartialContext<{
+  _inputs: Prettify<ToSignalObject<Inputs>>;
+}>;
 
 type CraftInputsOutputs<
   Context extends ContextConstraints,
@@ -39,16 +33,8 @@ export function craftInputs<
 >(inputs: Inputs): CraftInputsOutputs<Context, StoreConfig, Inputs> {
   // todo expose setXInputs as standalone ?
   return (contextData) => {
-    return {
-      props: {},
-      inputs: inputs,
-      __injections: {},
-      queryParams: {},
-      sources: {},
-      __query: {},
-      __mutation: {},
-      methods: {},
-      asyncMethods: {},
-    } as SpecificCraftInputsOutputs<Inputs>;
+    return partialContext({
+      _inputs: inputs,
+    }) as SpecificCraftInputsOutputs<Inputs>;
   };
 }

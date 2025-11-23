@@ -21,6 +21,10 @@ import {
   MutationDictionary,
   CraftFactoryUtility,
   StoreConfigConstraints,
+  PartialContext,
+  CraftFactoryEntries,
+  craftFactoryEntries,
+  partialContext,
 } from './craft';
 
 // todo Context['sources'] & Context['queryParams'] & Context['asyncMethods'];
@@ -43,20 +47,14 @@ type SpecificCraftQueryOutputs<
   InsertionsOutputs,
   ResourceParams,
   ResourceArgsParams
-> = {
+> = PartialContext<{
   props: {
     [key in `${ResourceName & string}QueryById`]: MergeObject<
       ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>,
       InsertionsOutputs
     >;
   };
-  methods: {};
-  inputs: {};
-  __injections: {};
-  queryParams: {};
-  sources: {};
-  asyncMethods: {};
-  __query: {
+  _query: {
     [key in ResourceName & string]: {
       queryRef: QueryByIdRef<
         GroupIdentifier,
@@ -73,8 +71,7 @@ type SpecificCraftQueryOutputs<
       >;
     };
   };
-  __mutation: {};
-};
+}>;
 
 type CraftQueryOutputs<
   Context extends ContextConstraints,
@@ -106,8 +103,7 @@ export type QueryByIdOptions<
   ResourceArgsParams,
   OtherProperties
 > = {
-  test1?: Context['__mutation'] extends infer Mutations ? Mutations : 'lol';
-  on?: Context['__mutation'] extends infer Mutations
+  on?: Context['_mutation'] extends infer Mutations
     ? {
         [key in keyof Mutations as `${key &
           string}${'__types' extends keyof Mutations[key]
@@ -185,14 +181,7 @@ export function craftQueryById<
   OtherProperties
 >(
   resourceName: ResourceName,
-  queryFactory: (
-    // todo export a generic type for context
-    context: Context['inputs'] &
-      Context['__injections'] &
-      Context['sources'] &
-      Context['queryParams'] &
-      Context['asyncMethods']
-  ) => {
+  queryFactory: (context: CraftFactoryEntries<Context>) => {
     queryRef: QueryByIdRef<
       NoInfer<GroupIdentifier>,
       NoInfer<ResourceState>,
@@ -227,11 +216,7 @@ export function craftQueryById<
   InsertionsOutputs
 > {
   return (contextData, injector) => {
-    const queryResult = queryFactory({
-      ...contextData.context.inputs,
-      ...contextData.context.__injections,
-      ...contextData.context.queryParams,
-    });
+    const queryResult = queryFactory(craftFactoryEntries(contextData));
     const {
       queryRef: { resourceById: queryResourcesById, insertionsOutputs },
     } = queryResult;
@@ -253,7 +238,7 @@ export function craftQueryById<
       queryResourcesById,
       injector
     );
-    return {
+    return partialContext({
       props: {
         [`${resourceName as ResourceName}QueryById`]: Object.assign(
           queryResourcesById,
@@ -263,17 +248,10 @@ export function craftQueryById<
           InsertionsOutputs
         >,
       },
-      inputs: {},
-      __injections: {},
-      queryParams: {},
-      sources: {},
-      asyncMethods: {},
-      __query: {
+      _query: {
         [resourceName as ResourceName]: queryResult,
       },
-      __mutation: {},
-      methods: {},
-    } as SpecificCraftQueryOutputs<
+    }) as SpecificCraftQueryOutputs<
       GroupIdentifier,
       ResourceName,
       ResourceState,
@@ -307,7 +285,7 @@ function handleQueryByIdMutationEffects<
           const formattedMutationName = mutationName
             .replace('Mutation', '')
             .replace('ById', '');
-          const mutationTargeted = (context.__mutation as MutationDictionary)[
+          const mutationTargeted = (context._mutation as MutationDictionary)[
             formattedMutationName
           ]?.mutationRef;
 

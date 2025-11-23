@@ -1,21 +1,17 @@
 import { Signal } from '@angular/core';
 import {
   ContextConstraints,
+  craftFactoryEntries,
+  CraftFactoryEntries,
   CraftFactoryUtility,
+  partialContext,
+  PartialContext,
   StoreConfigConstraints,
 } from './craft';
 
-type SpecificCraftComputedOutputs<Computed extends {}> = {
+type SpecificCraftComputedOutputs<Computed extends {}> = PartialContext<{
   props: Computed;
-  methods: {};
-  inputs: {};
-  queryParams: {};
-  sources: {};
-  __injections: {};
-  __query: {};
-  __mutation: {};
-  asyncMethods: {};
-};
+}>;
 
 type CraftComputedStatesOutputs<
   Context extends ContextConstraints,
@@ -32,31 +28,15 @@ export function craftComputedStates<
   StoreConfig extends StoreConfigConstraints,
   Computed extends {}
 >(
-  computedFactory: (
-    context: Context['inputs'] &
-      Context['__injections'] &
-      Context['sources'] &
-      Context['props']
-  ) => Computed
+  computedFactory: (context: CraftFactoryEntries<Context>) => Computed
 ): CraftComputedStatesOutputs<Context, StoreConfig, Computed> {
   return (contextData, injector) => {
-    const computedValues = computedFactory({
-      ...contextData.context.inputs,
-      ...contextData.context.__injections,
-      ...contextData.context.sources,
-      ...contextData.context.props,
-    }) as Record<string, Signal<unknown>>;
+    const computedValues = computedFactory(
+      craftFactoryEntries(contextData)
+    ) as Record<string, Signal<unknown>>;
 
-    return {
+    return partialContext({
       props: computedValues,
-      inputs: {},
-      queryParams: {},
-      sources: {},
-      __injections: {},
-      __query: {},
-      __mutation: {},
-      methods: {},
-      asyncMethods: {},
-    } as unknown as SpecificCraftComputedOutputs<Computed>;
+    }) as SpecificCraftComputedOutputs<Computed>;
   };
 }

@@ -1,6 +1,8 @@
 import {
   ContextConstraints,
   CraftFactoryUtility,
+  PartialContext,
+  partialContext,
   StoreConfigConstraints,
 } from './craft';
 import { Source } from './source';
@@ -17,17 +19,10 @@ type SourceSetterMethods<Sources extends {}> = {
   ) => void;
 };
 
-type SpecificCraftSourcesOutputs<Sources extends {}> = {
-  props: {};
+type SpecificCraftSourcesOutputs<Sources extends {}> = PartialContext<{
   methods: SourceSetterMethods<Sources>;
-  inputs: {};
-  __injections: {};
-  queryParams: {};
-  sources: Sources;
-  __query: {};
-  __mutation: {};
-  asyncMethods: {};
-};
+  _sources: Sources;
+}>;
 
 type CraftSourcesOutputs<
   Context extends ContextConstraints,
@@ -86,16 +81,9 @@ export function craftSources<
     };
   }, {} as Record<string, (payload: unknown) => void>);
   return Object.assign((contextData: ContextConstraints) => {
-    return {
-      props: {},
-      inputs: {},
-      __injections: {},
-      queryParams: {},
-      sources,
-      __query: {},
-      __mutation: {},
-      asyncMethods: {},
+    return partialContext({
+      _sources: sources,
       methods,
-    } as SpecificCraftSourcesOutputs<Sources>;
+    }) as SpecificCraftSourcesOutputs<Sources>;
   }, methods) as unknown as CraftSourcesOutputs<Context, StoreConfig, Sources>;
 }

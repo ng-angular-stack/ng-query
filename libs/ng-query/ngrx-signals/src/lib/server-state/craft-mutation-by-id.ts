@@ -1,7 +1,11 @@
 import { InternalType, MergeObject } from '../types/util.type';
 import {
   ContextConstraints,
+  craftFactoryEntries,
+  CraftFactoryEntries,
   CraftFactoryUtility,
+  partialContext,
+  PartialContext,
   StoreConfigConstraints,
 } from './craft';
 import { MutationByIdRef } from '../with-mutation-by-id';
@@ -27,7 +31,7 @@ type SpecificCraftMutationByIdOutputs<
   ResourceArgsParams,
   GroupIdentifier extends string,
   InsertionsOutputs
-> = {
+> = PartialContext<{
   props: MutationByIdPropsOutput<
     ResourceName,
     GroupIdentifier,
@@ -42,11 +46,7 @@ type SpecificCraftMutationByIdOutputs<
         ) => void;
       }
     : {};
-  inputs: {};
-  queryParams: {};
-  sources: {};
-  __injections: {};
-  __mutation: {
+  _mutation: {
     [key in ResourceName]: {
       mutationRef: MutationByIdRef<
         GroupIdentifier,
@@ -64,9 +64,7 @@ type SpecificCraftMutationByIdOutputs<
       >;
     };
   };
-  __query: {};
-  asyncMethods: {};
-};
+}>;
 
 type CraftMutationOutputs<
   Context extends ContextConstraints,
@@ -102,13 +100,7 @@ export function craftMutationById<
   OtherProperties // maybe add options only for this ?
 >(
   resourceName: ResourceName,
-  mutationFactory: (
-    context: Context['inputs'] &
-      Context['__injections'] &
-      Context['sources'] &
-      Context['queryParams'] &
-      Context['asyncMethods']
-  ) => {
+  mutationFactory: (context: CraftFactoryEntries<Context>) => {
     // ! avoid to get the MutationRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
     // That why it is always wrapped in a function
     mutationRef: MutationByIdRef<
@@ -137,13 +129,7 @@ export function craftMutationById<
   GroupIdentifier
 > {
   return (contextData) => {
-    const mutationResult = mutationFactory({
-      ...contextData.context.inputs,
-      ...contextData.context.__injections,
-      ...contextData.context.queryParams,
-      ...contextData.context.sources,
-      ...contextData.context.asyncMethods,
-    });
+    const mutationResult = mutationFactory(craftFactoryEntries(contextData));
     const {
       mutationRef: {
         resourceById: mutationResource,
@@ -155,7 +141,7 @@ export function craftMutationById<
     const capitalizedMutationName =
       resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
 
-    return {
+    return partialContext({
       props: {
         [`${resourceName as ResourceName}MutationById`]: Object.assign(
           mutationResource,
@@ -163,16 +149,9 @@ export function craftMutationById<
           method ? method : {}
         ),
       },
-      __mutation: {
+      _mutation: {
         [resourceName as ResourceName]: mutationResult,
       },
-      inputs: {},
-      __injections: {},
-
-      queryParams: {},
-      sources: {},
-      __query: {},
-      asyncMethods: {},
       methods: method
         ? {
             [`mutate${capitalizedMutationName}ById`]: (data: any) => {
@@ -187,7 +166,7 @@ export function craftMutationById<
             },
           }
         : {},
-    } as SpecificCraftMutationByIdOutputs<
+    }) as SpecificCraftMutationByIdOutputs<
       ResourceName,
       ResourceState,
       ResourceParams,
