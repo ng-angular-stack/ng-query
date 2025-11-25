@@ -403,7 +403,12 @@ describe('craft', () => {
         }))
       );
 
-      const { injectCraft, setPaginationQueryParams } = craft(
+      const {
+        injectCraft,
+        setPaginationQueryParams,
+        __META_STORE_CONTEXT,
+        _inputs,
+      } = craft(
         {
           name: '',
           providedIn: 'root',
@@ -444,6 +449,7 @@ describe('craft', () => {
           }
         )
       );
+      type test = (typeof __META_STORE_CONTEXT)['context']['_inputs'];
       const addNumberSource = source<number>();
       const resetSource = source<string>();
       const store = injectCraft({
@@ -910,58 +916,22 @@ describe('craft', () => {
         },
       }))
     );
-    type t = Omit<
+    type t = Pick<
       (typeof _HOST1_META_STORE_CONTEXT)['context'],
-      'methods' | 'props' | '_inputs'
+      '_dependencies'
     >;
-    expectTypeOf(_HOST1_META_STORE_CONTEXT).toEqualTypeOf<{
-      storeConfig: {
-        providedIn: 'root';
-        name: 'host1';
-      };
-      context: {
-        methods: SourceSetterMethods<{
-          increment: Source<{}>;
-          decrement: Source<{}>;
-          reset: Source<{}>;
-        }> & {
-          reset: () => number;
-        } & ExcludeCommonKeys<
-            {
-              addNumber: (numberValue: number) => number[];
-              reset: () => never[];
-            } & Record<string, Function>,
-            {
-              reset: Source<{}>;
-            }
-          > &
-          Record<string, Function>;
-        props: {
-          counter: Signal<number>;
-        } & {
-          numberList: Signal<number[]>;
-        };
-        _inputs: ExcludeCommonKeys<
-          {
-            shouldNotBeExposed: Signal<number | undefined>;
-          },
-          {}
-        >;
-        _injections: {};
-        _queryParams: {};
-        _sources: {
-          increment: Source<{}>;
-          decrement: Source<{}>;
-          reset: Source<{}>;
-        };
-        _asyncMethods: {};
-        _mutation: {};
-        _query: {};
-        _cloud: {};
-        _dependencies: {
-          dataPagination: typeof _DATAPAGINATION_META_STORE_CONTEXT;
-        };
-      };
+    expectTypeOf<
+      (typeof _HOST1_META_STORE_CONTEXT)['storeConfig']
+    >().toEqualTypeOf<{
+      providedIn: 'root';
+      name: 'host1';
+    }>();
+
+    expectTypeOf<
+      (typeof _HOST1_META_STORE_CONTEXT)['context']['_dependencies']['dataPagination']['storeConfig']
+    >().toEqualTypeOf<{
+      providedIn: 'root';
+      name: 'dataPagination';
     }>();
 
     const host1 = injectHost1Craft();

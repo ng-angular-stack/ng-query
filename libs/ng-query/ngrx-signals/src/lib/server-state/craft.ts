@@ -1,7 +1,7 @@
 import { Prettify } from '@ngrx/signals';
 import { __InternalSharedMutationConfig, MutationRef } from '../with-mutation';
 import { QueryRef } from '../with-query';
-import { InternalType, MergeObjects } from '../types/util.type';
+import { InternalType, MergeObject, MergeObjects } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
 import {
@@ -289,7 +289,7 @@ type ToCraftOutputs<
       >;
       _inputs: ExcludeCommonKeys<
         MergedContext['_inputs'],
-        '_inputs' extends keyof Config ? Config['_inputs'] : {}
+        'inputs' extends keyof Config ? Config['inputs'] : {}
       >;
       _queryParams: MergedContext['_queryParams'];
       _sources: MergedContext['_sources'];
