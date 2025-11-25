@@ -1,15 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
-import { craft, EmptyContext } from './craft';
+import { craft, EmptyContext, MergeTwoContexts, PartialContext } from './craft';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 import { queryById } from '../query-by-id';
-import { inject, linkedSignal, signal } from '@angular/core';
-import { craftQueryParams } from './craft-query-params';
+import { inject, linkedSignal, Signal, signal } from '@angular/core';
+import {
+  craftQueryParams,
+  QueryParamNavigationOptions,
+  QueryParamProps,
+  SpecificCraftQueryParamsOutputs,
+} from './craft-query-params';
 import { craftInputs } from './craft-inputs';
 import { craftState } from './craft-state';
-import { source } from './source';
-import { craftSources } from './craft-sources';
+import { Source, source } from './source';
+import { craftSources, SourceSetterMethods } from './craft-sources';
 import { afterRecomputation } from './after-recomputation';
 import { IsAny } from '../types/util.type';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
@@ -18,6 +23,8 @@ import { craftMutation } from './craft-mutation';
 import { craftQuery } from './craft-query';
 import { craftMutationById } from './craft-mutation-by-id';
 import { craftQueryById } from './craft-query-by-id';
+import { ExcludeCommonKeys } from './util/util.type';
+import { ReadonlySource } from './util/source.type';
 
 describe('craft', () => {
   beforeEach(() => {
@@ -755,7 +762,7 @@ describe('craft', () => {
       )
     );
 
-    const { injectHost1Craft } = craft(
+    const { injectHost1Craft, _HOST1_META_STORE_CONTEXT } = craft(
       {
         name: 'host1',
         providedIn: 'root',
@@ -783,6 +790,9 @@ describe('craft', () => {
         },
       }))
     );
+
+    type r =
+      (typeof _HOST1_META_STORE_CONTEXT)['context']['_dependencies']['dataPagination'];
 
     const { injectHost2Craft } = craft(
       {
@@ -846,8 +856,30 @@ describe('craft', () => {
     );
 
     expectTypeOf(_DATAPAGINATION_META_STORE_CONTEXT).toEqualTypeOf<{
-      providedIn: 'root';
-      name: 'dataPagination';
+      storeConfig: {
+        providedIn: 'root';
+        name: 'dataPagination';
+      };
+      context: {
+        methods: {
+          addNumber: (numberValue: number) => number[];
+          reset: () => never[];
+        } & Record<string, Function>;
+        props: {
+          numberList: Signal<number[]>;
+        };
+        _inputs: {
+          shouldNotBeExposed: Signal<number | undefined>;
+        };
+        _injections: {};
+        _mutation: {};
+        _query: {};
+        _queryParams: {};
+        _sources: {};
+        _asyncMethods: {};
+        _cloud: {};
+        _dependencies: {};
+      };
     }>();
 
     const { injectHost1Craft, _HOST1_META_STORE_CONTEXT } = craft(
@@ -878,9 +910,58 @@ describe('craft', () => {
         },
       }))
     );
+    type t = Omit<
+      (typeof _HOST1_META_STORE_CONTEXT)['context'],
+      'methods' | 'props' | '_inputs'
+    >;
     expectTypeOf(_HOST1_META_STORE_CONTEXT).toEqualTypeOf<{
-      providedIn: 'root';
-      name: 'host1';
+      storeConfig: {
+        providedIn: 'root';
+        name: 'host1';
+      };
+      context: {
+        methods: SourceSetterMethods<{
+          increment: Source<{}>;
+          decrement: Source<{}>;
+          reset: Source<{}>;
+        }> & {
+          reset: () => number;
+        } & ExcludeCommonKeys<
+            {
+              addNumber: (numberValue: number) => number[];
+              reset: () => never[];
+            } & Record<string, Function>,
+            {
+              reset: Source<{}>;
+            }
+          > &
+          Record<string, Function>;
+        props: {
+          counter: Signal<number>;
+        } & {
+          numberList: Signal<number[]>;
+        };
+        _inputs: ExcludeCommonKeys<
+          {
+            shouldNotBeExposed: Signal<number | undefined>;
+          },
+          {}
+        >;
+        _injections: {};
+        _queryParams: {};
+        _sources: {
+          increment: Source<{}>;
+          decrement: Source<{}>;
+          reset: Source<{}>;
+        };
+        _asyncMethods: {};
+        _mutation: {};
+        _query: {};
+        _cloud: {};
+        _dependencies: {
+          dataPagination: typeof _DATAPAGINATION_META_STORE_CONTEXT;
+        };
+      };
     }>();
 
     const host1 = injectHost1Craft();
@@ -888,6 +969,58 @@ describe('craft', () => {
     host1.addNumber(2);
     expect(host1.numberList()).toEqual([1, 2]);
   });
+});
+
+describe('craft metadata', () => {
+  const { _SHARED_META_STORE_CONTEXT, craftShared } = craft(
+    {
+      name: 'shared',
+      providedIn: 'feature',
+    },
+    craftState(
+      'test',
+      () => signal(1),
+      ({ state }) => ({
+        increment: () => state() + 1,
+      })
+    )
+  );
+  expectTypeOf(_SHARED_META_STORE_CONTEXT).toEqualTypeOf<{
+    storeConfig: {
+      providedIn: 'feature';
+      name: 'shared';
+    };
+    context: {
+      methods: {
+        increment: () => number;
+      } & Record<string, Function>;
+      props: {
+        test: Signal<number>;
+      };
+      _inputs: {};
+      _injections: {};
+      _mutation: {};
+      _query: {};
+      _queryParams: {};
+      _sources: {};
+      _asyncMethods: {};
+      _cloud: {};
+      _dependencies: {};
+    };
+  }>();
+
+  const { _DATA_META_STORE_CONTEXT } = craft(
+    {
+      name: 'data',
+      providedIn: 'root',
+    },
+    craftShared()
+  );
+  expectTypeOf(
+    _DATA_META_STORE_CONTEXT['context']['_dependencies']['shared']
+  ).toEqualTypeOf(_SHARED_META_STORE_CONTEXT);
+
+  // todo add test to check if data is correctly filled
 });
 
 describe('craft options', () => {
@@ -1129,9 +1262,54 @@ describe('craft preserve all context', () => {
           return EmptyContext;
         }
       );
+      type t = Omit<(typeof _TEST_META_STORE_CONTEXT)['context'], 'methods'>;
       expectTypeOf(_TEST_META_STORE_CONTEXT).toEqualTypeOf<{
-        providedIn: 'root';
-        name: 'test';
+        storeConfig: {
+          providedIn: 'root';
+          name: 'test';
+        };
+        context: {
+          methods: {
+            setActiveIdQueryParams: (
+              params: Partial<{
+                active: string;
+              }>,
+              options?: QueryParamNavigationOptions
+            ) => void;
+          } & {
+            resetActiveIdQueryParams: (
+              options?: QueryParamNavigationOptions
+            ) => void;
+          } & {
+            [x: string]:
+              | ((...args: any[]) => NoInfer<{
+                  active: never;
+                }>)
+              | ReadonlySource<{
+                  active: never;
+                }>;
+          } & Record<string, Function>;
+          _inputs: {};
+          props: QueryParamProps<{
+            active: {
+              defaultValue: undefined;
+              parse: (value: string) => string;
+              serialize: (value: unknown) => string;
+            };
+          }> & {
+            activeId: Signal<{
+              active: never;
+            }>;
+          };
+          _injections: {};
+          _mutation: {};
+          _query: {};
+          _queryParams: {};
+          _sources: {};
+          _asyncMethods: {};
+          _cloud: {};
+          _dependencies: {};
+        };
       }>();
     });
   });
@@ -1182,9 +1360,21 @@ describe('craft preserve all context', () => {
           return {} as EmptyContext;
         }
       );
-      expectTypeOf(_TEST_META_STORE_CONTEXT).toEqualTypeOf<{
+      type t = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_dependencies'
+      >;
+      expectTypeOf<
+        (typeof _TEST_META_STORE_CONTEXT)['storeConfig']
+      >().toEqualTypeOf<{
         providedIn: 'root';
         name: 'test';
+      }>();
+      expectTypeOf<
+        (typeof _TEST_META_STORE_CONTEXT)['context']['_dependencies']['mySharedFeature']['storeConfig']
+      >().toEqualTypeOf<{
+        providedIn: 'feature';
+        name: 'mySharedFeature';
       }>();
     });
   });

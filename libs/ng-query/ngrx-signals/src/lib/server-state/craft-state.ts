@@ -9,6 +9,7 @@ import {
 } from './craft';
 import { ReadonlySource } from './util/source.type';
 import { createMethodHandlers } from './util/util';
+import { Prettify } from '@ngrx/signals';
 
 type FilterConnectedToSourceMethods<Methods> = {
   [K in keyof Methods as Methods[K] extends ReadonlySource<any>
@@ -26,7 +27,7 @@ type SpecificCraftStateOutputs<
   props: { [key in StateName]: Signal<State> };
   methods: Methods extends undefined
     ? {}
-    : FilterConnectedToSourceMethods<Methods>;
+    : Prettify<FilterConnectedToSourceMethods<Methods>>;
 }>;
 
 type CraftStateOutputs<

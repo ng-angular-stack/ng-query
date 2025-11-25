@@ -13,7 +13,7 @@ import { capitalize } from './util/util';
 
 type InferSourceType<S> = S extends Source<infer T> ? T : never;
 
-type SourceSetterMethods<Sources extends {}> = {
+export type SourceSetterMethods<Sources extends {}> = {
   [K in keyof Sources as `set${Capitalize<string & K>}`]: (
     payload: InferSourceType<Sources[K]>
   ) => void;

@@ -33,7 +33,7 @@ export interface QueryParamNavigationOptions {
   skipLocationChange?: boolean;
 }
 
-type QueryParamProps<
+export type QueryParamProps<
   QueryParams extends Record<string, QueryParamConfig<unknown>>
 > = {
   [K in keyof QueryParams]: Signal<ReturnType<QueryParams[K]['parse']>>;
@@ -87,7 +87,7 @@ type CraftQueryParamsConfig<
   }) => Methods;
 };
 
-type SpecificCraftQueryParamsOutputs<
+export type SpecificCraftQueryParamsOutputs<
   QueryParamsName extends string,
   QueryParams extends Record<string, QueryParamConfig<unknown>>,
   CustomMethods

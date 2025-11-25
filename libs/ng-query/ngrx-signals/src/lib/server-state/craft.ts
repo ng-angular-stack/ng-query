@@ -65,7 +65,7 @@ export type ContextConstraints = {
   _cloud: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
   // _generatedDeps: {[name]: {propsKeys: string[], methodsKeys: string[]}}; // ? may be useful to generate interface that may be used for inversion of dependency
   // 👇 Filled when adding a nested craft
-  _dependencies: {}; // {[craftName]: {[aliasName]: ContextConstraints;}}
+  _dependencies: {}; // {[craftName]: {[aliasName]: ContextConstraints;}} // todo implements composition alias and implements it
 };
 
 // ! do not expose it
@@ -298,7 +298,12 @@ type ToCraftOutputs<
       _mutation: MergedContext['_mutation'];
       _query: MergedContext['_query'];
       _cloud: MergedContext['_cloud'];
-      _dependencies: MergedContext['_dependencies'];
+      _dependencies: MergedContext['_dependencies'] & {
+        [key in StoreConfig['name']]: {
+          storeConfig: StoreConfig;
+          context: MergedContext;
+        };
+      };
     },
     [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
   >;
@@ -315,7 +320,10 @@ type ToCraftOutputs<
      * Mainly used for debug and testing purposes
      * Not instantiated at runtime
      */
-    [k in `_${Uppercase<StoreConfig['name']>}_META_STORE_CONTEXT`]: StoreConfig;
+    [k in `_${Uppercase<StoreConfig['name']>}_META_STORE_CONTEXT`]: {
+      storeConfig: StoreConfig;
+      context: Prettify<MergedContext>;
+    };
   };
 
 type ProvidedInOption = 'root' | 'scoped' | 'feature';
@@ -345,7 +353,7 @@ type MergeStandaloneContexts<C extends StandaloneOutputsConstraints[]> =
       : never
     : _EmptyContext;
 
-type MergeTwoContexts<
+export type MergeTwoContexts<
   A extends ContextConstraints,
   B extends ContextConstraints
 > = {
