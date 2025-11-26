@@ -62,7 +62,7 @@ type QueryParamMethods<
     : K & string}`]: CustomMethods[K];
 };
 
-type ToState<QueryParamConfigs> = {
+export type QueryParamsToState<QueryParamConfigs> = {
   [K in keyof QueryParamConfigs]: ReturnType<
     QueryParamConfigs[K] extends QueryParamConfig<infer U> ? () => U : never
   >;
@@ -74,15 +74,17 @@ type CraftQueryParamsConfig<
   Methods extends
     | Record<
         string,
-        | ((...args: any[]) => NoInfer<Prettify<ToState<QueryParamsConfig>>>)
-        | ReadonlySource<Prettify<ToState<QueryParamsConfig>>>
+        | ((
+            ...args: any[]
+          ) => NoInfer<Prettify<QueryParamsToState<QueryParamsConfig>>>)
+        | ReadonlySource<Prettify<QueryParamsToState<QueryParamsConfig>>>
       >
     | undefined,
   Context extends ContextConstraints
 > = {
   options?: QueryParamNavigationOptions;
   methods?: (state: {
-    queryParams: Signal<ToState<QueryParamsConfig>>;
+    queryParams: Signal<QueryParamsToState<QueryParamsConfig>>;
     context: CraftFactoryEntries<Context>;
   }) => Methods;
 };
@@ -93,13 +95,13 @@ export type SpecificCraftQueryParamsOutputs<
   CustomMethods
 > = PartialContext<{
   props: QueryParamProps<QueryParams> & {
-    [K in QueryParamsName]: Signal<Prettify<ToState<QueryParams>>>;
+    [K in QueryParamsName]: Signal<Prettify<QueryParamsToState<QueryParams>>>;
   };
   methods: QueryParamMethods<QueryParamsName, QueryParams, CustomMethods>;
   _queryParams: {
     [K in QueryParamsName]: {
       config: QueryParams;
-      state: WritableSignal<ToState<QueryParams>>;
+      state: WritableSignal<QueryParamsToState<QueryParams>>;
     };
   };
 }>;
@@ -202,8 +204,10 @@ export function craftQueryParams<
   Methods extends
     | Record<
         string,
-        | ((...args: any[]) => NoInfer<Prettify<ToState<QueryParamsConfig>>>)
-        | ReadonlySource<Prettify<ToState<QueryParamsConfig>>>
+        | ((
+            ...args: any[]
+          ) => NoInfer<Prettify<QueryParamsToState<QueryParamsConfig>>>)
+        | ReadonlySource<Prettify<QueryParamsToState<QueryParamsConfig>>>
       >
     | undefined
 >(
@@ -257,7 +261,7 @@ export function craftQueryParams<
           return acc;
         }
       }, {} as Record<string, unknown>)
-    ) as WritableSignal<ToState<QueryParamsConfig>>;
+    ) as WritableSignal<QueryParamsToState<QueryParamsConfig>>;
 
     const props = Object.entries(queryParamsConfig).reduce(
       (acc, [key, config]) => {
@@ -291,7 +295,7 @@ export function craftQueryParams<
 
     // Helper function to parse state and navigate
     const serializeAndNavigate = (
-      state: Prettify<ToState<QueryParamsConfig>>,
+      state: Prettify<QueryParamsToState<QueryParamsConfig>>,
       options?: QueryParamNavigationOptions
     ) => {
       const serializedParams = serializeQueryParams(state, queryParamsConfig);
@@ -394,7 +398,7 @@ export function craftQueryParams<
   return Object.assign(context, {
     [`set${capitalize(queryParamsName)}QueryParams`]: (
       params: Partial<{
-        [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
+        [K in keyof QueryParamsToState<QueryParamsConfig>]: QueryParamsToState<QueryParamsConfig>[K];
       }>
     ) => serializeQueryParams(params, queryParamsConfig),
   }) as unknown as craftQueryParamsOutputs<
@@ -410,7 +414,7 @@ function serializeQueryParams<
   QueryParamsConfig extends Partial<Record<string, QueryParamConfig<unknown>>>
 >(
   params: Partial<{
-    [K in keyof ToState<QueryParamsConfig>]: ToState<QueryParamsConfig>[K];
+    [K in keyof QueryParamsToState<QueryParamsConfig>]: QueryParamsToState<QueryParamsConfig>[K];
   }>,
   queryParamsConfig: QueryParamsConfig
 ) {

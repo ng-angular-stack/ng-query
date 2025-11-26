@@ -4,11 +4,18 @@ import { craft, EmptyContext, MergeTwoContexts, PartialContext } from './craft';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 import { queryById } from '../query-by-id';
-import { inject, linkedSignal, Signal, signal } from '@angular/core';
+import {
+  inject,
+  linkedSignal,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import {
   craftQueryParams,
   QueryParamNavigationOptions,
   QueryParamProps,
+  QueryParamsToState,
   SpecificCraftQueryParamsOutputs,
 } from './craft-query-params';
 import { craftInputs } from './craft-inputs';
@@ -1232,7 +1239,9 @@ describe('craft preserve all context', () => {
           return EmptyContext;
         }
       );
-      type t = Omit<(typeof _TEST_META_STORE_CONTEXT)['context'], 'methods'>;
+      type t = Prettify<
+        Pick<(typeof _TEST_META_STORE_CONTEXT)['context'], '_queryParams'>
+      >;
       expectTypeOf(_TEST_META_STORE_CONTEXT).toEqualTypeOf<{
         storeConfig: {
           providedIn: 'root';
@@ -1274,7 +1283,26 @@ describe('craft preserve all context', () => {
           _injections: {};
           _mutation: {};
           _query: {};
-          _queryParams: {};
+          _queryParams: {
+            activeId: {
+              config: {
+                active: {
+                  defaultValue: undefined;
+                  parse: (value: string) => string;
+                  serialize: (value: unknown) => string;
+                };
+              };
+              state: WritableSignal<
+                QueryParamsToState<{
+                  active: {
+                    defaultValue: undefined;
+                    parse: (value: string) => string;
+                    serialize: (value: unknown) => string;
+                  };
+                }>
+              >;
+            };
+          };
           _sources: {};
           _asyncMethods: {};
           _cloud: {};
