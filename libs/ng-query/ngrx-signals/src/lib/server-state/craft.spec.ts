@@ -1284,7 +1284,7 @@ describe('craft preserve all context', () => {
     });
   });
 
-  it('should preserve the context when used with `usingServerState`', async () => {
+  it('should preserve the context when used with `craftX`', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { craftMySharedFeature, _MYSHAREDFEATURE_META_STORE_CONTEXT } =
         craft(
@@ -1305,7 +1305,9 @@ describe('craft preserve all context', () => {
             },
           }))
         );
-      expectTypeOf(_MYSHAREDFEATURE_META_STORE_CONTEXT).toEqualTypeOf<{
+      expectTypeOf<
+        (typeof _MYSHAREDFEATURE_META_STORE_CONTEXT)['storeConfig']
+      >().toEqualTypeOf<{
         providedIn: 'feature';
         name: 'mySharedFeature';
       }>();
@@ -1314,13 +1316,6 @@ describe('craft preserve all context', () => {
           name: 'test',
           providedIn: 'root',
         },
-        // ({ context }, injector, storeConfig) => {
-        //   expectTypeOf(storeConfig).toEqualTypeOf<{
-        //     name: 'test';
-        //     providedIn: 'root';
-        //   }>();
-        //   return {} as EmptyContext;
-        // },
         craftMySharedFeature(),
         ({ context }, injector, storeConfig) => {
           expectTypeOf(storeConfig).toEqualTypeOf<{
@@ -1345,49 +1340,6 @@ describe('craft preserve all context', () => {
       >().toEqualTypeOf<{
         providedIn: 'feature';
         name: 'mySharedFeature';
-      }>();
-    });
-  });
-});
-
-describe('Expose standalone setter all query params function', () => {
-  it('should expose setAllXQueryParams in standalone outputs', async () => {
-    await TestBed.runInInjectionContext(async () => {
-      const { setAllTestQueryParams } = craft(
-        {
-          name: 'test',
-          providedIn: 'root',
-        },
-        craftQueryParams('pagination', () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-          pageSize: {
-            defaultValue: 10,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-        })),
-        craftQueryParams('activeId', () => ({
-          active: {
-            defaultValue: undefined,
-            parse: (value: string) => value as string | undefined,
-            serialize: (value) => String(value),
-          },
-        })),
-        craftSetAllQueriesParamsStandalone()
-      );
-      type t = Prettify<
-        Parameters<typeof setAllTestQueryParams>[0]
-      >['activeId'];
-      expect(setAllTestQueryParams).toBeDefined();
-      expectTypeOf<
-        Parameters<typeof setAllTestQueryParams>[0]
-      >().toEqualTypeOf<{
-        pagination: { page: number; pageSize: number };
-        activeId: { active: string | undefined };
       }>();
     });
   });

@@ -96,7 +96,7 @@ export type SpecificCraftQueryParamsOutputs<
     [K in QueryParamsName]: Signal<Prettify<ToState<QueryParams>>>;
   };
   methods: QueryParamMethods<QueryParamsName, QueryParams, CustomMethods>;
-  queryParams: {
+  _queryParams: {
     [K in QueryParamsName]: {
       config: QueryParams;
       state: WritableSignal<ToState<QueryParams>>;

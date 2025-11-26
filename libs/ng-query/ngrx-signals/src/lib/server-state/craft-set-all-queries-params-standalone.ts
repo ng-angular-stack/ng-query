@@ -25,6 +25,8 @@ type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
   >(
     params: Prettify<AllQueriesParamsState>
   ) => AllQueriesParamsState;
+} & {
+  testQp: Prettify<Pick<Context, '_queryParams'>>;
 };
 
 type CraftSetAllQueriesParamsStandaloneOutputs<

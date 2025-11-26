@@ -2,10 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { craft } from './craft';
 import { craftQueryParams } from './craft-query-params';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
+import { Prettify } from '@ngrx/signals';
 
 describe('craftSetAllQueriesParamsStandalone', () => {
   it('should create query params configuration', () => {
-    const { injectTestStoreCraft, setAllTestStoreQueryParams } = craft(
+    const { injectTestStoreCraft, setAllTestStoreQueryParams, testQp } = craft(
       {
         providedIn: 'root',
         name: 'TestStore',
@@ -55,6 +56,18 @@ describe('craftSetAllQueriesParamsStandalone', () => {
         page: 1,
         pageSize: 10,
       });
+
+      expectTypeOf<
+        Prettify<Parameters<typeof setAllTestStoreQueryParams>[0]>
+      >().toEqualTypeOf<{
+        pagination: {
+          page: number;
+          pageSize: number;
+        };
+        filter: {
+          active: boolean;
+        };
+      }>();
       setAllTestStoreQueryParams({
         pagination: {
           page: 3,
