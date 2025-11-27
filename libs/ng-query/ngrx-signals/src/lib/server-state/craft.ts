@@ -256,8 +256,6 @@ type InjectCraftOutput<
   >;
 };
 
-type Strict<T> = T & Record<Exclude<string, keyof T>, never>;
-
 // todo try to find a way to not enable not known inputs/methods in pluggableConfig
 type CraftCompositionOutput<
   Context extends ContextConstraints,
@@ -298,7 +296,7 @@ type CraftCompositionOutput<
           ? [NotKnownMethodsUnion] extends [undefined]
             ? {}
             : {
-                errorMethodMsg: `Error: You are trying to add methods that are not defined in the connected store: ${UnionToTuple<NotKnownMethodsUnion> &
+                errorMethodMsg: `Error: You are trying to add methods that are not defined in the connected store (${StoreConfig['name']}): ${UnionToTuple<NotKnownMethodsUnion> &
                   string}`;
               }
           : {}
@@ -310,7 +308,7 @@ type CraftCompositionOutput<
         ? [NotKnownInputsUnion] extends [undefined]
           ? {}
           : {
-              errorMethodMsg: `Error: You are trying to add inputs that are not defined in the connected store: ${UnionToTuple<NotKnownInputsUnion> &
+              errorInputsMsg: `Error: You are trying to add inputs that are not defined in the connected store (${StoreConfig['name']}): ${UnionToTuple<NotKnownInputsUnion> &
                 string}`;
             }
         : {}

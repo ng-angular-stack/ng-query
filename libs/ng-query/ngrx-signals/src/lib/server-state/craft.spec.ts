@@ -988,7 +988,7 @@ describe('craft', () => {
       };
     }>();
 
-    const { injectHost1Craft, _HOST1_META_STORE_CONTEXT } = craft(
+    craft(
       {
         name: 'host1',
         providedIn: 'root',
