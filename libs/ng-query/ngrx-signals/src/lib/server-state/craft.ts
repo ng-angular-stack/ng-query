@@ -1,7 +1,12 @@
 import { Prettify } from '@ngrx/signals';
 import { __InternalSharedMutationConfig, MutationRef } from '../with-mutation';
 import { QueryRef } from '../with-query';
-import { InternalType, MergeObject, MergeObjects } from '../types/util.type';
+import {
+  InternalType,
+  MergeObject,
+  MergeObjects,
+  UnionToTuple,
+} from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
 import { QueryByIdRef } from '../with-query-by-id';
 import {
@@ -171,23 +176,25 @@ export type CraftFactory<
   StoreConfig,
   CraftActionOutputs extends ContextConstraints,
   StandaloneContextOutputs extends {}
-> = (<HostStoreConfig extends StoreConfigConstraints>( // todo add HostStoreConfig to deps
+> = (_cloud: any) => (<HostStoreConfig extends StoreConfigConstraints>(
   contextData: ContextInput<MergeContexts<Context>>,
   injector: Injector,
-  storeConfig: StoreConfig // do not use HostStoreConfig
+  storeConfig: StoreConfig, // do not use HostStoreConfig
+  _cloud: any
 ) => CraftActionOutputs) & {
   standaloneOutputs?: StandaloneContextOutputs;
 };
 
 export type CraftFactoryUtility<
   Context extends ContextConstraints,
-  StoreConfig extends StoreConfigConstraints, // todo try to keep this info
+  StoreConfig extends StoreConfigConstraints,
   CraftActionOutputs extends ContextConstraints,
   StandaloneOutputs extends {} = {}
-> = (<HostStoreConfig extends StoreConfigConstraints>(
+> = (_cloud: any) => (<HostStoreConfig extends StoreConfigConstraints>(
   contextData: ContextInput<Context>,
   injector: Injector,
-  storeConfig: HostStoreConfig
+  storeConfig: HostStoreConfig,
+  _cloud: any
 ) => CraftActionOutputs) & {
   standaloneOutputs?: StandaloneOutputs;
 };
@@ -211,25 +218,13 @@ type ReplaceStandaloneStoreToken<
     StoreConfig
   >]: StandaloneOutputs[K];
 };
-// ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
-type ToCraftOutputs<
-  Context extends ContextConstraints[],
-  StandaloneContextOutputs extends StandaloneOutputsConstraints[],
+type InjectCraftOutput<
+  Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
-  MergedContext extends MergeContexts<Context> = MergeContexts<Context>,
-  StandaloneOutputs = ReplaceStandaloneStoreToken<
-    MergeStandaloneContexts<StandaloneContextOutputs>,
-    StoreConfig
-  >,
-  StandaloneSetAllQueryParams = StandaloneOutputs, // todo
-  InputsToPlugin = EnableInputsToBeExternallyProvided<
-    MergedContext['_inputs'],
-    IsNotFeature<StoreConfig['providedIn']>
-  >,
-  HasInputs = keyof InputsToPlugin extends never ? false : true,
-  MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
-  HasMethods = keyof MethodsToConnect extends never ? false : true,
-  MethodsConnected extends MethodsToConnect = MethodsToConnect
+  HasInputs,
+  InputsToPlugin,
+  HasMethods,
+  MethodsConnected
 > = {
   [key in `inject${Capitalize<StoreConfig['name']>}Craft`]: <
     Config extends MergeObjects<
@@ -252,16 +247,30 @@ type ToCraftOutputs<
       : [pluggableConfig?: Config]
   ) => Prettify<
     RemoveIndexSignature<
-      MergedContext['props'] &
+      Context['props'] &
         ExcludeCommonKeys<
-          MergedContext['methods'],
+          Context['methods'],
           'methods' extends keyof Config ? Config['methods'] : {}
         >
     >
   >;
-} & {
+};
+
+type Strict<T> = T & Record<Exclude<string, keyof T>, never>;
+
+// todo try to find a way to not enable not known inputs/methods in pluggableConfig
+type CraftCompositionOutput<
+  Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints,
+  HasInputs,
+  InputsToPlugin,
+  HasMethods,
+  StandaloneOutputs,
+  MethodsToConnect,
+  MethodsConnected extends MethodsToConnect = MethodsToConnect
+> = {
   [key in `craft${Capitalize<StoreConfig['name']>}`]: <
-    Context extends ContextConstraints,
+    HostContext extends ContextConstraints,
     Config extends MergeObjects<
       [
         HasInputs extends true
@@ -271,60 +280,138 @@ type ToCraftOutputs<
           : {},
         HasMethods extends true
           ? {
-              methods?: Prettify<MethodsConnected>;
+              methods?: MethodsConnected;
             }
           : {}
       ]
     >
-  >( // todo user should not be able to add not expected inputs/methods
-    pluggableConfig?: (configFactory: CraftFactoryEntries<Context>) => Config
+  >(
+    pluggableConfig?: (
+      configFactory: CraftFactoryEntries<HostContext>
+    ) => MergeObject<
+      MergeObject<
+        Config,
+        Exclude<
+          'methods' extends keyof Config ? keyof Config['methods'] : never,
+          keyof MethodsToConnect
+        > extends infer NotKnownMethodsUnion
+          ? [NotKnownMethodsUnion] extends [undefined]
+            ? {}
+            : {
+                errorMethodMsg: `Error: You are trying to add methods that are not defined in the connected store: ${UnionToTuple<NotKnownMethodsUnion> &
+                  string}`;
+              }
+          : {}
+      >,
+      Exclude<
+        'inputs' extends keyof Config ? keyof Config['inputs'] : never,
+        keyof InputsToPlugin
+      > extends infer NotKnownInputsUnion
+        ? [NotKnownInputsUnion] extends [undefined]
+          ? {}
+          : {
+              errorMethodMsg: `Error: You are trying to add inputs that are not defined in the connected store: ${UnionToTuple<NotKnownInputsUnion> &
+                string}`;
+            }
+        : {}
+    >
   ) => CraftFactoryUtility<
-    Context,
+    HostContext,
     StoreConfig,
     {
-      props: MergedContext['props'];
+      props: Context['props'];
       methods: ExcludeCommonKeys<
-        MergedContext['methods'],
+        Context['methods'],
         'methods' extends keyof Config ? Config['methods'] : {}
       >;
       _inputs: ExcludeCommonKeys<
-        MergedContext['_inputs'],
+        Context['_inputs'],
         'inputs' extends keyof Config ? Config['inputs'] : {}
       >;
-      _queryParams: MergedContext['_queryParams'];
-      _sources: MergedContext['_sources'];
-      _injections: MergedContext['_injections'];
-      _asyncMethods: MergedContext['_asyncMethods'];
-      _mutation: MergedContext['_mutation'];
-      _query: MergedContext['_query'];
-      _cloud: MergedContext['_cloud'];
-      _dependencies: MergedContext['_dependencies'] & {
+      _queryParams: Context['_queryParams'];
+      _sources: Context['_sources'];
+      _injections: Context['_injections'];
+      _asyncMethods: Context['_asyncMethods'];
+      _mutation: Context['_mutation'];
+      _query: Context['_query'];
+      _cloud: Context['_cloud'];
+      _dependencies: Context['_dependencies'] & {
         [key in StoreConfig['name']]: {
           storeConfig: StoreConfig;
-          context: MergedContext;
+          context: Context;
         };
       };
     },
     [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
   >;
-} & {
+};
+
+type CraftToken<
+  Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints
+> = {
   [key in `${Capitalize<StoreConfig['name']>}Craft`]: InjectionToken<
-    Prettify<
-      RemoveIndexSignature<MergedContext['props'] & MergedContext['methods']>
-    >
+    Prettify<RemoveIndexSignature<Context['props'] & Context['methods']>>
   >;
-} & StandaloneOutputs & {
-    setAllQueryParams: StandaloneSetAllQueryParams;
-  } & {
-    /**
-     * Mainly used for debug and testing purposes
-     * Not instantiated at runtime
-     */
-    [k in `_${Uppercase<StoreConfig['name']>}_META_STORE_CONTEXT`]: {
-      storeConfig: StoreConfig;
-      context: Prettify<MergedContext>;
-    };
+};
+
+type META_CONTEXT<
+  Context extends ContextConstraints,
+  StoreConfig extends StoreConfigConstraints
+> = {
+  [k in `_${Uppercase<StoreConfig['name']>}_META_STORE_CONTEXT`]: {
+    storeConfig: StoreConfig;
+    context: Prettify<Context>;
   };
+};
+
+type OutputConstraints = {
+  context: ContextConstraints;
+  standaloneOutputs: {};
+  storeConfig: StoreConfigConstraints;
+  hasInputs: boolean;
+  inputsToPlugin: {};
+  hasMethods: boolean;
+  methodsToConnect: {};
+};
+
+// ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
+type ToCraftOutputs<
+  Context extends ContextConstraints[],
+  StandaloneContextOutputs extends StandaloneOutputsConstraints[],
+  StoreConfig extends StoreConfigConstraints,
+  MergedContext extends ContextConstraints = MergeContexts<Context>,
+  StandaloneOutputs = ReplaceStandaloneStoreToken<
+    MergeStandaloneContexts<StandaloneContextOutputs>,
+    StoreConfig
+  >,
+  InputsToPlugin = EnableInputsToBeExternallyProvided<
+    MergedContext['_inputs'],
+    IsNotFeature<StoreConfig['providedIn']>
+  >,
+  HasInputs = keyof InputsToPlugin extends never ? false : true,
+  MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
+  HasMethods = keyof MethodsToConnect extends never ? false : true
+> = InjectCraftOutput<
+  MergedContext,
+  StoreConfig,
+  HasInputs,
+  InputsToPlugin,
+  HasMethods,
+  MethodsToConnect
+> &
+  CraftCompositionOutput<
+    MergedContext,
+    StoreConfig,
+    HasInputs,
+    InputsToPlugin,
+    HasMethods,
+    StandaloneOutputs,
+    MethodsToConnect
+  > &
+  CraftToken<MergedContext, StoreConfig> &
+  StandaloneOutputs &
+  META_CONTEXT<MergedContext, StoreConfig>;
 
 type ProvidedInOption = 'root' | 'scoped' | 'feature';
 // todo handle feature to not expose the inject and the provide but only the using...
@@ -579,11 +666,13 @@ export function craft(
   };
   console.log('optionsName', options?.name);
 
+  const _cloud: any = {}; // todoCloud
+
   const extractedStandaloneOutputs = factoriesList.reduce(
     (acc, factoryWithStandalone) => {
       acc = {
         ...acc,
-        ...(factoryWithStandalone ?? {}),
+        ...(factoryWithStandalone(_cloud) ?? {}),
       };
       return acc;
     },
@@ -592,7 +681,6 @@ export function craft(
 
   // used to share context, when providedIn is not root and also used with 'inject' and with 'using'
   let sharedContext: ContextConstraints | undefined = undefined;
-
   const pluggableInputs = createSignalProxy(signal({}));
   let inputsKeysSet: Set<string> | undefined = undefined;
   const token = new InjectionToken('CraftStore', {
@@ -605,6 +693,7 @@ export function craft(
         pluggableInputs,
         injector,
         storeConfig,
+        _cloud,
       });
       inputsKeysSet = new Set(
         Object.keys((context as ContextConstraints)._inputs)
@@ -694,6 +783,7 @@ export function craft(
             pluggableInputs,
             injector,
             storeConfig,
+            _cloud,
           });
           storeContext = context;
         } else {
@@ -748,6 +838,7 @@ function mergeContextAndProps({
   pluggableInputs,
   injector,
   storeConfig,
+  _cloud,
 }: {
   factoriesList: CraftFactory<
     [ContextConstraints],
@@ -758,6 +849,7 @@ function mergeContextAndProps({
   pluggableInputs: SignalProxy<{}, true>;
   injector: Injector;
   storeConfig: StoreConfigConstraints;
+  _cloud: any;
 }): { propsAndMethods: any; context: any } {
   return factoriesList.reduce(
     (acc, factory) => {
@@ -768,12 +860,13 @@ function mergeContextAndProps({
           ContextConstraints,
           StandaloneOutputsConstraints
         >
-      )(
+      )(_cloud)(
         {
           context: { ...acc.context, _inputs: pluggableInputs },
         },
         injector,
-        storeConfig
+        storeConfig,
+        _cloud
       );
       Object.entries(result._inputs).forEach(([key, value]) => {
         const hasValue = pluggableInputs.$ref(key as never);
@@ -817,6 +910,7 @@ function mergeContextAndProps({
             ...result._asyncMethods,
           },
           _cloud: {
+            //todoCloud proxy composition
             ...acc.context._cloud,
             ...result._cloud,
           },

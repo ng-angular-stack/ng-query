@@ -534,10 +534,7 @@ describe('craft', () => {
           reset: () => 0,
         })
       ),
-      craftDataPagination(({ reset, counter }) => ({
-        inputs: {
-          defaultNumber: counter,
-        },
+      craftDataPagination(({ reset }) => ({
         methods: {
           reset,
         },
@@ -563,10 +560,7 @@ describe('craft', () => {
           reset: () => 0,
         })
       ),
-      craftDataPagination(({ reset, counter }) => ({
-        inputs: {
-          defaultNumber: counter,
-        },
+      craftDataPagination(({ reset }) => ({
         methods: {
           reset,
         },
@@ -705,10 +699,7 @@ describe('craft', () => {
           reset: () => 0,
         })
       ),
-      craftDataPagination(({ reset, counter }) => ({
-        inputs: {
-          defaultNumber: counter,
-        },
+      craftDataPagination(({ reset }) => ({
         methods: {
           reset,
         },
@@ -734,10 +725,7 @@ describe('craft', () => {
           reset: () => 0,
         })
       ),
-      craftDataPagination(({ reset, counter }) => ({
-        inputs: {
-          defaultNumber: counter,
-        },
+      craftDataPagination(({ reset }) => ({
         methods: {
           reset,
         },
@@ -917,6 +905,7 @@ describe('craft', () => {
       craftDataPagination(({ reset, counter }) => ({
         inputs: {
           shouldNotBeExposed: counter,
+          // test21: true,
         },
         methods: {
           reset,
@@ -944,7 +933,174 @@ describe('craft', () => {
     const host1 = injectHost1Craft();
 
     host1.addNumber(2);
+    host1.reset();
     expect(host1.numberList()).toEqual([1, 2]);
+  });
+
+  it('Typing: should add errorMethodMsg property  with the message You are trying to add methods that are not defined in the connected store..., If the connected methods name does not match', async () => {
+    const { craftDataPagination, _DATAPAGINATION_META_STORE_CONTEXT } = craft(
+      {
+        name: 'dataPagination',
+        providedIn: 'root',
+      },
+      craftInputs({
+        shouldNotBeExposed: undefined as number | undefined,
+      }),
+      craftState(
+        'numberList',
+        () => signal([1]),
+        ({ state }) => ({
+          addNumber: (numberValue: number) => {
+            const stateValue = state();
+            return [...stateValue, numberValue];
+          },
+          reset: () => {
+            return [];
+          },
+        })
+      )
+    );
+
+    expectTypeOf(_DATAPAGINATION_META_STORE_CONTEXT).toEqualTypeOf<{
+      storeConfig: {
+        providedIn: 'root';
+        name: 'dataPagination';
+      };
+      context: {
+        methods: {
+          addNumber: (numberValue: number) => number[];
+          reset: () => never[];
+        } & Record<string, Function>;
+        props: {
+          numberList: Signal<number[]>;
+        };
+        _inputs: {
+          shouldNotBeExposed: Signal<number | undefined>;
+        };
+        _injections: {};
+        _mutation: {};
+        _query: {};
+        _queryParams: {};
+        _sources: {};
+        _asyncMethods: {};
+        _cloud: {};
+        _dependencies: {};
+      };
+    }>();
+
+    const { injectHost1Craft, _HOST1_META_STORE_CONTEXT } = craft(
+      {
+        name: 'host1',
+        providedIn: 'root',
+      },
+      craftSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      craftState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      //@ts-expect-error test2 is not defined in the connected store methods, so errorMethodMsg is required
+      craftDataPagination(({ reset, counter }) => ({
+        inputs: {
+          shouldNotBeExposed: counter,
+        },
+        methods: {
+          reset,
+          test2: true,
+        },
+      }))
+    );
+  });
+
+  it('Typing: should add errorMethodMsg property  with the message You are trying to add methods that are not defined in the connected store..., If the connected methods name does not match', async () => {
+    const { craftDataPagination, _DATAPAGINATION_META_STORE_CONTEXT } = craft(
+      {
+        name: 'dataPagination',
+        providedIn: 'root',
+      },
+      craftInputs({
+        shouldNotBeExposed: undefined as number | undefined,
+      }),
+      craftState(
+        'numberList',
+        () => signal([1]),
+        ({ state }) => ({
+          addNumber: (numberValue: number) => {
+            const stateValue = state();
+            return [...stateValue, numberValue];
+          },
+          reset: () => {
+            return [];
+          },
+        })
+      )
+    );
+
+    expectTypeOf(_DATAPAGINATION_META_STORE_CONTEXT).toEqualTypeOf<{
+      storeConfig: {
+        providedIn: 'root';
+        name: 'dataPagination';
+      };
+      context: {
+        methods: {
+          addNumber: (numberValue: number) => number[];
+          reset: () => never[];
+        } & Record<string, Function>;
+        props: {
+          numberList: Signal<number[]>;
+        };
+        _inputs: {
+          shouldNotBeExposed: Signal<number | undefined>;
+        };
+        _injections: {};
+        _mutation: {};
+        _query: {};
+        _queryParams: {};
+        _sources: {};
+        _asyncMethods: {};
+        _cloud: {};
+        _dependencies: {};
+      };
+    }>();
+
+    craft(
+      {
+        name: 'host1',
+        providedIn: 'root',
+      },
+      craftSources({
+        increment: source<{}>(),
+        decrement: source<{}>(),
+        reset: source<{}>(),
+      }),
+      craftState(
+        'counter',
+        () => signal(0),
+        ({ context: { increment, decrement }, state }) => ({
+          increment: afterRecomputation(increment, () => state() + 1),
+          decrement: afterRecomputation(decrement, () => state() - 1),
+          reset: () => 0,
+        })
+      ),
+      //@ts-expect-error testNotExist is not defined in the connected store inputs, so errorInputMsg is required
+      craftDataPagination(({ reset, counter }) => ({
+        inputs: {
+          shouldNotBeExposed: counter,
+          testNotExist: true,
+        },
+        methods: {
+          reset,
+        },
+      }))
+    );
   });
 });
 
@@ -1125,94 +1281,104 @@ describe('craft preserve all context', () => {
           name: 'test',
           providedIn: 'root',
         },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        }
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          }
       );
       craft(
         {
           name: 'test',
           providedIn: 'root',
         },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        }
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          },
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          }
       );
       craft(
         {
           name: 'test',
           providedIn: 'root',
         },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        }
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          },
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          },
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          }
       );
       craft(
         {
           name: 'test',
           providedIn: 'root',
         },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        },
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return EmptyContext;
-        }
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          },
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          },
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          },
+        () =>
+          ({ context }, injector, storeConfig) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return EmptyContext;
+          }
       );
     });
   });
@@ -1231,7 +1397,7 @@ describe('craft preserve all context', () => {
             serialize: (value) => String(value),
           },
         })),
-        (contextData, injector, storeConfig) => {
+        () => (contextData, injector, storeConfig) => {
           expectTypeOf(storeConfig).toEqualTypeOf<{
             name: 'test';
             providedIn: 'root';
@@ -1345,13 +1511,14 @@ describe('craft preserve all context', () => {
           providedIn: 'root',
         },
         craftMySharedFeature(),
-        ({ context }, injector, storeConfig) => {
-          expectTypeOf(storeConfig).toEqualTypeOf<{
-            name: 'test';
-            providedIn: 'root';
-          }>();
-          return {} as EmptyContext;
-        }
+        (_cloud) =>
+          ({ context }, injector, storeConfig, _cloud) => {
+            expectTypeOf(storeConfig).toEqualTypeOf<{
+              name: 'test';
+              providedIn: 'root';
+            }>();
+            return {} as EmptyContext;
+          }
       );
       type t = Pick<
         (typeof _TEST_META_STORE_CONTEXT)['context'],
