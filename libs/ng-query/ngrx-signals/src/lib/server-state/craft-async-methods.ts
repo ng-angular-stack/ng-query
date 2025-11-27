@@ -144,7 +144,7 @@ export function craftAsyncMethods<
 >(
   asyncMethodsFactory: (context: CraftFactoryEntries<Context>) => AsyncMethods
 ): CraftAsyncMethodsOutputs<Context, StoreConfig, AsyncMethods> {
-  return (contextData, injector) => {
+  return (_cloudProxy) => (contextData) => {
     const asyncMethods = asyncMethodsFactory(
       craftFactoryEntries(contextData)
     ) as Record<

@@ -171,7 +171,7 @@ export function craftQuery<
   ResourceArgsParams,
   InsertionsOutputs
 > {
-  return (contextData, injector) => {
+  return (_cloudProxy) => (contextData, injector) => {
     const queryResult = queryFactory(craftFactoryEntries(contextData));
     const {
       queryRef: { resource: queryResource, insertionsOutputs },

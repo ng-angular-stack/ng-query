@@ -3,11 +3,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ApiService } from './api.service';
 import {
   queryById,
-  serverState,
   craftInject,
   craftMutationById,
   craftQueryById,
   craftQueryParams,
+  craft,
 } from '@ng-query/ngrx-signals';
 import { rxMutationById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
@@ -18,7 +18,11 @@ export type User = {
   name: string;
 };
 
-const { injectUserListServerState } = craft(
+const { injectUserListCraft } = craft(
+  {
+    name: 'UserList',
+    providedIn: 'root',
+  },
   craftInject(() => ({
     ApiService,
   })),
@@ -70,10 +74,7 @@ const { injectUserListServerState } = craft(
       },
       insertPaginationPlaceholderData
     )
-  ),
-  {
-    name: 'UserList',
-  }
+  )
 );
 
 @Component({

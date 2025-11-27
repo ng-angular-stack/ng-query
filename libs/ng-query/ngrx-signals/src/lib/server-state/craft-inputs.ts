@@ -32,7 +32,7 @@ export function craftInputs<
   Inputs extends {}
 >(inputs: Inputs): CraftInputsOutputs<Context, StoreConfig, Inputs> {
   // todo expose setXInputs as standalone ?
-  return (contextData) => {
+  return (_cloudProxy) => (contextData) => {
     return partialContext({
       _inputs: inputs,
     }) as SpecificCraftInputsOutputs<Inputs>;

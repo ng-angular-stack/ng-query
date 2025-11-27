@@ -105,7 +105,7 @@ export function craftMutation<
   ResourceParams,
   ResourceArgsParams
 > {
-  return (contextData) => {
+  return (_cloudProxy) => (contextData) => {
     const mutationResult = mutationFactory(craftFactoryEntries(contextData));
     const {
       mutationRef: {

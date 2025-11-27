@@ -25,8 +25,6 @@ type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
   >(
     params: Prettify<AllQueriesParamsState>
   ) => AllQueriesParamsState;
-} & {
-  testQp: Prettify<Pick<Context, '_queryParams'>>;
 };
 
 type CraftSetAllQueriesParamsStandaloneOutputs<
@@ -46,7 +44,7 @@ export function craftSetAllQueriesParamsStandalone<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints
 >(): CraftSetAllQueriesParamsStandaloneOutputs<Context, StoreConfig> {
-  return () => {
+  return (_cloudProxy) => () => {
     return partialContext({});
   };
 }

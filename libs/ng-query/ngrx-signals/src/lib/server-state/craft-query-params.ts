@@ -119,7 +119,7 @@ type SpecificCraftQueryStandaloneOutputs<
   ) => T;
 };
 
-type craftQueryParamsOutputs<
+type CraftQueryParamsOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   QueryParamsName extends string,
@@ -219,7 +219,7 @@ export function craftQueryParams<
     Methods,
     Context
   >
-): craftQueryParamsOutputs<
+): CraftQueryParamsOutputs<
   Context,
   StoreConfig,
   QueryParamsName,
@@ -230,7 +230,8 @@ export function craftQueryParams<
   const context = (
     contextData: ContextInput<Context>,
     injector: Injector,
-    _storeConfig: StoreConfig
+    _storeConfig: StoreConfig,
+    _cloudProxy: any
   ) => {
     const router = injector.get(Router);
     const activatedRoute = injector.get(ActivatedRoute);
@@ -388,6 +389,7 @@ export function craftQueryParams<
           state: queryParamsState,
         },
       },
+      methods,
     }) as SpecificCraftQueryParamsOutputs<
       QueryParamsName,
       QueryParamsConfig,
@@ -395,13 +397,21 @@ export function craftQueryParams<
     >;
   };
 
-  return Object.assign(context, {
-    [`set${capitalize(queryParamsName)}QueryParams`]: (
+  return ((_cloudProxy: any) => {
+    const setCurrentQueryParams = (
       params: Partial<{
         [K in keyof QueryParamsToState<QueryParamsConfig>]: QueryParamsToState<QueryParamsConfig>[K];
       }>
-    ) => serializeQueryParams(params, queryParamsConfig),
-  }) as unknown as craftQueryParamsOutputs<
+    ) => serializeQueryParams(params, queryParamsConfig);
+    const setCurrentQueryParamsKey = `set${capitalize(
+      queryParamsName
+    )}QueryParams`;
+    // expose to the cloudProxy
+    _cloudProxy[setCurrentQueryParamsKey] = setCurrentQueryParams;
+    return Object.assign(context, {
+      [setCurrentQueryParamsKey]: setCurrentQueryParams,
+    });
+  }) as unknown as CraftQueryParamsOutputs<
     Context,
     StoreConfig,
     QueryParamsName,

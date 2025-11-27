@@ -1,6 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
-import { craft, EmptyContext, MergeTwoContexts, PartialContext } from './craft';
+import {
+  craft,
+  EmptyContext,
+  MergeTwoContexts,
+  partialContext,
+  PartialContext,
+} from './craft';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 import { queryById } from '../query-by-id';
@@ -878,7 +884,7 @@ describe('craft', () => {
         _queryParams: {};
         _sources: {};
         _asyncMethods: {};
-        _cloud: {};
+        _cloudProxy: {};
         _dependencies: {};
       };
     }>();
@@ -983,7 +989,7 @@ describe('craft', () => {
         _queryParams: {};
         _sources: {};
         _asyncMethods: {};
-        _cloud: {};
+        _cloudProxy: {};
         _dependencies: {};
       };
     }>();
@@ -1066,7 +1072,7 @@ describe('craft', () => {
         _queryParams: {};
         _sources: {};
         _asyncMethods: {};
-        _cloud: {};
+        _cloudProxy: {};
         _dependencies: {};
       };
     }>();
@@ -1137,7 +1143,7 @@ describe('craft metadata', () => {
       _queryParams: {};
       _sources: {};
       _asyncMethods: {};
-      _cloud: {};
+      _cloudProxy: {};
       _dependencies: {};
     };
   }>();
@@ -1274,7 +1280,7 @@ describe('craft options', () => {
 });
 
 describe('craft preserve all context', () => {
-  it('should preserve the context when using serverState', async () => {
+  it('should preserve the context when using craft', async () => {
     await TestBed.runInInjectionContext(async () => {
       craft(
         {
@@ -1383,7 +1389,7 @@ describe('craft preserve all context', () => {
     });
   });
 
-  it('should preserve the context when using serverState', async () => {
+  it('should preserve the context when using craft', async () => {
     await TestBed.runInInjectionContext(async () => {
       const { _TEST_META_STORE_CONTEXT } = craft(
         {
@@ -1471,8 +1477,80 @@ describe('craft preserve all context', () => {
           };
           _sources: {};
           _asyncMethods: {};
-          _cloud: {};
+          _cloudProxy: {};
           _dependencies: {};
+        };
+      }>();
+    });
+  });
+
+  it('should preserve the context "cloudProxy" when using craft', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const { craftShared } = craft(
+        {
+          name: 'shared',
+          providedIn: 'feature',
+        },
+        () => () => {
+          return partialContext({
+            _cloudProxy: {
+              testPassingSharedValue: signal('share'),
+            },
+          }) as PartialContext<{
+            _cloudProxy: {
+              testPassingSharedValue: Signal<string>;
+            };
+          }>;
+        }
+      );
+      const { _TEST_META_STORE_CONTEXT } = craft(
+        {
+          name: 'test',
+          providedIn: 'root',
+        },
+        (outOfInjectionContextCloudProxy) =>
+          ({ context }, injector, storeConfig, cloudProxy) => {
+            expectTypeOf(cloudProxy).toEqualTypeOf<{}>();
+            return partialContext({
+              _cloudProxy: {
+                testPassingValue: signal('test'),
+              },
+            }) as PartialContext<{
+              _cloudProxy: {
+                testPassingValue: Signal<string>;
+              };
+            }>;
+          },
+        (outOfInjectionContextCloudProxy) => {
+          expectTypeOf(outOfInjectionContextCloudProxy).toEqualTypeOf<{
+            testPassingValue: Signal<string>;
+          }>();
+          return (contextData, injector, storeConfig, cloudProxy) => {
+            expectTypeOf(cloudProxy).toEqualTypeOf<{
+              testPassingValue: Signal<string>;
+            }>();
+            return partialContext({});
+          };
+        },
+        craftShared()
+      );
+      expectTypeOf<
+        Omit<(typeof _TEST_META_STORE_CONTEXT)['context'], '_dependencies'>
+      >().toEqualTypeOf<{
+        _inputs: ExcludeCommonKeys<{}, {}>;
+        methods: Record<string, Function> &
+          ExcludeCommonKeys<Record<string, Function>, {}>;
+        props: {};
+        _queryParams: {};
+        _sources: {};
+        _injections: {};
+        _asyncMethods: {};
+        _mutation: {};
+        _query: {};
+        _cloudProxy: {
+          testPassingValue: Signal<string>;
+        } & {
+          testPassingSharedValue: Signal<string>;
         };
       }>();
     });
@@ -1511,8 +1589,8 @@ describe('craft preserve all context', () => {
           providedIn: 'root',
         },
         craftMySharedFeature(),
-        (_cloud) =>
-          ({ context }, injector, storeConfig, _cloud) => {
+        (_cloudProxy) =>
+          ({ context }, injector, storeConfig, _cloudProxy) => {
             expectTypeOf(storeConfig).toEqualTypeOf<{
               name: 'test';
               providedIn: 'root';

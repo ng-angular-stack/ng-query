@@ -63,7 +63,7 @@ export function craftState<
     context: CraftFactoryEntries<Context>;
   }) => Methods
 ): CraftStateOutputs<Context, StoreConfig, StateName, State, Methods> {
-  return (contextData, injector) => {
+  return (_cloudProxy) => (contextData, injector) => {
     const stateResult = stateFactory(craftFactoryEntries(contextData));
 
     const state = stateResult;

@@ -1,98 +1,121 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import {
-  on,
-  serverState,
-  source,
-  craftInputs,
-  craftSources,
-  craftState,
-} from '@ng-query/ngrx-signals';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { craft, craftQueryParams } from '@ng-query/ngrx-signals';
 
-const { craftDataPaginationServerState } = craft(
-  craftInputs({
-    defaultNumber: undefined as number | undefined,
-  }),
-  craftState(
-    'numberList',
-    () => signal([1]),
-    ({ state, context: { defaultNumber } }) => {
-      return {
-        addNumber: (numberValue: number) => {
-          const stateValue = state();
-          return [...stateValue, numberValue];
-        },
-        addDefaultNumber: () => {
-          const stateValue = state();
-          return [...stateValue, defaultNumber() ?? 0];
-        },
-        reset: () => {
-          return [];
-        },
-      };
+const { injectQpCraft, setPaginationQueryParams } = craft(
+  {
+    name: 'qp',
+    providedIn: 'root',
+  },
+  craftQueryParams(
+    'pagination',
+    () => ({
+      page: {
+        defaultValue: 1,
+        parse: (value: string) => parseInt(value, 10),
+        serialize: (value: unknown) => String(value),
+      },
+    }),
+    {
+      methods: ({ queryParams }) => ({
+        nextPage: () => ({
+          ...queryParams(),
+          page: queryParams().page + 1,
+        }),
+        // _reset: afterRecomputation(reset, () => ({
+        //   ...queryParams(),
+        //   page: 1,
+        // })),
+      }),
     }
-  ),
-  {
-    name: 'dataPagination',
-    providedIn: 'feature',
-  }
+  )
 );
 
-const { injectHost1ServerState } = craft(
-  craftSources({
-    increment: source<{}>(),
-    decrement: source<{}>(),
-    reset: source<{}>(),
-  }),
-  craftState(
-    'counter',
-    () => signal(0),
-    ({ context: { increment, decrement }, state }) => ({
-      increment: on(increment, () => state() + 1),
-      decrement: on(decrement, () => state() - 1),
-      reset: () => 0,
-    })
-  ),
-  craftDataPaginationCraft(({ reset, counter }) => ({
-    inputs: {
-      defaultNumber: counter,
-    },
-    methods: {
-      reset,
-    },
-  })),
-  {
-    name: 'host1',
-  }
-);
+// const { craftDataPaginationServerState } = craft(
+//   craftInputs({
+//     defaultNumber: undefined as number | undefined,
+//   }),
+//   craftState(
+//     'numberList',
+//     () => signal([1]),
+//     ({ state, context: { defaultNumber } }) => {
+//       return {
+//         addNumber: (numberValue: number) => {
+//           const stateValue = state();
+//           return [...stateValue, numberValue];
+//         },
+//         addDefaultNumber: () => {
+//           const stateValue = state();
+//           return [...stateValue, defaultNumber() ?? 0];
+//         },
+//         reset: () => {
+//           return [];
+//         },
+//       };
+//     }
+//   ),
+//   {
+//     name: 'dataPagination',
+//     providedIn: 'feature',
+//   }
+// );
 
-const { injectHost2ServerState } = craft(
-  craftSources({
-    increment: source<{}>(),
-    decrement: source<{}>(),
-    reset: source<{}>(),
-  }),
-  craftState(
-    'counter',
-    () => signal(0),
-    ({ context: { increment, decrement }, state }) => ({
-      increment: on(increment, () => state() + 1),
-      decrement: on(decrement, () => state() - 1),
-      reset: () => 0,
-    })
-  ),
-  craftDataPaginationCraft(({ reset, counter }) => ({
-    inputs: {
-      defaultNumber: counter,
-    },
-    methods: {
-      reset,
-    },
-  })),
-  {
-    name: 'host2',
-  }
-);
+// const { injectHost1ServerState } = craft(
+//   craftSources({
+//     increment: source<{}>(),
+//     decrement: source<{}>(),
+//     reset: source<{}>(),
+//   }),
+//   craftState(
+//     'counter',
+//     () => signal(0),
+//     ({ context: { increment, decrement }, state }) => ({
+//       increment: on(increment, () => state() + 1),
+//       decrement: on(decrement, () => state() - 1),
+//       reset: () => 0,
+//     })
+//   ),
+//   craftDataPaginationCraft(({ reset, counter }) => ({
+//     inputs: {
+//       defaultNumber: counter,
+//     },
+//     methods: {
+//       reset,
+//     },
+//   })),
+//   {
+//     name: 'host1',
+//   }
+// );
+
+// const { injectHost2ServerState } = craft(
+//   craftSources({
+//     increment: source<{}>(),
+//     decrement: source<{}>(),
+//     reset: source<{}>(),
+//   }),
+//   craftState(
+//     'counter',
+//     () => signal(0),
+//     ({ context: { increment, decrement }, state }) => ({
+//       increment: on(increment, () => state() + 1),
+//       decrement: on(decrement, () => state() - 1),
+//       reset: () => 0,
+//     })
+//   ),
+//   craftDataPaginationCraft(({ reset, counter }) => ({
+//     inputs: {
+//       defaultNumber: counter,
+//     },
+//     methods: {
+//       reset,
+//     },
+//   })),
+//   {
+//     name: 'host2',
+//   }
+// );
 
 // const mySource = source<{ test: string }>();
 
@@ -236,7 +259,9 @@ const { injectHost2ServerState } = craft(
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="counter-container">
+    <div>{{ storeQp.pagination() | json }}</div>
+    <button (click)="storeQp.nextPage()">Next Page</button>
+    <!-- <div class="counter-container">
       <div class="counter-display">{{ store.counter() }}</div>
       <div class="counter-controls">
         <button
@@ -256,7 +281,7 @@ const { injectHost2ServerState } = craft(
 
     <div>store nested State numberList: {{ store.numberList() }}</div>
     <div>store2 nested State numberList: {{ store2.numberList() }}</div>
-    <button (click)="store.addDefaultNumber()">Add default number</button>
+    <button (click)="store.addDefaultNumber()">Add default number</button> -->
     <!-- Display async methods status /value-->
     <!-- <div>
       <h3>Async Method Status</h3>
@@ -371,12 +396,27 @@ const { injectHost2ServerState } = craft(
   ],
 })
 export default class TestComponent {
-  store = injectHost1Craft();
-  store2 = injectHost2Craft();
-
+  storeQp = injectQpCraft();
+  // store = injectHost1Craft();
+  // store2 = injectHost2Craft();
   // storeAsyncMethods = injectAsyncMethodsFeatureCraft();
-
   // store2 = injectTest2Craft();
-
   // myGlobalSource = myGlobalSource;
+
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
+
+  // todo avec _cloudProxy faire en sorte de pouvoir setAllQueryParams
+  constructor() {
+    let i = 1;
+    setInterval(() => {
+      setPaginationQueryParams({ page: i });
+      this.router.navigate([], {
+        relativeTo: this.activatedRoute,
+        queryParams: setPaginationQueryParams({ page: i }),
+        queryParamsHandling: 'replace', // merge or replace
+      });
+      i++;
+    }, 3000);
+  }
 }

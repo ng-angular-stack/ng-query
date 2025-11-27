@@ -6,7 +6,7 @@ import { Prettify } from '@ngrx/signals';
 
 describe('craftSetAllQueriesParamsStandalone', () => {
   it('should create query params configuration', () => {
-    const { injectTestStoreCraft, setAllTestStoreQueryParams, testQp } = craft(
+    const { injectTestStoreCraft, setAllTestStoreQueryParams } = craft(
       {
         providedIn: 'root',
         name: 'TestStore',

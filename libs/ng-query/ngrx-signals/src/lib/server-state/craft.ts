@@ -67,7 +67,7 @@ export type ContextConstraints = {
   _mutation: {};
   _query: {};
   _asyncMethods: {};
-  _cloud: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
+  _cloudProxy: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
   // _generatedDeps: {[name]: {propsKeys: string[], methodsKeys: string[]}}; // ? may be useful to generate interface that may be used for inversion of dependency
   // 👇 Filled when adding a nested craft
   _dependencies: {}; // {[craftName]: {[aliasName]: ContextConstraints;}} // todo implements composition alias and implements it
@@ -84,7 +84,7 @@ type _EmptyContext = {
   _asyncMethods: {};
   _mutation: {};
   _query: {};
-  _cloud: {};
+  _cloudProxy: {};
   _dependencies: {};
 };
 
@@ -98,7 +98,7 @@ export const EmptyContext = {
   _asyncMethods: {},
   _mutation: {},
   _query: {},
-  _cloud: {},
+  _cloudProxy: {},
   _dependencies: {},
 };
 
@@ -119,7 +119,7 @@ export function partialContext(
     _asyncMethods: context._asyncMethods ?? {},
     _mutation: context._mutation ?? {},
     _query: context._query ?? {},
-    _cloud: context._cloud ?? {},
+    _cloudProxy: context._cloudProxy ?? {},
     _dependencies: context._dependencies ?? {},
   };
 }
@@ -140,7 +140,9 @@ export type PartialContext<Context extends Partial<ContextConstraints>> = {
     : Context['_asyncMethods'];
   _mutation: [unknown] extends Context['_mutation'] ? {} : Context['_mutation'];
   _query: [unknown] extends Context['_query'] ? {} : Context['_query'];
-  _cloud: [unknown] extends Context['_cloud'] ? {} : Context['_cloud'];
+  _cloudProxy: [unknown] extends Context['_cloudProxy']
+    ? {}
+    : Context['_cloudProxy'];
   _dependencies: [unknown] extends Context['_dependencies']
     ? {}
     : Context['_dependencies'];
@@ -176,11 +178,13 @@ export type CraftFactory<
   StoreConfig,
   CraftActionOutputs extends ContextConstraints,
   StandaloneContextOutputs extends {}
-> = (_cloud: any) => (<HostStoreConfig extends StoreConfigConstraints>(
+> = (cloudProxy: MergeContexts<Context>['_cloudProxy']) => (<
+  HostStoreConfig extends StoreConfigConstraints
+>(
   contextData: ContextInput<MergeContexts<Context>>,
   injector: Injector,
   storeConfig: StoreConfig, // do not use HostStoreConfig
-  _cloud: any
+  cloudProxy: MergeContexts<Context>['_cloudProxy']
 ) => CraftActionOutputs) & {
   standaloneOutputs?: StandaloneContextOutputs;
 };
@@ -190,11 +194,13 @@ export type CraftFactoryUtility<
   StoreConfig extends StoreConfigConstraints,
   CraftActionOutputs extends ContextConstraints,
   StandaloneOutputs extends {} = {}
-> = (_cloud: any) => (<HostStoreConfig extends StoreConfigConstraints>(
+> = (cloudProxy: Context['_cloudProxy']) => (<
+  HostStoreConfig extends StoreConfigConstraints
+>(
   contextData: ContextInput<Context>,
   injector: Injector,
   storeConfig: HostStoreConfig,
-  _cloud: any
+  cloudProxy: Context['_cloudProxy']
 ) => CraftActionOutputs) & {
   standaloneOutputs?: StandaloneOutputs;
 };
@@ -332,7 +338,7 @@ type CraftCompositionOutput<
       _asyncMethods: Context['_asyncMethods'];
       _mutation: Context['_mutation'];
       _query: Context['_query'];
-      _cloud: Context['_cloud'];
+      _cloudProxy: Context['_cloudProxy'];
       _dependencies: Context['_dependencies'] & {
         [key in StoreConfig['name']]: {
           storeConfig: StoreConfig;
@@ -451,7 +457,7 @@ export type MergeTwoContexts<
   _queryParams: A['_queryParams'] & B['_queryParams'];
   _sources: A['_sources'] & B['_sources'];
   _asyncMethods: A['_asyncMethods'] & B['_asyncMethods'];
-  _cloud: A['_cloud'] & B['_cloud'];
+  _cloudProxy: A['_cloudProxy'] & B['_cloudProxy'];
   _dependencies: A['_dependencies'] & B['_dependencies'];
 };
 
@@ -664,13 +670,13 @@ export function craft(
   };
   console.log('optionsName', options?.name);
 
-  const _cloud: any = {}; // todoCloud
+  const _cloudProxy: any = {}; // todocloudProxy
 
   const extractedStandaloneOutputs = factoriesList.reduce(
     (acc, factoryWithStandalone) => {
       acc = {
         ...acc,
-        ...(factoryWithStandalone(_cloud) ?? {}),
+        ...(factoryWithStandalone(_cloudProxy) ?? {}),
       };
       return acc;
     },
@@ -691,7 +697,7 @@ export function craft(
         pluggableInputs,
         injector,
         storeConfig,
-        _cloud,
+        _cloudProxy,
       });
       inputsKeysSet = new Set(
         Object.keys((context as ContextConstraints)._inputs)
@@ -781,7 +787,7 @@ export function craft(
             pluggableInputs,
             injector,
             storeConfig,
-            _cloud,
+            _cloudProxy,
           });
           storeContext = context;
         } else {
@@ -836,7 +842,7 @@ function mergeContextAndProps({
   pluggableInputs,
   injector,
   storeConfig,
-  _cloud,
+  _cloudProxy,
 }: {
   factoriesList: CraftFactory<
     [ContextConstraints],
@@ -847,7 +853,7 @@ function mergeContextAndProps({
   pluggableInputs: SignalProxy<{}, true>;
   injector: Injector;
   storeConfig: StoreConfigConstraints;
-  _cloud: any;
+  _cloudProxy: any;
 }): { propsAndMethods: any; context: any } {
   return factoriesList.reduce(
     (acc, factory) => {
@@ -858,13 +864,13 @@ function mergeContextAndProps({
           ContextConstraints,
           StandaloneOutputsConstraints
         >
-      )(_cloud)(
+      )(_cloudProxy)(
         {
           context: { ...acc.context, _inputs: pluggableInputs },
         },
         injector,
         storeConfig,
-        _cloud
+        _cloudProxy
       );
       Object.entries(result._inputs).forEach(([key, value]) => {
         const hasValue = pluggableInputs.$ref(key as never);
@@ -907,10 +913,10 @@ function mergeContextAndProps({
             ...acc.context._asyncMethods,
             ...result._asyncMethods,
           },
-          _cloud: {
-            //todoCloud proxy composition
-            ...acc.context._cloud,
-            ...result._cloud,
+          _cloudProxy: {
+            //todocloudProxy proxy composition
+            ...acc.context._cloudProxy,
+            ...result._cloudProxy,
           },
           _dependencies: {
             ...acc.context._dependencies,
@@ -935,7 +941,7 @@ function mergeContextAndProps({
         _mutation: {},
         _query: {},
         _asyncMethods: {},
-        _cloud: {},
+        _cloudProxy: {},
         _dependencies: {},
       } as _EmptyContext,
       propsAndMethods: {},

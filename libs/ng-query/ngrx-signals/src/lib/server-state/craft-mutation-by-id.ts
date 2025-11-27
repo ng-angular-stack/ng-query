@@ -128,7 +128,7 @@ export function craftMutationById<
   ResourceArgsParams,
   GroupIdentifier
 > {
-  return (contextData) => {
+  return (_cloudProxy) => (contextData) => {
     const mutationResult = mutationFactory(craftFactoryEntries(contextData));
     const {
       mutationRef: {

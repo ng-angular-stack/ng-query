@@ -4,11 +4,11 @@ import {
   asyncMethod,
   mutationById,
   query,
-  serverState,
   craftAsyncMethods,
   craftInject,
   craftMutationById,
   craftQuery,
+  craft,
 } from '@ng-query/ngrx-signals';
 import { ApiService } from './api.service';
 import { StatusComponent } from '../../../../ui/status.component';
@@ -43,7 +43,11 @@ function cancellableTimeout(ms: number) {
 
 // suite: craftComputed/rename/inject/craftLocalGlobal
 
-const { injectGranularDeletionWithDelayServerState } = craft(
+const { injectGranularDeletionWithDelayCraft } = craft(
+  {
+    name: 'granularDeletionWithDelay',
+    providedIn: 'root',
+  },
   craftInject(() => ({
     ApiService,
   })),
@@ -61,12 +65,6 @@ const { injectGranularDeletionWithDelayServerState } = craft(
       },
     }),
   })),
-  // delayDeleteWithUndo._resourceById:
-  // Signal<{'1': Resource, '2': Resource, '3': Resource ...}>
-
-  // deleteItem:
-  // Signal<{'1': Resource, '2': Resource, '3': Resource ...}>
-
   craftMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
     mutationById({
       fromResourceById: delayDeleteWithUndo._resourceById,
@@ -106,10 +104,7 @@ const { injectGranularDeletionWithDelayServerState } = craft(
         },
       },
     }
-  ),
-  {
-    name: 'granularDeletionWithDelay',
-  }
+  )
 );
 
 @Component({
