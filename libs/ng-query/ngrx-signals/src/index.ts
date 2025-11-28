@@ -51,3 +51,4 @@ export { afterRecomputation } from './lib/server-state/after-recomputation';
 export { asyncMethod } from './lib/server-state/async-method';
 export { craftAsyncMethods } from './lib/server-state/craft-async-methods';
 export type { AsyncMethodRef } from './lib/server-state/craft-async-methods';
+export { craftSetAllQueriesParamsStandalone } from './lib/server-state/craft-set-all-queries-params-standalone';

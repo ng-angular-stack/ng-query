@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { craft, craftQueryParams } from '@ng-query/ngrx-signals';
+import {
+  craft,
+  craftQueryParams,
+  craftSetAllQueriesParamsStandalone,
+} from '@ng-query/ngrx-signals';
 
-const { injectQpCraft, setPaginationQueryParams } = craft(
+const { injectQpCraft, setAllQpQueryParams } = craft(
   {
     name: 'qp',
     providedIn: 'root',
@@ -23,13 +27,28 @@ const { injectQpCraft, setPaginationQueryParams } = craft(
           ...queryParams(),
           page: queryParams().page + 1,
         }),
-        // _reset: afterRecomputation(reset, () => ({
-        //   ...queryParams(),
-        //   page: 1,
-        // })),
       }),
     }
-  )
+  ),
+  craftQueryParams(
+    'activeFilters',
+    () => ({
+      active: {
+        defaultValue: false,
+        parse: (value: string) => value === 'true',
+        serialize: (value: unknown) => String(value),
+      },
+    }),
+    {
+      methods: ({ queryParams }) => ({
+        setActive: () => ({
+          ...queryParams(),
+          active: !queryParams().active,
+        }),
+      }),
+    }
+  ),
+  craftSetAllQueriesParamsStandalone()
 );
 
 // const { craftDataPaginationServerState } = craft(
@@ -410,12 +429,19 @@ export default class TestComponent {
   constructor() {
     let i = 1;
     setInterval(() => {
-      setPaginationQueryParams({ page: i });
       this.router.navigate([], {
         relativeTo: this.activatedRoute,
-        queryParams: setPaginationQueryParams({ page: i }),
+        queryParams: setAllQpQueryParams({
+          pagination: {
+            page: i,
+          },
+          activeFilters: {
+            active: i % 2 === 0,
+          },
+        }),
         queryParamsHandling: 'replace', // merge or replace
       });
+
       i++;
     }, 3000);
   }

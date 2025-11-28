@@ -4,6 +4,7 @@ import { craftQueryParams } from './craft-query-params';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
 import { Prettify } from '@ngrx/signals';
 
+// todo add test navigate with query params and navigateByUrl with query params
 describe('craftSetAllQueriesParamsStandalone', () => {
   it('should create query params configuration', () => {
     const { injectTestStoreCraft, setAllTestStoreQueryParams } = craft(

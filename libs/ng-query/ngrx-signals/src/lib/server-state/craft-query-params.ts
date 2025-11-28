@@ -17,7 +17,7 @@ import {
   StoreConfigConstraints,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
-import { createMethodHandlers } from './util/util';
+import { capitalize, createMethodHandlers } from './util/util';
 import { ReadonlySource } from './util/source.type';
 
 export interface QueryParamConfig<T = unknown> {
@@ -231,7 +231,7 @@ export function craftQueryParams<
     contextData: ContextInput<Context>,
     injector: Injector,
     _storeConfig: StoreConfig,
-    _cloudProxy: any
+    _cloudProxy: Context['_cloudProxy']
   ) => {
     const router = injector.get(Router);
     const activatedRoute = injector.get(ActivatedRoute);
@@ -376,7 +376,6 @@ export function craftQueryParams<
       ...generalMethods,
       ...finalMethods,
     } as QueryParamMethods<QueryParamsName, QueryParamsConfig, Methods>;
-    console.log('methods', methods);
 
     return partialContext({
       props: {
@@ -397,7 +396,7 @@ export function craftQueryParams<
     >;
   };
 
-  return ((_cloudProxy: any) => {
+  return (() => {
     const setCurrentQueryParams = (
       params: Partial<{
         [K in keyof QueryParamsToState<QueryParamsConfig>]: QueryParamsToState<QueryParamsConfig>[K];
@@ -406,8 +405,6 @@ export function craftQueryParams<
     const setCurrentQueryParamsKey = `set${capitalize(
       queryParamsName
     )}QueryParams`;
-    // expose to the cloudProxy
-    _cloudProxy[setCurrentQueryParamsKey] = setCurrentQueryParams;
     return Object.assign(context, {
       [setCurrentQueryParamsKey]: setCurrentQueryParams,
     });
@@ -445,10 +442,6 @@ function serializeQueryParams<
     },
     enumerable: false, // 👈 ne s'affichera pas dans les clés
   });
-}
-
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function serializedQueryParamsObjectToString(

@@ -56,7 +56,7 @@ export type QueryDictionary = Record<
 
 // todo rename __query/__mutation asyncMethods ?
 // todo find a way to simplify that, props exposed everywhere, _props only in stores and __props only in current store ?
-
+// todo doc about cloudProxy (it store all standalones methods automatically)
 export type ContextConstraints = {
   props: {};
   methods: Record<string, Function>; //? (editable in injectCraft/craftCraft)
@@ -68,9 +68,7 @@ export type ContextConstraints = {
   _query: {};
   _asyncMethods: {};
   _cloudProxy: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
-  // _generatedDeps: {[name]: {propsKeys: string[], methodsKeys: string[]}}; // ? may be useful to generate interface that may be used for inversion of dependency
-  // 👇 Filled when adding a nested craft
-  _dependencies: {}; // {[craftName]: {[aliasName]: ContextConstraints;}} // todo implements composition alias and implements it
+  _dependencies: {}; // todo implements composition alias and implements it
 };
 
 // ! do not expose it
@@ -148,6 +146,8 @@ export type PartialContext<Context extends Partial<ContextConstraints>> = {
     : Context['_dependencies'];
 };
 
+export type CloudProxy<T> = T;
+
 export type CraftFactoryEntries<Context extends ContextConstraints> =
   Context['_inputs'] &
     Context['_injections'] &
@@ -173,14 +173,16 @@ export type ContextInput<Context extends ContextConstraints> = {
  * ! Do not use it to generate the output of utilities like (craftQuery, craftMutation, etc..),
  * ! the context is not correctly inferred (use CraftFactoryUtility instead)
  */
+//todo _cloud should extends stadalone outputs _cloud
 export type CraftFactory<
   Context extends ContextConstraints[],
   StoreConfig,
   CraftActionOutputs extends ContextConstraints,
   StandaloneContextOutputs extends {}
-> = (cloudProxy: MergeContexts<Context>['_cloudProxy']) => (<
-  HostStoreConfig extends StoreConfigConstraints
->(
+> = (
+  cloudProxy: CloudProxy<MergeContexts<Context>['_cloudProxy']>,
+  storeConfig: StoreConfig
+) => (<HostStoreConfig extends StoreConfigConstraints>(
   contextData: ContextInput<MergeContexts<Context>>,
   injector: Injector,
   storeConfig: StoreConfig, // do not use HostStoreConfig
@@ -194,9 +196,10 @@ export type CraftFactoryUtility<
   StoreConfig extends StoreConfigConstraints,
   CraftActionOutputs extends ContextConstraints,
   StandaloneOutputs extends {} = {}
-> = (cloudProxy: Context['_cloudProxy']) => (<
-  HostStoreConfig extends StoreConfigConstraints
->(
+> = (
+  cloudProxy: CloudProxy<Context['_cloudProxy']>,
+  storeConfig: StoreConfig
+) => (<HostStoreConfig extends StoreConfigConstraints>(
   contextData: ContextInput<Context>,
   injector: Injector,
   storeConfig: HostStoreConfig,
@@ -262,7 +265,6 @@ type InjectCraftOutput<
   >;
 };
 
-// todo try to find a way to not enable not known inputs/methods in pluggableConfig
 type CraftCompositionOutput<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
@@ -367,16 +369,6 @@ type META_CONTEXT<
     storeConfig: StoreConfig;
     context: Prettify<Context>;
   };
-};
-
-type OutputConstraints = {
-  context: ContextConstraints;
-  standaloneOutputs: {};
-  storeConfig: StoreConfigConstraints;
-  hasInputs: boolean;
-  inputsToPlugin: {};
-  hasMethods: boolean;
-  methodsToConnect: {};
 };
 
 // ! Plugged methods are not exposed in the final store (at type level, at runtime they exists and they are not hiding)
@@ -670,18 +662,21 @@ export function craft(
   };
   console.log('optionsName', options?.name);
 
-  const _cloudProxy: any = {}; // todocloudProxy
+  const _cloudProxy = new Proxy({}, {});
 
   const extractedStandaloneOutputs = factoriesList.reduce(
     (acc, factoryWithStandalone) => {
       acc = {
         ...acc,
-        ...(factoryWithStandalone(_cloudProxy) ?? {}),
+        ...(factoryWithStandalone(_cloudProxy, storeConfig) ?? {}),
       };
       return acc;
     },
     {} as Record<string, unknown>
   );
+
+  // _cloudProxy will now have all the standalone outputs assigned to it
+  Object.assign(_cloudProxy, extractedStandaloneOutputs);
 
   // used to share context, when providedIn is not root and also used with 'inject' and with 'using'
   let sharedContext: ContextConstraints | undefined = undefined;
@@ -766,64 +761,72 @@ export function craft(
       }
     ) => {
       return (
-        contextData: ContextInput<ContextConstraints>,
-        injector: Injector // todo add store config
-      ) => {
-        console.log('optionsName craft', options?.name);
-        const entries =
-          pluggableConfig?.({
-            ...contextData.context._inputs,
-            ...contextData.context._injections,
-            ...contextData.context._sources,
-            ...contextData.context.props,
-          } as any) ?? {};
-        const entriesInputs = entries?.inputs;
+          hostCloud: CloudProxy<Record<string, unknown>>,
+          storeConfig: StoreConfigConstraints
+        ) =>
+        (
+          contextData: ContextInput<ContextConstraints>,
+          injector: Injector,
+          storeConfig: StoreConfigConstraints,
+          _cloudProxy: CloudProxy<Record<string, unknown>>
+        ) => {
+          const entries =
+            pluggableConfig?.({
+              ...contextData.context._inputs,
+              ...contextData.context._injections,
+              ...contextData.context._sources,
+              ...contextData.context.props,
+            } as any) ?? {};
+          const entriesInputs = entries?.inputs;
 
-        let storeContext: ContextConstraints | undefined = undefined;
+          let storeContext: ContextConstraints | undefined = undefined;
 
-        if (options?.providedIn !== 'root') {
-          const { context } = mergeContextAndProps({
-            factoriesList,
-            pluggableInputs,
-            injector,
-            storeConfig,
-            _cloudProxy,
-          });
-          storeContext = context;
-        } else {
-          const _getOrGenerateStore = inject(token);
-          storeContext = sharedContext;
-        }
+          if (options?.providedIn !== 'root') {
+            const { context } = mergeContextAndProps({
+              factoriesList,
+              pluggableInputs,
+              injector,
+              storeConfig,
+              _cloudProxy,
+            });
+            storeContext = context;
+          } else {
+            const _getOrGenerateStore = inject(token);
+            storeContext = sharedContext;
+          }
 
-        inputsKeysSet = new Set(
-          Object.keys((storeContext as ContextConstraints)._inputs)
-        );
-        if (entriesInputs) {
-          let hasInputs = false;
-          const inputs = Array.from(inputsKeysSet ?? []).reduce(
-            (acc, inputKey) => {
-              if (inputKey in entriesInputs) {
-                hasInputs = true;
-                const value = (entriesInputs as any)[inputKey];
-                if (value !== EXTERNALLY_PROVIDED) {
-                  acc[inputKey] = (entriesInputs as any)[inputKey];
+          inputsKeysSet = new Set(
+            Object.keys((storeContext as ContextConstraints)._inputs)
+          );
+          if (entriesInputs) {
+            let hasInputs = false;
+            const inputs = Array.from(inputsKeysSet ?? []).reduce(
+              (acc, inputKey) => {
+                if (inputKey in entriesInputs) {
+                  hasInputs = true;
+                  const value = (entriesInputs as any)[inputKey];
+                  if (value !== EXTERNALLY_PROVIDED) {
+                    acc[inputKey] = (entriesInputs as any)[inputKey];
+                  }
+                  return acc;
                 }
                 return acc;
-              }
-              return acc;
-            },
-            {} as Record<string, unknown>
-          );
-          if (hasInputs) {
-            pluggableInputs.$patch(inputs as ContextConstraints['_inputs']);
+              },
+              {} as Record<string, unknown>
+            );
+            if (hasInputs) {
+              pluggableInputs.$patch(inputs as ContextConstraints['_inputs']);
+            }
           }
-        }
-        // todo if provided global use the injected one, otherwise trigger manuually
-        return Object.assign(
-          storeContext as ContextConstraints,
-          extractedStandaloneOutputs
-        );
-      };
+
+          Object.assign(hostCloud, _cloudProxy);
+
+          // todo if provided global use the injected one, otherwise trigger manuually
+          return Object.assign(
+            storeContext as ContextConstraints,
+            extractedStandaloneOutputs
+          );
+        };
     },
     [`${capitalizedName}Craft`]: token,
     ...extractedStandaloneOutputs,
@@ -853,7 +856,7 @@ function mergeContextAndProps({
   pluggableInputs: SignalProxy<{}, true>;
   injector: Injector;
   storeConfig: StoreConfigConstraints;
-  _cloudProxy: any;
+  _cloudProxy: CloudProxy<Record<string, unknown>>;
 }): { propsAndMethods: any; context: any } {
   return factoriesList.reduce(
     (acc, factory) => {
@@ -864,7 +867,7 @@ function mergeContextAndProps({
           ContextConstraints,
           StandaloneOutputsConstraints
         >
-      )(_cloudProxy)(
+      )(_cloudProxy, storeConfig)(
         {
           context: { ...acc.context, _inputs: pluggableInputs },
         },
@@ -878,6 +881,7 @@ function mergeContextAndProps({
           pluggableInputs.$patch({ [key]: value } as any);
         }
       });
+      Object.assign(_cloudProxy, result._cloudProxy);
       return {
         context: {
           _inputs: { ...acc.context._inputs, ...result._inputs },
@@ -914,7 +918,6 @@ function mergeContextAndProps({
             ...result._asyncMethods,
           },
           _cloudProxy: {
-            //todocloudProxy proxy composition
             ...acc.context._cloudProxy,
             ...result._cloudProxy,
           },
