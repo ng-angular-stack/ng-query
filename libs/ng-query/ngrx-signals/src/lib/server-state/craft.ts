@@ -277,6 +277,7 @@ type CraftCompositionOutput<
 > = {
   [key in `craft${Capitalize<StoreConfig['name']>}`]: <
     HostContext extends ContextConstraints,
+    HostStoreConfig extends StoreConfigConstraints,
     Config extends MergeObjects<
       [
         HasInputs extends true
@@ -323,7 +324,7 @@ type CraftCompositionOutput<
     >
   ) => CraftFactoryUtility<
     HostContext,
-    StoreConfig,
+    HostStoreConfig,
     {
       props: Context['props'];
       methods: ExcludeCommonKeys<

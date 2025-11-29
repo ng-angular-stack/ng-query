@@ -1158,8 +1158,6 @@ describe('craft metadata', () => {
   expectTypeOf(
     _DATA_META_STORE_CONTEXT['context']['_dependencies']['shared']
   ).toEqualTypeOf(_SHARED_META_STORE_CONTEXT);
-
-  // todo add test to check if data is correctly filled
 });
 
 describe('craft options', () => {
