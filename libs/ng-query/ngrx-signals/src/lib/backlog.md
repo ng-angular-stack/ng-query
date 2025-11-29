@@ -1,4 +1,9 @@
-Ajout des tests manquants en même temps
+- passer les query mutation en une seule fonction
+- Revoir le persister pour les query et le state
+- doc
+- utilisation des observables
+- craftRoute state (matrix parameters, fragment... TS routes ?)
+- craft alias
 
 ## Feature
 

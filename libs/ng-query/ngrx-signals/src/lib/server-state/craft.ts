@@ -27,10 +27,7 @@ import {
 } from './util/util.type';
 
 //todo craft inouts should not accepts other params
-// todo inputs query&queryParams
-// todo rename craft ?
 // todo filter private fields and methods ?
-// todo keep each state dependencies (will enable to use some functionalities that will require to know the dependencies of other states, like setQueryParamsAnPrefetch (that can only works for root stores/states))
 
 // ! when adding standalone outputs make sure to assign like this: const c = Object.assign(() => true, {a: 5}) (function first)
 
