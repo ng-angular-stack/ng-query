@@ -144,6 +144,7 @@ export type PartialContext<Context extends Partial<ContextConstraints>> = {
 };
 
 export type CloudProxy<T> = T;
+export type CloudProxySource = Record<string, unknown>;
 
 export type CraftFactoryEntries<Context extends ContextConstraints> =
   Context['_inputs'] &
@@ -194,7 +195,7 @@ export type CraftFactoryUtility<
   CraftActionOutputs extends ContextConstraints,
   StandaloneOutputs extends {} = {}
 > = (
-  cloudProxy: CloudProxy<Context['_cloudProxy']>,
+  cloudProxy: CloudProxySource,
   storeConfig: StoreConfig
 ) => (<HostStoreConfig extends StoreConfigConstraints>(
   contextData: ContextInput<Context>,
@@ -722,7 +723,7 @@ export function craft(
               hasInputs = true;
               const value = (entriesInputs as any)[inputKey];
               if (value !== EXTERNALLY_PROVIDED) {
-                acc[inputKey] = (entries as any)[inputKey];
+                acc[inputKey] = (entries as any)['inputs'][inputKey];
               }
               return acc;
             }
@@ -858,6 +859,7 @@ function mergeContextAndProps({
 }): { propsAndMethods: any; context: any } {
   return factoriesList.reduce(
     (acc, factory) => {
+      console.log('factory', factory);
       const result = (
         factory as CraftFactory<
           [ContextConstraints],
@@ -878,7 +880,11 @@ function mergeContextAndProps({
         if (!hasValue) {
           pluggableInputs.$patch({ [key]: value } as any);
         }
+        //@ts-ignore
+        console.log('pluggableInputs', pluggableInputs['myParams']());
+        debugger;
       });
+
       Object.assign(_cloudProxy, result._cloudProxy);
       return {
         context: {

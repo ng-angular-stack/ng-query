@@ -2,6 +2,7 @@
 - Revoir le persister pour les query et le state
 - doc
 - utilisation des observables
+- augmenter les signatures de craft
 - craftRoute state (matrix parameters, fragment... TS routes ?)
 - craft alias
 

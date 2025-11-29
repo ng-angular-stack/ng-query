@@ -80,10 +80,15 @@ export function craftSources<
       },
     };
   }, {} as Record<string, (payload: unknown) => void>);
-  return Object.assign((contextData: ContextConstraints) => {
-    return partialContext({
-      _sources: sources,
-      methods,
-    }) as SpecificCraftSourcesOutputs<Sources>;
-  }, methods) as unknown as CraftSourcesOutputs<Context, StoreConfig, Sources>;
+  return (() =>
+    Object.assign((contextData: ContextConstraints) => {
+      return partialContext({
+        _sources: sources,
+        methods,
+      }) as SpecificCraftSourcesOutputs<Sources>;
+    }, methods) as unknown as CraftSourcesOutputs<
+      Context,
+      StoreConfig,
+      Sources
+    >) as unknown as CraftSourcesOutputs<Context, StoreConfig, Sources>;
 }

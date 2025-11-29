@@ -5,6 +5,7 @@ import {
   CraftFactoryUtility,
   StoreConfigConstraints,
   partialContext,
+  CloudProxySource,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
 import { STORE_CONFIG_TOKEN } from './util/util.type';
@@ -45,7 +46,7 @@ export function craftSetAllQueriesParamsStandalone<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints
 >(): CraftSetAllQueriesParamsStandaloneOutputs<Context, StoreConfig> {
-  return (_cloudProxy: Record<string, unknown>, storeConfig) => {
+  return (_cloudProxy: CloudProxySource, storeConfig) => {
     return Object.assign(() => partialContext({}), {
       [`setAll${capitalize(storeConfig.name)}QueryParams`]: (allQueryParams: {
         [queryParamsName: string]: unknown;

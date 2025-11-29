@@ -4,6 +4,7 @@ import {
   craftFactoryEntries,
   CraftFactoryEntries,
   CraftFactoryUtility,
+  partialContext,
   PartialContext,
   StoreConfigConstraints,
 } from './craft';
@@ -63,7 +64,7 @@ export function craftState<
     context: CraftFactoryEntries<Context>;
   }) => Methods
 ): CraftStateOutputs<Context, StoreConfig, StateName, State, Methods> {
-  return (_cloudProxy) => (contextData, injector) => {
+  return () => (contextData) => {
     const stateResult = stateFactory(craftFactoryEntries(contextData));
 
     const state = stateResult;
@@ -74,16 +75,9 @@ export function craftState<
     });
     const finalMethods = createMethodHandlers<State>(methodsData, state);
 
-    return {
+    return partialContext({
       props: { [stateName]: readonlyState },
-      inputs: {},
-      queryParams: {},
-      sources: {},
-      __injections: {},
-      __query: {},
-      __mutation: {},
-      asyncMethods: {},
       methods: finalMethods,
-    } as unknown as SpecificCraftStateOutputs<StateName, State, Methods>;
+    }) as unknown as SpecificCraftStateOutputs<StateName, State, Methods>;
   };
 }

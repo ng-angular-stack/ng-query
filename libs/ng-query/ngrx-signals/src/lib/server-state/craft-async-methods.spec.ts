@@ -200,14 +200,6 @@ describe('usingAsyncMethods with identifier', () => {
               return { searchChange };
             },
           }),
-          // searchLocalChange: asyncMethod({
-          //   method: on(myLocalSource, (payload) => payload),
-          //   identifier: (params) => params.searchChange,
-          //   loader: async ({ params: { timeToWait, searchChange } }) => {
-          //     await new Promise((resolve) => setTimeout(resolve, timeToWait));
-          //     return { searchChange };
-          //   },
-          // }),
         }))
       );
       const store = injectCraft();

@@ -1111,53 +1111,57 @@ describe('craft', () => {
 });
 
 describe('craft metadata', () => {
-  const { _SHARED_META_STORE_CONTEXT, craftShared } = craft(
-    {
-      name: 'shared',
-      providedIn: 'feature',
-    },
-    craftState(
-      'test',
-      () => signal(1),
-      ({ state }) => ({
-        increment: () => state() + 1,
-      })
-    )
-  );
-  expectTypeOf(_SHARED_META_STORE_CONTEXT).toEqualTypeOf<{
-    storeConfig: {
-      providedIn: 'feature';
-      name: 'shared';
-    };
-    context: {
-      methods: {
-        increment: () => number;
-      } & Record<string, Function>;
-      props: {
-        test: Signal<number>;
-      };
-      _inputs: {};
-      _injections: {};
-      _mutation: {};
-      _query: {};
-      _queryParams: {};
-      _sources: {};
-      _asyncMethods: {};
-      _cloudProxy: {};
-      _dependencies: {};
-    };
-  }>();
+  it('should expose the store metadata', async () => {
+    TestBed.runInInjectionContext(() => {
+      const { _SHARED_META_STORE_CONTEXT, craftShared } = craft(
+        {
+          name: 'shared',
+          providedIn: 'feature',
+        },
+        craftState(
+          'test',
+          () => signal(1),
+          ({ state }) => ({
+            increment: () => state() + 1,
+          })
+        )
+      );
+      expectTypeOf(_SHARED_META_STORE_CONTEXT).toEqualTypeOf<{
+        storeConfig: {
+          providedIn: 'feature';
+          name: 'shared';
+        };
+        context: {
+          methods: {
+            increment: () => number;
+          } & Record<string, Function>;
+          props: {
+            test: Signal<number>;
+          };
+          _inputs: {};
+          _injections: {};
+          _mutation: {};
+          _query: {};
+          _queryParams: {};
+          _sources: {};
+          _asyncMethods: {};
+          _cloudProxy: {};
+          _dependencies: {};
+        };
+      }>();
 
-  const { _DATA_META_STORE_CONTEXT } = craft(
-    {
-      name: 'data',
-      providedIn: 'root',
-    },
-    craftShared()
-  );
-  expectTypeOf(
-    _DATA_META_STORE_CONTEXT['context']['_dependencies']['shared']
-  ).toEqualTypeOf(_SHARED_META_STORE_CONTEXT);
+      const { _DATA_META_STORE_CONTEXT } = craft(
+        {
+          name: 'data',
+          providedIn: 'root',
+        },
+        craftShared()
+      );
+      expectTypeOf(
+        _DATA_META_STORE_CONTEXT['context']['_dependencies']['shared']
+      ).toEqualTypeOf(_SHARED_META_STORE_CONTEXT);
+    });
+  });
 });
 
 describe('craft options', () => {

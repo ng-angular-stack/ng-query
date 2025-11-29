@@ -215,7 +215,7 @@ export function craftQueryById<
   GroupIdentifier,
   InsertionsOutputs
 > {
-  return (_cloudProxy) => (contextData, injector) => {
+  return () => (contextData, injector) => {
     const queryResult = queryFactory(craftFactoryEntries(contextData));
     const {
       queryRef: { resourceById: queryResourcesById, insertionsOutputs },

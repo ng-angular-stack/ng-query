@@ -64,24 +64,7 @@ type CraftAsyncMethodsOutputs<
   SpecificCraftAsyncMethodsOutputs<AsyncMethods>
 >;
 
-export type AsyncMethodByIdRef<GroupIdentifier, State, ResourceParams> =
-  () => Prettify<
-    Partial<
-      Record<
-        GroupIdentifier & string,
-        {
-          readonly value: Signal<State | undefined>;
-          readonly status: Signal<string>;
-          readonly error: Signal<Error | undefined>;
-          readonly isLoading: Signal<boolean>;
-          hasValue(): boolean;
-        }
-      >
-    >
-  >;
 // ! It looks like TS does not handle to expose the ResourceByIdHandler without erasing the () => ... part
-// ResourceByIdHandler<GroupIdentifier & string, State, ResourceParams>;
-
 export type AsyncMethodRef<
   Value,
   ArgParams,

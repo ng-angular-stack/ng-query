@@ -1,55 +1,80 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  craft,
-  craftQueryParams,
-  craftSetAllQueriesParamsStandalone,
-} from '@ng-query/ngrx-signals';
+import { craft, craftInputs, craftQuery, query } from '@ng-query/ngrx-signals';
 
-const { injectQpCraft, setAllQpQueryParams } = craft(
+const { injectCraft } = craft(
   {
-    name: 'qp',
+    name: '',
     providedIn: 'root',
   },
-  craftQueryParams(
-    'pagination',
-    () => ({
-      page: {
-        defaultValue: 1,
-        parse: (value: string) => parseInt(value, 10),
-        serialize: (value: unknown) => String(value),
+  craftInputs({
+    myParams: undefined as string | undefined,
+  }),
+  craftQuery('user', (inputs) => {
+    console.log('inputs', inputs);
+    debugger;
+    return query({
+      params: () => {
+        const result = inputs.myParams();
+        console.log('result', result);
+        return result;
       },
-    }),
-    {
-      methods: ({ queryParams }) => ({
-        nextPage: () => ({
-          ...queryParams(),
-          page: queryParams().page + 1,
-        }),
-      }),
-    }
-  ),
-  craftQueryParams(
-    'activeFilters',
-    () => ({
-      active: {
-        defaultValue: false,
-        parse: (value: string) => value === 'true',
-        serialize: (value: unknown) => String(value),
+      loader: async ({ params }) => {
+        console.log('query params', params);
+        return {
+          id: params,
+          name: 'John Doe',
+          email: 'test@a.com',
+        };
       },
-    }),
-    {
-      methods: ({ queryParams }) => ({
-        setActive: () => ({
-          ...queryParams(),
-          active: !queryParams().active,
-        }),
-      }),
-    }
-  ),
-  craftSetAllQueriesParamsStandalone()
+    });
+  })
 );
+
+// const { injectQpCraft, setAllQpQueryParams } = craft(
+//   {
+//     name: 'qp',
+//     providedIn: 'root',
+//   },
+//   craftQueryParams(
+//     'pagination',
+//     () => ({
+//       page: {
+//         defaultValue: 1,
+//         parse: (value: string) => parseInt(value, 10),
+//         serialize: (value: unknown) => String(value),
+//       },
+//     }),
+//     {
+//       methods: ({ queryParams }) => ({
+//         nextPage: () => ({
+//           ...queryParams(),
+//           page: queryParams().page + 1,
+//         }),
+//       }),
+//     }
+//   ),
+//   craftQueryParams(
+//     'activeFilters',
+//     () => ({
+//       active: {
+//         defaultValue: false,
+//         parse: (value: string) => value === 'true',
+//         serialize: (value: unknown) => String(value),
+//       },
+//     }),
+//     {
+//       methods: ({ queryParams }) => ({
+//         setActive: () => ({
+//           ...queryParams(),
+//           active: !queryParams().active,
+//         }),
+//       }),
+//     }
+//   ),
+//   craftSetAllQueriesParamsStandalone()
+// );
 
 // const { craftDataPaginationServerState } = craft(
 //   craftInputs({
@@ -278,8 +303,8 @@ const { injectQpCraft, setAllQpQueryParams } = craft(
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div>{{ storeQp.pagination() | json }}</div>
-    <button (click)="storeQp.nextPage()">Next Page</button>
+    <!-- <div>{{ storeQp.pagination() | json }}</div>
+    <button (click)="storeQp.nextPage()">Next Page</button> -->
     <!-- <div class="counter-container">
       <div class="counter-display">{{ store.counter() }}</div>
       <div class="counter-controls">
@@ -415,7 +440,7 @@ const { injectQpCraft, setAllQpQueryParams } = craft(
   ],
 })
 export default class TestComponent {
-  storeQp = injectQpCraft();
+  // storeQp = injectQpCraft();
   // store = injectHost1Craft();
   // store2 = injectHost2Craft();
   // storeAsyncMethods = injectAsyncMethodsFeatureCraft();
@@ -424,25 +449,10 @@ export default class TestComponent {
 
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-
-  // todo avec _cloudProxy faire en sorte de pouvoir setAllQueryParams
-  constructor() {
-    let i = 1;
-    setInterval(() => {
-      this.router.navigate([], {
-        relativeTo: this.activatedRoute,
-        queryParams: setAllQpQueryParams({
-          pagination: {
-            page: i,
-          },
-          activeFilters: {
-            active: i % 2 === 0,
-          },
-        }),
-        queryParamsHandling: 'replace', // merge or replace
-      });
-
-      i++;
-    }, 3000);
-  }
+  myParams = signal('1');
+  store = injectCraft({
+    inputs: {
+      myParams: this.myParams,
+    },
+  });
 }

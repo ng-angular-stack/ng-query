@@ -42,7 +42,7 @@ export function craftInject<
 >(
   injections: (entries: CraftFactoryEntries<Context>) => Injections
 ): CraftInputsOutputs<Context, StoreConfig, Injections> {
-  return (_cloudProxy) => (contextData, injector) => {
+  return () => (contextData, injector) => {
     const injectedInjections = Object.entries(
       injections(craftFactoryEntries(contextData))
     ).reduce(

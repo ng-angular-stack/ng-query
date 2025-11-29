@@ -30,7 +30,7 @@ export function craftComputedStates<
 >(
   computedFactory: (context: CraftFactoryEntries<Context>) => Computed
 ): CraftComputedStatesOutputs<Context, StoreConfig, Computed> {
-  return (contextData, injector) => {
+  return () => (contextData) => {
     const computedValues = computedFactory(
       craftFactoryEntries(contextData)
     ) as Record<string, Signal<unknown>>;
