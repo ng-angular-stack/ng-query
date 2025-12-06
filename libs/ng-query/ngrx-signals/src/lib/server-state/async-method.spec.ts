@@ -125,7 +125,7 @@ describe('asyncMethod types without identifier', () => {
         ),
       }));
 
-      type props = ReturnType<typeof asyncMethodsOutput>['props'];
+      type props = ReturnType<ReturnType<typeof asyncMethodsOutput>>['props'];
       type s = props['searchChange'];
       expectTypeOf<props>().toEqualTypeOf<{
         searchChange: {
@@ -155,7 +155,9 @@ describe('asyncMethod types without identifier', () => {
         };
       }>();
 
-      type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
+      type methods = ReturnType<
+        ReturnType<typeof asyncMethodsOutput>
+      >['methods'];
       expectTypeOf<methods>().toEqualTypeOf<
         {
           setSearchChange: (args: {
@@ -208,7 +210,7 @@ describe('asyncMethod types without identifier', () => {
         ),
       }));
 
-      type props = ReturnType<typeof asyncMethodsOutput>['props'];
+      type props = ReturnType<ReturnType<typeof asyncMethodsOutput>>['props'];
       expectTypeOf<props>().toEqualTypeOf<{
         searchChange: {
           readonly error: Signal<Error | undefined>;
@@ -240,7 +242,9 @@ describe('asyncMethod types without identifier', () => {
         };
       }>();
 
-      type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
+      type methods = ReturnType<
+        ReturnType<typeof asyncMethodsOutput>
+      >['methods'];
       //   ^?
       expectTypeOf<methods>().toEqualTypeOf<{
         setFilterChange: (args: { filter: string }) => {
@@ -352,7 +356,7 @@ describe('asyncMethod types with identifier', () => {
         ),
       }));
 
-      type props = ReturnType<typeof asyncMethodsOutput>['props'];
+      type props = ReturnType<ReturnType<typeof asyncMethodsOutput>>['props'];
       type s = props['searchChange'];
 
       const search = {} as ReturnType<s['select']>;
@@ -390,7 +394,9 @@ describe('asyncMethod types with identifier', () => {
         additionalInsertion: 'injectedValue';
       }>();
 
-      type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
+      type methods = ReturnType<
+        ReturnType<typeof asyncMethodsOutput>
+      >['methods'];
       expectTypeOf<methods>().toEqualTypeOf<
         {
           setSearchChange: (args: {
@@ -444,9 +450,10 @@ describe('asyncMethod types with identifier', () => {
         ),
       }));
 
-      type props = ReturnType<typeof asyncMethodsOutput>['props'];
+      type props = ReturnType<ReturnType<typeof asyncMethodsOutput>>['props'];
       try {
-        const search = asyncMethodsOutput(
+        const search = asyncMethodsOutput({} as any, {} as any)(
+          {} as any,
           {} as any,
           {} as any,
           {} as any
@@ -467,8 +474,12 @@ describe('asyncMethod types with identifier', () => {
           | undefined
         >();
 
-        const filter = asyncMethodsOutput({} as any, {} as any, {} as any).props
-          .filterChange;
+        const filter = asyncMethodsOutput({} as any, {} as any)(
+          {} as any,
+          {} as any,
+          {} as any,
+          {} as any
+        ).props.filterChange;
         expectTypeOf(filter).toEqualTypeOf<{
           readonly error: Signal<Error | undefined>;
           readonly value: Signal<
@@ -483,14 +494,18 @@ describe('asyncMethod types with identifier', () => {
           additionalInsertion: 'injectedValue';
         }>();
 
-        type methods = ReturnType<typeof asyncMethodsOutput>['methods'];
+        type methods = ReturnType<
+          ReturnType<typeof asyncMethodsOutput>
+        >['methods'];
         //   ^?
         expectTypeOf<methods>().toEqualTypeOf<{
           setFilterChange: (args: { filter: string }) => {
             filter: string;
           };
         }>();
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     });
   });
 
