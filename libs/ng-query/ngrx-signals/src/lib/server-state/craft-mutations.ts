@@ -23,7 +23,7 @@ type SpecificCraftMutationsOutputs<Mutations extends {}> = PartialContext<{
     'mutate'
   >;
   _mutations: {
-    [key in keyof Mutations]: Prettify<Omit<Mutations[key], 'method'>>;
+    [key in keyof Mutations]: Mutations[key];
   };
 }>;
 
@@ -111,7 +111,7 @@ export function craftMutations<
     return partialContext({
       props: resourceRefs,
       methods,
-      _asyncMethods: resourceRefs,
+      _mutation: resourceRefs,
     }) as unknown as SpecificCraftMutationsOutputs<Mutations>;
   };
 }

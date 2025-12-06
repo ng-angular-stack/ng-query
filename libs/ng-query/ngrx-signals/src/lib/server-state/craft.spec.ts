@@ -1,12 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
-import {
-  craft,
-  EmptyContext,
-  MergeTwoContexts,
-  partialContext,
-  PartialContext,
-} from './craft';
+import { craft, EmptyContext, partialContext, PartialContext } from './craft';
 import { mutation } from '../mutation';
 import { mutationById } from '../mutation-by-id';
 import { queryById } from '../query-by-id';
@@ -22,21 +16,18 @@ import {
   QueryParamNavigationOptions,
   QueryParamProps,
   QueryParamsToState,
-  SpecificCraftQueryParamsOutputs,
 } from './craft-query-params';
 import { craftInputs } from './craft-inputs';
 import { craftState } from './craft-state';
-import { Source, source } from './source';
-import { craftSources, SourceSetterMethods } from './craft-sources';
+import { source } from './source';
+import { craftSources } from './craft-sources';
 import { afterRecomputation } from './after-recomputation';
 import { IsAny } from '../types/util.type';
-import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
 import { Prettify } from '@ngrx/signals';
 import { craftMutation } from './craft-mutation';
 import { craftQuery } from './craft-query';
 import { craftMutationById } from './craft-mutation-by-id';
 import { craftQueryById } from './craft-query-by-id';
-import { ExcludeCommonKeys } from './util/util.type';
 import { ReadonlySource } from './util/source.type';
 
 describe('craft', () => {
