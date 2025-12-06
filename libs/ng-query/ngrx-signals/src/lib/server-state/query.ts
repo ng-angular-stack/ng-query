@@ -654,9 +654,9 @@ export function mutation<
   {}
 > {
   // todo handle query that have queryParams
-  const queryResourceParamsFnSignal = signal<MutationParams | undefined>(
-    undefined
-  );
+  const hasParamsFn = typeof mutationConfig.method === 'function';
+  const queryResourceParamsFnSignal =
+    mutationConfig.params ?? signal<MutationParams | undefined>(undefined);
 
   const isConnectedToSource = isSignal(mutationConfig.method);
   const isUsingIdentifier = 'identifier' in mutationConfig;
@@ -712,23 +712,29 @@ export function mutation<
         }
       : {},
     {
-      method: isSignal(mutationConfig.method)
-        ? undefined
-        : (arg: MutationArgsParams) => {
-            const result = mutationConfig.method(arg);
-            if (isUsingIdentifier) {
-              const id = mutationConfig.identifier?.(arg as any);
-              (
-                resourceTarget as ResourceByIdRef<
-                  GroupIdentifier & string,
-                  MutationState,
-                  MutationParams
-                >
-              ).addById(id as GroupIdentifier & string);
-            }
-            asyncmethodResourceParamsFnSignal.set(result as MutationParams);
-            return result;
-          },
+      method:
+        hasParamsFn || isSignal(mutationConfig.method)
+          ? undefined
+          : (arg: MutationArgsParams) => {
+              const result = (
+                mutationConfig.method as unknown as (
+                  args: MutationArgsParams
+                ) => MutationParams
+              )(arg);
+              if (isUsingIdentifier) {
+                const id = mutationConfig.identifier?.(arg as any);
+                (
+                  resourceTarget as ResourceByIdRef<
+                    GroupIdentifier & string,
+                    MutationState,
+                    MutationParams
+                  >
+                ).addById(id as GroupIdentifier & string);
+              }
+              //@ts-expect-error if method is exposed params can not be of type (entity: ResourceRef<NoInfer<FromObjectState>>) => MutationParams
+              queryResourceParamsFnSignal.set(result as MutationParams);
+              return result;
+            },
     },
     (
       insertions as InsertionsFactory<
