@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from '../query';
 import { craft, EmptyContext, partialContext, PartialContext } from './craft';
-import { mutation } from '../mutation';
-import { mutationById } from '../mutation-by-id';
+import { mutation } from './mutation';
 import { queryById } from '../query-by-id';
 import {
   inject,
@@ -24,11 +23,11 @@ import { craftSources } from './craft-sources';
 import { afterRecomputation } from './after-recomputation';
 import { IsAny } from '../types/util.type';
 import { Prettify } from '@ngrx/signals';
-import { craftMutation } from './craft-mutation';
 import { craftQuery } from './craft-query';
-import { craftMutationById } from './craft-mutation-by-id';
 import { craftQueryById } from './craft-query-by-id';
 import { ReadonlySource } from './util/source.type';
+import { craftMutations } from './craft-mutations';
+import { ExcludeCommonKeys } from './util/util.type';
 
 describe('craft', () => {
   beforeEach(() => {
@@ -44,12 +43,12 @@ describe('craft', () => {
         name: '',
         providedIn: 'root',
       },
-      craftMutation('save', () =>
-        mutation({
+      craftMutations(() => ({
+        save: mutation({
           method: (data: { id: number; name: string }) => data,
           loader: async ({ params }) => params,
-        })
-      ),
+        }),
+      })),
       craftQuery('test', () =>
         query({
           params: () => 5,
@@ -82,7 +81,7 @@ describe('craft', () => {
       expect(testServerState.mutateSave).toBeDefined();
       testServerState.mutateSave({ id: 3, name: 'test' });
       await vi.runAllTimersAsync();
-      expect(testServerState.saveMutation.value()).toEqual({
+      expect(testServerState.save.value()).toEqual({
         id: 3,
         name: 'test',
       });
@@ -96,8 +95,8 @@ describe('craft', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('save', () =>
-          mutation({
+        craftMutations(() => ({
+          save: mutation({
             method: (data: { id: number; name: string }) => data,
             loader: async ({ params }) => {
               if (params.name === 'error') {
@@ -105,8 +104,8 @@ describe('craft', () => {
               }
               return params;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'test',
           () =>
@@ -152,8 +151,8 @@ describe('craft', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutationById('save', () =>
-          mutationById({
+        craftMutations(() => ({
+          save: mutation({
             method: (data: { id: string; name: string }) => data,
             identifier: (params) => params.id,
             loader: async ({ params }) => {
@@ -162,8 +161,8 @@ describe('craft', () => {
               }
               return params;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'test',
           () =>
@@ -194,11 +193,11 @@ describe('craft', () => {
       expect(q.testQuery.value).toBeDefined();
       expect(q.testQuery.value()).toEqual({ id: '3', name: 'test' });
 
-      q.mutateSaveById({ id: '3', name: 'testMutated' });
+      q.mutateSave({ id: '3', name: 'testMutated' });
       await vi.runAllTimersAsync();
       expect(q.testQuery.value()).toEqual({ id: '3', name: 'testMutated' });
 
-      q.mutateSaveById({ id: '3', name: 'error' });
+      q.mutateSave({ id: '3', name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
       expect(q.testQuery.status()).toEqual('reloading');
     });
@@ -211,8 +210,8 @@ describe('craft', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutationById('save', () =>
-          mutationById({
+        craftMutations(() => ({
+          save: mutation({
             method: (data: { id: string; name: string }) => data,
             identifier: (params) => '' + params.id,
             loader: async ({ params }) => {
@@ -221,8 +220,8 @@ describe('craft', () => {
               }
               return params;
             },
-          })
-        ),
+          }),
+        })),
         craftQueryById(
           'test',
           () =>
@@ -257,14 +256,14 @@ describe('craft', () => {
         name: 'test',
       });
 
-      q.mutateSaveById({ id: '3', name: 'testMutated' });
+      q.mutateSave({ id: '3', name: 'testMutated' });
       await vi.runAllTimersAsync();
       expect(q.testQueryById()['3']?.value()).toEqual({
         id: '3',
         name: 'testMutated',
       });
 
-      q.mutateSaveById({ id: '3', name: 'error' });
+      q.mutateSave({ id: '3', name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
       expect(q.testQueryById()['3']?.status()).toEqual('reloading');
     });
@@ -1181,12 +1180,12 @@ describe('craft options', () => {
           name: 'user',
           providedIn: 'root',
         },
-        craftMutation('save', () =>
-          mutation({
+        craftMutations(() => ({
+          save: mutation({
             method: (data: { id: number; name: string }) => data,
             loader: async ({ params }) => params,
-          })
-        ),
+          }),
+        })),
         craftQuery('test', () =>
           query({
             params: () => 5,
@@ -1218,7 +1217,7 @@ describe('craft options', () => {
       expect(userServerState.mutateSave).toBeDefined();
       userServerState.mutateSave({ id: 3, name: 'test' });
       await vi.runAllTimersAsync();
-      expect(userServerState.saveMutation.value()).toEqual({
+      expect(userServerState.save.value()).toEqual({
         id: 3,
         name: 'test',
       });
@@ -1232,12 +1231,12 @@ describe('craft options', () => {
           name: 'user',
           providedIn: 'root',
         },
-        craftMutation('save', () =>
-          mutation({
+        craftMutations(() => ({
+          save: mutation({
             method: (data: { id: number; name: string }) => data,
             loader: async ({ params }) => params,
-          })
-        ),
+          }),
+        })),
         craftQuery('test', () =>
           query({
             params: () => 5,
@@ -1269,13 +1268,13 @@ describe('craft options', () => {
       expect(userServerState.mutateSave).toBeDefined();
       userServerState.mutateSave({ id: 3, name: 'test' });
       await vi.runAllTimersAsync();
-      expect(userServerState.saveMutation.value()).toEqual({
+      expect(userServerState.save.value()).toEqual({
         id: 3,
         name: 'test',
       });
 
       expect(sameUserServerState.test2Query.value).toBeDefined();
-      expect(userServerState.saveMutation.value()).toEqual({
+      expect(userServerState.save.value()).toEqual({
         id: 3,
         name: 'test',
       });
