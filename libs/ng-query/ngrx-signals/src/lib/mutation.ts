@@ -1,4 +1,3 @@
-import { SignalStoreFeatureResult } from '@ngrx/signals';
 import { ResourceWithParamsOrParamsFn } from './types/resource-with-params-or-params-fn.type';
 import { InternalType } from './types/util.type';
 import {

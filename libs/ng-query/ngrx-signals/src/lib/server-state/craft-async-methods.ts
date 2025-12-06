@@ -13,32 +13,7 @@ import { ReadonlySource } from './util/source.type';
 import { Prettify } from '@ngrx/signals';
 import { capitalize } from './util/util';
 import { ResourceByIdRef } from '../resource-by-id';
-
-type FilterMethodsBoundToSources<
-  Methods extends {},
-  Rest,
-  Acc = {}
-> = Rest extends [infer First, ...infer Next]
-  ? First extends keyof Methods
-    ? Methods[First] extends {
-        method: infer Method;
-      }
-      ? [Method] extends [ReadonlySource<infer SourceState>]
-        ? FilterMethodsBoundToSources<Methods, Next, Acc>
-        : FilterMethodsBoundToSources<
-            Methods,
-            Next,
-            Acc & {
-              [K in First as `set${Capitalize<string & K>}`]: [Method] extends [
-                Function
-              ]
-                ? Method
-                : never;
-            }
-          >
-      : FilterMethodsBoundToSources<Methods, Next, Acc>
-    : FilterMethodsBoundToSources<Methods, Next, Acc>
-  : Acc;
+import { FilterMethodsBoundToSources } from './util/util.type';
 
 type SpecificCraftAsyncMethodsOutputs<AsyncMethods extends {}> =
   PartialContext<{
@@ -47,7 +22,8 @@ type SpecificCraftAsyncMethodsOutputs<AsyncMethods extends {}> =
     };
     methods: FilterMethodsBoundToSources<
       AsyncMethods,
-      UnionToTuple<keyof AsyncMethods>
+      UnionToTuple<keyof AsyncMethods>,
+      'set'
     >;
     _asyncMethods: {
       [key in keyof AsyncMethods]: Prettify<Omit<AsyncMethods[key], 'method'>>;

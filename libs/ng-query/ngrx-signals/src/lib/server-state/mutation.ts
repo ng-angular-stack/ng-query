@@ -10,11 +10,12 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { InsertionsFactory } from '../core/query.core';
+import { resourceById, ResourceByIdRef } from '../resource-by-id';
 import { AsyncMethodRef } from './craft-async-methods';
 import { ReadonlySource } from './util/source.type';
-import { resourceById, ResourceByIdRef } from '../resource-by-id';
+// todo refactor to share code with AsyncMethod
 
-type AsyncMethodConfig<
+type MutationConfig<
   ResourceState,
   Params,
   ParamsArgs,
@@ -77,7 +78,25 @@ type AsyncMethodConfig<
           }
       );
 
-export type AsyncMethodOutput<
+export type MutationRef<
+  Value,
+  ArgParams,
+  Params,
+  Insertions,
+  IsMethod,
+  SourceParams,
+  GroupIdentifier
+> = AsyncMethodRef<
+  Value,
+  ArgParams,
+  Params,
+  Insertions,
+  IsMethod,
+  SourceParams,
+  GroupIdentifier
+>;
+
+export type MutationOutput<
   State extends object | undefined,
   ArgParams,
   Params,
@@ -94,137 +113,137 @@ export type AsyncMethodOutput<
   GroupIdentifier
 >;
 
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   {}
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   insertion1: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion1
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1,
   Insertion2
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   insertion1: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1,
   Insertion2,
   Insertion3
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   insertion1: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1,
@@ -232,48 +251,48 @@ export function asyncMethod<
   Insertion3,
   Insertion4
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   insertion1: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1,
@@ -282,54 +301,54 @@ export function asyncMethod<
   Insertion4,
   Insertion5
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   insertion1: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1,
@@ -339,60 +358,60 @@ export function asyncMethod<
   Insertion5,
   Insertion6
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   insertion1: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1,
@@ -403,58 +422,58 @@ export function asyncMethod<
   Insertion6,
   Insertion7
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   insertion1: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >,
   insertion7: InsertionsFactory<
-    NoInfer<AsyncMethodState>,
-    NoInfer<AsyncMethodParams>,
+    NoInfer<MutationState>,
+    NoInfer<MutationParams>,
     Insertion7,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
   >
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 &
@@ -465,55 +484,55 @@ export function asyncMethod<
     Insertion6 &
     Insertion7
 >;
-export function asyncMethod<
-  AsyncMethodState extends object | undefined,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+export function mutation<
+  MutationState extends object | undefined,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier
 >(
-  asyncMethodConfig: AsyncMethodConfig<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  mutationConfig: MutationConfig<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier
   >,
   ...insertions: any[]
-): AsyncMethodOutput<
-  AsyncMethodState,
-  AsyncMethodParams,
-  AsyncMethodArgsParams,
+): MutationOutput<
+  MutationState,
+  MutationParams,
+  MutationArgsParams,
   SourceParams,
   GroupIdentifier,
   {}
 > {
-  const asyncmethodResourceParamsFnSignal = signal<
-    AsyncMethodParams | undefined
-  >(undefined);
+  const asyncmethodResourceParamsFnSignal = signal<MutationParams | undefined>(
+    undefined
+  );
 
-  const isConnectedToSource = isSignal(asyncMethodConfig.method);
-  const isUsingIdentifier = 'identifier' in asyncMethodConfig;
+  const isConnectedToSource = isSignal(mutationConfig.method);
+  const isUsingIdentifier = 'identifier' in mutationConfig;
 
   const resourceParamsSrc = isConnectedToSource
-    ? asyncMethodConfig.method
+    ? mutationConfig.method
     : asyncmethodResourceParamsFnSignal;
 
   const resourceTarget = isUsingIdentifier
     ? resourceById<
-        AsyncMethodState,
-        AsyncMethodParams,
+        MutationState,
+        MutationParams,
         GroupIdentifier & string,
         string,
         unknown,
         unknown
       >({
-        ...asyncMethodConfig,
+        ...mutationConfig,
         params: resourceParamsSrc,
-        identifier: asyncMethodConfig.identifier,
+        identifier: mutationConfig.identifier,
       } as any)
-    : resource<AsyncMethodState, AsyncMethodParams>({
-        ...asyncMethodConfig,
+    : resource<MutationState, MutationParams>({
+        ...mutationConfig,
         params: resourceParamsSrc,
       } as ResourceOptions<any, any>);
 
@@ -527,16 +546,16 @@ export function asyncMethod<
            */
           _resourceById: resourceTarget as ResourceByIdRef<
             GroupIdentifier & string,
-            AsyncMethodState,
-            AsyncMethodParams
+            MutationState,
+            MutationParams
           >,
           select: (id: GroupIdentifier) => {
             return computed(() => {
               const list = (
                 resourceTarget as ResourceByIdRef<
                   GroupIdentifier & string,
-                  AsyncMethodState,
-                  AsyncMethodParams
+                  MutationState,
+                  MutationParams
                 >
               )();
               //@ts-expect-error GroupIdentifier & string is not recognized correctly
@@ -546,46 +565,46 @@ export function asyncMethod<
         }
       : {},
     {
-      method: isSignal(asyncMethodConfig.method)
+      method: isSignal(mutationConfig.method)
         ? undefined
-        : (arg: AsyncMethodArgsParams) => {
-            const result = asyncMethodConfig.method(arg);
+        : (arg: MutationArgsParams) => {
+            const result = mutationConfig.method(arg);
             if (isUsingIdentifier) {
-              const id = asyncMethodConfig.identifier?.(arg as any);
+              const id = mutationConfig.identifier?.(arg as any);
               (
                 resourceTarget as ResourceByIdRef<
                   GroupIdentifier & string,
-                  AsyncMethodState,
-                  AsyncMethodParams
+                  MutationState,
+                  MutationParams
                 >
               ).addById(id as GroupIdentifier & string);
             }
-            asyncmethodResourceParamsFnSignal.set(result as AsyncMethodParams);
+            asyncmethodResourceParamsFnSignal.set(result as MutationParams);
             return result;
           },
     },
     (
       insertions as InsertionsFactory<
-        NoInfer<AsyncMethodState>,
-        NoInfer<AsyncMethodParams>,
+        NoInfer<MutationState>,
+        NoInfer<MutationParams>,
         {}
       >[]
     )?.reduce((acc, insert) => {
       return {
         ...acc,
         ...insert({
-          resource: resourceTarget as ResourceRef<AsyncMethodState>,
+          resource: resourceTarget as ResourceRef<MutationState>,
           resourceParams: resourceParamsSrc as WritableSignal<
-            NoInfer<AsyncMethodParams>
+            NoInfer<MutationParams>
           >,
           insertions: acc as {},
         }),
       };
     }, {} as Record<string, unknown>)
-  ) as unknown as AsyncMethodOutput<
-    AsyncMethodState,
-    AsyncMethodParams,
-    AsyncMethodArgsParams,
+  ) as unknown as MutationOutput<
+    MutationState,
+    MutationParams,
+    MutationArgsParams,
     SourceParams,
     GroupIdentifier,
     {}

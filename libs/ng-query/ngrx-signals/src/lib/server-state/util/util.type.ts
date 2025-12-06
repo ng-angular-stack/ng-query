@@ -60,3 +60,31 @@ export type ReplaceStoreConfigToken<
       StoreConfig
     >
   : StandaloneOutputName;
+
+export type FilterMethodsBoundToSources<
+  Methods extends {},
+  Rest,
+  MethodPrefix extends string,
+  Acc = {}
+> = Rest extends [infer First, ...infer Next]
+  ? First extends keyof Methods
+    ? Methods[First] extends {
+        method: infer Method;
+      }
+      ? [Method] extends [ReadonlySource<infer SourceState>]
+        ? FilterMethodsBoundToSources<Methods, Next, MethodPrefix, Acc>
+        : FilterMethodsBoundToSources<
+            Methods,
+            Next,
+            MethodPrefix,
+            Acc & {
+              [K in First as `${MethodPrefix}${Capitalize<string & K>}`]: [
+                Method
+              ] extends [Function]
+                ? Method
+                : never;
+            }
+          >
+      : FilterMethodsBoundToSources<Methods, Next, MethodPrefix, Acc>
+    : FilterMethodsBoundToSources<Methods, Next, MethodPrefix, Acc>
+  : Acc;
