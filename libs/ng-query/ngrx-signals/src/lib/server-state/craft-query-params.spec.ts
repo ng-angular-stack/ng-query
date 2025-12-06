@@ -21,6 +21,10 @@ describe('craftQueryParams', () => {
     TestBed.configureTestingModule({
       providers: [provideRouter([{ path: '', component: TestComponent }])],
     });
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should create query params configuration', () => {
@@ -146,7 +150,7 @@ describe('craftQueryParams', () => {
     });
   });
 
-  it('should accept custom methods that rely on source', () => {
+  it('should accept custom methods that rely on source', async () => {
     const { injectCraft } = craft(
       {
         providedIn: 'root',
@@ -167,6 +171,7 @@ describe('craftQueryParams', () => {
         {
           methods: ({ context: { nextPage }, queryParams }) => ({
             nextPage: afterRecomputation(nextPage, (nextPage) => {
+              console.log('afterRecomputation nextPage', nextPage);
               expectTypeOf(nextPage).toEqualTypeOf<{}>();
               expectTypeOf(queryParams()).toEqualTypeOf<{ page: number }>();
               expect(queryParams().page).toBe(2);
@@ -179,7 +184,7 @@ describe('craftQueryParams', () => {
         }
       )
     );
-    TestBed.runInInjectionContext(() => {
+    await TestBed.runInInjectionContext(async () => {
       const store = injectCraft();
 
       expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
@@ -190,6 +195,9 @@ describe('craftQueryParams', () => {
       expect(store.page()).toBe(2);
       //@ts-expect-error nextPage is not exposed
       expectTypeOf(store.nextPage).toEqualTypeOf<unknown>();
+      store.setNextPage({});
+      console.log('setNextPage');
+      await vi.runAllTimersAsync();
       expect(store.page()).toBe(3);
     });
   });

@@ -321,7 +321,7 @@ describe('craft', () => {
           ({ state, context: { reset } }) => {
             return {
               addNumber: (numberValue: number) => {
-                console.log('addNumber numberValue', numberValue);
+                console.log('numberValue', numberValue);
                 const stateValue = state();
                 return [...stateValue, numberValue];
               },
@@ -363,6 +363,7 @@ describe('craft', () => {
       expect(store.numberList()).toEqual([10]);
 
       addNumberSource.set(2);
+      await vi.runAllTimersAsync();
       expect(store.numberList()).toEqual([10, 2]);
 
       store.filterNumber(10);
@@ -462,41 +463,43 @@ describe('craft', () => {
           }
         )
       );
-      type test = (typeof __META_STORE_CONTEXT)['context']['_inputs'];
-      const addNumberSource = source<number>();
-      const resetSource = source<string>();
-      const store = injectCraft({
-        inputs: {
-          myParams: signal('PassMyParam'),
-          // myParams2 must be provided here
-          myParams2: signal('PassMyParam2'),
-        },
-        methods: {
-          setReset: resetSource,
-          addNumber: addNumberSource,
-          addNumber2: addNumberSource,
-          // reset: resetSource,
-          // addNumber: addNumberSource,
-        },
-        // sources: {
-        //   reset: resetSource,
-        // },
+      await TestBed.runInInjectionContext(async () => {
+        type test = (typeof __META_STORE_CONTEXT)['context']['_inputs'];
+        const addNumberSource = source<number>();
+        const resetSource = source<string>();
+        const store = injectCraft({
+          inputs: {
+            myParams: signal('PassMyParam'),
+            // myParams2 must be provided here
+            myParams2: signal('PassMyParam2'),
+          },
+          methods: {
+            setReset: resetSource,
+            addNumber: addNumberSource,
+            addNumber2: addNumberSource,
+            // reset: resetSource,
+            // addNumber: addNumberSource,
+          },
+          // sources: {
+          //   reset: resetSource,
+          // },
+        });
+        expectTypeOf<IsAny<typeof store>>().toEqualTypeOf<false>();
+
+        expectTypeOf(store.filterNumber).toBeFunction();
+        expectTypeOf(store.filterNumber2).toBeFunction();
+        //@ts-expect-error it should not be exposed, because connected to a Source
+        type resetNotExposed = (typeof store)['reset'];
+
+        // verify setPaginationQueryParams is exposed
+        expectTypeOf<
+          Parameters<typeof setPaginationQueryParams>[0]
+        >().toEqualTypeOf<{
+          page?: number | undefined;
+          pageSize?: number | undefined;
+        }>();
+        expect(setPaginationQueryParams).toBeDefined();
       });
-      expectTypeOf<IsAny<typeof store>>().toEqualTypeOf<false>();
-
-      expectTypeOf(store.filterNumber).toBeFunction();
-      expectTypeOf(store.filterNumber2).toBeFunction();
-      //@ts-expect-error it should not be exposed, because connected to a Source
-      type resetNotExposed = (typeof store)['reset'];
-
-      // verify setPaginationQueryParams is exposed
-      expectTypeOf<
-        Parameters<typeof setPaginationQueryParams>[0]
-      >().toEqualTypeOf<{
-        page?: number | undefined;
-        pageSize?: number | undefined;
-      }>();
-      expect(setPaginationQueryParams).toBeDefined();
     });
   });
 
@@ -572,12 +575,15 @@ describe('craft', () => {
         },
       }))
     );
-    const host1 = injectHost1Craft();
-    const host2 = injectHost2Craft();
 
-    host1.addNumber(2);
-    expect(host1.numberList()).toEqual([1, 2]);
-    expect(host2.numberList()).toEqual([1, 2]);
+    await TestBed.runInInjectionContext(async () => {
+      const host1 = injectHost1Craft();
+      const host2 = injectHost2Craft();
+
+      host1.addNumber(2);
+      expect(host1.numberList()).toEqual([1, 2]);
+      expect(host2.numberList()).toEqual([1, 2]);
+    });
   });
 
   it('should enable to plug local store to another. The plugged local store will not share an unique instance', async () => {
@@ -658,12 +664,15 @@ describe('craft', () => {
         },
       }))
     );
-    const host1 = injectHost1Craft();
-    const host2 = injectHost2Craft();
 
-    host1.addNumber();
-    expect(host1.numberList()).toEqual([1, 2]);
-    expect(host2.numberList()).toEqual([1]);
+    await TestBed.runInInjectionContext(async () => {
+      const host1 = injectHost1Craft();
+      const host2 = injectHost2Craft();
+
+      host1.addNumber();
+      expect(host1.numberList()).toEqual([1, 2]);
+      expect(host2.numberList()).toEqual([1]);
+    });
   });
   it('should enable to plug feature store to another. The plugged feature store will not share an unique instance', async () => {
     const { craftDataPagination } = craft(
@@ -737,12 +746,14 @@ describe('craft', () => {
         },
       }))
     );
-    const host1 = injectHost1Craft();
-    const host2 = injectHost2Craft();
+    await TestBed.runInInjectionContext(async () => {
+      const host1 = injectHost1Craft();
+      const host2 = injectHost2Craft();
 
-    host1.addNumber(2);
-    expect(host1.numberList()).toEqual([1, 2]);
-    expect(host2.numberList()).toEqual([1]);
+      host1.addNumber(2);
+      expect(host1.numberList()).toEqual([1, 2]);
+      expect(host2.numberList()).toEqual([1]);
+    });
   });
 
   it('should enable to plug global store to another. It is possible to not propagate the non set inputs (because, they can come from another place)', async () => {

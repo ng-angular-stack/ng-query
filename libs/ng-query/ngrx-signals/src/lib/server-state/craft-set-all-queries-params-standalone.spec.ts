@@ -35,6 +35,7 @@ describe('craftSetAllQueriesParamsStandalone', () => {
     );
 
     TestBed.runInInjectionContext(() => {
+      console.log('injectTestStoreCraft');
       const store = injectTestStoreCraft();
 
       expect(store.page()).toBe(1);

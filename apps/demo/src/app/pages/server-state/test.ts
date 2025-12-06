@@ -1,7 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, linkedSignal, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { craft, craftInputs, craftQuery, query } from '@ng-query/ngrx-signals';
+import {
+  afterRecomputation,
+  craft,
+  craftInputs,
+  craftSources,
+  craftState,
+  source,
+} from '@ng-query/ngrx-signals';
 
 const { injectCraft } = craft(
   {
@@ -9,27 +16,31 @@ const { injectCraft } = craft(
     providedIn: 'root',
   },
   craftInputs({
-    myParams: undefined as string | undefined,
+    myParams: undefined as number | undefined,
   }),
-  craftQuery('user', (inputs) => {
-    console.log('inputs', inputs);
-    debugger;
-    return query({
-      params: () => {
-        const result = inputs.myParams();
-        console.log('result', result);
-        return result;
-      },
-      loader: async ({ params }) => {
-        console.log('query params', params);
-        return {
-          id: params,
-          name: 'John Doe',
-          email: 'test@a.com',
-        };
-      },
-    });
-  })
+  craftSources({
+    reset: source<string>(),
+  }),
+  craftState(
+    'numberList',
+    ({ myParams }) => linkedSignal(() => [myParams() ?? 0]),
+    ({ state, context: { reset } }) => {
+      return {
+        addNumber: (numberValue: number) => {
+          console.log('addNumber numberValue', numberValue);
+          const stateValue = state();
+          return [...stateValue, numberValue];
+        },
+        filterNumber: (filterValue: number) => {
+          const stateValue = state();
+          return stateValue.filter((num) => num !== filterValue);
+        },
+        reset: afterRecomputation(reset, () => {
+          return [];
+        }),
+      };
+    }
+  )
 );
 
 // const { injectQpCraft, setAllQpQueryParams } = craft(
@@ -303,6 +314,9 @@ const { injectCraft } = craft(
   standalone: true,
   imports: [CommonModule],
   template: `
+    numberList{{ store.numberList() | json }}
+    <button (click)="addNumberSource.set(5)">add</button>
+    <button (click)="store.filterNumber(10)">filter</button>
     <!-- <div>{{ storeQp.pagination() | json }}</div>
     <button (click)="storeQp.nextPage()">Next Page</button> -->
     <!-- <div class="counter-container">
@@ -450,9 +464,20 @@ export default class TestComponent {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   myParams = signal('1');
+  addNumberSource = source<number>({ equal: () => false });
+  resetSource = source<string>();
   store = injectCraft({
     inputs: {
-      myParams: this.myParams,
+      myParams: signal(10),
     },
+    methods: {
+      setReset: this.resetSource,
+      addNumber: this.addNumberSource,
+      // reset: resetSource,
+      // addNumber: addNumberSource,
+    },
+    // sources: {
+    //   reset: resetSource,
+    // },
   });
 }

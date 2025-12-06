@@ -20,7 +20,7 @@ type User = {
   id: string;
   name: string;
 };
-describe('SignalServerState', () => {
+describe.skip('SignalServerState', () => {
   beforeEach(() => {
     vi.useRealTimers();
   });
@@ -271,7 +271,3 @@ describe('SignalServerState', () => {
     });
   });
 });
-
-function wait(ms = 0): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

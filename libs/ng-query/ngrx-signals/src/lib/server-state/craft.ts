@@ -659,7 +659,6 @@ export function craft(
     providedIn: options?.providedIn,
     name: options?.name,
   };
-  console.log('optionsName', options?.name);
 
   const _cloudProxy = new Proxy({}, {});
 
@@ -684,7 +683,6 @@ export function craft(
   const token = new InjectionToken('CraftStore', {
     providedIn,
     factory: () => {
-      console.log('optionsName', options?.name);
       const injector = inject(Injector);
       const { propsAndMethods, context } = mergeContextAndProps({
         factoriesList,
@@ -706,13 +704,16 @@ export function craft(
     ? name.charAt(0).toUpperCase() + name.slice(1)
     : '';
   const injectNameCraft = `inject${capitalizedName}Craft`;
-  const craftNameCraft = `craft${capitalizedName}Craft`;
+  const craftNameCraft = `craft${capitalizedName}`;
+
+  const injectCraft = () => injectNameCraft;
+
   return {
     [injectNameCraft]: (entries?: {
       inputs?: Record<string, unknown>;
       methods?: Record<string, unknown>;
     }) => {
-      assertInInjectionContext(craft);
+      assertInInjectionContext(injectCraft);
       const tokenValue = inject(token); // inject will enable to set inputsKeysSet
       const entriesInputs = entries?.inputs;
       if (entriesInputs) {
@@ -859,7 +860,6 @@ function mergeContextAndProps({
 }): { propsAndMethods: any; context: any } {
   return factoriesList.reduce(
     (acc, factory) => {
-      console.log('factory', factory);
       const result = (
         factory as CraftFactory<
           [ContextConstraints],
@@ -880,9 +880,6 @@ function mergeContextAndProps({
         if (!hasValue) {
           pluggableInputs.$patch({ [key]: value } as any);
         }
-        //@ts-ignore
-        console.log('pluggableInputs', pluggableInputs['myParams']());
-        debugger;
       });
 
       Object.assign(_cloudProxy, result._cloudProxy);
