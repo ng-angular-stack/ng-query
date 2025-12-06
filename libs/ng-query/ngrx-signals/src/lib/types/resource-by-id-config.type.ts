@@ -81,7 +81,7 @@ export type ResourceByIdConfig<
         | {
             /**
              * Use it, when you need to bind a ResourceByIdRef to another ResourceByIdRef.
-             * It will kill the fromObject keys syncing when the fromObject resource change.
+             * It will enforce the fromObject keys syncing when the fromObject resource change.
              */
             fromResourceById: ResourceByIdRef<
               FromObjectGroupIdentifier,
