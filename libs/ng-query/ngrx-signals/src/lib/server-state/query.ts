@@ -54,7 +54,7 @@ type QueryConfig<
              *
              * Only support one parameter which can be an object to pass multiple parameters.
              *
-             * It also accepts a ReadonlySource<SourceParams> to connect the mutation params to an external signal source.
+             * It also accepts a ReadonlySource<SourceParams> to connect the query params to an external signal source.
              */
             method:
               | ((args: ParamsArgs) => Params)
@@ -156,7 +156,7 @@ type QueryConfig<
          *
          * For **queries** the default value is 'useIdentifier'
          *
-         * For **mutations** the default value is 'default'
+         * For **querys** the default value is 'default'
          */
         equalParams?: Params extends object
           ?
@@ -188,7 +188,7 @@ export type QueryRef<
   GroupIdentifier
 >;
 
-export type MutationOutput<
+export type QueryOutput<
   State extends object | undefined,
   ArgParams,
   Params,
@@ -203,40 +203,42 @@ export type MutationOutput<
   [unknown] extends [Params] ? false : true,
   SourceParams,
   GroupIdentifier
->;
+> & {
+  resourceParamsSrc: WritableSignal<Params | undefined>;
+};
 
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
   FromObjectState,
   FromObjectResourceParams
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
     FromObjectState,
     FromObjectResourceParams
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   {}
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
@@ -244,10 +246,10 @@ export function mutation<
   FromObjectResourceParams,
   Insertion1
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -255,22 +257,22 @@ export function mutation<
     FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion1
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
@@ -279,10 +281,10 @@ export function mutation<
   Insertion1,
   Insertion2
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -290,28 +292,28 @@ export function mutation<
     FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
@@ -321,10 +323,10 @@ export function mutation<
   Insertion2,
   Insertion3
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -332,34 +334,34 @@ export function mutation<
     FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
@@ -370,10 +372,10 @@ export function mutation<
   Insertion3,
   Insertion4
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -381,40 +383,40 @@ export function mutation<
     FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
@@ -426,10 +428,10 @@ export function mutation<
   Insertion4,
   Insertion5
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -437,46 +439,46 @@ export function mutation<
     FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
@@ -489,10 +491,10 @@ export function mutation<
   Insertion5,
   Insertion6
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -500,52 +502,52 @@ export function mutation<
     FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
@@ -559,10 +561,10 @@ export function mutation<
   Insertion6,
   Insertion7
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -570,50 +572,50 @@ export function mutation<
     FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion1
   >,
   insertion2: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
   insertion3: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
   insertion4: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
   insertion5: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
   insertion6: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >,
   insertion7: InsertionsFactory<
-    NoInfer<MutationState>,
-    NoInfer<MutationParams>,
+    NoInfer<QueryState>,
+    NoInfer<QueryParams>,
     Insertion7,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5 & Insertion6
   >
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   Insertion1 &
@@ -624,20 +626,20 @@ export function mutation<
     Insertion6 &
     Insertion7
 >;
-export function mutation<
-  MutationState extends object | undefined,
-  MutationParams,
-  MutationArgsParams,
+export function query<
+  QueryState extends object | undefined,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   FromObjectGroupIdentifier extends string,
   FromObjectState,
   FromObjectResourceParams
 >(
-  mutationConfig: QueryConfig<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  queryConfig: QueryConfig<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     FromObjectGroupIdentifier,
@@ -645,41 +647,40 @@ export function mutation<
     FromObjectResourceParams
   >,
   ...insertions: any[]
-): MutationOutput<
-  MutationState,
-  MutationParams,
-  MutationArgsParams,
+): QueryOutput<
+  QueryState,
+  QueryParams,
+  QueryArgsParams,
   SourceParams,
   GroupIdentifier,
   {}
 > {
-  // todo handle query that have queryParams
-  const hasParamsFn = typeof mutationConfig.method === 'function';
+  const hasParamsFn = typeof queryConfig.method === 'function';
   const queryResourceParamsFnSignal =
-    mutationConfig.params ?? signal<MutationParams | undefined>(undefined);
+    queryConfig.params ?? signal<QueryParams | undefined>(undefined);
 
-  const isConnectedToSource = isSignal(mutationConfig.method);
-  const isUsingIdentifier = 'identifier' in mutationConfig;
+  const isConnectedToSource = isSignal(queryConfig.method);
+  const isUsingIdentifier = 'identifier' in queryConfig;
 
   const resourceParamsSrc = isConnectedToSource
-    ? mutationConfig.method
+    ? queryConfig.method
     : queryResourceParamsFnSignal;
 
   const resourceTarget = isUsingIdentifier
     ? resourceById<
-        MutationState,
-        MutationParams,
+        QueryState,
+        QueryParams,
         GroupIdentifier & string,
         string,
         unknown,
         unknown
       >({
-        ...mutationConfig,
+        ...queryConfig,
         params: resourceParamsSrc,
-        identifier: mutationConfig.identifier,
+        identifier: queryConfig.identifier,
       } as any)
-    : resource<MutationState, MutationParams>({
-        ...mutationConfig,
+    : resource<QueryState, QueryParams>({
+        ...queryConfig,
         params: resourceParamsSrc,
       } as ResourceOptions<any, any>);
 
@@ -693,16 +694,16 @@ export function mutation<
            */
           _resourceById: resourceTarget as ResourceByIdRef<
             GroupIdentifier & string,
-            MutationState,
-            MutationParams
+            QueryState,
+            QueryParams
           >,
           select: (id: GroupIdentifier) => {
             return computed(() => {
               const list = (
                 resourceTarget as ResourceByIdRef<
                   GroupIdentifier & string,
-                  MutationState,
-                  MutationParams
+                  QueryState,
+                  QueryParams
                 >
               )();
               //@ts-expect-error GroupIdentifier & string is not recognized correctly
@@ -712,52 +713,55 @@ export function mutation<
         }
       : {},
     {
+      resourceParamsSrc: resourceParamsSrc as WritableSignal<
+        QueryParams | undefined
+      >,
       method:
-        hasParamsFn || isSignal(mutationConfig.method)
+        hasParamsFn || isSignal(queryConfig.method)
           ? undefined
-          : (arg: MutationArgsParams) => {
+          : (arg: QueryArgsParams) => {
               const result = (
-                mutationConfig.method as unknown as (
-                  args: MutationArgsParams
-                ) => MutationParams
+                queryConfig.method as unknown as (
+                  args: QueryArgsParams
+                ) => QueryParams
               )(arg);
               if (isUsingIdentifier) {
-                const id = mutationConfig.identifier?.(arg as any);
+                const id = queryConfig.identifier?.(arg as any);
                 (
                   resourceTarget as ResourceByIdRef<
                     GroupIdentifier & string,
-                    MutationState,
-                    MutationParams
+                    QueryState,
+                    QueryParams
                   >
                 ).addById(id as GroupIdentifier & string);
               }
-              //@ts-expect-error if method is exposed params can not be of type (entity: ResourceRef<NoInfer<FromObjectState>>) => MutationParams
-              queryResourceParamsFnSignal.set(result as MutationParams);
+              //@ts-expect-error if method is exposed params can not be of type (entity: ResourceRef<NoInfer<FromObjectState>>) => QueryParams
+              queryResourceParamsFnSignal.set(result as QueryParams);
               return result;
             },
     },
     (
       insertions as InsertionsFactory<
-        NoInfer<MutationState>,
-        NoInfer<MutationParams>,
+        NoInfer<QueryState>,
+        NoInfer<QueryParams>,
         {}
       >[]
     )?.reduce((acc, insert) => {
       return {
         ...acc,
         ...insert({
-          resource: resourceTarget as ResourceRef<MutationState>,
+          resource: resourceTarget as ResourceRef<QueryState>,
           resourceParams: resourceParamsSrc as WritableSignal<
-            NoInfer<MutationParams>
+            NoInfer<QueryParams>
           >,
           insertions: acc as {},
         }),
       };
     }, {} as Record<string, unknown>)
-  ) as unknown as MutationOutput<
-    MutationState,
-    MutationParams,
-    MutationArgsParams,
+  ) as unknown as QueryOutput<
+    QueryState,
+    QueryParams,
+    QueryArgsParams,
     SourceParams,
     GroupIdentifier,
     {}
