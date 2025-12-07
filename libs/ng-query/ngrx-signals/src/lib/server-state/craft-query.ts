@@ -1,10 +1,9 @@
 import {
-  QueryDeclarativeEffect,
   setAllPatchFromMutationOnQueryValue,
   setAllUpdatesFromMutationOnQueryValue,
   triggerQueryReloadOnMutationStatusChange,
 } from '../core/query.core';
-import { InternalType, MergeObject } from '../types/util.type';
+import { InternalType, MergeObject, MergeObjects } from '../types/util.type';
 import {
   ContextConstraints,
   MutationDictionary,
@@ -15,7 +14,6 @@ import {
   craftFactoryEntries,
   partialContext,
 } from './craft';
-import { QueryRef } from '../with-query';
 import {
   effect,
   EffectRef,
@@ -26,57 +24,140 @@ import {
 } from '@angular/core';
 import { ResourceByIdRef } from '../resource-by-id';
 import { nestedEffect } from '../types/util';
+import { QueryOutput, QueryRef } from './query';
+import { MutationOutput, MutationRef } from './mutation';
+import {
+  FilterQueryById,
+  PatchMutationQuery,
+  QueryAndMutationRecordConstraints,
+  ReloadQueriesConfig,
+} from '../types/shared.type';
+import { Prettify } from '@ngrx/signals';
 
-type QueryOptions<
+type UpdateData<
+  QueryAndMutationRecord extends QueryAndMutationRecordConstraints
+> = MergeObjects<
+  [
+    {
+      queryResource: ResourceRef<QueryAndMutationRecord['query']['state']>;
+      mutationResource: ResourceRef<
+        NoInfer<QueryAndMutationRecord['mutation']['state']>
+      >;
+      mutationParams: NonNullable<
+        NoInfer<QueryAndMutationRecord['mutation']['params']>
+      >;
+    },
+    QueryAndMutationRecord['query']['isGroupedResource'] extends true
+      ? {
+          queryIdentifier: QueryAndMutationRecord['query']['groupIdentifier'];
+          queryResources: ResourceByIdRef<
+            string,
+            QueryAndMutationRecord['query']['state'],
+            QueryAndMutationRecord['query']['params']
+          >;
+        }
+      : {},
+    QueryAndMutationRecord['mutation']['groupIdentifier'] extends
+      | string
+      | number
+      ? {
+          mutationIdentifier: QueryAndMutationRecord['mutation']['groupIdentifier'];
+          mutationResources: ResourceByIdRef<
+            string,
+            QueryAndMutationRecord['mutation']['state'],
+            QueryAndMutationRecord['mutation']['params']
+          >;
+        }
+      : {}
+  ]
+>;
+
+type QueryDeclarativeEffect<
+  QueryAndMutationRecord extends QueryAndMutationRecordConstraints
+> = MergeObjects<
+  [
+    {
+      /**
+       * Run when the mutation is in loading state.
+       */
+      optimisticUpdate?: (
+        data: UpdateData<QueryAndMutationRecord>
+      ) => QueryAndMutationRecord['query']['state'];
+      /**
+       * Run when the mutation is in loaded state.
+       */
+      update?: (
+        data: UpdateData<QueryAndMutationRecord>
+      ) => QueryAndMutationRecord['query']['state'];
+      reload?: ReloadQueriesConfig<QueryAndMutationRecord>;
+      /**
+       * Run when the mutation is in loading state.
+       * Will patch the query specific state with the mutation data.
+       * If the query is loading, it will not patch.
+       * If the mutation data is not compatible with the query state, it will not patch.
+       * Be careful! If the mutation is already in a loading state, trigger the mutation again will cancelled the previous mutation loader and will patch with the new value.
+       */
+      optimisticPatch?: PatchMutationQuery<QueryAndMutationRecord>;
+      /**
+       * Run when the mutation is in loaded state.
+       * Will patch the query specific state with the mutation data.
+       * If the query is loading, it will not patch.
+       * If the mutation data is not compatible with the query state, it will not patch.
+       * Be careful! If the mutation is already in a loading state, trigger the mutation again will cancelled the previous mutation loader and will patch with the new value.
+       */
+      patch?: PatchMutationQuery<QueryAndMutationRecord>;
+    },
+    QueryAndMutationRecord['mutation']['isGroupedResource'] extends true
+      ? {
+          filter: FilterQueryById<QueryAndMutationRecord>;
+        }
+      : QueryAndMutationRecord['query']['isGroupedResource'] extends true
+      ? {
+          filter: FilterQueryById<QueryAndMutationRecord>;
+        }
+      : {}
+  ]
+>;
+
+export type QueryOptions<
   Context extends ContextConstraints,
   ResourceState extends object | undefined,
   ResourceParams,
-  ResourceArgsParams,
-  OtherProperties
+  GroupIdentifier,
+  ResourceArgsParams
 > = {
+  test?: Context;
+  // todo dans _mutation partager explicitement le type via InternalType et le MutationRef
   on?: Context['_mutation'] extends infer Mutations
     ? {
         [key in keyof Mutations as `${key &
-          string}${'__types' extends keyof Mutations[key]
-          ? Mutations[key]['__types'] extends InternalType<
-              infer _State,
-              infer _Params,
-              infer _Args,
-              infer IsGroupedResource
-            >
-            ? IsGroupedResource extends true
-              ? 'MutationById'
-              : 'Mutation'
-            : never
-          : never}`]?: '__types' extends keyof Mutations[key]
-          ? Mutations[key]['__types'] extends InternalType<
-              infer MutationState,
-              infer MutationParams,
-              infer MutationArgsParams,
-              infer MutationIsByGroup,
-              infer MutationGroupIdentifier
-            >
-            ? QueryDeclarativeEffect<{
-                query: InternalType<
-                  ResourceState,
-                  ResourceParams,
-                  ResourceArgsParams,
-                  false
-                >;
-                mutation: InternalType<
-                  MutationState,
-                  MutationParams,
-                  MutationArgsParams,
-                  MutationIsByGroup,
-                  MutationGroupIdentifier
-                >;
-              }>
-            : never
-          : never;
+          string}Mutation`]?: Mutations[key] extends MutationOutput<
+          infer MutationState,
+          infer MutationArgParams,
+          infer MutationParams,
+          infer MutationSourceParams,
+          infer MutationGroupIdentifier,
+          infer MutationInsertions
+        >
+          ? QueryDeclarativeEffect<{
+              query: InternalType<
+                ResourceState,
+                ResourceParams,
+                ResourceArgsParams,
+                [unknown] extends [GroupIdentifier] ? false : true,
+                GroupIdentifier
+              >;
+              mutation: InternalType<
+                MutationState,
+                MutationParams,
+                MutationArgParams,
+                [unknown] extends [MutationGroupIdentifier] ? false : true,
+                MutationGroupIdentifier
+              >;
+            }>
+          : 'error infer mutation';
       }
-    : never;
-} & {
-  [key in keyof OtherProperties]: OtherProperties[key];
+    : 'never2';
 };
 
 type SpecificCraftQueryOutputs<
@@ -84,28 +165,30 @@ type SpecificCraftQueryOutputs<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
+  IsMethod,
+  SourceParams,
+  GroupIdentifier,
   InsertionsOutputs
 > = PartialContext<{
   props: {
-    [key in `${ResourceName & string}Query`]: MergeObject<
-      ResourceRef<ResourceState>,
+    [key in `${ResourceName & string}Query`]: QueryOutput<
+      ResourceState,
+      ResourceArgsParams,
+      ResourceParams,
+      SourceParams,
+      GroupIdentifier,
       InsertionsOutputs
     >;
   };
-  __query: {
-    [key in ResourceName & string]: {
-      queryRef: QueryRef<
-        NoInfer<ResourceState>,
-        NoInfer<ResourceParams>,
-        InsertionsOutputs
-      >;
-      __types: InternalType<
-        ResourceState,
-        ResourceParams,
-        ResourceArgsParams,
-        false
-      >;
-    };
+  _query: {
+    [key in ResourceName & string]: QueryOutput<
+      ResourceState,
+      ResourceArgsParams,
+      ResourceParams,
+      SourceParams,
+      GroupIdentifier,
+      InsertionsOutputs
+    >;
   };
 }>;
 
@@ -116,6 +199,9 @@ type CraftQueryOutputs<
   ResourceState extends object | undefined,
   ResourceParams,
   ResourceArgsParams,
+  IsMethod,
+  SourceParams,
+  GroupIdentifier,
   InsertionsOutputs
 > = CraftFactoryUtility<
   Context,
@@ -125,6 +211,9 @@ type CraftQueryOutputs<
     ResourceState,
     ResourceParams,
     ResourceArgsParams,
+    IsMethod,
+    SourceParams,
+    GroupIdentifier,
     InsertionsOutputs
   >
 >;
@@ -137,266 +226,311 @@ export function craftQuery<
   ResourceParams,
   ResourceArgsParams,
   InsertionsOutputs,
-  OtherProperties
+  IsMethod,
+  SourceParams,
+  GroupIdentifier
 >(
   resourceName: ResourceName,
-  queryFactory: (context: CraftFactoryEntries<Context>) => {
-    // ! avoid to get the QueryRef directly, because it will return a ResourceRef that must be instantiated in an injectionContext
-    // That why it is always wrapped in a function
-    queryRef: QueryRef<
-      NoInfer<ResourceState>,
-      NoInfer<ResourceParams>,
-      InsertionsOutputs
-    >;
-    __types: InternalType<
-      ResourceState,
-      ResourceParams,
-      ResourceArgsParams,
-      false
-    >;
-  },
+  queryFactory: (
+    context: CraftFactoryEntries<Context>
+  ) => QueryOutput<
+    ResourceState,
+    ResourceArgsParams,
+    ResourceParams,
+    SourceParams,
+    GroupIdentifier,
+    InsertionsOutputs
+  >,
   queryOptions?: QueryOptions<
     NoInfer<Context>,
-    ResourceState,
-    ResourceParams,
-    ResourceArgsParams,
-    OtherProperties
+    NoInfer<ResourceState>,
+    NoInfer<ResourceParams>,
+    NoInfer<GroupIdentifier>,
+    NoInfer<ResourceArgsParams>
   >
 ): CraftQueryOutputs<
   Context,
   StoreConfig,
   ResourceName,
-  ResourceState,
+  NoInfer<ResourceState>,
   ResourceParams,
   ResourceArgsParams,
+  IsMethod,
+  SourceParams,
+  GroupIdentifier,
   InsertionsOutputs
 > {
   return () => (contextData, injector) => {
-    const queryResult = queryFactory(craftFactoryEntries(contextData));
-    const {
-      queryRef: { resource: queryResource, insertionsOutputs },
-    } = queryResult;
+    const queryRef = queryFactory(craftFactoryEntries(contextData)) as QueryRef<
+      ResourceState,
+      ResourceArgsParams,
+      ResourceParams,
+      InsertionsOutputs,
+      IsMethod,
+      SourceParams,
+      GroupIdentifier
+    >;
     const mutationsConfigEffect = Object.entries(
       (queryOptions?.on ?? {}) as Record<string, QueryDeclarativeEffect<any>>
     );
+    const context = contextData.context;
 
-    handleQueryMutationsReactions<
+    const resourceTarget = (
+      '_resourceById' in queryRef ? queryRef._resourceById : queryRef
+    ) as
+      | ResourceByIdRef<string, ResourceState, ResourceParams>
+      | ResourceRef<ResourceState>;
+
+    handleQueryResourceMutationEffects<
       Context,
       ResourceName,
       ResourceState,
-      ResourceParams
+      ResourceParams,
+      ResourceArgsParams,
+      IsMethod,
+      SourceParams,
+      GroupIdentifier & string,
+      InsertionsOutputs
     >(
       mutationsConfigEffect,
-      contextData.context as unknown as Context,
+      context as unknown as Context,
       resourceName,
-      queryResource,
+      resourceTarget,
       injector
     );
 
     return partialContext({
       props: {
-        [`${resourceName as ResourceName}Query`]: Object.assign(
-          queryResource,
-          insertionsOutputs ?? {}
-        ) as MergeObject<ResourceRef<ResourceState>, InsertionsOutputs>,
+        [`${resourceName as ResourceName}`]: Object.assign(
+          queryRef
+        ) as MergeObject<
+          ResourceByIdRef<
+            GroupIdentifier & string,
+            ResourceState,
+            ResourceParams
+          >,
+          InsertionsOutputs
+        >,
       },
       _query: {
-        [resourceName as ResourceName]: queryResult,
+        [resourceName as ResourceName]: queryRef,
       },
     }) as SpecificCraftQueryOutputs<
       ResourceName,
       ResourceState,
       ResourceParams,
       ResourceArgsParams,
+      IsMethod,
+      SourceParams,
+      GroupIdentifier,
       InsertionsOutputs
     >;
   };
 }
 
-function handleQueryMutationsReactions<
+function handleQueryResourceMutationEffects<
   Context extends ContextConstraints,
-  const ResourceName extends string,
-  ResourceState extends object | undefined,
-  ResourceParams
+  ResourceName extends string,
+  ResourceState,
+  ResourceParams,
+  ResourceArgsParams,
+  IsMethod,
+  SourceParams,
+  GroupIdentifier extends string,
+  InsertionsOutputs
 >(
   mutationsConfigEffect: [string, QueryDeclarativeEffect<any>][],
   context: Context,
   resourceName: ResourceName,
-  queryResource: ResourceRef<NoInfer<ResourceState> | undefined>,
+  queryResourceTarget:
+    | ResourceByIdRef<string, ResourceState, ResourceParams>
+    | ResourceRef<ResourceState>,
   _injector: Injector
 ) {
-  mutationsConfigEffect.reduce((acc, [mutationName, mutationEffectOptions]) => {
-    const formattedMutationName = mutationName
-      .replace('Mutation', '')
-      .replace('ById', '');
-    const mutationTargeted = (context._mutation as MutationDictionary)[
-      formattedMutationName
-    ]?.mutationRef;
-    console.log('formattedMutationName', formattedMutationName);
-    console.log('mutationTargeted', mutationTargeted);
-    if ('resource' in mutationTargeted) {
-      const mutationResource = mutationTargeted.resource;
-      return {
-        ...acc,
-        [`_on${formattedMutationName}${resourceName}QueryEffect`]: effect(
-          () => {
-            const mutationStatus = mutationResource.status();
-            const mutationParamsSrc = (context._mutation as MutationDictionary)[
-              formattedMutationName
-            ].mutationRef.resourceParamsSrc;
-            // use to track the value of the mutation
-            const _mutationValueChanged = mutationResource.hasValue()
-              ? mutationResource.value()
-              : undefined;
+  return {
+    ...(mutationsConfigEffect.length &&
+      mutationsConfigEffect.reduce(
+        (acc, [mutationName, mutationEffectOptions]) => {
+          const formattedMutationName = mutationName
+            .replace('Mutation', '')
+            .replace('ById', '');
+          const mutationTargeted = (context._mutation as MutationDictionary)[
+            formattedMutationName
+          ]?.mutationRef;
 
-            if (
-              mutationEffectOptions?.optimisticUpdate ||
-              mutationEffectOptions?.update
-            ) {
-              untracked(() => {
-                setAllUpdatesFromMutationOnQueryValue({
-                  mutationStatus,
-                  queryResourceTarget: queryResource,
-                  mutationEffectOptions,
-                  mutationResource,
-                  mutationParamsSrc,
-                  mutationIdentifier: undefined,
-                  mutationResources: undefined,
-                });
-              });
-            }
-            const reloadCConfig = mutationEffectOptions.reload;
-            if (reloadCConfig) {
-              untracked(() => {
-                triggerQueryReloadOnMutationStatusChange({
-                  mutationStatus,
-                  queryResourceTarget: queryResource,
-                  mutationEffectOptions,
-                  mutationResource,
-                  mutationParamsSrc,
-                  reloadCConfig,
-                  mutationIdentifier: undefined,
-                  mutationResources: undefined,
-                });
-              });
-            }
-            if (
-              mutationEffectOptions.optimisticPatch ||
-              mutationEffectOptions.patch
-            ) {
-              untracked(() => {
-                setAllPatchFromMutationOnQueryValue({
-                  mutationStatus,
-                  queryResourceTarget: queryResource,
-                  mutationEffectOptions,
-                  mutationResource,
-                  mutationParamsSrc,
-                  mutationIdentifier: undefined,
-                  mutationResources: undefined,
-                });
-              });
-            }
+          if ('resource' in mutationTargeted) {
+            const mutationResource = mutationTargeted.resource;
+            return {
+              ...acc,
+              [`_on${mutationName}${resourceName}QueryEffect`]: effect(() => {
+                const mutationStatus = mutationResource.status();
+                const mutationParamsSrc = mutationTargeted.resourceParamsSrc;
+                // use to track the value of the mutation
+                const _mutationValueChanged = mutationResource.hasValue()
+                  ? mutationResource.value()
+                  : undefined;
+
+                if (
+                  mutationEffectOptions?.optimisticUpdate ||
+                  mutationEffectOptions.update
+                ) {
+                  untracked(() => {
+                    setAllUpdatesFromMutationOnQueryValue({
+                      mutationStatus,
+                      queryResourceTarget,
+                      mutationEffectOptions,
+                      mutationResource,
+                      mutationParamsSrc,
+                      mutationIdentifier: undefined,
+                      mutationResources: undefined,
+                    });
+                  });
+                }
+                const reloadCConfig = mutationEffectOptions.reload;
+                if (reloadCConfig) {
+                  untracked(() => {
+                    triggerQueryReloadOnMutationStatusChange({
+                      mutationStatus,
+                      queryResourceTarget,
+                      mutationEffectOptions,
+                      mutationResource,
+                      mutationParamsSrc,
+                      reloadCConfig,
+                      mutationIdentifier: undefined,
+                      mutationResources: undefined,
+                    });
+                  });
+                }
+                if (
+                  mutationEffectOptions.optimisticPatch ||
+                  mutationEffectOptions.patch
+                ) {
+                  untracked(() => {
+                    setAllPatchFromMutationOnQueryValue({
+                      mutationStatus,
+                      //@ts-expect-error not understand from where the error come from
+                      queryResourceTarget: queryResourceTarget,
+                      mutationEffectOptions: mutationEffectOptions as any,
+                      mutationResource,
+                      mutationParamsSrc,
+                      mutationIdentifier: undefined,
+                      mutationResources: undefined,
+                    });
+                  });
+                }
+              }),
+            };
           }
-        ),
-      };
-    }
-    const mutationResources = mutationTargeted.resourceById;
-    const newMutationResourceRefForNestedEffect = linkedSignal<
-      ResourceByIdRef<string, ResourceState, ResourceParams>,
-      { newKeys: string[] } | undefined
-    >({
-      source: mutationResources as any,
-      computation: (currentSource, previous) => {
-        if (!currentSource || !Object.keys(currentSource).length) {
-          return undefined;
-        }
+          const mutationResources = mutationTargeted.resourceById;
+          const newMutationResourceRefForNestedEffect = linkedSignal<
+            ResourceByIdRef<GroupIdentifier, ResourceState, ResourceParams>,
+            { newKeys: GroupIdentifier[] } | undefined
+          >({
+            source: mutationTargeted.resourceById as any,
+            computation: (currentSource, previous) => {
+              if (!currentSource || !Object.keys(currentSource).length) {
+                return undefined;
+              }
 
-        const currentKeys = Object.keys(currentSource) as string[];
-        const previousKeys = Object.keys(previous?.source || {}) as string[];
+              const currentKeys = Object.keys(
+                currentSource
+              ) as GroupIdentifier[];
+              const previousKeys = Object.keys(
+                previous?.source || {}
+              ) as GroupIdentifier[];
 
-        // Find keys that exist in current but not in previous
-        const newKeys = currentKeys.filter(
-          (key) => !previousKeys.includes(key)
-        );
+              // Find keys that exist in current but not in previous
+              const newKeys = currentKeys.filter(
+                (key) => !previousKeys.includes(key)
+              );
 
-        return newKeys.length > 0 ? { newKeys } : previous?.value;
-      },
-    });
+              return newKeys.length > 0 ? { newKeys } : previous?.value;
+            },
+          });
 
-    return {
-      ...acc,
-      [`_on${formattedMutationName}${resourceName}QueryEffect`]: effect(() => {
-        if (!newMutationResourceRefForNestedEffect()?.newKeys) {
-          return;
-        }
-        newMutationResourceRefForNestedEffect()?.newKeys.forEach(
-          (mutationIdentifier) => {
-            nestedEffect(_injector, () => {
-              const mutationResource =
-                mutationTargeted.resourceById()[mutationIdentifier];
-
-              if (!mutationResource) {
+          return {
+            ...acc,
+            [`_on${mutationName}${resourceName}QueryEffect`]: effect(() => {
+              if (!newMutationResourceRefForNestedEffect()?.newKeys) {
                 return;
               }
-              const mutationStatus = mutationResource.status();
-              const mutationParamsSrc = (
-                context._mutation as MutationDictionary
-              )[formattedMutationName].mutationRef.resourceParamsSrc;
-              // use to track the value of the mutation
-              const _mutationValueChanged = mutationResource.hasValue()
-                ? mutationResource.value()
-                : undefined;
-              if (
-                mutationEffectOptions?.optimisticUpdate ||
-                mutationEffectOptions?.update
-              ) {
-                untracked(() => {
-                  setAllUpdatesFromMutationOnQueryValue({
-                    mutationStatus,
-                    queryResourceTarget: queryResource,
-                    mutationEffectOptions,
-                    mutationResource,
-                    mutationParamsSrc,
-                    mutationIdentifier,
-                    mutationResources,
+              newMutationResourceRefForNestedEffect()?.newKeys.forEach(
+                (mutationIdentifier) => {
+                  nestedEffect(_injector, () => {
+                    const mutationResource =
+                      mutationTargeted.resourceById()[mutationIdentifier];
+
+                    if (!mutationResource) {
+                      return;
+                    }
+                    const mutationStatus = mutationResource.status();
+                    const mutationParamsSrc =
+                      mutationTargeted.resourceParamsSrc;
+                    // use to track the value of the mutation
+                    const _mutationValueChanged = mutationResource.hasValue()
+                      ? mutationResource.value()
+                      : undefined;
+
+                    if (
+                      typeof mutationParamsSrc === 'function' &&
+                      mutationParamsSrc()
+                    ) {
+                      // ! keep this check, it is used to track mutationParamsSrc, otherwise it does not works
+                    }
+                    if (
+                      mutationEffectOptions?.optimisticUpdate ||
+                      mutationEffectOptions.update
+                    ) {
+                      untracked(() => {
+                        setAllUpdatesFromMutationOnQueryValue({
+                          mutationStatus,
+                          queryResourceTarget,
+                          mutationEffectOptions,
+                          mutationResource,
+                          mutationParamsSrc,
+                          mutationIdentifier,
+                          mutationResources,
+                        });
+                      });
+                    }
+                    const reloadCConfig = mutationEffectOptions.reload;
+                    if (reloadCConfig) {
+                      untracked(() => {
+                        triggerQueryReloadOnMutationStatusChange({
+                          mutationStatus,
+                          queryResourceTarget,
+                          mutationEffectOptions,
+                          mutationResource,
+                          mutationParamsSrc,
+                          reloadCConfig,
+                          mutationIdentifier,
+                          mutationResources,
+                        });
+                      });
+                    }
+                    if (
+                      mutationEffectOptions.optimisticPatch ||
+                      mutationEffectOptions.patch
+                    ) {
+                      untracked(() => {
+                        setAllPatchFromMutationOnQueryValue({
+                          mutationStatus,
+                          queryResourceTarget,
+                          mutationEffectOptions,
+                          mutationResource,
+                          mutationParamsSrc,
+                          mutationIdentifier: mutationIdentifier,
+                          mutationResources,
+                        });
+                      });
+                    }
                   });
-                });
-              }
-              const reloadCConfig = mutationEffectOptions.reload;
-              if (reloadCConfig) {
-                untracked(() => {
-                  triggerQueryReloadOnMutationStatusChange({
-                    mutationStatus,
-                    queryResourceTarget: queryResource,
-                    mutationEffectOptions,
-                    mutationResource,
-                    mutationParamsSrc,
-                    reloadCConfig,
-                    mutationIdentifier,
-                    mutationResources,
-                  });
-                });
-              }
-              if (
-                mutationEffectOptions.optimisticPatch ||
-                mutationEffectOptions.patch
-              ) {
-                untracked(() => {
-                  setAllPatchFromMutationOnQueryValue({
-                    mutationStatus,
-                    queryResourceTarget: queryResource,
-                    mutationEffectOptions,
-                    mutationResource,
-                    mutationParamsSrc,
-                    mutationIdentifier: mutationIdentifier,
-                    mutationResources,
-                  });
-                });
-              }
-            });
-          }
-        );
-      }),
-    };
-  }, {} as Record<`_on${string}${ResourceName}QueryEffect`, EffectRef>);
+                }
+              );
+            }),
+          };
+        },
+        {} as Record<`_on${string}${ResourceName}QueryEffect`, EffectRef>
+      )),
+  };
 }

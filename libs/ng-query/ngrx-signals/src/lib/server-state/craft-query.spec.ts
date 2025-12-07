@@ -2,13 +2,15 @@ import { Expect, Equal } from 'test-type';
 import { inject, ResourceRef, ResourceStreamItem, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { expectTypeOf, vi } from 'vitest';
-import { craftQuery } from './craft-query';
-import { query } from '../query';
 import { craft, CraftFactory } from './craft';
 import { craftMutation } from './craft-mutation';
 import { craftMutationById } from './craft-mutation-by-id';
-import { mutation } from '../mutation';
+import { mutation } from './mutation';
 import { mutationById } from '../mutation-by-id';
+import { query } from './query';
+import { craftQuery } from './craft-query';
+import { craftMutations } from './craft-mutations';
+import { Prettify } from '@ngrx/signals';
 
 type User = {
   id: string;
@@ -59,7 +61,7 @@ describe('craftQuery', () => {
         },
         craftQuery('user', () =>
           query({
-            params: () => undefined,
+            params: () => undefined as string | undefined,
             loader: async ({ params }) => {
               return {
                 id: params,
@@ -218,8 +220,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('userEmail', () =>
-          mutation({
+        craftMutations(() => ({
+          userEmail: mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
               email,
@@ -231,8 +233,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
                 email: params.email,
               } satisfies User;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -275,7 +277,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       });
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value().email).toBe('mutated@test.com');
+      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
     });
   });
 

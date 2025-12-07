@@ -51,7 +51,6 @@ export type QueryDictionary = Record<
   }
 >;
 
-// todo rename __query/__mutation asyncMethods ?
 // todo find a way to simplify that, props exposed everywhere, _props only in stores and __props only in current store ?
 // todo doc about cloudProxy (it store all standalones methods automatically)
 export type ContextConstraints = {

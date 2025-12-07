@@ -96,7 +96,19 @@ export type MutationRef<
   IsMethod,
   SourceParams,
   GroupIdentifier
->;
+> & {
+  // ! Otherwise TS erases the types
+  [key in `~InternalType`]: {
+    State: Value;
+    ArgParams: ArgParams;
+    Params: Params;
+    Insertions: Insertions;
+    IsMethod: IsMethod;
+    SourceParams: SourceParams;
+    GroupIdentifier: GroupIdentifier;
+    IsGroupedResource: [unknown] extends [GroupIdentifier] ? false : true;
+  };
+};
 
 export type MutationOutput<
   State extends object | undefined,

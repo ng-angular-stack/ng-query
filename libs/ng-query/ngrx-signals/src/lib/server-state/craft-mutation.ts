@@ -69,6 +69,9 @@ type CraftMutationOutputs<
   >
 >;
 
+/**
+ * @deprecated
+ */
 export function craftMutation<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,

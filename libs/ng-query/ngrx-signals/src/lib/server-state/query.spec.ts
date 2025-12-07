@@ -30,7 +30,7 @@ describe('query', () => {
   });
 });
 
-describe('queryById', () => {
+describe('query with identifier>', () => {
   it('Retrieve returned types of queryByIdFn', () => {
     TestBed.runInInjectionContext(() => {
       const queryByIdFn = query({

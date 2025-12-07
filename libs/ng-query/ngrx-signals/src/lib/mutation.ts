@@ -33,6 +33,9 @@ type MutationOutput<
   >;
 };
 
+/**
+ * @deprecated
+ */
 export function mutation<
   MutationState extends object | undefined,
   MutationParams,
@@ -351,6 +354,9 @@ export function mutation<
     Insertion6 &
     Insertion7
 >;
+/**
+ * @deprecated
+ */
 export function mutation<
   MutationState extends object | undefined,
   MutationParams,

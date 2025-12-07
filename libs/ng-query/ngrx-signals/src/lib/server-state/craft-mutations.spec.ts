@@ -6,7 +6,7 @@ import { craft } from './craft';
 import { ResourceByIdRef } from '../resource-by-id';
 import { craftMutations } from './craft-mutations';
 import { ReadonlySource } from './util/source.type';
-import { mutation } from './mutation';
+import { mutation, MutationRef } from './mutation';
 
 type User = {
   id: string;
@@ -61,6 +61,15 @@ describe('craftMutationById', () => {
         readonly isLoading: Signal<boolean>;
         hasValue: () => boolean;
         source: ReadonlySource<string>;
+        '~InternalType': {
+          State: User;
+          ArgParams: string;
+          Params: unknown;
+          Insertions: {};
+          IsMethod: false;
+          SourceParams: string;
+          GroupIdentifier: unknown;
+        };
       }>();
 
       expect(store.userById._resourceById).toBeDefined();
@@ -132,5 +141,31 @@ describe('craftMutationById', () => {
       expect(store.user.select('7')?.status()).toEqual('resolved');
       expect(store.user.select('8')?.status()).toEqual('resolved');
     });
+  });
+
+  it('6- Should expose all defined mutation in _mutation context', async () => {
+    const returnedUser = {
+      id: '5',
+      name: 'John Doe',
+      email: 'test@a.com',
+    };
+    const { __META_STORE_CONTEXT } = craft(
+      {
+        name: '',
+        providedIn: 'root',
+      },
+      craftMutations(() => ({
+        user: mutation({
+          method: (user: User) => user,
+          loader: ({ params: user }) => {
+            return lastValueFrom(of(user));
+          },
+          identifier: ({ id }) => id,
+        }),
+      }))
+    );
+    expectTypeOf<
+      keyof typeof __META_STORE_CONTEXT.context._mutation
+    >().toEqualTypeOf<'user'>();
   });
 });
