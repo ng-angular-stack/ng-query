@@ -205,6 +205,7 @@ export type QueryOutput<
   GroupIdentifier
 > & {
   resourceParamsSrc: WritableSignal<Params | undefined>;
+  reload(): boolean;
 };
 
 export function query<

@@ -3,14 +3,10 @@ import { inject, ResourceRef, ResourceStreamItem, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { expectTypeOf, vi } from 'vitest';
 import { craft, CraftFactory } from './craft';
-import { craftMutation } from './craft-mutation';
-import { craftMutationById } from './craft-mutation-by-id';
 import { mutation } from './mutation';
-import { mutationById } from '../mutation-by-id';
-import { query } from './query';
+import { query, QueryOutput } from './query';
 import { craftQuery } from './craft-query';
 import { craftMutations } from './craft-mutations';
-import { Prettify } from '@ngrx/signals';
 
 type User = {
   id: string;
@@ -288,8 +284,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('userEmail', () =>
-          mutation({
+        craftMutations(() => ({
+          userEmail: mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
               email,
@@ -302,8 +298,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
                 email: params.email,
               } satisfies User;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -343,7 +339,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         email: 'mutated@test.com',
       });
       await vi.advanceTimersByTimeAsync(2000);
-      expect(store.userEmailMutation.status()).toBe('error');
+      expect(store.userEmail.status()).toBe('error');
       expect(store.userQuery.status()).toBe('reloading');
     });
   });
@@ -354,8 +350,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('userEmail', () =>
-          mutation({
+        craftMutations(() => ({
+          userEmail: mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
               email,
@@ -372,8 +368,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
                 email: params.email,
               } satisfies User;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -414,7 +410,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         email: 'mutated@test.com',
       });
       await vi.advanceTimersByTimeAsync(5000);
-      expect(store.userEmailMutation.status()).toBe('error');
+      expect(store.userEmail.status()).toBe('error');
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('resolved');
 
@@ -423,7 +419,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         email: 'mutated@test.com',
       });
       await vi.advanceTimersByTimeAsync(2000);
-      expect(store.userEmailMutation.status()).toBe('error');
+      expect(store.userEmail.status()).toBe('error');
       await vi.advanceTimersByTimeAsync(2000);
       expect(store.userQuery.status()).toBe('reloading');
       await vi.runAllTimersAsync();
@@ -438,8 +434,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('userEmail', () =>
-          mutation({
+        craftMutations(() => ({
+          userEmail: mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
               email,
@@ -451,8 +447,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
                 email: params.email,
               } satisfies User;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -494,11 +490,11 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value().email).toBe('mutated@test.com');
+      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
     });
   });
 
-  it('5- Should handle craftMutationById reactions effect', async () => {
+  it('5- Should handle craftMutation reactions effect', async () => {
     await TestBed.runInInjectionContext(async () => {
       const returnedUser = (id: string) => ({
         id: `${id}`,
@@ -510,8 +506,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutationById('user', () =>
-          mutationById({
+        craftMutations(() => ({
+          user: mutation({
             method(user: User) {
               return user;
             },
@@ -520,8 +516,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
               await wait(1000);
               return params;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -534,7 +530,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
             }),
           {
             on: {
-              userMutationById: {
+              userMutation: {
                 filter: ({ mutationIdentifier, queryResource }) =>
                   queryResource.hasValue()
                     ? queryResource.value().id === mutationIdentifier
@@ -552,9 +548,9 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const store = inject(Craft);
       const userQuery = store.userQuery;
       await vi.runAllTimersAsync();
-      expect(userQuery?.value()).toEqual(returnedUser('5'));
-      const userQuery5ReloadSpy = vi.spyOn(userQuery!, 'reload');
-      store.mutateUserById({
+      expect(userQuery.value()).toEqual(returnedUser('5'));
+      const userQuery5ReloadSpy = vi.spyOn(userQuery, 'reload');
+      store.mutateUser({
         id: '5',
         name: 'Updated User',
         email: 'updated.doe@example.com',
@@ -573,8 +569,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('userEmail', () =>
-          mutation({
+        craftMutations(() => ({
+          userEmail: mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
               email,
@@ -586,8 +582,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
                 email: params.email,
               } satisfies User;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -631,7 +627,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       });
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value().email).toBe('mutated@test.com');
+      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
     });
   });
   it('7- craftQuery should handle patch', async () => {
@@ -641,8 +637,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('userEmail', () =>
-          mutation({
+        craftMutations(() => ({
+          userEmail: mutation({
             method: ({ id, email }: { id: string; email: string }) => ({
               id,
               email,
@@ -654,8 +650,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
                 email: params.email,
               } satisfies User;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -696,10 +692,10 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
 
       await vi.runAllTimersAsync();
       expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value().email).toBe('mutated@test.com');
+      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
     });
   });
-  it('8- Should handle craftMutationById update', async () => {
+  it('8- Should handle craftMutation update', async () => {
     await TestBed.runInInjectionContext(async () => {
       const returnedUser = (id: string) => ({
         id: `${id}`,
@@ -711,8 +707,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutationById('user', () =>
-          mutationById({
+        craftMutations(() => ({
+          user: mutation({
             method(user: User) {
               return user;
             },
@@ -721,8 +717,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
               await wait(1000);
               return params;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -735,7 +731,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
             }),
           {
             on: {
-              userMutationById: {
+              userMutation: {
                 filter: ({ mutationIdentifier, queryResource }) =>
                   queryResource.hasValue()
                     ? queryResource.value().id === mutationIdentifier
@@ -756,7 +752,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const userQuery = store.userQuery;
       await vi.runAllTimersAsync();
       expect(userQuery?.value()).toEqual(returnedUser('5'));
-      store.mutateUserById({
+      store.mutateUser({
         id: '5',
         name: 'Updated User',
         email: 'updated.doe@example.com',
@@ -771,7 +767,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       vi.restoreAllMocks();
     });
   });
-  it('9- Should handle craftMutationById patch', async () => {
+  it('9- Should handle craftMutation patch', async () => {
     await TestBed.runInInjectionContext(async () => {
       const returnedUser = (id: string) => ({
         id: `${id}`,
@@ -783,8 +779,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutationById('user', () =>
-          mutationById({
+        craftMutations(() => ({
+          user: mutation({
             method(user: User) {
               return user;
             },
@@ -793,8 +789,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
               await wait(1000);
               return params;
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>
@@ -807,7 +803,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
             }),
           {
             on: {
-              userMutationById: {
+              userMutation: {
                 filter: ({ mutationIdentifier, queryResource }) =>
                   queryResource.hasValue()
                     ? queryResource.value().id === mutationIdentifier
@@ -826,7 +822,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const userQuery = store.userQuery;
       await vi.runAllTimersAsync();
       expect(userQuery?.value()).toEqual(returnedUser('5'));
-      store.mutateUserById({
+      store.mutateUser({
         id: '5',
         name: 'Updated User',
         email: 'updated.doe@example.com',
@@ -912,19 +908,27 @@ describe('craftQuery typing', () => {
       >;
 
       type _ExpectThePropsToHaveARecordWithResourceRef = Expect<
-        Equal<ResultType['props']['userQuery'], ResourceRef<User>>
+        Equal<
+          ReturnType<ResultType['props']['userQuery']['value']>,
+          User | undefined
+        >
       >;
 
-      type _ExpectThePropsToHaveARecordcraftQueryNameAndHistype = Expect<
+      type _ExpectThePropsToHaveARecordCraftQueryNameAndHisType = Expect<
         Equal<
           ResultType['props'],
           {
-            userQuery: ResourceRef<
+            userQuery: QueryOutput<
               NoInfer<{
                 id: string;
                 name: string;
                 email: string;
-              }>
+              }>,
+              string,
+              unknown,
+              unknown,
+              unknown,
+              {}
             >;
           }
         >
@@ -939,8 +943,8 @@ describe('craftQuery typing', () => {
           name: '',
           providedIn: 'root',
         },
-        craftMutation('userName', () =>
-          mutation({
+        craftMutations(() => ({
+          userName: mutation({
             method: (id: string) => ({ id }),
             loader: async ({ params }) => {
               return {
@@ -949,10 +953,8 @@ describe('craftQuery typing', () => {
                 email: 'er@d',
               } satisfies User;
             },
-          })
-        ),
-        craftMutation('userEmail', () =>
-          mutation({
+          }),
+          userEmail: mutation({
             method: (id: string) => ({ id }),
             loader: async ({ params }) => {
               return {
@@ -962,10 +964,8 @@ describe('craftQuery typing', () => {
                 lol: 5,
               } satisfies User & { lol: number };
             },
-          })
-        ),
-        craftMutation('userTest', () =>
-          mutation({
+          }),
+          userTest: mutation({
             method: (id: string) => ({ id }),
             loader: async ({ params }) => {
               return {
@@ -975,8 +975,8 @@ describe('craftQuery typing', () => {
                 lol: 5,
               } satisfies User & { lol: number };
             },
-          })
-        ),
+          }),
+        })),
         craftQuery(
           'user',
           () =>

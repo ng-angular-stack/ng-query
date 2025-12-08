@@ -98,22 +98,13 @@ export type MutationRef<
   GroupIdentifier
 > & {
   // ! Otherwise TS erases the types
-  [key in `~InternalType`]: {
-    State: Value;
-    ArgParams: ArgParams;
-    Params: Params;
-    Insertions: Insertions;
-    IsMethod: IsMethod;
-    SourceParams: SourceParams;
-    GroupIdentifier: GroupIdentifier;
-    IsGroupedResource: [unknown] extends [GroupIdentifier] ? false : true;
-  };
+  [key in `~InternalType`]: 'Used to avoid TS type erasure';
 };
 
 export type MutationOutput<
   State extends object | undefined,
-  ArgParams,
   Params,
+  ArgParams,
   SourceParams,
   GroupIdentifier,
   Insertions

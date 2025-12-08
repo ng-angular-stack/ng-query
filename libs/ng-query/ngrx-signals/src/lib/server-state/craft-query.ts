@@ -133,8 +133,8 @@ export type QueryOptions<
         [key in keyof Mutations as `${key &
           string}Mutation`]?: Mutations[key] extends MutationOutput<
           infer MutationState,
-          infer MutationArgParams,
           infer MutationParams,
+          infer MutationArgParams,
           infer MutationSourceParams,
           infer MutationGroupIdentifier,
           infer MutationInsertions

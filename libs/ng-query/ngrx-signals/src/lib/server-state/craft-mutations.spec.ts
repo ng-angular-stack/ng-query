@@ -56,26 +56,17 @@ describe('craftMutationById', () => {
 
       expectTypeOf(store.user).toEqualTypeOf<{
         readonly error: Signal<Error | undefined>;
+        '~InternalType': 'Used to avoid TS type erasure';
         readonly value: Signal<User | undefined>;
         readonly status: Signal<string>;
         readonly isLoading: Signal<boolean>;
         hasValue: () => boolean;
-        source: ReadonlySource<string>;
-        '~InternalType': {
-          State: User;
-          ArgParams: string;
-          Params: unknown;
-          Insertions: {};
-          IsMethod: false;
-          SourceParams: string;
-          GroupIdentifier: unknown;
-        };
       }>();
 
       expect(store.userById._resourceById).toBeDefined();
 
       expectTypeOf(store.userById._resourceById).toEqualTypeOf<
-        ResourceByIdRef<string, User, string>
+        ResourceByIdRef<string, User, unknown>
       >();
 
       await vi.runAllTimersAsync();
