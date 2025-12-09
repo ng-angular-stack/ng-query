@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, linkedSignal, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   afterRecomputation,
@@ -9,6 +17,8 @@ import {
   craftState,
   source,
 } from '@ng-query/ngrx-signals';
+import { Source } from 'libs/ng-query/ngrx-signals/src/lib/server-state/source';
+import { ReadonlySource } from 'libs/ng-query/ngrx-signals/src/lib/server-state/util/source.type';
 
 const { injectCraft } = craft(
   {
