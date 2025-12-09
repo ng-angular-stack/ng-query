@@ -11,8 +11,7 @@ import { UnionToTuple } from '../types/util.type';
 import { Prettify } from '@ngrx/signals';
 import { capitalize } from './util/util';
 import { FilterMethodsBoundToSources } from './util/util.type';
-import { MutationRef } from './mutation';
-import { AsyncMethodRef } from './craft-async-methods';
+import { MutationOutput, MutationRef } from './mutation';
 
 type SpecificCraftMutationsOutputs<Mutations extends {}> = PartialContext<{
   props: {
@@ -41,7 +40,10 @@ type CraftMutationsOutputs<
 export function craftMutations<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
-  Mutations extends {}
+  Mutations extends Record<
+    string,
+    MutationOutput<object, unknown, unknown, unknown, unknown, any>
+  >
 >(
   mutationsFactory: (context: CraftFactoryEntries<Context>) => Mutations
 ): CraftMutationsOutputs<Context, StoreConfig, Mutations> {

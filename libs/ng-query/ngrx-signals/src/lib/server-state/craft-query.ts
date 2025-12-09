@@ -126,7 +126,6 @@ export type QueryOptions<
   GroupIdentifier,
   ResourceArgsParams
 > = {
-  test?: Context;
   // todo dans _mutation partager explicitement le type via InternalType et le MutationRef
   on?: Context['_mutation'] extends infer Mutations
     ? {
