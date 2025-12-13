@@ -1,6 +1,6 @@
 import { craftAsyncMethods } from './craft-async-methods';
 import { asyncMethod } from './async-method';
-import { Signal } from '@angular/core';
+import { ResourceStatus, Signal } from '@angular/core';
 import { afterRecomputation } from './after-recomputation';
 import { source } from './source';
 import { ReadonlySource } from './util/source.type';
@@ -135,7 +135,7 @@ describe('asyncMethod types without identifier', () => {
               }
             | undefined
           >;
-          readonly status: Signal<string>;
+          readonly status: Signal<ResourceStatus>;
           readonly error: Signal<Error | undefined>;
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
@@ -147,7 +147,7 @@ describe('asyncMethod types without identifier', () => {
               }
             | undefined
           >;
-          readonly status: Signal<string>;
+          readonly status: Signal<ResourceStatus>;
           readonly error: Signal<Error | undefined>;
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
@@ -220,7 +220,7 @@ describe('asyncMethod types without identifier', () => {
               }
             | undefined
           >;
-          readonly status: Signal<string>;
+          readonly status: Signal<ResourceStatus>;
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
           source: ReadonlySource<{
@@ -235,7 +235,7 @@ describe('asyncMethod types without identifier', () => {
               }
             | undefined
           >;
-          readonly status: Signal<string>;
+          readonly status: Signal<ResourceStatus>;
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
           additionalInsertion: 'injectedValue';
@@ -272,7 +272,7 @@ describe('asyncMethod types without identifier', () => {
             }
           | undefined
         >;
-        readonly status: Signal<string>;
+        readonly status: Signal<ResourceStatus>;
         readonly error: Signal<Error | undefined>;
         readonly isLoading: Signal<boolean>;
         hasValue: () => boolean;
@@ -301,7 +301,7 @@ describe('asyncMethod types without identifier', () => {
             }
           | undefined
         >;
-        readonly status: Signal<string>;
+        readonly status: Signal<ResourceStatus>;
         readonly error: Signal<Error | undefined>;
         readonly isLoading: Signal<boolean>;
         hasValue: () => boolean;
@@ -368,7 +368,7 @@ describe('asyncMethod types with identifier', () => {
                 }
               | undefined
             >;
-            readonly status: Signal<string>;
+            readonly status: Signal<ResourceStatus>;
             readonly error: Signal<Error | undefined>;
             readonly isLoading: Signal<boolean>;
             hasValue(): boolean;
@@ -388,7 +388,7 @@ describe('asyncMethod types with identifier', () => {
             }
           | undefined
         >;
-        readonly status: Signal<string>;
+        readonly status: Signal<ResourceStatus>;
         readonly isLoading: Signal<boolean>;
         hasValue: () => boolean;
         additionalInsertion: 'injectedValue';
@@ -466,7 +466,7 @@ describe('asyncMethod types with identifier', () => {
                   }
                 | undefined
               >;
-              readonly status: Signal<string>;
+              readonly status: Signal<ResourceStatus>;
               readonly error: Signal<Error | undefined>;
               readonly isLoading: Signal<boolean>;
               hasValue(): boolean;
@@ -488,7 +488,7 @@ describe('asyncMethod types with identifier', () => {
               }
             | undefined
           >;
-          readonly status: Signal<string>;
+          readonly status: Signal<ResourceStatus>;
           readonly isLoading: Signal<boolean>;
           hasValue: () => boolean;
           additionalInsertion: 'injectedValue';
@@ -530,7 +530,7 @@ describe('asyncMethod types with identifier', () => {
                 }
               | undefined
             >;
-            readonly status: Signal<string>;
+            readonly status: Signal<ResourceStatus>;
             readonly error: Signal<Error | undefined>;
             readonly isLoading: Signal<boolean>;
             hasValue(): boolean;
