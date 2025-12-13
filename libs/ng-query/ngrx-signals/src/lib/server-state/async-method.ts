@@ -79,8 +79,8 @@ type AsyncMethodConfig<
 
 export type AsyncMethodOutput<
   State extends object | undefined,
-  ArgParams,
   Params,
+  ArgParams,
   SourceParams,
   GroupIdentifier,
   Insertions
@@ -89,7 +89,7 @@ export type AsyncMethodOutput<
   ArgParams,
   Params,
   Insertions,
-  [unknown] extends [Params] ? false : true,
+  [unknown] extends [ArgParams] ? false : true, // ! force to method to have one arg minimum, we can not compare SourceParams type, because it also infer Params
   SourceParams,
   GroupIdentifier
 >;

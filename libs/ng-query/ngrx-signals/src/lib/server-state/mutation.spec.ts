@@ -53,7 +53,7 @@ describe('mutation', () => {
         (searchConfig) => searchConfig
       );
       const result = test();
-      const mymutation = mutation({
+      const myMutation = mutation({
         method: afterRecomputation(
           searchSource,
           (searchConfig) => searchConfig
@@ -66,8 +66,8 @@ describe('mutation', () => {
         },
       });
 
-      expect(mymutation.status()).toBe('idle');
-      expectTypeOf(mymutation.source).toEqualTypeOf<
+      expect(myMutation.status()).toBe('idle');
+      expectTypeOf(myMutation.source).toEqualTypeOf<
         ReadonlySource<{
           searchChange: string;
           timeToWait: number;
@@ -77,10 +77,10 @@ describe('mutation', () => {
         searchChange: 'test',
         timeToWait: 1000,
       });
-      expect(mymutation.status()).toBe('loading');
+      expect(myMutation.status()).toBe('loading');
       await vi.runAllTimersAsync();
-      expect(mymutation.status()).toBe('resolved');
-      expect(mymutation.value()).toBe('test');
+      expect(myMutation.status()).toBe('resolved');
+      expect(myMutation.value()).toBe('test');
     });
   });
 });
@@ -128,7 +128,7 @@ describe('mutation types without identifier', () => {
       }));
 
       type props = ReturnType<ReturnType<typeof mutationsOutput>>['props'];
-      type s = props['searchChange'];
+      type s = props['filterChange'];
       expectTypeOf<props>().toEqualTypeOf<{
         searchChange: {
           readonly error: Signal<Error | undefined>;
@@ -217,6 +217,9 @@ describe('mutation types without identifier', () => {
         searchChange: {
           readonly error: Signal<Error | undefined>;
           '~InternalType': 'Used to avoid TS type erasure';
+          source: ReadonlySource<{
+            searchChangeText: string;
+          }>;
           readonly value: Signal<
             | {
                 searchChangeText: string;
@@ -245,19 +248,11 @@ describe('mutation types without identifier', () => {
 
       type methods = ReturnType<ReturnType<typeof mutationsOutput>>['methods'];
       //   ^?
-      expectTypeOf<methods>().toEqualTypeOf<
-        {
-          mutateSearchChange: (args: unknown) =>
-            | {
-                searchChangeText: string;
-              }
-            | undefined;
-        } & {
-          mutateFilterChange: (args: { filter: string }) => {
-            filter: string;
-          };
-        }
-      >();
+      expectTypeOf<methods>().toEqualTypeOf<{
+        mutateFilterChange: (args: { filter: string }) => {
+          filter: string;
+        };
+      }>();
     });
   });
 
@@ -506,19 +501,11 @@ describe('mutation types with identifier', () => {
           ReturnType<typeof mutationsOutput>
         >['methods'];
         //   ^?
-        expectTypeOf<methods>().toEqualTypeOf<
-          {
-            mutateSearchChange: (args: unknown) =>
-              | {
-                  searchChangeText: string;
-                }
-              | undefined;
-          } & {
-            mutateFilterChange: (args: { filter: string }) => {
-              filter: string;
-            };
-          }
-        >();
+        expectTypeOf<methods>().toEqualTypeOf<{
+          mutateFilterChange: (args: { filter: string }) => {
+            filter: string;
+          };
+        }>();
       } catch (error) {
         console.error(error);
       }

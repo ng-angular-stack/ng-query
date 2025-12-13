@@ -31,6 +31,8 @@ type MutationConfig<
             /**
              * Used to generate a method in the store, when called will trigger the resource loader/stream.
              *
+             * ! It required One parameter at least to be able to generate the method (otherwise it will think it is bind to a source, see below).
+             *
              * Only support one parameter which can be an object to pass multiple parameters.
              *
              * It also accepts a ReadonlySource<SourceParams> to connect the mutation params to an external signal source.
@@ -59,6 +61,15 @@ type MutationConfig<
             preservePreviousValue?: () => boolean;
           }
         | {
+            /**
+             * Used to generate a method in the store, when called will trigger the resource loader/stream.
+             *
+             * ! It required One parameter at least to be able to generate the method (otherwise it will think it is bind to a source, see below).
+             *
+             * Only support one parameter which can be an object to pass multiple parameters.
+             *
+             * It also accepts a ReadonlySource<SourceParams> to connect the mutation params to an external signal source.
+             */
             method:
               | ((args: ParamsArgs) => Params)
               | ReadonlySource<SourceParams>;
@@ -192,7 +203,7 @@ export type MutationOutput<
   ArgParams,
   Params,
   Insertions,
-  [unknown] extends [Params] ? false : true,
+  [unknown] extends [ArgParams] ? false : true, // ! force to method to have one arg minimum, we can not compare SourceParams type, because it also infer Params
   SourceParams,
   GroupIdentifier
 >;
