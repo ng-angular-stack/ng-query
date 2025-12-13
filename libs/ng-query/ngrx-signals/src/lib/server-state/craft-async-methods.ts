@@ -1,4 +1,4 @@
-import { Signal } from '@angular/core';
+import { ResourceStatus, Signal } from '@angular/core';
 import {
   ContextConstraints,
   craftFactoryEntries,
@@ -54,7 +54,7 @@ export type AsyncMethodRef<
     [unknown] extends [GroupIdentifier]
       ? {
           readonly value: Signal<Value | undefined>;
-          readonly status: Signal<string>;
+          readonly status: Signal<ResourceStatus>;
           readonly error: Signal<Error | undefined>;
           readonly isLoading: Signal<boolean>;
           hasValue(): boolean;
@@ -86,7 +86,7 @@ export type AsyncMethodRef<
           select: (id: GroupIdentifier) =>
             | {
                 readonly value: Signal<Value | undefined>;
-                readonly status: Signal<string>;
+                readonly status: Signal<ResourceStatus>;
                 readonly error: Signal<Error | undefined>;
                 readonly isLoading: Signal<boolean>;
                 hasValue(): boolean;

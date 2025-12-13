@@ -91,7 +91,7 @@ const { injectGranularDeletionWithDelayCraft } = craft(
       }),
     {
       on: {
-        deleteItemMutationById: {
+        deleteItemMutation: {
           filter: ({ queryResource, mutationIdentifier }) =>
             queryResource.hasValue() &&
             queryResource
@@ -141,7 +141,7 @@ const { injectGranularDeletionWithDelayCraft } = craft(
                     <td>{{ user.name }}</td>
 
                     <td>
-                      @if(!store.deleteItemMutationById()[user.id]) {
+                      @if(!store.deleteItem.select(user.id)) {
                       @if(store.delayDeleteWithUndo.select(user.id)?.status()
                       === 'loading') {
                       <span>Deleting in 5s...</span>

@@ -20,7 +20,10 @@ type MutationConfig<
   Params,
   ParamsArgs,
   SourceParams,
-  GroupIdentifier
+  GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
 > =
   | Omit<ResourceOptions<NoInfer<ResourceState>, Params>, 'params' | 'loader'> &
       (
@@ -35,6 +38,7 @@ type MutationConfig<
             method:
               | ((args: ParamsArgs) => Params)
               | ReadonlySource<SourceParams>;
+            fromResourceById?: never;
             /**
              * A unique identifier for the resource, derived from the params.
              * It should be a string that uniquely identifies the resource based on the params.
@@ -59,6 +63,7 @@ type MutationConfig<
               | ((args: ParamsArgs) => Params)
               | ReadonlySource<SourceParams>;
             loader?: never;
+            fromResourceById?: never;
             identifier?: (
               params: NoInfer<NonNullable<Params>>
             ) => GroupIdentifier;
@@ -76,6 +81,80 @@ type MutationConfig<
                 >
               >
             >;
+            preservePreviousValue?: () => boolean;
+          }
+        | {
+            /**
+             * Use it, when you need to bind a ResourceByIdRef to another ResourceByIdRef.
+             * It will enforce the fromObject keys syncing when the fromObject resource change.
+             */
+            fromResourceById: ResourceByIdRef<
+              FromObjectGroupIdentifier,
+              FromObjectState,
+              FromObjectResourceParams
+            >;
+            /**
+             * A reactive function which determines the request to be made. Whenever the request changes, the
+             * loader will be triggered to fetch a new value for the resource.
+             *
+             * If a request function isn't provided, the loader won't rerun unless the resource is reloaded.
+             */
+            params: (entity: ResourceRef<NoInfer<FromObjectState>>) => Params;
+            loader?: never;
+            method?: never;
+            identifier?: (
+              params: NoInfer<NonNullable<Params>>
+            ) => GroupIdentifier;
+            /**
+             * Loading function which returns a `Promise` of a signal of the resource's value for a given
+             * request, which can change over time as new values are received from a stream.
+             */
+            stream: ResourceStreamingLoader<
+              ResourceState,
+              ResourceLoaderParams<
+                NonNullable<
+                  [unknown] extends [Params]
+                    ? NoInfer<SourceParams>
+                    : NoInfer<Params>
+                >
+              >
+            >;
+            preservePreviousValue?: () => boolean;
+          }
+        | {
+            /**
+             * Use it, when you need to bind a ResourceByIdRef to another ResourceByIdRef.
+             * It will enforce the fromObject keys syncing when the fromObject resource change.
+             */
+            fromResourceById: ResourceByIdRef<
+              FromObjectGroupIdentifier,
+              FromObjectState,
+              FromObjectResourceParams
+            >;
+            /**
+             * A reactive function which determines the request to be made. Whenever the request changes, the
+             * loader will be triggered to fetch a new value for the resource.
+             *
+             * If a request function isn't provided, the loader won't rerun unless the resource is reloaded.
+             */
+            params: (entity: ResourceRef<NoInfer<FromObjectState>>) => Params;
+            /**
+             * A unique identifier for the resource, derived from the params.
+             * It should be a string that uniquely identifies the resource based on the params.
+             */
+            identifier?: (
+              params: NoInfer<NonNullable<Params>>
+            ) => GroupIdentifier;
+            loader: (
+              param: ResourceLoaderParams<
+                NonNullable<
+                  [unknown] extends [Params]
+                    ? NoInfer<SourceParams>
+                    : NoInfer<Params>
+                >
+              >
+            ) => Promise<ResourceState>;
+            stream?: never;
             preservePreviousValue?: () => boolean;
           }
       );
@@ -123,14 +202,20 @@ export function mutation<
   MutationParams,
   MutationArgsParams,
   SourceParams,
-  GroupIdentifier
+  GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
 >(
   mutationConfig: MutationConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >
 ): MutationOutput<
   MutationState,
@@ -146,6 +231,9 @@ export function mutation<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertion1
 >(
   mutationConfig: MutationConfig<
@@ -153,7 +241,10 @@ export function mutation<
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -174,6 +265,9 @@ export function mutation<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertion1,
   Insertion2
 >(
@@ -182,7 +276,10 @@ export function mutation<
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -209,6 +306,9 @@ export function mutation<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertion1,
   Insertion2,
   Insertion3
@@ -218,7 +318,10 @@ export function mutation<
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -251,6 +354,9 @@ export function mutation<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -261,7 +367,10 @@ export function mutation<
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -300,6 +409,9 @@ export function mutation<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -311,7 +423,10 @@ export function mutation<
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -356,6 +471,9 @@ export function mutation<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -368,7 +486,10 @@ export function mutation<
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -419,6 +540,9 @@ export function mutation<
   MutationArgsParams,
   SourceParams,
   GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams,
   Insertion1,
   Insertion2,
   Insertion3,
@@ -432,7 +556,10 @@ export function mutation<
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   insertion1: InsertionsFactory<
     NoInfer<MutationState>,
@@ -494,14 +621,20 @@ export function mutation<
   MutationParams,
   MutationArgsParams,
   SourceParams,
-  GroupIdentifier
+  GroupIdentifier,
+  FromObjectGroupIdentifier extends string,
+  FromObjectState,
+  FromObjectResourceParams
 >(
   mutationConfig: MutationConfig<
     MutationState,
     MutationParams,
     MutationArgsParams,
     SourceParams,
-    GroupIdentifier
+    GroupIdentifier,
+    FromObjectGroupIdentifier,
+    FromObjectState,
+    FromObjectResourceParams
   >,
   ...insertions: any[]
 ): MutationOutput<
@@ -516,7 +649,10 @@ export function mutation<
     undefined
   );
 
-  const isConnectedToSource = isSignal(mutationConfig.method);
+  const isConnectedToAResourceById = 'fromResourceById' in mutationConfig;
+
+  const isConnectedToSource =
+    'method' in mutationConfig && isSignal(mutationConfig.method);
   const isUsingIdentifier = 'identifier' in mutationConfig;
 
   const resourceParamsSrc = isConnectedToSource
@@ -528,9 +664,9 @@ export function mutation<
         MutationState,
         MutationParams,
         GroupIdentifier & string,
-        string,
-        unknown,
-        unknown
+        FromObjectGroupIdentifier,
+        FromObjectState,
+        FromObjectResourceParams
       >({
         ...mutationConfig,
         params: resourceParamsSrc,
@@ -570,23 +706,25 @@ export function mutation<
         }
       : {},
     {
-      method: isSignal(mutationConfig.method)
-        ? undefined
-        : (arg: MutationArgsParams) => {
-            const result = mutationConfig.method(arg);
-            if (isUsingIdentifier) {
-              const id = mutationConfig.identifier?.(arg as any);
-              (
-                resourceTarget as ResourceByIdRef<
-                  GroupIdentifier & string,
-                  MutationState,
-                  MutationParams
-                >
-              ).addById(id as GroupIdentifier & string);
-            }
-            mutationResourceParamsFnSignal.set(result as MutationParams);
-            return result;
-          },
+      method:
+        isConnectedToAResourceById ||
+        ('method' in mutationConfig && isSignal(mutationConfig.method))
+          ? undefined
+          : (arg: MutationArgsParams) => {
+              const result = mutationConfig.method(arg);
+              if (isUsingIdentifier) {
+                const id = mutationConfig.identifier?.(arg as any);
+                (
+                  resourceTarget as ResourceByIdRef<
+                    GroupIdentifier & string,
+                    MutationState,
+                    MutationParams
+                  >
+                ).addById(id as GroupIdentifier & string);
+              }
+              mutationResourceParamsFnSignal.set(result as MutationParams);
+              return result;
+            },
     },
     (
       insertions as InsertionsFactory<
