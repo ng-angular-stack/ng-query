@@ -25,14 +25,13 @@ import {
 import { ResourceByIdRef } from '../resource-by-id';
 import { nestedEffect } from '../types/util';
 import { QueryOutput, QueryRef } from './query';
-import { MutationOutput, MutationRef } from './mutation';
+import { MutationOutput } from './mutation';
 import {
   FilterQueryById,
   PatchMutationQuery,
   QueryAndMutationRecordConstraints,
   ReloadQueriesConfig,
 } from '../types/shared.type';
-import { Prettify } from '@ngrx/signals';
 
 type UpdateData<
   QueryAndMutationRecord extends QueryAndMutationRecordConstraints

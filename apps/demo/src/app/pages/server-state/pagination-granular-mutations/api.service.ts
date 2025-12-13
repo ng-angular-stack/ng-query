@@ -100,10 +100,12 @@ export class ApiService {
   updateItem(updatedItem: User) {
     console.log('updatedItem', updatedItem);
     if (this.updateError()) {
-      return timer(3000).pipe(
-        map(() => {
-          throw new Error('Api error during update');
-        })
+      return lastValueFrom(
+        timer(3000).pipe(
+          map(() => {
+            throw new Error('Api error during update');
+          })
+        )
       );
     }
     this.dataList$.next(
@@ -111,6 +113,6 @@ export class ApiService {
         dataItem.id === updatedItem.id ? updatedItem : dataItem
       )
     );
-    return of(updatedItem).pipe(delay(2000));
+    return lastValueFrom(of(updatedItem).pipe(delay(2000)));
   }
 }

@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { query } from '../query';
+import { query } from './query';
 import { craft, EmptyContext, partialContext, PartialContext } from './craft';
 import { mutation } from './mutation';
-import { queryById } from '../query-by-id';
 import {
   inject,
   linkedSignal,
@@ -24,7 +23,6 @@ import { afterRecomputation } from './after-recomputation';
 import { IsAny } from '../types/util.type';
 import { Prettify } from '@ngrx/signals';
 import { craftQuery } from './craft-query';
-import { craftQueryById } from './craft-query-by-id';
 import { ReadonlySource } from './util/source.type';
 import { craftMutations } from './craft-mutations';
 import { ExcludeCommonKeys } from './util/util.type';
@@ -175,7 +173,7 @@ describe('craft', () => {
             }),
           {
             on: {
-              saveMutationById: {
+              saveMutation: {
                 filter: ({ mutationParams, queryResource }) =>
                   mutationParams.id === queryResource.value()?.id,
                 optimisticUpdate: ({ mutationParams }) => mutationParams,
@@ -1626,3 +1624,30 @@ function wait(ms: number) {
     setTimeout(() => resolve(), ms);
   });
 }
+
+craft(
+  {
+    name: 'MyAwesomeStore',
+    providedIn: 'root',
+  },
+  craftSources({
+    reset: source<{}>(),
+  }),
+  craftState(
+    'counter',
+    () => signal(0),
+    ({ state, context: { reset } }) => ({
+      increment: () => state() + 1,
+      decrement: () => state() - 1,
+      _reset: afterRecomputation(reset, () => 0),
+    })
+  ),
+  craftState(
+    'search',
+    () => signal(''),
+    ({ context: { reset } }) => ({
+      setSearch: (value: string) => value,
+      _reset: afterRecomputation(reset, () => ''),
+    })
+  )
+);

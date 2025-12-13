@@ -4,10 +4,12 @@ import { ApiService } from './api.service';
 import {
   queryById,
   craftInject,
-  craftMutationById,
-  craftQueryById,
   craftQueryParams,
   craft,
+  craftMutations,
+  mutation,
+  craftQuery,
+  query,
 } from '@ng-query/ngrx-signals';
 import { rxMutationById } from '@ng-query/ngrx-signals-rxjs';
 import { insertPaginationPlaceholderData } from '@ng-query/ngrx-signals/insertions/insert-pagination-place-holder-data';
@@ -39,41 +41,59 @@ const { injectUserListCraft } = craft(
         parse: (value: string) => parseInt(value, 10),
         serialize: (value: unknown) => String(value),
       },
-    })
-    // {
-    //   methods: {
-    //     nextPage: (state) => ({
-    //       ...state,
-    //       page: state.page + 1,
-    //     }),
-    //     previousPage: (state) => ({
-    //       ...state,
-    //       page: Math.max(1, state.page - 1),
-    //     }),
-    //     setPageSize: (state, size: number) => ({
-    //       ...state,
-    //       page: 1,
-    //       pageSize: size,
-    //     }),
-    //   },
-    // }
+    }),
+    {
+      methods: ({ queryParams }) => ({
+        nextPage: () => ({
+          ...queryParams(),
+          page: queryParams().page + 1,
+        }),
+        previousPage: () => ({
+          ...queryParams(),
+          page: Math.max(1, queryParams().page - 1),
+        }),
+        setPageSize: (size: number) => ({
+          ...queryParams(),
+          page: 1,
+          pageSize: size,
+        }),
+      }),
+    }
   ),
-  craftMutationById('user', ({ apiService }) =>
-    rxMutationById({
+  craftMutations(({ apiService }) => ({
+    user: mutation({
       method: (user: User) => user,
       identifier: ({ id }) => id,
-      stream: ({ params: user }) => apiService.updateItem(user),
-    })
-  ),
-  craftQueryById('users', ({ pagination, apiService }) =>
-    queryById(
-      {
+      loader: ({ params: user }) => apiService.updateItem(user),
+    }),
+  })),
+  craftQuery(
+    'users',
+    ({ pagination, apiService }) =>
+      query({
         params: pagination,
         identifier: ({ page, pageSize }) => `${page}-${pageSize}`,
         loader: ({ params: pagination }) => apiService.getDataList(pagination),
+      }),
+    {
+      on: {
+        userMutation: {
+          filter: ({ queryResource, mutationParams }) =>
+            queryResource.hasValue() &&
+            queryResource.value().some((item) => item.id === mutationParams.id),
+          optimisticUpdate: ({ queryResource, mutationParams }) => {
+            return queryResource
+              .value()
+              .map((item) =>
+                item.id === mutationParams.id ? mutationParams : item
+              );
+          },
+          reload: {
+            onMutationError: true,
+          },
+        },
       },
-      insertPaginationPlaceholderData
-    )
+    }
   )
 );
 
@@ -94,9 +114,9 @@ export default class ListWithPagination {
   }
 
   protected mutateUserName(user: User) {
-    this.store.mutateUserById({
-      ...user,
-      name: user.name + '-',
-    });
+    // this.store.mutateUserById({
+    //   ...user,
+    //   name: user.name + '-',
+    // });
   }
 }

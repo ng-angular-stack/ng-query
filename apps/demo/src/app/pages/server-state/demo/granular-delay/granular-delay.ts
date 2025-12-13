@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {
   asyncMethod,
-  mutationById,
   query,
   craftAsyncMethods,
   craftInject,
-  craftMutationById,
   craftQuery,
   craft,
+  craftMutations,
+  mutation,
 } from '@ng-query/ngrx-signals';
 import { ApiService } from './api.service';
 import { StatusComponent } from '../../../../ui/status.component';
@@ -65,8 +65,8 @@ const { injectGranularDeletionWithDelayCraft } = craft(
       },
     }),
   })),
-  craftMutationById('deleteItem', ({ apiService, delayDeleteWithUndo }) =>
-    mutationById({
+  craftMutations(({ apiService, delayDeleteWithUndo }) => ({
+    deleteItem: mutation({
       fromResourceById: delayDeleteWithUndo._resourceById,
       params: (delayDeleteWithUndoResource) => {
         return delayDeleteWithUndoResource?.status() === 'resolved' &&
@@ -78,8 +78,8 @@ const { injectGranularDeletionWithDelayCraft } = craft(
       loader: ({ params: id }) => {
         return apiService.deleteItem(id);
       },
-    })
-  ),
+    }),
+  })),
   craftQuery(
     'items',
     ({ apiService }) =>

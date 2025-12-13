@@ -17,8 +17,6 @@ import {
   craftState,
   source,
 } from '@ng-query/ngrx-signals';
-import { Source } from 'libs/ng-query/ngrx-signals/src/lib/server-state/source';
-import { ReadonlySource } from 'libs/ng-query/ngrx-signals/src/lib/server-state/util/source.type';
 
 const { injectCraft } = craft(
   {
@@ -470,6 +468,15 @@ export default class TestComponent {
   // storeAsyncMethods = injectAsyncMethodsFeatureCraft();
   // store2 = injectTest2Craft();
   // myGlobalSource = myGlobalSource;
+
+  source1;
+
+  _afterRecomputation = afterRecomputation(
+    () => {
+      return 42;
+    },
+    (value) => `The answer is ${value}`
+  );
 
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);

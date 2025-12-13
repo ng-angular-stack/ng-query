@@ -12,12 +12,13 @@ describe('computedSource', () => {
     vi.resetAllMocks();
   });
   it('should generate a computedSource', () => {
-    const mySignal = source<{ text: string }>();
-    const mySource = computedSource(
-      mySignal,
+    const mySource = source<{ text: string }>();
+    const myComputedSource = computedSource(
+      mySource,
       (sourceValue) => sourceValue.text
     );
-    expectTypeOf(mySource).toEqualTypeOf<ReadonlySource<string>>();
+
+    expectTypeOf(myComputedSource).toEqualTypeOf<ReadonlySource<string>>();
 
     const myListener = computed(() => {
       const s = mySource();
@@ -26,11 +27,11 @@ describe('computedSource', () => {
 
     expect(myListener()).toBe(undefined);
 
-    mySignal.set({ text: 'Hello World' });
+    myComputedSource.set({ text: 'Hello World' });
 
     expect(myListener()).toBe('Hello World');
 
-    mySignal.set({ text: 'Hello Ng-Query' });
+    myComputedSource.set({ text: 'Hello Ng-Query' });
     expect(myListener()).toBe('Hello Ng-Query');
   });
 });
