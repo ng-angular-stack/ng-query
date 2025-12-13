@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { lastValueFrom, of } from 'rxjs';
-import { inject, Signal } from '@angular/core';
+import { inject, ResourceStatus, Signal } from '@angular/core';
 import { vi } from 'vitest';
 import { craft } from './craft';
 import { ResourceByIdRef } from '../resource-by-id';
@@ -57,7 +57,7 @@ describe('craftMutationById', () => {
         readonly error: Signal<Error | undefined>;
         '~InternalType': 'Used to avoid TS type erasure';
         readonly value: Signal<User | undefined>;
-        readonly status: Signal<string>;
+        readonly status: Signal<ResourceStatus>;
         readonly isLoading: Signal<boolean>;
         hasValue: () => boolean;
       }>();

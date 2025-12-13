@@ -1,6 +1,6 @@
-- passer les query mutation en une seule fonction
+- ✅ passer les query mutation en une seule fonction
 - Revoir le persister pour les query et le state
-- craftMutations forcer à mettre des mutation et pas nimp
+- ✅ craftMutations forcer à mettre des mutation et pas nimp
 - groupidentifeir des mutation/query forcer à mettre string | number et pas nimp
 - query/mutation Error type
 - doc
