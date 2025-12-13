@@ -9,7 +9,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { InsertionsFactory } from '../core/query.core';
+import { InsertionsFactory, InsertionsFactory2 } from '../core/query.core';
 import { resourceById, ResourceByIdRef } from '../resource-by-id';
 import { AsyncMethodRef } from './craft-async-methods';
 import { ReadonlySource } from './util/source.type';
@@ -257,7 +257,8 @@ export function mutation<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
@@ -292,12 +293,14 @@ export function mutation<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
@@ -334,18 +337,21 @@ export function mutation<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
@@ -383,24 +389,28 @@ export function mutation<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
@@ -439,30 +449,35 @@ export function mutation<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion5,
@@ -502,36 +517,42 @@ export function mutation<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
-  insertion6: InsertionsFactory<
+  insertion6: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion6,
@@ -572,42 +593,49 @@ export function mutation<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
-  insertion6: InsertionsFactory<
+  insertion6: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >,
-  insertion7: InsertionsFactory<
+  insertion7: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<MutationState>,
     NoInfer<MutationParams>,
     Insertion7,
@@ -738,7 +766,8 @@ export function mutation<
             },
     },
     (
-      insertions as InsertionsFactory<
+      insertions as InsertionsFactory2<
+        NoInfer<GroupIdentifier>,
         NoInfer<MutationState>,
         NoInfer<MutationParams>,
         {}
@@ -747,12 +776,14 @@ export function mutation<
       return {
         ...acc,
         ...insert({
-          resource: resourceTarget as ResourceRef<MutationState>,
+          ...(isUsingIdentifier
+            ? { resourceById: resourceTarget }
+            : { resource: resourceTarget }),
           resourceParams: resourceParamsSrc as WritableSignal<
             NoInfer<MutationParams>
           >,
           insertions: acc as {},
-        }),
+        } as any),
       };
     }, {} as Record<string, unknown>)
   ) as unknown as MutationOutput<

@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { query, QueryOutput } from './query';
 import { craft } from './craft';
 import { craftQuery } from './craft-query';
+import { ResourceRef } from '@angular/core';
+import { ResourceByIdRef } from '../resource-by-id';
 
 type User = {
   id: string;
@@ -117,6 +119,97 @@ describe('query Insertions output', () => {
               page: 1,
             },
           })
+        )
+      )
+    );
+    TestBed.runInInjectionContext(() => {
+      const store = injectCraft();
+      expect(store.userQuery.pagination).toEqual({ page: 1 });
+      expect(store.userQuery.pagination).toBeDefined();
+    });
+  });
+
+  it('should accept an Insertion, with the correct resource infer', () => {
+    const { injectCraft } = craft(
+      {
+        name: '',
+        providedIn: 'root',
+      },
+      craftQuery('user', () =>
+        query(
+          {
+            params: () => '5',
+            loader: async ({ params }) => {
+              return {
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              };
+            },
+          },
+          (data) => {
+            expectTypeOf(data.resource).toEqualTypeOf<
+              ResourceRef<{
+                id: string;
+                name: string;
+                email: string;
+              }>
+            >();
+            expect(data.resource).toBeDefined();
+            return {
+              pagination: {
+                page: 1,
+              },
+            };
+          }
+        )
+      )
+    );
+    TestBed.runInInjectionContext(() => {
+      const store = injectCraft();
+      expect(store.userQuery.pagination).toEqual({ page: 1 });
+      expect(store.userQuery.pagination).toBeDefined();
+    });
+  });
+
+  it('should accept an Insertion, with the correct resourceById infer', () => {
+    const { injectCraft } = craft(
+      {
+        name: '',
+        providedIn: 'root',
+      },
+      craftQuery('user', () =>
+        query(
+          {
+            params: () => '5',
+            identifier: (params) => params,
+            loader: async ({ params }) => {
+              return {
+                id: params,
+                name: 'John Doe',
+                email: 'test@a.com',
+              };
+            },
+          },
+          (data) => {
+            expectTypeOf(data.resourceById).toEqualTypeOf<
+              ResourceByIdRef<
+                string,
+                NoInfer<{
+                  id: string;
+                  name: string;
+                  email: string;
+                }>,
+                string
+              >
+            >();
+            expect(data.resourceById).toBeDefined();
+            return {
+              pagination: {
+                page: 1,
+              },
+            };
+          }
         )
       )
     );

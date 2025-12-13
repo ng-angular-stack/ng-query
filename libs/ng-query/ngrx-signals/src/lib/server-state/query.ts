@@ -9,7 +9,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { InsertionsFactory } from '../core/query.core';
+import { InsertionsFactory, InsertionsFactory2 } from '../core/query.core';
 import { resourceById, ResourceByIdRef } from '../resource-by-id';
 import { AsyncMethodRef } from './craft-async-methods';
 import { ReadonlySource } from './util/source.type';
@@ -257,7 +257,8 @@ export function query<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
@@ -292,12 +293,14 @@ export function query<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
@@ -334,18 +337,21 @@ export function query<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
@@ -383,24 +389,28 @@ export function query<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
@@ -439,30 +449,35 @@ export function query<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion5,
@@ -502,36 +517,42 @@ export function query<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
-  insertion6: InsertionsFactory<
+  insertion6: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion6,
@@ -572,42 +593,49 @@ export function query<
     FromObjectState,
     FromObjectResourceParams
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
-  insertion6: InsertionsFactory<
+  insertion6: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >,
-  insertion7: InsertionsFactory<
+  insertion7: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<QueryState>,
     NoInfer<QueryParams>,
     Insertion7,
@@ -742,7 +770,8 @@ export function query<
             },
     },
     (
-      insertions as InsertionsFactory<
+      insertions as InsertionsFactory2<
+        NoInfer<GroupIdentifier>,
         NoInfer<QueryState>,
         NoInfer<QueryParams>,
         {}
@@ -751,12 +780,14 @@ export function query<
       return {
         ...acc,
         ...insert({
-          resource: resourceTarget as ResourceRef<QueryState>,
+          ...(isUsingIdentifier
+            ? { resourceById: resourceTarget }
+            : { resource: resourceTarget }),
           resourceParams: resourceParamsSrc as WritableSignal<
             NoInfer<QueryParams>
           >,
           insertions: acc as {},
-        }),
+        } as any), // try to improve the type here
       };
     }, {} as Record<string, unknown>)
   ) as unknown as QueryOutput<

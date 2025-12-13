@@ -554,6 +554,27 @@ export type InsertionsByIdFactory<
   >
 ) => InsertionsOutputs;
 
+export type InsertionsFactory2<
+  GroupIdentifier,
+  ResourceState extends object | undefined,
+  ResourceParams,
+  InsertionsOutputs,
+  PreviousInsertionsOutputs = {}
+> = [unknown] extends [GroupIdentifier]
+  ? InsertionsFactory<
+      ResourceState,
+      ResourceParams,
+      InsertionsOutputs,
+      PreviousInsertionsOutputs
+    >
+  : InsertionsByIdFactory<
+      ResourceState,
+      ResourceParams,
+      GroupIdentifier & string,
+      InsertionsOutputs,
+      PreviousInsertionsOutputs
+    >;
+
 export type DefaultInsertionByIdParams = InsertionByIdParams<
   string,
   {},

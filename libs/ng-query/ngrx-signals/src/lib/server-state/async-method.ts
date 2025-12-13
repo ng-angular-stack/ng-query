@@ -9,7 +9,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { InsertionsFactory } from '../core/query.core';
+import { InsertionsFactory, InsertionsFactory2 } from '../core/query.core';
 import { AsyncMethodRef } from './craft-async-methods';
 import { ReadonlySource } from './util/source.type';
 import { resourceById, ResourceByIdRef } from '../resource-by-id';
@@ -131,7 +131,8 @@ export function asyncMethod<
     SourceParams,
     GroupIdentifier
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion1
@@ -160,12 +161,14 @@ export function asyncMethod<
     SourceParams,
     GroupIdentifier
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion2,
@@ -196,18 +199,21 @@ export function asyncMethod<
     SourceParams,
     GroupIdentifier
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion3,
@@ -239,24 +245,28 @@ export function asyncMethod<
     SourceParams,
     GroupIdentifier
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion4,
@@ -289,30 +299,35 @@ export function asyncMethod<
     SourceParams,
     GroupIdentifier
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion5,
@@ -346,36 +361,42 @@ export function asyncMethod<
     SourceParams,
     GroupIdentifier
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
-  insertion6: InsertionsFactory<
+  insertion6: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion6,
@@ -410,42 +431,49 @@ export function asyncMethod<
     SourceParams,
     GroupIdentifier
   >,
-  insertion1: InsertionsFactory<
+  insertion1: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion1
   >,
-  insertion2: InsertionsFactory<
+  insertion2: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion2,
     Insertion1
   >,
-  insertion3: InsertionsFactory<
+  insertion3: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion3,
     Insertion1 & Insertion2
   >,
-  insertion4: InsertionsFactory<
+  insertion4: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion4,
     Insertion1 & Insertion2 & Insertion3
   >,
-  insertion5: InsertionsFactory<
+  insertion5: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion5,
     Insertion1 & Insertion2 & Insertion3 & Insertion4
   >,
-  insertion6: InsertionsFactory<
+  insertion6: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion6,
     Insertion1 & Insertion2 & Insertion3 & Insertion4 & Insertion5
   >,
-  insertion7: InsertionsFactory<
+  insertion7: InsertionsFactory2<
+    NoInfer<GroupIdentifier>,
     NoInfer<AsyncMethodState>,
     NoInfer<AsyncMethodParams>,
     Insertion7,
@@ -565,7 +593,8 @@ export function asyncMethod<
           },
     },
     (
-      insertions as InsertionsFactory<
+      insertions as InsertionsFactory2<
+        NoInfer<GroupIdentifier>,
         NoInfer<AsyncMethodState>,
         NoInfer<AsyncMethodParams>,
         {}
@@ -574,12 +603,14 @@ export function asyncMethod<
       return {
         ...acc,
         ...insert({
-          resource: resourceTarget as ResourceRef<AsyncMethodState>,
+          ...(isUsingIdentifier
+            ? { resourceById: resourceTarget }
+            : { resource: resourceTarget }),
           resourceParams: resourceParamsSrc as WritableSignal<
             NoInfer<AsyncMethodParams>
           >,
           insertions: acc as {},
-        }),
+        } as any),
       };
     }, {} as Record<string, unknown>)
   ) as unknown as AsyncMethodOutput<
