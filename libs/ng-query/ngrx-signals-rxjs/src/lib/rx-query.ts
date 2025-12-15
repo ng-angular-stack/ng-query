@@ -386,7 +386,7 @@ export function rxQuery<
           ...acc,
           ...insert({
             resource: queryResource as ResourceRef<QueryState>,
-            resourceParams: resourceParamsSrc as WritableSignal<
+            resourceParamsSrc: resourceParamsSrc as WritableSignal<
               NoInfer<QueryParams>
             >,
             insertions: acc as {},

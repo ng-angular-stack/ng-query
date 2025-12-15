@@ -606,7 +606,7 @@ export function asyncMethod<
           ...(isUsingIdentifier
             ? { resourceById: resourceTarget }
             : { resource: resourceTarget }),
-          resourceParams: resourceParamsSrc as WritableSignal<
+          resourceParamsSrc: resourceParamsSrc as WritableSignal<
             NoInfer<AsyncMethodParams>
           >,
           insertions: acc as {},

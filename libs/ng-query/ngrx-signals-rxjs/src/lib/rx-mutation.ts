@@ -389,7 +389,7 @@ export function rxMutation<
           ...acc,
           ...insert({
             resource: mutationResource as ResourceRef<MutationState>,
-            resourceParams: resourceParamsSrc as WritableSignal<
+            resourceParamsSrc: resourceParamsSrc as WritableSignal<
               NoInfer<MutationParams>
             >,
             insertions: acc as {},

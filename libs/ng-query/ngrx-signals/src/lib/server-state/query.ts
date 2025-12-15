@@ -781,9 +781,12 @@ export function query<
         ...acc,
         ...insert({
           ...(isUsingIdentifier
-            ? { resourceById: resourceTarget }
+            ? {
+                resourceById: resourceTarget,
+                identifier: queryConfig.identifier,
+              }
             : { resource: resourceTarget }),
-          resourceParams: resourceParamsSrc as WritableSignal<
+          resourceParamsSrc: resourceParamsSrc as WritableSignal<
             NoInfer<QueryParams>
           >,
           insertions: acc as {},

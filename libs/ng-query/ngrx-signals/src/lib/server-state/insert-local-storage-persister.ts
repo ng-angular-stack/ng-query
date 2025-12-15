@@ -1,0 +1,76 @@
+import { InsertionFactoryContext } from '../core/query.core';
+import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
+import { ResourceByIdRef } from '../resource-by-id';
+import { ResourceRef } from '@angular/core';
+
+export function insertLocalStoragePersister<
+  GroupIdentifier extends string,
+  ResourceState extends object | undefined,
+  ResourceParams,
+  PreviousInsertionsOutputs,
+  const CacheTime = 300000 // Default cache time in milliseconds (5 minutes)
+>(config: {
+  /** Name of your current store, it is mainly used as a prefix for localStorage keys */
+  storeName: string;
+  /** Key used to identify the specific data within the store */
+  key: string;
+  /** Whether to wait for the params source to be equal to its previous value before persisting.
+   * Mainly useful when params can be undefined at the beginning. (And for single resource).
+   * Default is true.
+   */
+  waitForParamsSrcToBeEqualToPreviousValue?: boolean;
+  /**
+   * Default cache time in milliseconds.
+   * This is the time after which the cached data will be considered stale and eligible for garbage collection.
+   * If not specified, the default is 5 minutes (300000 ms).
+   */
+  cacheTime?: CacheTime;
+}) {
+  return (
+    context: InsertionFactoryContext<
+      GroupIdentifier,
+      ResourceState,
+      ResourceParams,
+      PreviousInsertionsOutputs
+    >
+  ) => {
+    const persister = localStoragePersister(config.storeName);
+    const hasStateById = 'stateById' in context;
+    const hasResourceById = 'resourceById' in context;
+    const isUsingIdentifier =
+      hasStateById ||
+      hasResourceById ||
+      ('identifier' in context && typeof context.identifier === 'function');
+    const resourceTarget =
+      'stateById' in context
+        ? context.stateById
+        : 'resourceById' in context
+        ? context.resourceById
+        : 'state' in context
+        ? context.state
+        : context.resource;
+
+    if (isUsingIdentifier) {
+      persister.addQueryByIdToPersist({
+        key: 'userQuery',
+        cacheTime: (config?.cacheTime as number | undefined) ?? 300000,
+        queryByIdResource: resourceTarget as unknown as ResourceByIdRef<
+          string,
+          unknown,
+          unknown
+        >,
+        queryResourceParamsSrc: context.resourceParamsSrc,
+      });
+    } else {
+      persister.addQueryToPersist({
+        key: 'userQuery',
+        cacheTime: (config?.cacheTime as number | undefined) ?? 300000,
+        queryResource: resourceTarget as unknown as ResourceRef<unknown>,
+        queryResourceParamsSrc: context.resourceParamsSrc,
+        waitForParamsSrcToBeEqualToPreviousValue: true,
+      });
+    }
+
+    return {};
+  };
+}

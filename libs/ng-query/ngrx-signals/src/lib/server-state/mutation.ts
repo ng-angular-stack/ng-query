@@ -777,9 +777,12 @@ export function mutation<
         ...acc,
         ...insert({
           ...(isUsingIdentifier
-            ? { resourceById: resourceTarget }
+            ? {
+                resourceById: resourceTarget,
+                identifier: mutationConfig.identifier,
+              }
             : { resource: resourceTarget }),
-          resourceParams: resourceParamsSrc as WritableSignal<
+          resourceParamsSrc: resourceParamsSrc as WritableSignal<
             NoInfer<MutationParams>
           >,
           insertions: acc as {},

@@ -169,7 +169,7 @@ type SpecificCraftQueryOutputs<
   InsertionsOutputs
 > = PartialContext<{
   props: {
-    [key in `${ResourceName & string}Query`]: QueryOutput<
+    [key in `${ResourceName & string}`]: QueryOutput<
       ResourceState,
       ResourceArgsParams,
       ResourceParams,

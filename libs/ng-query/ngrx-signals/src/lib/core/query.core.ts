@@ -506,7 +506,7 @@ export type InsertionParams<
   PreviousInsertionsOutputs
 > = {
   resource: ResourceRef<ResourceState>;
-  resourceParams: WritableSignal<ResourceParams>;
+  resourceParamsSrc: WritableSignal<ResourceParams>;
   insertions: keyof PreviousInsertionsOutputs extends string
     ? PreviousInsertionsOutputs
     : never;
@@ -554,26 +554,34 @@ export type InsertionsByIdFactory<
   >
 ) => InsertionsOutputs;
 
+export type InsertionFactoryContext<
+  GroupIdentifier,
+  ResourceState extends object | undefined,
+  ResourceParams,
+  PreviousInsertionsOutputs
+> = [unknown] extends [GroupIdentifier]
+  ? InsertionParams<ResourceState, ResourceParams, PreviousInsertionsOutputs>
+  : InsertionByIdParams<
+      GroupIdentifier & string,
+      ResourceState,
+      ResourceParams,
+      PreviousInsertionsOutputs
+    >;
+
 export type InsertionsFactory2<
   GroupIdentifier,
   ResourceState extends object | undefined,
   ResourceParams,
   InsertionsOutputs,
   PreviousInsertionsOutputs = {}
-> = [unknown] extends [GroupIdentifier]
-  ? InsertionsFactory<
-      ResourceState,
-      ResourceParams,
-      InsertionsOutputs,
-      PreviousInsertionsOutputs
-    >
-  : InsertionsByIdFactory<
-      ResourceState,
-      ResourceParams,
-      GroupIdentifier & string,
-      InsertionsOutputs,
-      PreviousInsertionsOutputs
-    >;
+> = (
+  context: InsertionFactoryContext<
+    GroupIdentifier,
+    ResourceState,
+    ResourceParams,
+    PreviousInsertionsOutputs
+  >
+) => InsertionsOutputs;
 
 export type DefaultInsertionByIdParams = InsertionByIdParams<
   string,

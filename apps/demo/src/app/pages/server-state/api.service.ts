@@ -19,7 +19,6 @@ export type User = {
   providedIn: 'root',
 })
 export class ApiService {
-  // Not a single line of RxJS ??? Realy ahah
   private dataList$ = new BehaviorSubject<User[]>([
     { id: '1', name: 'Romain' },
     { id: '2', name: 'Geffrault' },
@@ -44,21 +43,27 @@ export class ApiService {
           data.page * data.pageSize
         )
       ),
-      delay(3000)
+      delay(2000)
     );
   }
 
+  getDataList(data: { page: number; pageSize: number }): Promise<User[]> {
+    return firstValueFrom(this.getDataList$(data));
+  }
+
   getItemById(itemId: User['id']) {
-    return this.dataList$.pipe(
-      take(1),
-      map((dataList) => {
-        const item = dataList.find((dataItem) => dataItem.id === itemId);
-        if (!item) {
-          throw new Error(`failed to find the item ${itemId}`);
-        }
-        return item;
-      }),
-      delay(2000)
+    return firstValueFrom(
+      this.dataList$.pipe(
+        take(1),
+        map((dataList) => {
+          const item = dataList.find((dataItem) => dataItem.id === itemId);
+          if (!item) {
+            throw new Error(`failed to find the item ${itemId}`);
+          }
+          return item;
+        }),
+        delay(1000)
+      )
     );
   }
 
@@ -78,7 +83,7 @@ export class ApiService {
     this.dataList$.next(
       this.dataList$.value.filter((dataItem) => dataItem.id !== itemId)
     );
-    return firstValueFrom(of(deletedItem).pipe(delay(2000)));
+    return firstValueFrom(of(deletedItem).pipe(delay(1000)));
   }
 
   updateItem(updatedItem: User) {
