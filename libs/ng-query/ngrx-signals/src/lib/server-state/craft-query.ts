@@ -231,7 +231,7 @@ export function craftQuery<
   resourceName: ResourceName,
   queryFactory: (
     context: CraftFactoryEntries<Context> & {
-      META_CONFIG: {
+      INSERT_CONFIG: {
         storeName: StoreConfig['name'];
         key: NoInfer<ResourceName>;
       };
@@ -267,7 +267,7 @@ export function craftQuery<
     const queryFactoryContext = craftFactoryEntries(contextData);
     const queryRef = queryFactory({
       ...queryFactoryContext,
-      META_CONFIG: {
+      INSERT_CONFIG: {
         storeName: storeConfig.name,
         key: resourceName,
       },

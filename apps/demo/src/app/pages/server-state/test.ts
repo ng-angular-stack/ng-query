@@ -24,7 +24,7 @@ const { injectTestPersisterCraft } = craft(
     providedIn: 'root',
   },
   craftInject(() => ({ ApiService })),
-  craftQuery('users', ({ apiService, META_CONFIG }) =>
+  craftQuery('users', ({ apiService, INSERT_CONFIG }) =>
     query(
       {
         params: () => '1',
@@ -32,7 +32,7 @@ const { injectTestPersisterCraft } = craft(
         loader: async ({ params }) =>
           apiService.getDataList({ page: +params, pageSize: 10 }),
       },
-      insertLocalStoragePersister(META_CONFIG)
+      insertLocalStoragePersister(INSERT_CONFIG)
     )
   )
 );
