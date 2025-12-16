@@ -230,7 +230,12 @@ export function craftQuery<
 >(
   resourceName: ResourceName,
   queryFactory: (
-    context: CraftFactoryEntries<Context>
+    context: CraftFactoryEntries<Context> & {
+      META_CONFIG: {
+        storeName: StoreConfig['name'];
+        key: NoInfer<ResourceName>;
+      };
+    }
   ) => QueryOutput<
     ResourceState,
     ResourceArgsParams,
@@ -258,8 +263,15 @@ export function craftQuery<
   GroupIdentifier,
   InsertionsOutputs
 > {
-  return () => (contextData, injector) => {
-    const queryRef = queryFactory(craftFactoryEntries(contextData)) as QueryRef<
+  return () => (contextData, injector, storeConfig) => {
+    const queryFactoryContext = craftFactoryEntries(contextData);
+    const queryRef = queryFactory({
+      ...queryFactoryContext,
+      META_CONFIG: {
+        storeName: storeConfig.name,
+        key: resourceName,
+      },
+    }) as QueryRef<
       ResourceState,
       ResourceArgsParams,
       ResourceParams,
