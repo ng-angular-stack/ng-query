@@ -1,4 +1,8 @@
-import { InsertionFactoryContext } from '../core/query.core';
+import {
+  InsertionByIdParams,
+  InsertionFactoryContext,
+  InsertionParams,
+} from '../core/query.core';
 import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
 import { ResourceByIdRef } from '../resource-by-id';
 import { ResourceRef } from '@angular/core';
@@ -34,21 +38,33 @@ export function insertLocalStoragePersister<
       PreviousInsertionsOutputs
     >
   ) => {
+    type ResourceByIdContext = InsertionByIdParams<
+      GroupIdentifier,
+      ResourceState,
+      ResourceParams,
+      PreviousInsertionsOutputs
+    >;
+    type ResourceContext = InsertionParams<
+      ResourceState,
+      ResourceParams,
+      PreviousInsertionsOutputs
+    >;
     const persister = localStoragePersister(config.storeName);
     const hasStateById = 'stateById' in context;
     const hasResourceById = 'resourceById' in context;
     const isUsingIdentifier =
       hasStateById ||
       hasResourceById ||
-      ('identifier' in context && typeof context.identifier === 'function');
+      ('identifier' in context &&
+        typeof (context as ResourceByIdContext).identifier === 'function');
     const resourceTarget =
       'stateById' in context
         ? context.stateById
         : 'resourceById' in context
         ? context.resourceById
         : 'state' in context
-        ? context.state
-        : context.resource;
+        ? (context as any).state
+        : (context as ResourceContext).resource;
 
     if (isUsingIdentifier) {
       persister.addQueryByIdToPersist({
@@ -59,18 +75,24 @@ export function insertLocalStoragePersister<
           unknown,
           unknown
         >,
-        queryResourceParamsSrc: context.resourceParamsSrc,
+        queryResourceParamsSrc: (
+          context as ResourceByIdContext | ResourceContext
+        ).resourceParamsSrc,
       });
     } else {
       persister.addQueryToPersist({
         key: 'userQuery',
         cacheTime: (config?.cacheTime as number | undefined) ?? 300000,
         queryResource: resourceTarget as unknown as ResourceRef<unknown>,
-        queryResourceParamsSrc: context.resourceParamsSrc,
+        queryResourceParamsSrc: (
+          context as ResourceByIdContext | ResourceContext
+        ).resourceParamsSrc,
         waitForParamsSrcToBeEqualToPreviousValue: true,
       });
     }
 
-    return {};
+    return {
+      persister,
+    };
   };
 }

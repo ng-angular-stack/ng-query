@@ -384,6 +384,7 @@ export function rxQuery<
       )?.reduce((acc, insert) => {
         return {
           ...acc,
+          //@ts-ignore
           ...insert({
             resource: queryResource as ResourceRef<QueryState>,
             resourceParamsSrc: resourceParamsSrc as WritableSignal<

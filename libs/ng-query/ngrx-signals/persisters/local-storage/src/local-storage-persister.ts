@@ -72,7 +72,6 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         }
         untracked(() => {
           const queryParams = queryResourceParamsSrc();
-
           localStorage.setItem(
             storageKey,
             JSON.stringify({
@@ -250,7 +249,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
         cacheTime,
       } = data;
 
-      const storageKey = getStorageKey(prefix, key);
+      const storageKey = getStorageKey(prefix, key, 'resource');
       const storedValue = localStorage.getItem(storageKey);
       if (storedValue && !waitForParamsSrcToBeEqualToPreviousValue) {
         try {
@@ -286,7 +285,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
       const { key, queryByIdResource, queryResourceParamsSrc, cacheTime } =
         data;
 
-      const storageKey = getStorageKey(prefix, key);
+      const storageKey = getStorageKey(prefix, key, 'resourceById');
       let storedValue: QueryByIdStored | undefined;
       try {
         storedValue = JSON.parse(localStorage.getItem(storageKey) || 'null');
@@ -334,7 +333,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     clearQuery(queryKey: string): void {
       queriesMap.update((map) => {
         map.delete(queryKey);
-        localStorage.removeItem(getStorageKey(prefix, queryKey));
+        localStorage.removeItem(getStorageKey(prefix, queryKey, 'resource'));
         return map;
       });
     },
@@ -342,14 +341,16 @@ export function localStoragePersister(prefix: string): QueriesPersister {
     clearQueryBy(queryByIdKey: string): void {
       queriesByIdMap.update((map) => {
         map.delete(queryByIdKey);
-        localStorage.removeItem(getStorageKey(prefix, queryByIdKey));
+        localStorage.removeItem(
+          getStorageKey(prefix, queryByIdKey, 'resourceById')
+        );
         return map;
       });
     },
 
     clearAllQueries(): void {
       queriesMap().forEach((_, key) => {
-        localStorage.removeItem(getStorageKey(prefix, key));
+        localStorage.removeItem(getStorageKey(prefix, key, 'resource'));
       });
       queriesMap.update((map) => {
         map.clear();
@@ -359,7 +360,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
 
     clearAllQueriesById(): void {
       queriesByIdMap().forEach((_, key) => {
-        localStorage.removeItem(getStorageKey(prefix, key));
+        localStorage.removeItem(getStorageKey(prefix, key, 'resourceById'));
       });
       queriesByIdMap.update((map) => {
         map.clear();
@@ -393,8 +394,8 @@ type QueryByIdStored = {
   timestamp: number;
 };
 
-function getStorageKey(prefix: string, key: string) {
-  return `ng-query-${prefix}-${key}`;
+function getStorageKey(prefix: string, key: string, type: string) {
+  return `ng-query-${prefix}-${type}-${key}`;
 }
 
 function isValueExpired(timestamp: number, cacheTime: number): boolean {
@@ -409,7 +410,6 @@ function removeNotValidRecordsWithValidCacheTime(
   if (!storedValue) {
     return undefined;
   }
-
   const { queryByIdValue, timestamp } = storedValue;
 
   if (timestamp && cacheTime > 0 && isValueExpired(timestamp, cacheTime)) {

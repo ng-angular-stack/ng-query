@@ -510,6 +510,9 @@ export type InsertionParams<
   insertions: keyof PreviousInsertionsOutputs extends string
     ? PreviousInsertionsOutputs
     : never;
+  // 👇 Seems required for insertLocalStoragePersister, otherwise TS says they can be missing
+  resourceById: never;
+  identifier: never;
 };
 
 export type InsertionsFactory<

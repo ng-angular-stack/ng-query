@@ -387,6 +387,7 @@ export function rxMutation<
       )?.reduce((acc, insert) => {
         return {
           ...acc,
+          //@ts-ignore
           ...insert({
             resource: mutationResource as ResourceRef<MutationState>,
             resourceParamsSrc: resourceParamsSrc as WritableSignal<

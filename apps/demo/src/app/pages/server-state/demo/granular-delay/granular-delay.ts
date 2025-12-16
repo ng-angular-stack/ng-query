@@ -120,7 +120,7 @@ const { injectGranularDeletionWithDelayCraft } = craft(
             <h2 class="card-title">
               User Management:
 
-              <app-status [status]="store.itemsQuery.status()"></app-status>
+              <app-status [status]="store.items.status()"></app-status>
             </h2>
 
             <div class="table-container">
@@ -133,8 +133,8 @@ const { injectGranularDeletionWithDelayCraft } = craft(
                   </tr>
                 </thead>
                 <tbody>
-                  @if(store.itemsQuery.hasValue()) { @for(user of
-                  store.itemsQuery.value(); track user.id) {
+                  @if(store.items.hasValue()) { @for(user of
+                  store.items.value(); track user.id) {
                   <tr>
                     <td>{{ user.id }}</td>
 
