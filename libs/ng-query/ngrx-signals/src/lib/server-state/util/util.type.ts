@@ -34,6 +34,8 @@ export type RemoveIndexSignature<T> = {
     : K]: T[K];
 };
 
+export type IsEmptyObject<T> = keyof T extends never ? true : false;
+
 export type ExcludeCommonKeys<Origin, Target> = {
   [key in keyof Origin as key extends keyof Target ? never : key]: Origin[key];
 };

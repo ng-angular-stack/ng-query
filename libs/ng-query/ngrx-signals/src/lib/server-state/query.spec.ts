@@ -91,7 +91,7 @@ describe('withQuery using query', () => {
     });
     const store = TestBed.inject(Craft);
 
-    expect(store.userQuery).toBeDefined();
+    expect(store.user).toBeDefined();
   });
 });
 
@@ -124,8 +124,8 @@ describe('query Insertions output', () => {
     );
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
-      expect(store.userQuery.pagination).toEqual({ page: 1 });
-      expect(store.userQuery.pagination).toBeDefined();
+      expect(store.user.pagination).toEqual({ page: 1 });
+      expect(store.user.pagination).toBeDefined();
     });
   });
 
@@ -167,8 +167,8 @@ describe('query Insertions output', () => {
     );
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
-      expect(store.userQuery.pagination).toEqual({ page: 1 });
-      expect(store.userQuery.pagination).toBeDefined();
+      expect(store.user.pagination).toEqual({ page: 1 });
+      expect(store.user.pagination).toBeDefined();
     });
   });
 
@@ -215,8 +215,8 @@ describe('query Insertions output', () => {
     );
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
-      expect(store.userQuery.pagination).toEqual({ page: 1 });
-      expect(store.userQuery.pagination).toBeDefined();
+      expect(store.user.pagination).toEqual({ page: 1 });
+      expect(store.user.pagination).toBeDefined();
     });
   });
 
@@ -251,10 +251,10 @@ describe('query Insertions output', () => {
     );
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
-      expectTypeOf(store.userQuery.pagination).toEqualTypeOf<{
+      expectTypeOf(store.user.pagination).toEqualTypeOf<{
         page: number;
       }>();
-      expect(store.userQuery.pagination).toBeDefined();
+      expect(store.user.pagination).toBeDefined();
     });
   });
   it('should accept multiple insertions, that appear in the store', () => {
@@ -300,14 +300,14 @@ describe('query Insertions output', () => {
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
       //insert 1
-      expectTypeOf(store.userQuery.pagination).toEqualTypeOf<{
+      expectTypeOf(store.user.pagination).toEqualTypeOf<{
         page: number;
       }>();
-      expect(store.userQuery.pagination).toBeDefined();
+      expect(store.user.pagination).toBeDefined();
 
       //insert 2
-      expectTypeOf(store.userQuery.someOtherInfo).toEqualTypeOf<boolean>();
-      expect(store.userQuery.someOtherInfo).toBeDefined();
+      expectTypeOf(store.user.someOtherInfo).toEqualTypeOf<boolean>();
+      expect(store.user.someOtherInfo).toBeDefined();
     });
   });
   it('should accept seven insertions, all outputs appear in the store', () => {
@@ -347,20 +347,20 @@ describe('query Insertions output', () => {
     );
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
-      expectTypeOf(store.userQuery.ext1).toEqualTypeOf<number>();
-      expectTypeOf(store.userQuery.ext2).toEqualTypeOf<number>();
-      expectTypeOf(store.userQuery.ext3).toEqualTypeOf<number>();
-      expectTypeOf(store.userQuery.ext4).toEqualTypeOf<number>();
-      expectTypeOf(store.userQuery.ext5).toEqualTypeOf<number>();
-      expectTypeOf(store.userQuery.ext6).toEqualTypeOf<number>();
-      expectTypeOf(store.userQuery.ext7).toEqualTypeOf<number>();
-      expect(store.userQuery.ext1).toBeDefined();
-      expect(store.userQuery.ext2).toBeDefined();
-      expect(store.userQuery.ext3).toBeDefined();
-      expect(store.userQuery.ext4).toBeDefined();
-      expect(store.userQuery.ext5).toBeDefined();
-      expect(store.userQuery.ext6).toBeDefined();
-      expect(store.userQuery.ext7).toBeDefined();
+      expectTypeOf(store.user.ext1).toEqualTypeOf<number>();
+      expectTypeOf(store.user.ext2).toEqualTypeOf<number>();
+      expectTypeOf(store.user.ext3).toEqualTypeOf<number>();
+      expectTypeOf(store.user.ext4).toEqualTypeOf<number>();
+      expectTypeOf(store.user.ext5).toEqualTypeOf<number>();
+      expectTypeOf(store.user.ext6).toEqualTypeOf<number>();
+      expectTypeOf(store.user.ext7).toEqualTypeOf<number>();
+      expect(store.user.ext1).toBeDefined();
+      expect(store.user.ext2).toBeDefined();
+      expect(store.user.ext3).toBeDefined();
+      expect(store.user.ext4).toBeDefined();
+      expect(store.user.ext5).toBeDefined();
+      expect(store.user.ext6).toBeDefined();
+      expect(store.user.ext7).toBeDefined();
     });
   });
 });

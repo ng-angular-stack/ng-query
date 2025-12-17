@@ -1,6 +1,6 @@
 import {
   InsertionByIdParams,
-  InsertionFactoryContext,
+  InsertionResourceFactoryContext,
   InsertionParams,
 } from '../core/query.core';
 import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
@@ -12,6 +12,7 @@ export function insertLocalStoragePersister<
   ResourceState extends object | undefined,
   ResourceParams,
   PreviousInsertionsOutputs,
+  StateType,
   const CacheTime = 300000 // Default cache time in milliseconds (5 minutes)
 >(config: {
   /** Name of your current store, it is mainly used as a prefix for localStorage keys */
@@ -31,11 +32,12 @@ export function insertLocalStoragePersister<
   cacheTime?: CacheTime;
 }) {
   return (
-    context: InsertionFactoryContext<
+    context: InsertionResourceFactoryContext<
       GroupIdentifier,
       ResourceState,
       ResourceParams,
-      PreviousInsertionsOutputs
+      PreviousInsertionsOutputs,
+      StateType
     >
   ) => {
     type ResourceByIdContext = InsertionByIdParams<

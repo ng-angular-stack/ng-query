@@ -1,18 +1,10 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  computed,
-  inject,
-  linkedSignal,
-  Signal,
-  signal,
-  WritableSignal,
-} from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, signal } from '@angular/core';
 import {
   craft,
   craftInject,
   craftQuery,
+  craftState,
   insertLocalStoragePersister,
   query,
 } from '@ng-query/ngrx-signals';
@@ -34,6 +26,18 @@ const { injectTestPersisterCraft } = craft(
       },
       insertLocalStoragePersister(INSERT_CONFIG)
     )
+  ),
+  // craftState(
+  //   'counter',
+  //   () => signal(0),
+  //   ({ state }) => ({
+  //     increment: (by: number) => state() + by,
+  //   })
+  // )
+  craftState('counter', () =>
+    state(signal(0), ({ state }) => ({
+      increment: (by: number) => state() + by,
+    }))
   )
 );
 

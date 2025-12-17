@@ -542,6 +542,16 @@ export type InsertionByIdParams<
     : never;
 };
 
+export type InsertionStateFactoryContext<StateType, PreviousInsertionsOutputs> =
+  {
+    state: Signal<StateType>;
+    set: (newState: StateType) => StateType;
+    update: (updateFn: (currentState: StateType) => StateType) => StateType;
+    insertions: keyof PreviousInsertionsOutputs extends string
+      ? PreviousInsertionsOutputs
+      : never;
+  };
+
 export type InsertionsByIdFactory<
   ResourceState extends object | undefined,
   ResourceParams,
@@ -557,7 +567,7 @@ export type InsertionsByIdFactory<
   >
 ) => InsertionsOutputs;
 
-export type InsertionFactoryContext<
+export type InsertionResourceFactoryContext<
   GroupIdentifier,
   ResourceState extends object | undefined,
   ResourceParams,
@@ -570,20 +580,27 @@ export type InsertionFactoryContext<
       ResourceParams,
       PreviousInsertionsOutputs
     >;
-
-export type InsertionsFactory2<
+export type InsertionsResourcesFactory<
   GroupIdentifier,
   ResourceState extends object | undefined,
   ResourceParams,
   InsertionsOutputs,
   PreviousInsertionsOutputs = {}
 > = (
-  context: InsertionFactoryContext<
+  context: InsertionResourceFactoryContext<
     GroupIdentifier,
     ResourceState,
     ResourceParams,
     PreviousInsertionsOutputs
   >
+) => InsertionsOutputs;
+
+export type InsertionsStateFactory<
+  State,
+  InsertionsOutputs,
+  PreviousInsertionsOutputs = {}
+> = (
+  context: InsertionStateFactoryContext<State, PreviousInsertionsOutputs>
 ) => InsertionsOutputs;
 
 export type DefaultInsertionByIdParams = InsertionByIdParams<
