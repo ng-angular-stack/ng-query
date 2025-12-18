@@ -2,6 +2,7 @@ import {
   InsertionByIdParams,
   InsertionResourceFactoryContext,
   InsertionParams,
+  InsertionStateFactoryContext,
 } from '../core/query.core';
 import { localStoragePersister } from '@ng-query/ngrx-signals/persisters/local-storage';
 import { ResourceByIdRef } from '../resource-by-id';
@@ -32,13 +33,14 @@ export function insertLocalStoragePersister<
   cacheTime?: CacheTime;
 }) {
   return (
-    context: InsertionResourceFactoryContext<
-      GroupIdentifier,
-      ResourceState,
-      ResourceParams,
-      PreviousInsertionsOutputs,
-      StateType
-    >
+    context:
+      | InsertionResourceFactoryContext<
+          GroupIdentifier,
+          ResourceState,
+          ResourceParams,
+          PreviousInsertionsOutputs
+        >
+      | InsertionStateFactoryContext<StateType, PreviousInsertionsOutputs>
   ) => {
     type ResourceByIdContext = InsertionByIdParams<
       GroupIdentifier,
@@ -52,17 +54,13 @@ export function insertLocalStoragePersister<
       PreviousInsertionsOutputs
     >;
     const persister = localStoragePersister(config.storeName);
-    const hasStateById = 'stateById' in context;
     const hasResourceById = 'resourceById' in context;
     const isUsingIdentifier =
-      hasStateById ||
       hasResourceById ||
       ('identifier' in context &&
         typeof (context as ResourceByIdContext).identifier === 'function');
     const resourceTarget =
-      'stateById' in context
-        ? context.stateById
-        : 'resourceById' in context
+      'resourceById' in context
         ? context.resourceById
         : 'state' in context
         ? (context as any).state

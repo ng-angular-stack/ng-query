@@ -1,4 +1,3 @@
-import { Signal, WritableSignal } from '@angular/core';
 import {
   ContextConstraints,
   craftFactoryEntries,
@@ -8,39 +7,54 @@ import {
   PartialContext,
   StoreConfigConstraints,
 } from './craft';
-import { ReadonlySource } from './util/source.type';
-import { createMethodHandlers } from './util/util';
-import { Prettify } from '@ngrx/signals';
+import { StateOutput } from './state';
+import { UnionToTuple } from '../types/util.type';
+import { ExtractSignalPropsAndMethods } from './util/extract-signal-props-and-methods';
+import { isSignal, Signal } from '@angular/core';
+import { capitalize } from './util/util';
 
-type FilterConnectedToSourceMethods<Methods> = {
-  [K in keyof Methods as Methods[K] extends ReadonlySource<any>
-    ? never
-    : K]: Methods[K];
-};
-
-// todo enable to sync with localStorage or sessionStorage
+// Helper type to defer evaluation and avoid infinite recursion
+type DeferredExtract<Insertions> = UnionToTuple<
+  keyof Insertions
+> extends infer Keys
+  ? ExtractSignalPropsAndMethods<
+      Insertions,
+      Keys,
+      { props: {}; methods: Record<string, Function> }
+    >
+  : never;
 
 type SpecificCraftStateOutputs<
   StateName extends string,
   State,
-  Methods extends Record<string, (...args: any[]) => any> | undefined
-> = PartialContext<{
-  props: { [key in StateName]: Signal<State> };
-  methods: Methods extends undefined
-    ? {}
-    : Prettify<FilterConnectedToSourceMethods<Methods>>;
-}>;
+  Insertions
+> = DeferredExtract<Insertions> extends infer Extracted
+  ? Extracted extends { props: unknown; methods: Record<string, Function> }
+    ? PartialContext<{
+        props: {
+          [key in StateName]: Signal<State>;
+        } & {
+          [key in keyof Extracted['props'] as `${StateName &
+            string}${Capitalize<key & string>}`]: Extracted['props'][key];
+        };
+        methods: {
+          [key in keyof Extracted['methods'] as `${StateName &
+            string}${Capitalize<key & string>}`]: Extracted['methods'][key];
+        };
+      }>
+    : never
+  : never;
 
 type CraftStateOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   StateName extends string,
   State,
-  Methods extends Record<string, (...args: any[]) => any> | undefined
+  Insertions
 > = CraftFactoryUtility<
   Context,
   StoreConfig,
-  SpecificCraftStateOutputs<StateName, State, Methods>
+  SpecificCraftStateOutputs<StateName, State, Insertions>
 >;
 
 export function craftState<
@@ -48,36 +62,35 @@ export function craftState<
   StoreConfig extends StoreConfigConstraints,
   const StateName extends string,
   State,
-  Methods extends
-    | Record<
-        string,
-        ((...args: any[]) => NoInfer<State>) | ReadonlySource<State>
-      >
-    | undefined
+  Insertions
 >(
   stateName: StateName,
   stateFactory: (
     context: CraftFactoryEntries<Context>
-  ) => WritableSignal<State>,
-  methodsFactory?: (state: {
-    state: Signal<NoInfer<State>>;
-    context: CraftFactoryEntries<Context>;
-  }) => Methods
-): CraftStateOutputs<Context, StoreConfig, StateName, State, Methods> {
+  ) => StateOutput<State, Insertions>
+): CraftStateOutputs<Context, StoreConfig, StateName, State, Insertions> {
   return () => (contextData) => {
     const stateResult = stateFactory(craftFactoryEntries(contextData));
 
-    const state = stateResult;
-    const readonlyState = stateResult.asReadonly();
-    const methodsData = methodsFactory?.({
-      state: readonlyState,
-      context: craftFactoryEntries(contextData),
-    });
-    const finalMethods = createMethodHandlers<State>(methodsData, state);
-
+    const { props, methods } = Object.entries(stateResult).reduce(
+      (acc, [key, value]) => {
+        if (isSignal(value)) {
+          (acc.props as Record<string, Signal<any>>)[capitalize(key)] = value;
+        } else {
+          (acc.methods as Record<string, Function>)[
+            `${stateName}${capitalize(key)}`
+          ] = value;
+        }
+        return acc;
+      },
+      {} as {
+        props: Record<string, Signal<any>>;
+        methods: Record<string, Function>;
+      }
+    );
     return partialContext({
-      props: { [stateName]: readonlyState },
-      methods: finalMethods,
-    }) as unknown as SpecificCraftStateOutputs<StateName, State, Methods>;
+      props: { [stateName]: stateResult, ...props },
+      methods,
+    }) as unknown as SpecificCraftStateOutputs<StateName, State, Insertions>;
   };
 }
