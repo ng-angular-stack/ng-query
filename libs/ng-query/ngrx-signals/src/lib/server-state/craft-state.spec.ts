@@ -123,13 +123,13 @@ describe('craftState', () => {
       );
       const store = injectCraft();
       await vi.runAllTimersAsync();
-      store.addNumber(2);
+      store.numberListAddNumber(2);
 
       expectTypeOf(store.numberList).toEqualTypeOf<Signal<number[]>>();
 
       expect(store.numberList()).toEqual([1, 2]);
 
-      store.addNumber(3);
+      store.numberListAddNumber(3);
       expect(store.numberList()).toEqual([1, 2, 3]);
 
       store.setReset('localReset');
