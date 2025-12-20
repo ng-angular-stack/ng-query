@@ -57,6 +57,32 @@ type CraftStateOutputs<
   SpecificCraftStateOutputs<StateName, State, Insertions>
 >;
 
+/**
+ * Creates a craft state with the given name and state factory.
+ *
+ * @example
+ * ```ts
+ * const { injectCraft } = craft(
+ *   {
+ *     name: 'MyStore',
+ *     providedIn: 'root',
+ *   },
+ *   craftState('numberList', () =>
+ *     state([1], ({ set, state }) => ({
+ *       addNumber: (numberValue: number) => {
+ *         set([...state(), numberValue]);
+ *       },
+ *       count: computed(() => state().length),
+ *     }))
+ *   )
+ * );
+ *
+ * const store = injectCraft();
+ * store.numberListAddNumber(2); // Calls the addNumber method
+ * store.numberList(); // Returns number[]
+ * store.numberListCount(); // Returns the computed count
+ * ```
+ */
 export function craftState<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,

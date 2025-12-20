@@ -24,7 +24,7 @@ describe('ExtractSignalPropsAndMethods', () => {
       }
     >();
     expectTypeOf<Result['methods']>().toEqualTypeOf<
-      {
+      Record<string, Function> & {
         increment: () => number;
       } & {
         reset: () => void;

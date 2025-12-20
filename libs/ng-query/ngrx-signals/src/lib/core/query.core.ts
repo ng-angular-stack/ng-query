@@ -18,6 +18,7 @@ import {
   createNestedStateUpdate,
 } from './update-state.util';
 import { MergeObjects } from '../types/util.type';
+import { QueryParamNavigationOptions } from '../server-state/craft-query-params';
 
 type UpdateData<
   QueryAndMutationRecord extends QueryAndMutationRecordConstraints
@@ -552,6 +553,34 @@ export type InsertionStateFactoryContext<StateType, PreviousInsertionsOutputs> =
       : never;
   };
 
+export type QueryParamMethods<QueryParamsState> = {
+  patch: (
+    params: Partial<QueryParamsState>,
+    options?: QueryParamNavigationOptions
+  ) => void;
+  reset: (options?: QueryParamNavigationOptions) => void;
+  set: (
+    params: QueryParamsState,
+    options?: QueryParamNavigationOptions
+  ) => void;
+  update: (
+    updateFn: (currentParams: QueryParamsState) => QueryParamsState,
+    options?: QueryParamNavigationOptions
+  ) => void;
+};
+
+export type InsertionQueryParamsFactoryContext<
+  QueryParamsType,
+  PreviousInsertionsOutputs,
+  QueryParamsState
+> = QueryParamMethods<QueryParamsState> & {
+  state: Signal<QueryParamsState>;
+  config: QueryParamsType;
+  insertions: keyof PreviousInsertionsOutputs extends string
+    ? PreviousInsertionsOutputs
+    : never;
+};
+
 export type InsertionsByIdFactory<
   ResourceState extends object | undefined,
   ResourceParams,
@@ -601,6 +630,19 @@ export type InsertionsStateFactory<
   PreviousInsertionsOutputs = {}
 > = (
   context: InsertionStateFactoryContext<State, PreviousInsertionsOutputs>
+) => InsertionsOutputs;
+
+export type InsertionsQueryParamsFactory<
+  State,
+  QueryParamsType,
+  InsertionsOutputs,
+  PreviousInsertionsOutputs = {}
+> = (
+  context: InsertionQueryParamsFactoryContext<
+    QueryParamsType,
+    PreviousInsertionsOutputs,
+    State
+  >
 ) => InsertionsOutputs;
 
 export type DefaultInsertionByIdParams = InsertionByIdParams<

@@ -20,6 +20,77 @@ export type StateOutput<StateType, Insertions> = MergeObject<
 
 type StateConfig<State> = State | WritableSignal<State>;
 
+/**
+ * Creates a signal state with optional insertions for adding methods and computed properties.
+ *
+ * The `state` function allows you to create a Signal-based state that can be extended with custom
+ * methods and properties through insertions. Each insertion receives a context object with
+ * `state`, `set`, `update` methods and previous insertions.
+ *
+ * @param stateConfig - The initial state value or a WritableSignal (e.g., linkedSignal)
+ * @param insertions - Optional insertion functions to extend the state with methods and properties
+ * @returns A Signal representing the state, merged with all insertion properties and methods
+ *
+ * @example
+ * // Simple state with a primitive value
+ * const counter = state(0);
+ * console.log(counter()); // 0
+ *
+ * @example
+ * // State with a linkedSignal
+ * const origin = signal(5);
+ * const doubled = state(linkedSignal(() => origin() * 2));
+ * console.log(doubled()); // 10
+ *
+ * @example
+ * // State with insertions to add methods
+ * const origin = signal(5);
+ * const counter = state(
+ *   linkedSignal(() => origin() * 2),
+ *   ({ update, set }) => ({
+ *     increment: () => update((current) => current + 1),
+ *     reset: () => set(0),
+ *   })
+ * );
+ * console.log(counter()); // 10
+ * counter.increment();
+ * console.log(counter()); // 11
+ * counter.reset();
+ * console.log(counter()); // 0
+ *
+ * @example
+ * // State with multiple insertions (methods and computed properties)
+ * const origin = signal(5);
+ * const counter = state(
+ *   linkedSignal(() => origin() * 2),
+ *   ({ update, set }) => ({
+ *     increment: () => update((current) => current + 1),
+ *     reset: () => set(0),
+ *   }),
+ *   ({ state }) => ({
+ *     isOdd: computed(() => state() % 2 === 1),
+ *   })
+ * );
+ * console.log(counter()); // 10
+ * console.log(counter.isOdd()); // false
+ * counter.increment();
+ * console.log(counter()); // 11
+ * console.log(counter.isOdd()); // true
+ *
+ * @example
+ * // State with source binding (methods bound to sources are not exposed)
+ * const sourceSignal = source<number>();
+ * const myState = state(0, ({ set }) => ({
+ *   setValue: afterRecomputation(sourceSignal, (value) => set(value)),
+ *   reset: () => set(0),
+ * }));
+ * console.log(myState()); // 0
+ * // Note: setValue is not exposed on myState, only used internally
+ * sourceSignal.set(34);
+ * console.log(myState()); // 34
+ * myState.reset();
+ * console.log(myState()); // 0
+ */
 export function state<StateType>(
   stateConfig: StateConfig<StateType>
 ): StateOutput<StateType, {}>;

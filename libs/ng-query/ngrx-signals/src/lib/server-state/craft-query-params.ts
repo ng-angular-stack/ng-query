@@ -20,19 +20,6 @@ import { Prettify } from '@ngrx/signals';
 import { capitalize, createMethodHandlers } from './util/util';
 import { ReadonlySource } from './util/source.type';
 
-export interface QueryParamConfig<T = unknown> {
-  defaultValue: NoInfer<T>;
-  parse: (value: string) => T;
-  serialize: (value: NoInfer<T>) => string;
-}
-
-export interface QueryParamNavigationOptions {
-  queryParamsHandling?: 'merge' | 'preserve' | '';
-  onSameUrlNavigation?: 'reload' | 'ignore';
-  replaceUrl?: boolean;
-  skipLocationChange?: boolean;
-}
-
 export type QueryParamProps<
   QueryParams extends Record<string, QueryParamConfig<unknown>>
 > = {
@@ -60,12 +47,6 @@ type QueryParamMethods<
   >
     ? never
     : K & string}`]: CustomMethods[K];
-};
-
-export type QueryParamsToState<QueryParamConfigs> = {
-  [K in keyof QueryParamConfigs]: ReturnType<
-    QueryParamConfigs[K] extends QueryParamConfig<infer U> ? () => U : never
-  >;
 };
 
 type CraftQueryParamsConfig<
