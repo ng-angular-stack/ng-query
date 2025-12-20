@@ -1,23 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { Router, ActivatedRoute } from '@angular/router';
 import { queryParams } from './query-params';
+import { provideRouter } from '@angular/router';
 
 describe('queryParams', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: Router,
-          useValue: {
-            navigate: vi.fn().mockResolvedValue(true),
-          },
-        },
-        {
-          provide: ActivatedRoute,
-          useValue: {},
-        },
-      ],
-    });
+      providers: [provideRouter([])],
+    }).compileComponents();
   });
 
   it('should create a query params', () => {
