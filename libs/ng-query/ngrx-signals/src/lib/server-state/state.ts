@@ -3,15 +3,8 @@ import {
   InsertionsStateFactory,
   InsertionStateFactoryContext,
 } from '../core/query.core';
-import { ReadonlySource } from './util/source.type';
 import { MergeObject } from '../types/util.type';
-import { IsEmptyObject } from './util/util.type';
-
-type FilterReadonlySource<Insertions> = {
-  [K in keyof Insertions as Insertions[K] extends ReadonlySource<any>
-    ? never
-    : K]: Insertions[K];
-};
+import { FilterReadonlySource, IsEmptyObject } from './util/util.type';
 
 export type StateOutput<StateType, Insertions> = MergeObject<
   Signal<StateType>,

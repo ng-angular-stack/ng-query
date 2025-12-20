@@ -58,7 +58,8 @@ export function insertLocalStoragePersister<
     const isUsingIdentifier =
       hasResourceById ||
       ('identifier' in context &&
-        typeof (context as ResourceByIdContext).identifier === 'function');
+        typeof (context as unknown as ResourceByIdContext).identifier ===
+          'function');
     const resourceTarget =
       'resourceById' in context
         ? context.resourceById
@@ -85,7 +86,7 @@ export function insertLocalStoragePersister<
         cacheTime: (config?.cacheTime as number | undefined) ?? 300000,
         queryResource: resourceTarget as unknown as ResourceRef<unknown>,
         queryResourceParamsSrc: (
-          context as ResourceByIdContext | ResourceContext
+          context as unknown as ResourceByIdContext | ResourceContext
         ).resourceParamsSrc,
         waitForParamsSrcToBeEqualToPreviousValue: true,
       });

@@ -2,8 +2,6 @@ import {
   assertInInjectionContext,
   computed,
   inject,
-  isSignal,
-  linkedSignal,
   Signal,
   signal,
   WritableSignal,
@@ -13,18 +11,10 @@ import {
   InsertionQueryParamsFactoryContext,
   QueryParamMethods,
 } from '../core/query.core';
-import { ReadonlySource } from './util/source.type';
 import { MergeObjects } from '../types/util.type';
-import { IsEmptyObject } from './util/util.type';
+import { FilterReadonlySource, IsEmptyObject } from './util/util.type';
 import { Prettify } from '@ngrx/signals';
 import { ActivatedRoute, Router } from '@angular/router';
-
-// todo facto
-type FilterReadonlySource<Insertions> = {
-  [K in keyof Insertions as Insertions[K] extends ReadonlySource<any>
-    ? never
-    : K]: Insertions[K];
-};
 
 export interface QueryParamNavigationOptions {
   queryParamsHandling?: 'merge' | 'preserve' | '';

@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { queryParams } from './query-params';
 import { provideRouter } from '@angular/router';
+import { source } from './source';
+import { afterRecomputation } from './after-recomputation';
 
 describe('queryParams', () => {
   beforeEach(() => {
@@ -230,6 +232,45 @@ describe('queryParams', () => {
           };
         }
       );
+    });
+  });
+
+  it('should not expose methods bind to a source', () => {
+    TestBed.runInInjectionContext(() => {
+      const mySource = source<number>();
+      const myQueryParams = queryParams(
+        {
+          state: {
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              defaultValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+          },
+        },
+        ({ state, set, update, patch, reset, config }) => {
+          return {
+            _setPage: afterRecomputation(mySource, (newPage: number) => {
+              expectTypeOf(state()).toEqualTypeOf<{
+                page: number;
+                pageSize: number;
+              }>();
+              set({
+                ...state(),
+                page: newPage,
+              });
+            }),
+          };
+        }
+      );
+      //@ts-expect-error _setPage is bind to a source, so it should not be exposed
+      myQueryParams._setPage(2);
+
     });
   });
 });

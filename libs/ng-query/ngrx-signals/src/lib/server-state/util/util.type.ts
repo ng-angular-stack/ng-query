@@ -90,3 +90,9 @@ export type FilterMethodsBoundToSources<
       : FilterMethodsBoundToSources<Methods, Next, MethodPrefix, Acc>
     : FilterMethodsBoundToSources<Methods, Next, MethodPrefix, Acc>
   : Acc;
+
+export type FilterReadonlySource<Insertions> = {
+  [K in keyof Insertions as Insertions[K] extends ReadonlySource<any>
+    ? never
+    : K]: Insertions[K];
+};
