@@ -4,7 +4,6 @@ import { ApiService } from './api.service';
 import {
   queryById,
   craftInject,
-  craftQueryParams,
   craft,
   craftMutations,
   mutation,
@@ -28,73 +27,73 @@ const { injectUserListCraft } = craft(
   craftInject(() => ({
     ApiService,
   })),
-  craftQueryParams(
-    'pagination',
-    () => ({
-      page: {
-        defaultValue: 1,
-        parse: (value: string) => parseInt(value, 10),
-        serialize: (value: unknown) => String(value),
-      },
-      pageSize: {
-        defaultValue: 4,
-        parse: (value: string) => parseInt(value, 10),
-        serialize: (value: unknown) => String(value),
-      },
-    }),
-    {
-      methods: ({ queryParams }) => ({
-        nextPage: () => ({
-          ...queryParams(),
-          page: queryParams().page + 1,
-        }),
-        previousPage: () => ({
-          ...queryParams(),
-          page: Math.max(1, queryParams().page - 1),
-        }),
-        setPageSize: (size: number) => ({
-          ...queryParams(),
-          page: 1,
-          pageSize: size,
-        }),
-      }),
-    }
-  ),
+  // craftQueryParams(
+  //   'pagination',
+  //   () => ({
+  //     page: {
+  //       defaultValue: 1,
+  //       parse: (value: string) => parseInt(value, 10),
+  //       serialize: (value: unknown) => String(value),
+  //     },
+  //     pageSize: {
+  //       defaultValue: 4,
+  //       parse: (value: string) => parseInt(value, 10),
+  //       serialize: (value: unknown) => String(value),
+  //     },
+  //   }),
+  //   {
+  //     methods: ({ queryParams }) => ({
+  //       nextPage: () => ({
+  //         ...queryParams(),
+  //         page: queryParams().page + 1,
+  //       }),
+  //       previousPage: () => ({
+  //         ...queryParams(),
+  //         page: Math.max(1, queryParams().page - 1),
+  //       }),
+  //       setPageSize: (size: number) => ({
+  //         ...queryParams(),
+  //         page: 1,
+  //         pageSize: size,
+  //       }),
+  //     }),
+  //   }
+  // ),
   craftMutations(({ apiService }) => ({
     user: mutation({
       method: (user: User) => user,
       identifier: ({ id }) => id,
       loader: ({ params: user }) => apiService.updateItem(user),
     }),
-  })),
-  craftQuery(
-    'users',
-    ({ pagination, apiService }) =>
-      query({
-        params: pagination,
-        identifier: ({ page, pageSize }) => `${page}-${pageSize}`,
-        loader: ({ params: pagination }) => apiService.getDataList(pagination),
-      }),
-    {
-      on: {
-        userMutation: {
-          filter: ({ queryResource, mutationParams }) =>
-            queryResource.hasValue() &&
-            queryResource.value().some((item) => item.id === mutationParams.id),
-          optimisticUpdate: ({ queryResource, mutationParams }) => {
-            return queryResource
-              .value()
-              .map((item) =>
-                item.id === mutationParams.id ? mutationParams : item
-              );
-          },
-          reload: {
-            onMutationError: true,
-          },
-        },
-      },
-    }
-  )
+  }))
+  // craftQuery(
+  //   'users',
+  //   ({ pagination, apiService }) =>
+  //     query({
+  //       params: pagination,
+  //       identifier: ({ page, pageSize }) => `${page}-${pageSize}`,
+  //       loader: ({ params: pagination }) => apiService.getDataList(pagination),
+  //     }),
+  //   {
+  //     on: {
+  //       userMutation: {
+  //         filter: ({ queryResource, mutationParams }) =>
+  //           queryResource.hasValue() &&
+  //           queryResource.value().some((item) => item.id === mutationParams.id),
+  //         optimisticUpdate: ({ queryResource, mutationParams }) => {
+  //           return queryResource
+  //             .value()
+  //             .map((item) =>
+  //               item.id === mutationParams.id ? mutationParams : item
+  //             );
+  //         },
+  //         reload: {
+  //           onMutationError: true,
+  //         },
+  //       },
+  //     },
+  //   }
+  // )
 );
 
 @Component({

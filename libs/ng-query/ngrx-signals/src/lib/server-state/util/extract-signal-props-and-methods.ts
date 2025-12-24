@@ -1,4 +1,5 @@
 import { Signal } from '@angular/core';
+import { RemoveIndexSignature } from './util.type';
 
 export type ExtractSignalPropsAndMethods<
   State,
@@ -24,4 +25,7 @@ export type ExtractSignalPropsAndMethods<
           }
         >
     : Acc
-  : Acc;
+  : {
+      props: Acc['props'];
+      methods: RemoveIndexSignature<Acc['methods']>;
+    };

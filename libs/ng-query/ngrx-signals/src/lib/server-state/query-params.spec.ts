@@ -253,7 +253,7 @@ describe('queryParams', () => {
             },
           },
         },
-        ({ state, set, update, patch, reset, config }) => {
+        ({ state, set }) => {
           return {
             _setPage: afterRecomputation(mySource, (newPage: number) => {
               expectTypeOf(state()).toEqualTypeOf<{
@@ -270,7 +270,6 @@ describe('queryParams', () => {
       );
       //@ts-expect-error _setPage is bind to a source, so it should not be exposed
       myQueryParams._setPage(2);
-
     });
   });
 });

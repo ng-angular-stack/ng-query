@@ -6,7 +6,7 @@ describe('state', () => {
   it('should create a simple state', () => {
     const myState = state(0);
 
-    expect(myState).toBxDefined();
+    expect(myState).toBeDefined();
     expectTypeOf(myState).toEqualTypeOf<Signal<number>>();
     expect(myState()).toBe(0);
   });

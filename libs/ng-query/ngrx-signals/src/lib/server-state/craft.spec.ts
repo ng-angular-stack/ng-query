@@ -9,12 +9,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import {
-  craftQueryParams,
-  QueryParamNavigationOptions,
-  QueryParamProps,
-  QueryParamsToState,
-} from './craft-query-params';
+import { craftQueryParams, QueryParamProps } from './craft-query-params';
 import { craftInputs } from './craft-inputs';
 import { craftState } from './craft-state';
 import { source } from './source';
@@ -26,6 +21,7 @@ import { craftQuery } from './craft-query';
 import { ReadonlySource } from './util/source.type';
 import { craftMutations } from './craft-mutations';
 import { ExcludeCommonKeys } from './util/util.type';
+import { state } from './state';
 
 describe('craft', () => {
   beforeEach(() => {
@@ -65,13 +61,13 @@ describe('craft', () => {
 
       await vi.runAllTimersAsync();
       expect(testServerState).toBeDefined();
-      expect(testServerState.testQuery.value).toBeDefined();
-      expect(testServerState.testQuery.value()).toEqual({
+      expect(testServerState.test.value).toBeDefined();
+      expect(testServerState.test.value()).toEqual({
         id: 5,
         name: 'test',
       });
-      expect(testServerState.test2Query.value).toBeDefined();
-      expect(testServerState.test2Query.value()).toEqual({
+      expect(testServerState.test2.value).toBeDefined();
+      expect(testServerState.test2.value()).toEqual({
         id: 3,
         name: 'test2',
       });
@@ -129,16 +125,16 @@ describe('craft', () => {
       const state = injectCraft();
       await vi.runAllTimersAsync();
       expect(state).toBeDefined();
-      expect(state.testQuery.value).toBeDefined();
-      expect(state.testQuery.value()).toEqual({ id: 3, name: 'test' });
+      expect(state.test.value).toBeDefined();
+      expect(state.test.value()).toEqual({ id: 3, name: 'test' });
 
       state.mutateSave({ id: 3, name: 'testMutated' });
       await vi.runAllTimersAsync();
-      expect(state.testQuery.value()).toEqual({ id: 3, name: 'testMutated' });
+      expect(state.test.value()).toEqual({ id: 3, name: 'testMutated' });
 
       state.mutateSave({ id: 3, name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
-      expect(state.testQuery.status()).toEqual('reloading');
+      expect(state.test.status()).toEqual('reloading');
     });
   });
 
@@ -188,16 +184,16 @@ describe('craft', () => {
       const q = injectCraft();
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
-      expect(q.testQuery.value).toBeDefined();
-      expect(q.testQuery.value()).toEqual({ id: '3', name: 'test' });
+      expect(q.test.value).toBeDefined();
+      expect(q.test.value()).toEqual({ id: '3', name: 'test' });
 
       q.mutateSave({ id: '3', name: 'testMutated' });
       await vi.runAllTimersAsync();
-      expect(q.testQuery.value()).toEqual({ id: '3', name: 'testMutated' });
+      expect(q.test.value()).toEqual({ id: '3', name: 'testMutated' });
 
       q.mutateSave({ id: '3', name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
-      expect(q.testQuery.status()).toEqual('reloading');
+      expect(q.test.status()).toEqual('reloading');
     });
   });
 
@@ -248,22 +244,22 @@ describe('craft', () => {
       const q = injectCraft();
       await vi.runAllTimersAsync();
       expect(q).toBeDefined();
-      expect(q.testQuery.select('3')?.value).toBeDefined();
-      expect(q.testQuery.select('3')?.value()).toEqual({
+      expect(q.test.select('3')?.value).toBeDefined();
+      expect(q.test.select('3')?.value()).toEqual({
         id: '3',
         name: 'test',
       });
 
       q.mutateSave({ id: '3', name: 'testMutated' });
       await vi.runAllTimersAsync();
-      expect(q.testQuery.select('3')?.value()).toEqual({
+      expect(q.test.select('3')?.value()).toEqual({
         id: '3',
         name: 'testMutated',
       });
 
       q.mutateSave({ id: '3', name: 'error' });
       await vi.advanceTimersByTimeAsync(5000);
-      expect(q.testQuery.select('3')?.status()).toEqual('reloading');
+      expect(q.test.select('3')?.status()).toEqual('reloading');
     });
   });
 
@@ -303,25 +299,24 @@ describe('craft', () => {
         craftSources({
           reset: source<string>(),
         }),
-        craftState(
-          'numberList',
-          ({ myParams }) => linkedSignal(() => [myParams() ?? 0]),
-          ({ state, context: { reset } }) => {
-            return {
+        craftState('numberList', ({ myParams, reset }) =>
+          state(
+            linkedSignal(() => [myParams() ?? 0]),
+            ({ set, state }) => ({
               addNumber: (numberValue: number) => {
                 console.log('numberValue', numberValue);
                 const stateValue = state();
-                return [...stateValue, numberValue];
+                set([...stateValue, numberValue]);
               },
               filterNumber: (filterValue: number) => {
                 const stateValue = state();
-                return stateValue.filter((num) => num !== filterValue);
+                set(stateValue.filter((num) => num !== filterValue));
               },
               reset: afterRecomputation(reset, () => {
-                return [];
+                set([]);
               }),
-            };
-          }
+            })
+          )
         )
       );
 
@@ -333,7 +328,7 @@ describe('craft', () => {
         },
         methods: {
           setReset: resetSource,
-          addNumber: addNumberSource,
+          numberListAddNumber: addNumberSource,
           // reset: resetSource,
           // addNumber: addNumberSource,
         },
@@ -343,7 +338,7 @@ describe('craft', () => {
       });
       expectTypeOf<IsAny<typeof store>>().toEqualTypeOf<false>();
 
-      expectTypeOf(store.filterNumber).toBeFunction();
+      expectTypeOf(store.numberListFilterNumber).toBeFunction();
       //@ts-expect-error it should not be exposed, because connected to a Source
       type resetNotExposed = (typeof store)['reset'];
 
@@ -354,7 +349,7 @@ describe('craft', () => {
       await vi.runAllTimersAsync();
       expect(store.numberList()).toEqual([10, 2]);
 
-      store.filterNumber(10);
+      store.numberListFilterNumber(10);
       expect(store.numberList()).toEqual([2]);
     });
   });
@@ -372,24 +367,21 @@ describe('craft', () => {
         craftSources({
           reset: source<string>(),
         }),
-        craftState(
-          'numberList1',
-          () => signal([1]),
-          ({ state, context: { reset } }) => {
-            return {
-              addNumber: (numberValue: number) => {
-                const stateValue = state();
-                return [...stateValue, numberValue];
-              },
-              filterNumber: (filterValue: number) => {
-                const stateValue = state();
-                return stateValue.filter((num) => num !== filterValue);
-              },
-              reset: afterRecomputation(reset, () => {
-                return [];
-              }),
-            };
-          }
+        craftState('numberList1', ({ reset }) =>
+          state([1], ({ state, set }) => ({
+            addNumber: (numberValue: number) => {
+              console.log('numberValue', numberValue);
+              const stateValue = state();
+              set([...stateValue, numberValue]);
+            },
+            filterNumber: (filterValue: number) => {
+              const stateValue = state();
+              set(stateValue.filter((num) => num !== filterValue));
+            },
+            reset: afterRecomputation(reset, () => {
+              set([]);
+            }),
+          }))
         ),
         craftQueryParams('pagination', () => ({
           page: {
@@ -430,25 +422,21 @@ describe('craft', () => {
             setReset: reset,
           },
         })),
-        craftState(
-          'numberList2',
-          () => signal([1]),
-          ({ state, context: { reset } }) => {
-            return {
-              addNumber2: (numberValue: number) => {
-                console.log('addNumber numberValue', numberValue);
-                const stateValue = state();
-                return [...stateValue, numberValue];
-              },
-              filterNumber2: (filterValue: number) => {
-                const stateValue = state();
-                return stateValue.filter((num) => num !== filterValue);
-              },
-              reset2: afterRecomputation(reset, () => {
-                return [];
-              }),
-            };
-          }
+        craftState('numberList2', ({ reset }) =>
+          state([1], ({ state, set }) => ({
+            addNumber2: (numberValue: number) => {
+              console.log('addNumber numberValue', numberValue);
+              const stateValue = state();
+              set([...stateValue, numberValue]);
+            },
+            filterNumber2: (filterValue: number) => {
+              const stateValue = state();
+              set(stateValue.filter((num) => num !== filterValue));
+            },
+            reset2: afterRecomputation(reset, () => {
+              set([]);
+            }),
+          }))
         )
       );
       await TestBed.runInInjectionContext(async () => {
@@ -463,8 +451,8 @@ describe('craft', () => {
           },
           methods: {
             setReset: resetSource,
-            addNumber: addNumberSource,
-            addNumber2: addNumberSource,
+            numberList1AddNumber: addNumberSource,
+            numberList2AddNumber2: addNumberSource,
             // reset: resetSource,
             // addNumber: addNumberSource,
           },
@@ -474,8 +462,8 @@ describe('craft', () => {
         });
         expectTypeOf<IsAny<typeof store>>().toEqualTypeOf<false>();
 
-        expectTypeOf(store.filterNumber).toBeFunction();
-        expectTypeOf(store.filterNumber2).toBeFunction();
+        expectTypeOf(store.numberList1FilterNumber).toBeFunction();
+        expectTypeOf(store.numberList2FilterNumber2).toBeFunction();
         //@ts-expect-error it should not be exposed, because connected to a Source
         type resetNotExposed = (typeof store)['reset'];
 
@@ -497,18 +485,16 @@ describe('craft', () => {
         name: 'dataPagination',
         providedIn: 'root',
       },
-      craftState(
-        'numberList',
-        () => signal([1]),
-        ({ state }) => ({
+      craftState('numberList', () =>
+        state([1], ({ state, set }) => ({
           addNumber: (numberValue: number) => {
             const stateValue = state();
-            return [...stateValue, numberValue];
+            set([...stateValue, numberValue]);
           },
           reset: () => {
-            return [];
+            set([]);
           },
-        })
+        }))
       )
     );
 
@@ -522,18 +508,16 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       craftDataPagination(({ reset }) => ({
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -548,18 +532,16 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       craftDataPagination(({ reset }) => ({
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -568,7 +550,7 @@ describe('craft', () => {
       const host1 = injectHost1Craft();
       const host2 = injectHost2Craft();
 
-      host1.addNumber(2);
+      host1.numberListAddNumber(2);
       expect(host1.numberList()).toEqual([1, 2]);
       expect(host2.numberList()).toEqual([1, 2]);
     });
@@ -583,15 +565,16 @@ describe('craft', () => {
       craftInputs({
         defaultNumber: undefined as number | undefined,
       }),
-      craftState(
-        'numberList',
-        ({ defaultNumber }) => linkedSignal(() => [defaultNumber() ?? 1]),
-        ({ state, context: { defaultNumber } }) => ({
-          addNumber: () => [...state(), defaultNumber() ?? 1],
-          reset: () => {
-            return [];
-          },
-        })
+      craftState('numberList', ({ defaultNumber }) =>
+        state(
+          linkedSignal(() => [defaultNumber() ?? 1]),
+          ({ state, set }) => ({
+            addNumber: () => [...state(), defaultNumber() ?? 1],
+            reset: () => {
+              return [];
+            },
+          })
+        )
       )
     );
 
@@ -605,21 +588,19 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
           increment: afterRecomputation(increment, () => state() + 1),
           decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
-        })
+        }))
       ),
       craftSharedFeature(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -634,21 +615,19 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
           increment: afterRecomputation(increment, () => state() + 1),
           decrement: afterRecomputation(decrement, () => state() - 1),
           reset: () => 0,
-        })
+        }))
       ),
       craftSharedFeature(({ reset, counter }) => ({
         inputs: {
           defaultNumber: counter,
         },
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -657,7 +636,7 @@ describe('craft', () => {
       const host1 = injectHost1Craft();
       const host2 = injectHost2Craft();
 
-      host1.addNumber();
+      host1.numberListAddNumber();
       expect(host1.numberList()).toEqual([1, 2]);
       expect(host2.numberList()).toEqual([1]);
     });
@@ -668,18 +647,16 @@ describe('craft', () => {
         name: 'dataPagination',
         providedIn: 'feature',
       },
-      craftState(
-        'numberList',
-        () => signal([1]),
-        ({ state }) => ({
+      craftState('numberList', () =>
+        state([1], ({ state, set }) => ({
           addNumber: (numberValue: number) => {
             const stateValue = state();
-            return [...stateValue, numberValue];
+            set([...stateValue, numberValue]);
           },
           reset: () => {
-            return [];
+            set([]);
           },
-        })
+        }))
       )
     );
 
@@ -693,18 +670,16 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       craftDataPagination(({ reset }) => ({
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -719,18 +694,16 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       craftDataPagination(({ reset }) => ({
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -738,7 +711,7 @@ describe('craft', () => {
       const host1 = injectHost1Craft();
       const host2 = injectHost2Craft();
 
-      host1.addNumber(2);
+      host1.numberListAddNumber(2);
       expect(host1.numberList()).toEqual([1, 2]);
       expect(host2.numberList()).toEqual([1]);
     });
@@ -753,18 +726,16 @@ describe('craft', () => {
       craftInputs({
         shouldNotBeExposed: undefined as number | undefined,
       }),
-      craftState(
-        'numberList',
-        () => signal([1]),
-        ({ state }) => ({
+      craftState('numberList', () =>
+        state([1], ({ state, set }) => ({
           addNumber: (numberValue: number) => {
             const stateValue = state();
-            return [...stateValue, numberValue];
+            set([...stateValue, numberValue]);
           },
           reset: () => {
-            return [];
+            set([]);
           },
-        })
+        }))
       )
     );
 
@@ -778,21 +749,19 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       craftDataPagination(({ reset, counter }) => ({
         inputs: {
           shouldNotBeExposed: counter,
         },
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -810,21 +779,19 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       craftDataPagination(({ reset, counter }) => ({
         inputs: {
           shouldNotBeExposed: 'EXTERNALLY_PROVIDED',
         },
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -832,7 +799,7 @@ describe('craft', () => {
     // 👇 no error, because shouldNotBeExposed is not propagated
     const host2 = injectHost2Craft();
 
-    host1.addNumber(2);
+    host1.numberListAddNumber(2);
     expect(host1.numberList()).toEqual([1, 2]);
     expect(host2.numberList()).toEqual([1, 2]);
   });
@@ -846,18 +813,16 @@ describe('craft', () => {
       craftInputs({
         shouldNotBeExposed: undefined as number | undefined,
       }),
-      craftState(
-        'numberList',
-        () => signal([1]),
-        ({ state }) => ({
+      craftState('numberList', () =>
+        state([1], ({ state, set }) => ({
           addNumber: (numberValue: number) => {
             const stateValue = state();
-            return [...stateValue, numberValue];
+            set([...stateValue, numberValue]);
           },
           reset: () => {
-            return [];
+            set([]);
           },
-        })
+        }))
       )
     );
 
@@ -898,14 +863,12 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       craftDataPagination(({ reset, counter }) => ({
         inputs: {
@@ -913,7 +876,7 @@ describe('craft', () => {
           // test21: true,
         },
         methods: {
-          reset,
+          numberListReset: reset,
         },
       }))
     );
@@ -937,8 +900,8 @@ describe('craft', () => {
 
     const host1 = injectHost1Craft();
 
-    host1.addNumber(2);
-    host1.reset();
+    host1.numberListAddNumber(2);
+    host1.numberListReset();
     expect(host1.numberList()).toEqual([1, 2]);
   });
 
@@ -951,18 +914,16 @@ describe('craft', () => {
       craftInputs({
         shouldNotBeExposed: undefined as number | undefined,
       }),
-      craftState(
-        'numberList',
-        () => signal([1]),
-        ({ state }) => ({
+      craftState('numberList', () =>
+        state([1], ({ state, set }) => ({
           addNumber: (numberValue: number) => {
             const stateValue = state();
-            return [...stateValue, numberValue];
+            set([...stateValue, numberValue]);
           },
           reset: () => {
-            return [];
+            set([]);
           },
-        })
+        }))
       )
     );
 
@@ -973,12 +934,13 @@ describe('craft', () => {
       };
       context: {
         methods: {
-          addNumber: (numberValue: number) => number[];
-          reset: () => never[];
+          [x: `numberList${Capitalize<string>}`]: Function;
+          numberListAddNumber: (numberValue: number) => void;
+          numberListReset: () => void;
         } & Record<string, Function>;
         props: {
           numberList: Signal<number[]>;
-        };
+        } & {};
         _inputs: {
           shouldNotBeExposed: Signal<number | undefined>;
         };
@@ -1003,14 +965,12 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       //@ts-expect-error test2 is not defined in the connected store methods, so errorMethodMsg is required
       craftDataPagination(({ reset, counter }) => ({
@@ -1034,18 +994,16 @@ describe('craft', () => {
       craftInputs({
         shouldNotBeExposed: undefined as number | undefined,
       }),
-      craftState(
-        'numberList',
-        () => signal([1]),
-        ({ state }) => ({
+      craftState('numberList', () =>
+        state([1], ({ state, set }) => ({
           addNumber: (numberValue: number) => {
             const stateValue = state();
-            return [...stateValue, numberValue];
+            set([...stateValue, numberValue]);
           },
           reset: () => {
-            return [];
+            set([]);
           },
-        })
+        }))
       )
     );
 
@@ -1086,14 +1044,12 @@ describe('craft', () => {
         decrement: source<{}>(),
         reset: source<{}>(),
       }),
-      craftState(
-        'counter',
-        () => signal(0),
-        ({ context: { increment, decrement }, state }) => ({
-          increment: afterRecomputation(increment, () => state() + 1),
-          decrement: afterRecomputation(decrement, () => state() - 1),
+      craftState('counter', ({ increment, decrement }) =>
+        state(0, ({ state, set }) => ({
+          increment: afterRecomputation(increment, () => set(state() + 1)),
+          decrement: afterRecomputation(decrement, () => set(state() - 1)),
           reset: () => 0,
-        })
+        }))
       ),
       //@ts-expect-error testNotExist is not defined in the connected store inputs, so errorInputMsg is required
       craftDataPagination(({ reset, counter }) => ({
@@ -1117,12 +1073,10 @@ describe('craft metadata', () => {
           name: 'shared',
           providedIn: 'feature',
         },
-        craftState(
-          'test',
-          () => signal(1),
-          ({ state }) => ({
-            increment: () => state() + 1,
-          })
+        craftState('test', () =>
+          state(1, ({ state, set }) => ({
+            increment: () => set(state() + 1),
+          }))
         )
       );
       expectTypeOf(_SHARED_META_STORE_CONTEXT).toEqualTypeOf<{
@@ -1201,13 +1155,13 @@ describe('craft options', () => {
       // todo fix exposed functions
       await vi.runAllTimersAsync();
       expect(userServerState).toBeDefined();
-      expect(userServerState.testQuery.value).toBeDefined();
-      expect(userServerState.testQuery.value()).toEqual({
+      expect(userServerState.test.value).toBeDefined();
+      expect(userServerState.test.value()).toEqual({
         id: 5,
         name: 'test',
       });
-      expect(userServerState.test2Query.value).toBeDefined();
-      expect(userServerState.test2Query.value()).toEqual({
+      expect(userServerState.test2.value).toBeDefined();
+      expect(userServerState.test2.value()).toEqual({
         id: 3,
         name: 'test2',
       });
@@ -1252,13 +1206,13 @@ describe('craft options', () => {
       const sameUserServerState = inject(UserCraft);
       await vi.runAllTimersAsync();
       expect(userServerState).toBeDefined();
-      expect(userServerState.testQuery.value).toBeDefined();
-      expect(userServerState.testQuery.value()).toEqual({
+      expect(userServerState.test.value).toBeDefined();
+      expect(userServerState.test.value()).toEqual({
         id: 5,
         name: 'test',
       });
-      expect(userServerState.test2Query.value).toBeDefined();
-      expect(userServerState.test2Query.value()).toEqual({
+      expect(userServerState.test2.value).toBeDefined();
+      expect(userServerState.test2.value()).toEqual({
         id: 3,
         name: 'test2',
       });
@@ -1271,7 +1225,7 @@ describe('craft options', () => {
         name: 'test',
       });
 
-      expect(sameUserServerState.test2Query.value).toBeDefined();
+      expect(sameUserServerState.test2.value).toBeDefined();
       expect(userServerState.save.value()).toEqual({
         id: 3,
         name: 'test',
@@ -1633,21 +1587,76 @@ craft(
   craftSources({
     reset: source<{}>(),
   }),
-  craftState(
-    'counter',
-    () => signal(0),
-    ({ state, context: { reset } }) => ({
-      increment: () => state() + 1,
-      decrement: () => state() - 1,
-      _reset: afterRecomputation(reset, () => 0),
-    })
+  craftState('counter', ({ reset }) =>
+    state(0, ({ state, set }) => ({
+      increment: () => set(state() + 1),
+      decrement: () => set(state() - 1),
+      _reset: afterRecomputation(reset, () => set(0)),
+    }))
   ),
-  craftState(
-    'search',
-    () => signal(''),
-    ({ context: { reset } }) => ({
+  craftState('search', ({ reset }) =>
+    state('', ({ state, set }) => ({
       setSearch: (value: string) => value,
-      _reset: afterRecomputation(reset, () => ''),
-    })
+      _reset: afterRecomputation(reset, () => set('')),
+    }))
   )
 );
+
+describe('craft should accept contract/implementation', () => {
+  type UserImplementation = {
+    user: {
+      id: number;
+      name: string;
+    };
+    setName: (name: string) => void;
+  };
+  it('should accept contract/implementation', async () => {
+    const data = craft(
+      {
+        name: 'contractImplementationStore',
+        providedIn: 'root',
+        implements: Contract<UserImplementation>,
+      },
+      craftState(
+        'user',
+        () => signal({ id: 1, name: 'test' }),
+        ({ state }) => ({
+          setName: (name: string) => ({ ...state(), name }),
+        })
+      )
+    );
+  });
+  it('should return an error if contract/implementation is not satisfies', async () => {
+    const data = craft({
+      name: 'contractImplementationStore',
+      providedIn: 'root',
+      implements: Contract<UserImplementation>,
+    });
+  });
+
+  it('should accept a craft contract/implementation', async () => {
+    // type myContract = CraftContract<"customName"",{
+    //   //..
+    // }>;
+    type myCustomNameInterface = myContract['interface'];
+    type myCustomNameCraftContract = myContract['craftContract'];
+    ``;
+    const data = craft({
+      name: 'contractImplementationStore',
+      providedIn: 'root',
+      implements: CraftContract<{
+        // functions that the store should implement
+        // can add a contract on queryParams...
+        // should also enable to pass a props/methods contract ?
+      }>,
+    });
+  });
+
+  it('should return an error if craft contract/implementation is not satisfies', async () => {
+    const data = craft({
+      name: 'contractImplementationStore',
+      providedIn: 'root',
+      implements: CraftContract<UserImplementation>,
+    });
+  });
+});
