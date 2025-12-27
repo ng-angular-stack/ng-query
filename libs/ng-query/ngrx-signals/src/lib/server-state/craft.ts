@@ -98,6 +98,10 @@ export const EmptyContext = {
 
 export type EmptyContext = typeof EmptyContext;
 
+export function contract<Implement>() {
+  return {} as Implement;
+}
+
 type EmptyStandaloneContext = {};
 
 export function partialContext(
@@ -385,33 +389,74 @@ type ToCraftOutputs<
   >,
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
-  HasMethods = keyof MethodsToConnect extends never ? false : true
-> = InjectCraftOutput<
-  MergedContext,
-  StoreConfig,
-  HasInputs,
-  InputsToPlugin,
-  HasMethods,
-  MethodsToConnect
-> &
-  CraftCompositionOutput<
-    MergedContext,
-    StoreConfig,
-    HasInputs,
-    InputsToPlugin,
-    HasMethods,
-    StandaloneOutputs,
-    MethodsToConnect
-  > &
-  CraftToken<MergedContext, StoreConfig> &
-  StandaloneOutputs &
+  HasMethods = keyof MethodsToConnect extends never ? false : true,
+  HasContractToImplements = [unknown] extends [StoreConfig['implements']]
+    ? false
+    : true,
+  RespectContract = HasContractToImplements extends false
+    ? true
+    : IsEqual<
+        RemoveIndexSignature<MergedContext['props'] & MergedContext['methods']>,
+        NonNullable<StoreConfig['implements']>
+      >
+> = (RespectContract extends true
+  ? InjectCraftOutput<
+      MergedContext,
+      StoreConfig,
+      HasInputs,
+      InputsToPlugin,
+      HasMethods,
+      MethodsToConnect
+    > &
+      CraftCompositionOutput<
+        MergedContext,
+        StoreConfig,
+        HasInputs,
+        InputsToPlugin,
+        HasMethods,
+        StandaloneOutputs,
+        MethodsToConnect
+      > &
+      CraftToken<MergedContext, StoreConfig> &
+      StandaloneOutputs
+  : {
+      testContract: NonNullable<StoreConfig['implements']> extends Function
+        ? true
+        : false;
+      error: NonNullable<StoreConfig['implements']> extends Function
+        ? 'Contract Implementation Error: The current contract is not called properly. Did you forget to call it as a function? i.e., contract<...>()'
+        : 'Contract Implementation Error: The current contract is not respected.';
+    }) &
   META_CONTEXT<MergedContext, StoreConfig>;
+
+type IsEqual<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
+  ? 1
+  : 2
+  ? (<T>() => T extends B ? 1 : 2) extends <T>() => T extends A ? 1 : 2
+    ? true
+    : false
+  : false;
+
+type Diff<A, B> = {
+  added: Exclude<keyof B, keyof A>;
+  removed: Exclude<keyof A, keyof B>;
+  changed: ChangedKeys<A, B>;
+};
+
+type ChangedKeys<A, B> = {
+  [K in keyof A & keyof B]: A[K] extends B[K]
+    ? B[K] extends A[K]
+      ? never
+      : K
+    : K;
+}[keyof A & keyof B];
 
 type ProvidedInOption = 'root' | 'scoped' | 'feature';
 // todo handle feature to not expose the inject and the provide but only the using...
 export type StoreConfigConstraints = {
   providedIn: ProvidedInOption;
   name: string;
+  implements?: unknown;
 };
 
 type MergeContexts<C extends ContextConstraints[]> = C extends [
@@ -467,6 +512,7 @@ export function craft<
   options: {
     providedIn: ProvidedIn;
     name: Name;
+    implements?: unknown;
   },
   factory1: CraftFactory<
     [_EmptyContext],
@@ -515,6 +561,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
+    implements?: unknown;
   }
 >;
 export function craft<
@@ -530,6 +577,7 @@ export function craft<
   options: {
     providedIn: ProvidedIn;
     name: Name;
+    implements?: unknown;
   },
   factory1: CraftFactory<
     [_EmptyContext],
@@ -564,6 +612,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
+    implements?: unknown;
   }
 >;
 export function craft<
@@ -577,6 +626,7 @@ export function craft<
   options: {
     providedIn: ProvidedIn;
     name: Name;
+    implements?: unknown;
   },
   factory1: CraftFactory<
     [_EmptyContext],
@@ -602,17 +652,20 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
+    implements?: unknown;
   }
 >;
 export function craft<
   outputs1 extends ContextConstraints,
   standaloneOutputs1 extends StandaloneOutputsConstraints,
   const ProvidedIn extends ProvidedInOption,
-  const Name extends string
+  const Name extends string,
+  ToImplementContract
 >(
   options: {
     providedIn: ProvidedIn;
     name: Name;
+    implements?: ToImplementContract;
   },
   factory1: CraftFactory<
     [_EmptyContext],
@@ -629,6 +682,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
+    implements?: NoInfer<ToImplementContract>;
   }
 >;
 export function craft(
@@ -648,6 +702,7 @@ export function craft(
   {
     name: string;
     providedIn: ProvidedInOption;
+    implements?: unknown;
   }
 > {
   const providedIn =
@@ -657,6 +712,7 @@ export function craft(
   const storeConfig: StoreConfigConstraints = {
     providedIn: options?.providedIn,
     name: options?.name,
+    implements: options?.implements,
   };
 
   const _cloudProxy = new Proxy({}, {});
@@ -711,6 +767,7 @@ export function craft(
     [injectNameCraft]: (entries?: {
       inputs?: Record<string, unknown>;
       methods?: Record<string, unknown>;
+      implements?: unknown;
     }) => {
       assertInInjectionContext(injectCraft);
       const tokenValue = inject(token); // inject will enable to set inputsKeysSet

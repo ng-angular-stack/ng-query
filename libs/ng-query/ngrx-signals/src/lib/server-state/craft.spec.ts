@@ -1,6 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { query } from './query';
-import { craft, EmptyContext, partialContext, PartialContext } from './craft';
+import {
+  contract,
+  craft,
+  EmptyContext,
+  partialContext,
+  PartialContext,
+} from './craft';
 import { mutation } from './mutation';
 import {
   inject,
@@ -22,6 +28,7 @@ import { ReadonlySource } from './util/source.type';
 import { craftMutations } from './craft-mutations';
 import { ExcludeCommonKeys } from './util/util.type';
 import { state } from './state';
+import { Equal, Expect } from 'test-type';
 
 describe('craft', () => {
   beforeEach(() => {
@@ -1604,59 +1611,75 @@ craft(
 
 describe('craft should accept contract/implementation', () => {
   type UserImplementation = {
-    user: {
+    user: Signal<{
       id: number;
       name: string;
+    }>;
+    userSetName: (name: string) => {
+      name: string;
+      id: number;
     };
-    setName: (name: string) => void;
   };
   it('should accept contract/implementation', async () => {
-    const data = craft(
+    const { injectContractImplementationStoreCraft } = craft(
       {
         name: 'contractImplementationStore',
         providedIn: 'root',
-        implements: Contract<UserImplementation>,
+        implements: contract<UserImplementation>(),
       },
-      craftState(
-        'user',
-        () => signal({ id: 1, name: 'test' }),
-        ({ state }) => ({
+      craftState('user', () =>
+        state({ id: 1, name: 'test' }, ({ state }) => ({
           setName: (name: string) => ({ ...state(), name }),
-        })
+        }))
+      )
+    );
+  });
+  it('should accept no contract/implementation', async () => {
+    const { injectContractImplementationStoreCraft } = craft(
+      {
+        name: 'contractImplementationStore',
+        providedIn: 'root',
+      },
+      craftState('user', () =>
+        state({ id: 1, name: 'test' }, ({ state }) => ({
+          setName: (name: string) => ({ ...state(), name }),
+        }))
       )
     );
   });
   it('should return an error if contract/implementation is not satisfies', async () => {
-    const data = craft({
-      name: 'contractImplementationStore',
-      providedIn: 'root',
-      implements: Contract<UserImplementation>,
-    });
+    const { error } = craft(
+      {
+        name: 'contractImplementationStore',
+        providedIn: 'root',
+        implements: contract<UserImplementation>(),
+      },
+      craftState('other', () => state({ id: 1, name: 'test' }))
+    );
+
+    type _ = Expect<
+      Equal<
+        typeof error,
+        'Contract Implementation Error: The current contract is not respected.'
+      >
+    >;
   });
 
-  it('should accept a craft contract/implementation', async () => {
-    // type myContract = CraftContract<"customName"",{
-    //   //..
-    // }>;
-    type myCustomNameInterface = myContract['interface'];
-    type myCustomNameCraftContract = myContract['craftContract'];
-    ``;
-    const data = craft({
-      name: 'contractImplementationStore',
-      providedIn: 'root',
-      implements: CraftContract<{
-        // functions that the store should implement
-        // can add a contract on queryParams...
-        // should also enable to pass a props/methods contract ?
-      }>,
-    });
-  });
+  it('should return an error if "contract" is not called: contract<...> instead of  contract<...>()', async () => {
+    const { error } = craft(
+      {
+        name: 'contractImplementationStore',
+        providedIn: 'root',
+        implements: contract<UserImplementation>,
+      },
+      craftState('other', () => state({ id: 1, name: 'test' }))
+    );
 
-  it('should return an error if craft contract/implementation is not satisfies', async () => {
-    const data = craft({
-      name: 'contractImplementationStore',
-      providedIn: 'root',
-      implements: CraftContract<UserImplementation>,
-    });
+    type _ = Expect<
+      Equal<
+        typeof error,
+        'Contract Implementation Error: The current contract is not called properly. Did you forget to call it as a function? i.e., contract<...>()'
+      >
+    >;
   });
 });
