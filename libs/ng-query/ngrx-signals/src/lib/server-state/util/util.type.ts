@@ -1,5 +1,7 @@
+import { UnionToTuple } from '../../types/util.type';
 import { StoreConfigConstraints } from '../craft';
 import { Source } from '../source';
+import { ExtractSignalPropsAndMethods } from './extract-signal-props-and-methods';
 import { ReadonlySource } from './source.type';
 
 export type FilterPrivateFields<T> = {
@@ -96,3 +98,14 @@ export type FilterReadonlySource<Insertions> = {
     ? never
     : K]: Insertions[K];
 };
+
+// Helper type to defer evaluation and avoid infinite recursion
+export type DeferredExtract<Insertions> = UnionToTuple<
+  keyof Insertions
+> extends infer Keys
+  ? ExtractSignalPropsAndMethods<
+      Insertions,
+      Keys,
+      { props: {}; methods: Record<string, Function> }
+    >
+  : never;

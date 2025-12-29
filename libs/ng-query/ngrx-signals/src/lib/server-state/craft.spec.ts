@@ -15,7 +15,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { craftQueryParams, QueryParamProps } from './craft-query-params';
+import { craftQueryParams, QueryParamProps } from './craft-query-param';
 import { craftInputs } from './craft-inputs';
 import { craftState } from './craft-state';
 import { source } from './source';
@@ -29,6 +29,11 @@ import { craftMutations } from './craft-mutations';
 import { ExcludeCommonKeys } from './util/util.type';
 import { state } from './state';
 import { Equal, Expect } from 'test-type';
+import {
+  QueryParamNavigationOptions,
+  QueryParamNavigationOptions,
+  QueryParamsToState,
+} from './query-param';
 
 describe('craft', () => {
   beforeEach(() => {
@@ -1374,12 +1379,14 @@ describe('craft preserve all context', () => {
         }
       );
       type t = Prettify<
-        Pick<(typeof _TEST_META_STORE_CONTEXT)['context'], '_queryParams'>
+        Pick<(typeof _TEST_META_STORE_CONTEXT)['context'], 'methods'>
       >;
+      type t1 = Prettify<(typeof _TEST_META_STORE_CONTEXT)['storeConfig']>;
       expectTypeOf(_TEST_META_STORE_CONTEXT).toEqualTypeOf<{
         storeConfig: {
           providedIn: 'root';
           name: 'test';
+          implements?: unknown;
         };
         context: {
           methods: {
@@ -1395,12 +1402,18 @@ describe('craft preserve all context', () => {
             ) => void;
           } & {
             [x: string]:
-              | ((...args: any[]) => NoInfer<{
-                  active: never;
-                }>)
-              | ReadonlySource<{
-                  active: never;
-                }>;
+              | ReadonlySource<QueryParamsToState<QueryParamsConfig>>
+              | ((...args: any[]) => NoInfer<
+                  Prettify<
+                    QueryParamsToState<{
+                      active: {
+                        defaultValue: undefined;
+                        parse: (value: string) => string;
+                        serialize: (value: any) => string;
+                      };
+                    }>
+                  >
+                >);
           } & Record<string, Function>;
           _inputs: {};
           props: QueryParamProps<{
@@ -1418,23 +1431,17 @@ describe('craft preserve all context', () => {
           _mutation: {};
           _query: {};
           _queryParams: {
-            activeId: {
-              config: {
-                active: {
-                  defaultValue: undefined;
-                  parse: (value: string) => string;
-                  serialize: (value: unknown) => string;
-                };
-              };
-              state: WritableSignal<
-                QueryParamsToState<{
+            _queryParams: {
+              activeId: {
+                config: {
                   active: {
                     defaultValue: undefined;
                     parse: (value: string) => string;
-                    serialize: (value: unknown) => string;
+                    serialize: (value: any) => string;
                   };
-                }>
-              >;
+                };
+                state: WritableSignal<QueryParamsToState<QueryParams>>;
+              };
             };
           };
           _sources: {};
@@ -1544,6 +1551,7 @@ describe('craft preserve all context', () => {
       >().toEqualTypeOf<{
         providedIn: 'feature';
         name: 'mySharedFeature';
+        implements?: unknown;
       }>();
       const { _TEST_META_STORE_CONTEXT } = craft(
         {
@@ -1569,12 +1577,14 @@ describe('craft preserve all context', () => {
       >().toEqualTypeOf<{
         providedIn: 'root';
         name: 'test';
+        implements?: unknown;
       }>();
       expectTypeOf<
         (typeof _TEST_META_STORE_CONTEXT)['context']['_dependencies']['mySharedFeature']['storeConfig']
       >().toEqualTypeOf<{
         providedIn: 'feature';
         name: 'mySharedFeature';
+        implements?: unknown;
       }>();
     });
   });

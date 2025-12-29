@@ -1,13 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { craft } from './craft';
-import { craftQueryParams } from './craft-query-params';
+import { craftQueryParam } from './craft-query-param';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Location } from '@angular/common';
 import { craftSources } from './craft-sources';
 import { source } from './source';
 import { afterRecomputation } from './after-recomputation';
+import { queryParam } from './query-param';
+import { craftComputedStates } from './craft-computed';
 @Component({
   template: '',
   standalone: true,
@@ -16,7 +18,7 @@ class TestComponent {
   route = inject(ActivatedRoute);
 }
 
-describe('craftQueryParams', () => {
+describe('craftQueryParam', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideRouter([{ path: '', component: TestComponent }])],
@@ -33,25 +35,32 @@ describe('craftQueryParams', () => {
         providedIn: 'root',
         name: '',
       },
-      craftQueryParams('pagination', () => ({
-        page: {
-          defaultValue: 1,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-        pageSize: {
-          defaultValue: 10,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-      }))
+      craftQueryParam('pagination', () =>
+        queryParam(
+          {
+            state: {
+              page: {
+                defaultValue: 1,
+                parse: (value: string) => parseInt(value, 10),
+                serialize: (value: unknown) => String(value),
+              },
+              pageSize: {
+                defaultValue: 10,
+                parse: (value: string) => parseInt(value, 10),
+                serialize: (value: unknown) => String(value),
+              },
+            },
+          },
+          ({ set, reset }) => ({ set, reset })
+        )
+      )
     );
 
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
 
-      expect(store.page()).toBe(1);
-      expect(store.pageSize()).toBe(10);
+      expect(store.paginationPage()).toBe(1);
+      expect(store.paginationPageSize()).toBe(10);
       expect(store.pagination()).toEqual({
         page: 1,
         pageSize: 10,
@@ -60,12 +69,12 @@ describe('craftQueryParams', () => {
         page: number;
         pageSize: number;
       }>();
-      store.setPaginationQueryParams({ page: 2, pageSize: 20 });
+      store.setPagination({ page: 2, pageSize: 20 });
       expect(store.pagination()).toEqual({
         page: 2,
         pageSize: 20,
       });
-      store.resetPaginationQueryParams();
+      store.resetPagination();
       expect(store.pagination()).toEqual({
         page: 1,
         pageSize: 10,
@@ -79,25 +88,29 @@ describe('craftQueryParams', () => {
         providedIn: 'root',
         name: '',
       },
-      craftQueryParams('pagination', () => ({
-        page: {
-          defaultValue: 1,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-        active: {
-          defaultValue: false,
-          parse: (value: string) => value === 'true',
-          serialize: (value: unknown) => String(value),
-        },
-      }))
+      craftQueryParam('pagination', () =>
+        queryParam({
+          state: {
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            active: {
+              defaultValue: false,
+              parse: (value: string) => value === 'true',
+              serialize: (value: unknown) => String(value),
+            },
+          },
+        })
+      )
     );
 
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
 
-      expect(store.page()).toBe(1);
-      expect(store.active()).toBe(false);
+      expect(store.paginationPage()).toBe(1);
+      expect(store.paginationActive()).toBe(false);
     });
   });
 
@@ -107,46 +120,49 @@ describe('craftQueryParams', () => {
         providedIn: 'root',
         name: '',
       },
-      craftQueryParams(
-        'pagination',
-        () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-        }),
-        {
-          methods: ({ queryParams }) => ({
-            customMethod: (newPage: number) => {
-              expectTypeOf(queryParams()).toEqualTypeOf<{ page: number }>();
-              expect(queryParams().page).toBe(2);
-              return {
-                ...queryParams(),
-                page: newPage,
-              };
+      craftQueryParam('pagination', () =>
+        queryParam(
+          {
+            state: {
+              page: {
+                defaultValue: 1,
+                parse: (value: string) => parseInt(value, 10),
+                serialize: (value: unknown) => String(value),
+              },
             },
-          }),
-        }
+          },
+          ({ state, set }) => ({
+            set,
+            customMethod: (newPage: number) => {
+              expectTypeOf(state()).toEqualTypeOf<{ page: number }>();
+              expect(state().page).toBe(2);
+              set({
+                ...state(),
+                page: newPage,
+              });
+              return state();
+            },
+          })
+        )
       )
     );
 
     TestBed.runInInjectionContext(() => {
       const store = injectCraft();
 
-      expect(typeof store['customMethod']).toBe('function');
+      expect(typeof store['customMethodPagination']).toBe('function');
       expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
       expect(store.pagination().page).toBe(1);
-      expectTypeOf(store.page()).toEqualTypeOf<number>();
-      expect(store.page()).toBe(1);
-      store.setPaginationQueryParams({ page: 2 });
-      expect(store.page()).toBe(2);
-      expectTypeOf(store.customMethod).toEqualTypeOf<
+      expectTypeOf(store.paginationPage()).toEqualTypeOf<number>();
+      expect(store.paginationPage()).toBe(1);
+      store.setPagination({ page: 2 });
+      expect(store.paginationPage()).toBe(2);
+      expectTypeOf(store.customMethodPagination).toEqualTypeOf<
         (newPage: number) => { page: number }
       >();
-      store.customMethod(3);
+      store.customMethodPagination(3);
 
-      expect(store.page()).toBe(3);
+      expect(store.paginationPage()).toBe(3);
     });
   });
 
@@ -159,29 +175,31 @@ describe('craftQueryParams', () => {
       craftSources({
         nextPage: source<{}>(),
       }),
-      craftQueryParams(
-        'pagination',
-        () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
+      craftQueryParam('pagination', ({ nextPage }) =>
+        queryParam(
+          {
+            state: {
+              page: {
+                defaultValue: 1,
+                parse: (value: string) => parseInt(value, 10),
+                serialize: (value: unknown) => String(value),
+              },
+            },
           },
-        }),
-        {
-          methods: ({ context: { nextPage }, queryParams }) => ({
+          ({ set, state }) => ({
+            set,
             nextPage: afterRecomputation(nextPage, (nextPage) => {
               console.log('afterRecomputation nextPage', nextPage);
               expectTypeOf(nextPage).toEqualTypeOf<{}>();
-              expectTypeOf(queryParams()).toEqualTypeOf<{ page: number }>();
-              expect(queryParams().page).toBe(2);
-              return {
-                ...queryParams(),
-                page: queryParams().page + 1,
-              };
+              expectTypeOf(state()).toEqualTypeOf<{ page: number }>();
+              expect(state().page).toBe(2);
+              set({
+                ...state(),
+                page: state().page + 1,
+              });
             }),
-          }),
-        }
+          })
+        )
       )
     );
     await TestBed.runInInjectionContext(async () => {
@@ -189,16 +207,16 @@ describe('craftQueryParams', () => {
 
       expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
       expect(store.pagination().page).toBe(1);
-      expectTypeOf(store.page()).toEqualTypeOf<number>();
-      expect(store.page()).toBe(1);
-      store.setPaginationQueryParams({ page: 2 });
-      expect(store.page()).toBe(2);
+      expectTypeOf(store.paginationPage()).toEqualTypeOf<number>();
+      expect(store.paginationPage()).toBe(1);
+      store.setPagination({ page: 2 });
+      expect(store.paginationPage()).toBe(2);
       //@ts-expect-error nextPage is not exposed
       expectTypeOf(store.nextPage).toEqualTypeOf<unknown>();
       store.setNextPage({});
       console.log('setNextPage');
       await vi.runAllTimersAsync();
-      expect(store.page()).toBe(3);
+      expect(store.paginationPage()).toBe(3);
     });
   });
 });
@@ -208,21 +226,28 @@ const { injectCraft } = craft(
     providedIn: 'root',
     name: '',
   },
-  craftQueryParams('pagination', () => ({
-    page: {
-      defaultValue: 1,
-      parse: (value: string) => parseInt(value, 10),
-      serialize: (value: unknown) => String(value),
-    },
-    pageSize: {
-      defaultValue: 10,
-      parse: (value: string) => parseInt(value, 10),
-      serialize: (value: unknown) => String(value),
-    },
-  }))
+  craftQueryParam('pagination', () =>
+    queryParam(
+      {
+        state: {
+          page: {
+            defaultValue: 1,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+          pageSize: {
+            defaultValue: 10,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+        },
+      },
+      ({ set }) => ({ set })
+    )
+  )
 );
 
-describe('craftQueryParams integration', () => {
+describe('craftQueryParam integration', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideRouter([{ path: 'test', component: TestComponent }])],
@@ -260,7 +285,7 @@ describe('craftQueryParams integration', () => {
         pageSize: 10,
       });
 
-      store.setPaginationQueryParams({ page: 3, pageSize: 15 });
+      store.setPagination({ page: 3, pageSize: 15 });
 
       await harness.fixture.whenStable();
 
@@ -271,7 +296,7 @@ describe('craftQueryParams integration', () => {
   });
 });
 
-describe('craftQueryParams standalone methods', () => {
+describe('craftQueryParam standalone methods', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideRouter([{ path: 'test', component: TestComponent }])],
@@ -284,20 +309,24 @@ describe('craftQueryParams standalone methods', () => {
         providedIn: 'root',
         name: '',
       },
-      craftQueryParams('pagination', () => ({
-        page: {
-          defaultValue: 1,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-        pageSize: {
-          defaultValue: 10,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-      }))
+      craftQueryParam('pagination', () =>
+        queryParam({
+          state: {
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              defaultValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+          },
+        })
+      )
     );
-    console.log('setPaginationQueryParams', setPaginationQueryParams);
+
     await TestBed.runInInjectionContext(async () => {
       const router = inject(Router);
       const location = inject(Location);
@@ -325,18 +354,22 @@ describe('craftQueryParams standalone methods', () => {
         providedIn: 'root',
         name: '',
       },
-      craftQueryParams('pagination', () => ({
-        page: {
-          defaultValue: 1,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-        pageSize: {
-          defaultValue: 10,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-      }))
+      craftQueryParam('pagination', () =>
+        queryParam({
+          state: {
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              defaultValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+          },
+        })
+      )
     );
     await TestBed.runInInjectionContext(async () => {
       const router = inject(Router);

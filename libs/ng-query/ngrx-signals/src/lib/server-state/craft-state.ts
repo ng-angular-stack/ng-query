@@ -12,17 +12,7 @@ import { UnionToTuple } from '../types/util.type';
 import { ExtractSignalPropsAndMethods } from './util/extract-signal-props-and-methods';
 import { isSignal, Signal } from '@angular/core';
 import { capitalize } from './util/util';
-
-// Helper type to defer evaluation and avoid infinite recursion
-type DeferredExtract<Insertions> = UnionToTuple<
-  keyof Insertions
-> extends infer Keys
-  ? ExtractSignalPropsAndMethods<
-      Insertions,
-      Keys,
-      { props: {}; methods: Record<string, Function> }
-    >
-  : never;
+import { DeferredExtract } from './util/util.type';
 
 type SpecificCraftStateOutputs<
   StateName extends string,

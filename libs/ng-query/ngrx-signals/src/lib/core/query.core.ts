@@ -18,7 +18,12 @@ import {
   createNestedStateUpdate,
 } from './update-state.util';
 import { MergeObjects } from '../types/util.type';
-import { QueryParamNavigationOptions } from '../server-state/craft-query-params';
+export interface QueryParamNavigationOptions {
+  queryParamsHandling?: 'merge' | 'preserve' | '';
+  onSameUrlNavigation?: 'reload' | 'ignore';
+  replaceUrl?: boolean;
+  skipLocationChange?: boolean;
+}
 
 type UpdateData<
   QueryAndMutationRecord extends QueryAndMutationRecordConstraints

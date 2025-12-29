@@ -30,7 +30,7 @@ export type QueryParamsToState<QueryParamConfigs> = {
 };
 
 export type QueryParamsOutput<QueryParamsType, Insertions, QueryParamsState> =
-  Signal<QueryParamsToState<QueryParamsType>> &
+  Signal<QueryParamsState> &
     MergeObjects<
       [
         {
@@ -39,7 +39,10 @@ export type QueryParamsOutput<QueryParamsType, Insertions, QueryParamsState> =
         QueryParamMethods<QueryParamsState>,
         IsEmptyObject<Insertions> extends true
           ? {}
-          : FilterReadonlySource<Insertions>
+          : FilterReadonlySource<Insertions>,
+        {
+          _config: QueryParamsType;
+        }
       ]
     >;
 
@@ -49,7 +52,7 @@ export interface QueryParamConfig<T = unknown> {
   serialize: (value: NoInfer<T>) => string;
 }
 
-export function queryParams<
+export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   QueryParamsState = Prettify<QueryParamsToState<QueryParamsType>>
 >(
@@ -57,7 +60,7 @@ export function queryParams<
     state: QueryParamsType;
   } & QueryParamNavigationOptions
 ): QueryParamsOutput<QueryParamsType, {}, QueryParamsState>;
-export function queryParams<
+export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   Insertion1,
   QueryParamsState = Prettify<QueryParamsToState<QueryParamsType>>
@@ -69,7 +72,7 @@ export function queryParams<
     Insertion1
   >
 ): QueryParamsOutput<QueryParamsType, Insertion1, QueryParamsState>;
-export function queryParams<
+export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   Insertion1,
   Insertion2,
@@ -92,7 +95,7 @@ export function queryParams<
   Insertion1 & Insertion2,
   QueryParamsState
 >;
-export function queryParams<
+export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   Insertion1,
   Insertion2,
@@ -122,14 +125,23 @@ export function queryParams<
   Insertion1 & Insertion2 & Insertion3,
   QueryParamsState
 >;
-export function queryParams<
+/**
+ * If it is not called in an injection context, it returns the config under _config.
+ */
+export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   QueryParamsState = Prettify<QueryParamsToState<QueryParamsType>>
 >(
   config: { state: QueryParamsType } & QueryParamNavigationOptions,
   ...insertions: any[]
 ): QueryParamsOutput<QueryParamsType, {}, QueryParamsState> {
-  assertInInjectionContext(queryParams);
+  try {
+    assertInInjectionContext(queryParam);
+  } catch (e) {
+    return {
+      _config: config,
+    } as any;
+  }
 
   const router = inject(Router);
   const activatedRoute = inject(ActivatedRoute);
@@ -240,10 +252,7 @@ export function queryParams<
       };
     }, {} as Record<string, unknown>) || {};
 
-  return Object.assign(
-    queryParamsState,
-    props,
-    methods,
-    insertionResults
-  ) as unknown as QueryParamsOutput<QueryParamsType, {}, QueryParamsState>;
+  return Object.assign(queryParamsState, props, methods, insertionResults, {
+    _config: config,
+  }) as unknown as QueryParamsOutput<QueryParamsType, {}, QueryParamsState>;
 }

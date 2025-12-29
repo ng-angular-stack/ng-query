@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { craft } from './craft';
-import { craftQueryParams } from './craft-query-params';
+import { craftQueryParams } from './craft-query-param';
 import { craftSetAllQueriesParamsStandalone } from './craft-set-all-queries-params-standalone';
 import { Prettify } from '@ngrx/signals';
 

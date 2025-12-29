@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { queryParams } from './query-params';
+import { queryParam } from './query-param';
 import { provideRouter } from '@angular/router';
 import { source } from './source';
 import { afterRecomputation } from './after-recomputation';
@@ -13,7 +13,7 @@ describe('queryParams', () => {
 
   it('should create a query params', () => {
     TestBed.runInInjectionContext(() => {
-      const myQueryParams = queryParams({
+      const myQueryParams = queryParam({
         state: {
           page: {
             defaultValue: 1,
@@ -27,14 +27,13 @@ describe('queryParams', () => {
           },
         },
       });
-
       expect(myQueryParams).toBeDefined();
     });
   });
 
   it('should create a query params and expose state and basic methods (set, update, patch)', () => {
     TestBed.runInInjectionContext(() => {
-      const myQueryParams = queryParams({
+      const myQueryParams = queryParam({
         state: {
           page: {
             defaultValue: 1,
@@ -83,7 +82,7 @@ describe('queryParams', () => {
 
   it('should create a query params and methods', () => {
     TestBed.runInInjectionContext(() => {
-      const myQueryParams = queryParams(
+      const myQueryParams = queryParam(
         {
           state: {
             page: {
@@ -116,7 +115,7 @@ describe('queryParams', () => {
 
   it('should expose basic methods in insertions', () => {
     TestBed.runInInjectionContext(() => {
-      const myQueryParams = queryParams(
+      const myQueryParams = queryParam(
         {
           state: {
             page: {
@@ -180,7 +179,7 @@ describe('queryParams', () => {
 
   it('should accept options and not loosing insertions inference', () => {
     TestBed.runInInjectionContext(() => {
-      const myQueryParams = queryParams(
+      const myQueryParams = queryParam(
         {
           state: {
             page: {
@@ -238,7 +237,7 @@ describe('queryParams', () => {
   it('should not expose methods bind to a source', () => {
     TestBed.runInInjectionContext(() => {
       const mySource = source<number>();
-      const myQueryParams = queryParams(
+      const myQueryParams = queryParam(
         {
           state: {
             page: {
