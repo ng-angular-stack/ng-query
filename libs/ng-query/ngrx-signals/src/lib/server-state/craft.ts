@@ -41,16 +41,6 @@ export type MutationDictionary = Record<
   }
 >;
 
-export type QueryDictionary = Record<
-  string,
-  {
-    queryRef:
-      | QueryRef<unknown, unknown, unknown>
-      | QueryByIdRef<string, unknown, unknown, unknown>;
-    __types: InternalType<unknown, unknown, unknown, boolean, unknown>;
-  }
->;
-
 // todo find a way to simplify that, props exposed everywhere, _props only in stores and __props only in current store ?
 // todo doc about cloudProxy (it store all standalones methods automatically)
 export type ContextConstraints = {
@@ -65,6 +55,7 @@ export type ContextConstraints = {
   _asyncMethods: {};
   _cloudProxy: {}; // A proxy that is used to share data between the injectable context and standalone outputs functions, composed store merge this proxy values
   _dependencies: {}; // todo implements composition alias and implements it
+  _error: {};
 };
 
 // ! do not expose it
@@ -80,6 +71,7 @@ type _EmptyContext = {
   _query: {};
   _cloudProxy: {};
   _dependencies: {};
+  _error: {};
 };
 
 export const EmptyContext = {
@@ -94,6 +86,7 @@ export const EmptyContext = {
   _query: {},
   _cloudProxy: {},
   _dependencies: {},
+  _error: {},
 };
 
 export type EmptyContext = typeof EmptyContext;
@@ -119,6 +112,7 @@ export function partialContext(
     _query: context._query ?? {},
     _cloudProxy: context._cloudProxy ?? {},
     _dependencies: context._dependencies ?? {},
+    _error: context._error ?? {},
   };
 }
 
@@ -144,6 +138,7 @@ export type PartialContext<Context extends Partial<ContextConstraints>> = {
   _dependencies: [unknown] extends Context['_dependencies']
     ? {}
     : Context['_dependencies'];
+  _error: [unknown] extends Context['_error'] ? {} : Context['_error'];
 };
 
 export type CloudProxy<T> = T;
@@ -349,6 +344,7 @@ type CraftCompositionOutput<
           context: Context;
         };
       };
+      _error: Context['_error'];
     },
     [StandaloneOutputs] extends [{}] ? StandaloneOutputs : {}
   >;
@@ -387,6 +383,7 @@ type ToCraftOutputs<
     MergedContext['_inputs'],
     IsNotFeature<StoreConfig['providedIn']>
   >,
+  HasError = keyof MergedContext['_error'] extends never ? false : true,
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
   HasMethods = keyof MethodsToConnect extends never ? false : true,
@@ -399,33 +396,34 @@ type ToCraftOutputs<
         RemoveIndexSignature<MergedContext['props'] & MergedContext['methods']>,
         NonNullable<StoreConfig['implements']>
       >
-> = (RespectContract extends true
-  ? InjectCraftOutput<
-      MergedContext,
-      StoreConfig,
-      HasInputs,
-      InputsToPlugin,
-      HasMethods,
-      MethodsToConnect
-    > &
-      CraftCompositionOutput<
+> = (HasError extends false
+  ? RespectContract extends true
+    ? InjectCraftOutput<
         MergedContext,
         StoreConfig,
         HasInputs,
         InputsToPlugin,
         HasMethods,
-        StandaloneOutputs,
         MethodsToConnect
       > &
-      CraftToken<MergedContext, StoreConfig> &
-      StandaloneOutputs
+        CraftCompositionOutput<
+          MergedContext,
+          StoreConfig,
+          HasInputs,
+          InputsToPlugin,
+          HasMethods,
+          StandaloneOutputs,
+          MethodsToConnect
+        > &
+        CraftToken<MergedContext, StoreConfig> &
+        StandaloneOutputs
+    : {
+        error: NonNullable<StoreConfig['implements']> extends Function
+          ? 'Contract Implementation Error: The current contract is not called properly. Did you forget to call it as a function? i.e., contract<...>()'
+          : 'Contract Implementation Error: The current contract is not respected.';
+      }
   : {
-      testContract: NonNullable<StoreConfig['implements']> extends Function
-        ? true
-        : false;
-      error: NonNullable<StoreConfig['implements']> extends Function
-        ? 'Contract Implementation Error: The current contract is not called properly. Did you forget to call it as a function? i.e., contract<...>()'
-        : 'Contract Implementation Error: The current contract is not respected.';
+      error: MergedContext['_error'];
     }) &
   META_CONTEXT<MergedContext, StoreConfig>;
 
@@ -494,9 +492,11 @@ export type MergeTwoContexts<
   _asyncMethods: A['_asyncMethods'] & B['_asyncMethods'];
   _cloudProxy: A['_cloudProxy'] & B['_cloudProxy'];
   _dependencies: A['_dependencies'] & B['_dependencies'];
+  _error: A['_error'] & B['_error'];
 };
 
 type StandaloneOutputsConstraints = {};
+
 export function craft<
   outputs1 extends ContextConstraints,
   outputs2 extends ContextConstraints,
@@ -982,6 +982,10 @@ function mergeContextAndProps({
             ...acc.context._dependencies,
             ...result._dependencies,
           },
+          _error: {
+            ...acc.context._error,
+            ...result._error,
+          },
         },
         propsAndMethods: {
           ...acc.propsAndMethods,
@@ -1003,6 +1007,7 @@ function mergeContextAndProps({
         _asyncMethods: {},
         _cloudProxy: {},
         _dependencies: {},
+        _error: {},
       } as _EmptyContext,
       propsAndMethods: {},
     } as {

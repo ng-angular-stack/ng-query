@@ -13,7 +13,7 @@ import { capitalize } from './util/util';
 import { QueryParamConfig, QueryParamsOutput } from './query-param';
 import { DeferredExtract } from './util/util.type';
 
-export type SpecificCraftQueryParamsOutputs<
+export type SpecificCraftQueryParamOutputs<
   QueryParamsName extends string,
   QueryParamsType,
   Insertions,
@@ -45,7 +45,7 @@ export type SpecificCraftQueryParamsOutputs<
     : never
   : never;
 
-type SpecificCraftQueryStandaloneOutputs<
+type SpecificCraftQueryParamStandaloneOutputs<
   QueryParamsName extends string,
   QueryParamsType,
   Insertions,
@@ -60,7 +60,7 @@ type SpecificCraftQueryStandaloneOutputs<
   ) => T;
 };
 
-type CraftQueryParamsOutputs<
+type CraftQueryParamOutputs<
   Context extends ContextConstraints,
   StoreConfig extends StoreConfigConstraints,
   QueryParamsName extends string,
@@ -70,13 +70,13 @@ type CraftQueryParamsOutputs<
 > = CraftFactoryUtility<
   Context,
   StoreConfig,
-  SpecificCraftQueryParamsOutputs<
+  SpecificCraftQueryParamOutputs<
     QueryParamsName,
     QueryParamsType,
     Insertions,
     QueryParamsState
   >,
-  SpecificCraftQueryStandaloneOutputs<
+  SpecificCraftQueryParamStandaloneOutputs<
     QueryParamsName,
     QueryParamsType,
     Insertions,
@@ -153,7 +153,7 @@ export function craftQueryParam<
   queryParamFactory: (
     context: CraftFactoryEntries<Context>
   ) => QueryParamsOutput<QueryParamsType, Insertions, QueryParamsState>
-): CraftQueryParamsOutputs<
+): CraftQueryParamOutputs<
   Context,
   StoreConfig,
   QueryParamsName,
@@ -198,7 +198,7 @@ export function craftQueryParam<
         },
       },
       methods,
-    }) as SpecificCraftQueryParamsOutputs<
+    }) as SpecificCraftQueryParamOutputs<
       QueryParamsName,
       QueryParamsType,
       Insertions,
@@ -227,7 +227,7 @@ export function craftQueryParam<
     return Object.assign(context, {
       [setCurrentQueryParamsKey]: setCurrentQueryParams,
     });
-  }) as unknown as CraftQueryParamsOutputs<
+  }) as unknown as CraftQueryParamOutputs<
     Context,
     StoreConfig,
     QueryParamsName,
