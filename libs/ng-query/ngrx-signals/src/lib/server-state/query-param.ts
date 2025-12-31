@@ -29,7 +29,7 @@ export type QueryParamsToState<QueryParamConfigs> = {
   >;
 };
 
-export type QueryParamsOutput<QueryParamsType, Insertions, QueryParamsState> =
+export type QueryParamOutput<QueryParamsType, Insertions, QueryParamsState> =
   Signal<QueryParamsState> &
     MergeObjects<
       [
@@ -59,7 +59,7 @@ export function queryParam<
   config: {
     state: QueryParamsType;
   } & QueryParamNavigationOptions
-): QueryParamsOutput<QueryParamsType, {}, QueryParamsState>;
+): QueryParamOutput<QueryParamsType, {}, QueryParamsState>;
 export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   Insertion1,
@@ -71,7 +71,7 @@ export function queryParam<
     NoInfer<QueryParamsType>,
     Insertion1
   >
-): QueryParamsOutput<QueryParamsType, Insertion1, QueryParamsState>;
+): QueryParamOutput<QueryParamsType, Insertion1, QueryParamsState>;
 export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   Insertion1,
@@ -90,11 +90,7 @@ export function queryParam<
     Insertion2,
     Insertion1
   >
-): QueryParamsOutput<
-  QueryParamsType,
-  Insertion1 & Insertion2,
-  QueryParamsState
->;
+): QueryParamOutput<QueryParamsType, Insertion1 & Insertion2, QueryParamsState>;
 export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   Insertion1,
@@ -120,7 +116,7 @@ export function queryParam<
     Insertion3,
     Insertion1 & Insertion2
   >
-): QueryParamsOutput<
+): QueryParamOutput<
   QueryParamsType,
   Insertion1 & Insertion2 & Insertion3,
   QueryParamsState
@@ -134,7 +130,7 @@ export function queryParam<
 >(
   config: { state: QueryParamsType } & QueryParamNavigationOptions,
   ...insertions: any[]
-): QueryParamsOutput<QueryParamsType, {}, QueryParamsState> {
+): QueryParamOutput<QueryParamsType, {}, QueryParamsState> {
   try {
     assertInInjectionContext(queryParam);
   } catch (e) {
@@ -254,5 +250,5 @@ export function queryParam<
 
   return Object.assign(queryParamsState, props, methods, insertionResults, {
     _config: config,
-  }) as unknown as QueryParamsOutput<QueryParamsType, {}, QueryParamsState>;
+  }) as unknown as QueryParamOutput<QueryParamsType, {}, QueryParamsState>;
 }

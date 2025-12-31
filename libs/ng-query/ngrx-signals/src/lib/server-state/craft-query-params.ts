@@ -11,7 +11,7 @@ import {
   StoreConfigConstraints,
 } from './craft';
 import { capitalize } from './util/util';
-import { QueryParamConfig, QueryParamsOutput } from './query-param';
+import { QueryParamConfig, QueryParamOutput } from './query-param';
 import { UnionToTuple } from '../types/util.type';
 import { SpecificCraftQueryParamOutputs } from './craft-query-param';
 
@@ -22,7 +22,7 @@ type ToSpecificCraftQueryParamsOutputs<
   StoreConfig extends StoreConfigConstraints
 > = QueryParamKeysTuple extends [infer Head, ...infer Tail]
   ? Head extends keyof QueryParams
-    ? QueryParams[Head] extends QueryParamsOutput<
+    ? QueryParams[Head] extends QueryParamOutput<
         infer QueryParamsType,
         infer Insertions,
         infer QueryParamsState
@@ -68,7 +68,7 @@ type SpecificCraftQueryStandaloneOutputs<
 > = {
   [K in QueryParamKeys as `set${Capitalize<
     K & string
-  >}QueryParams`]: QueryParams[K] extends QueryParamsOutput<
+  >}QueryParams`]: QueryParams[K] extends QueryParamOutput<
     unknown,
     unknown,
     infer QueryParamsState
@@ -109,17 +109,36 @@ export function craftQueryParams<
     _storeConfig: StoreConfig,
     _cloudProxy: Context['_cloudProxy']
   ) => {
-    const queryParamState = queryParamFactory(craftFactoryEntries(contextData));
+    const queryParamStates = queryParamFactory(
+      craftFactoryEntries(contextData)
+    );
 
-    const { props, methods } = Object.entries(queryParamState).reduce(
-      (acc, [key, value]) => {
-        if (isSignal(value)) {
-          (acc.props as Record<string, Signal<any>>)[capitalize(key)] = value;
-        } else {
-          (acc.methods as Record<string, Function>)[
-            `${queryParamsName}${capitalize(key)}`
-          ] = value;
-        }
+    const { props, methods } = Object.entries(queryParamStates).reduce(
+      (acc, [key, queryParam]) => {
+        const { props, methods } = Object.entries(
+          queryParam as QueryParamOutput<unknown, unknown, unknown>
+        ).reduce(
+          (acc, [queryParamKey, queryParamValue]) => {
+            if (isSignal(queryParamValue)) {
+              (acc.props as Record<string, Signal<any>>)[
+                capitalize(queryParamKey)
+              ] = queryParamValue;
+            } else {
+              (acc.methods as Record<string, Function>)[
+                `${key}${capitalize(queryParamKey)}`
+              ] = queryParamValue as Function;
+            }
+            return acc;
+          },
+          {} as {
+            props: Record<string, Signal<any>>;
+            methods: Record<string, Function>;
+          }
+        );
+
+        Object.assign(acc.props, props);
+        Object.assign(acc.methods, methods);
+
         return acc;
       },
       {} as {
@@ -129,10 +148,7 @@ export function craftQueryParams<
     );
 
     return partialContext({
-      props: {
-        ...props,
-        [`${queryParamsName}`]: queryParamState,
-      },
+      props: props,
       _queryParams: {
         [`${queryParamsName}`]: {
           config: queryParamState,

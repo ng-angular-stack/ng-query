@@ -10,7 +10,7 @@ import {
   StoreConfigConstraints,
 } from './craft';
 import { capitalize } from './util/util';
-import { QueryParamConfig, QueryParamsOutput } from './query-param';
+import { QueryParamConfig, QueryParamOutput } from './query-param';
 import { DeferredExtract } from './util/util.type';
 
 export type SpecificCraftQueryParamOutputs<
@@ -152,7 +152,7 @@ export function craftQueryParam<
   queryParamsName: QueryParamsName,
   queryParamFactory: (
     context: CraftFactoryEntries<Context>
-  ) => QueryParamsOutput<QueryParamsType, Insertions, QueryParamsState>
+  ) => QueryParamOutput<QueryParamsType, Insertions, QueryParamsState>
 ): CraftQueryParamOutputs<
   Context,
   StoreConfig,
