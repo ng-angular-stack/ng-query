@@ -109,3 +109,9 @@ export type DeferredExtract<Insertions> = UnionToTuple<
       { props: {}; methods: Record<string, Function> }
     >
   : never;
+
+export type HasKeys<T> = T extends object
+  ? keyof T extends never
+    ? false
+    : true
+  : false;
