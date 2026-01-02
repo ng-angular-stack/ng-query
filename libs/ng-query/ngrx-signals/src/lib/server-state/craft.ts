@@ -1,6 +1,5 @@
 import { Prettify } from '@ngrx/signals';
 import { __InternalSharedMutationConfig, MutationRef } from '../with-mutation';
-import { QueryRef } from '../with-query';
 import {
   InternalType,
   MergeObject,
@@ -8,7 +7,6 @@ import {
   UnionToTuple,
 } from '../types/util.type';
 import { MutationByIdRef } from '../with-mutation-by-id';
-import { QueryByIdRef } from '../with-query-by-id';
 import {
   assertInInjectionContext,
   effect,
@@ -21,6 +19,7 @@ import {
 import { createSignalProxy, SignalProxy } from '../signal-proxy';
 import {
   ExcludeCommonKeys,
+  HasKeys,
   RemoveIndexSignature,
   ReplaceStoreConfigToken,
   ToConnectableMethodFromInject,
@@ -383,7 +382,7 @@ type ToCraftOutputs<
     MergedContext['_inputs'],
     IsNotFeature<StoreConfig['providedIn']>
   >,
-  HasError = keyof MergedContext['_error'] extends never ? false : true,
+  HasError = HasKeys<MergedContext['_error']>,
   HasInputs = keyof InputsToPlugin extends never ? false : true,
   MethodsToConnect = ToConnectableMethodFromInject<MergedContext['methods']>,
   HasMethods = keyof MethodsToConnect extends never ? false : true,
@@ -682,7 +681,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
-    implements?: NoInfer<ToImplementContract>;
+    implements?: unknown;
   }
 >;
 export function craft(
