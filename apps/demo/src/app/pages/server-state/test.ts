@@ -1,45 +1,61 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   craft,
-  craftInject,
-  craftQuery,
-  craftState,
-  insertLocalStoragePersister,
-  query,
-  state,
+  craftQueryParam,
+  craftQueryParams,
+  queryParam,
 } from '@ng-query/ngrx-signals';
-import { ApiService } from './api.service';
-
-const { injectTestPersisterCraft } = craft(
+const { injectMyStoreCraft } = craft(
   {
-    name: 'testPersister',
+    name: 'MyStore',
     providedIn: 'root',
   },
-  craftInject(() => ({ ApiService })),
-  craftQuery('users', ({ apiService, INSERT_CONFIG }) =>
-    query(
+  craftQueryParam('search', () =>
+    queryParam(
       {
-        params: () => '1',
-        // identifier: (params: string) => params,
-        loader: async ({ params }) =>
-          apiService.getDataList({ page: +params, pageSize: 10 }),
+        state: {
+          search: {
+            defaultValue: '',
+            parse: (value: string) => value,
+            serialize: (value: unknown) => String(value),
+          },
+        },
       },
-      insertLocalStoragePersister(INSERT_CONFIG)
+      ({ set, reset }) => ({ set, reset })
     )
   ),
-  // craftState(
-  //   'counter',
-  //   () => signal(0),
-  //   ({ state }) => ({
-  //     increment: (by: number) => state() + by,
-  //   })
-  // )
-  craftState('counter', () =>
-    state(signal(0), ({ state }) => ({
-      increment: (by: number) => state() + by,
-    }))
-  )
+  craftQueryParams(() => ({
+    pagination: queryParam(
+      {
+        state: {
+          page: {
+            defaultValue: 1,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+          pageSize: {
+            defaultValue: 10,
+            parse: (value: string) => parseInt(value, 10),
+            serialize: (value: unknown) => String(value),
+          },
+        },
+      },
+      ({ set, reset }) => ({ set, reset })
+    ),
+    active: queryParam(
+      {
+        state: {
+          isActive: {
+            defaultValue: false,
+            parse: (value: string) => value === 'true',
+            serialize: (value: unknown) => String(value),
+          },
+        },
+      },
+      ({ set }) => ({ set })
+    ),
+  }))
 );
 
 @Component({
@@ -47,15 +63,30 @@ const { injectTestPersisterCraft } = craft(
   standalone: true,
   imports: [CommonModule],
   template: `
-    status: {{ store.users.status() }}
-    <pre>{{ store.users.value() | json }}</pre>
-    <!-- status: {{ store.users.select('1')?.status() }}
-    <pre>{{ store.users.select('1')?.value() | json }}</pre> -->
+    <div>
+      <h2>Test Component</h2>
+      <p>Page: {{ store.pagination().page }}</p>
+      <p>Page Size: {{ store.pagination().pageSize }}</p>
+      <p>Is Active: {{ store.active().isActive }}</p>
+      <p>Search: {{ store.search().search }}</p>
+    </div>
+    <button
+      (click)="
+        store.setPagination({
+          page: store.pagination().page + 1,
+          pageSize: store.pagination().pageSize
+        })
+      "
+    >
+      Next Page
+    </button>
+    <button (click)="store.resetPagination()">Reset</button>
   `,
 })
 export default class TestComponent {
-  protected readonly store = injectTestPersisterCraft();
+  store = injectMyStoreCraft();
+
   constructor() {
-    console.log('this.store', this.store);
+    console.log('store', this.store);
   }
 }

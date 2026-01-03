@@ -180,7 +180,7 @@ export function craftQueryParam<
         }
         return acc;
       },
-      {} as {
+      { props: {}, methods: {} } as {
         props: Record<string, Signal<any>>;
         methods: Record<string, Function>;
       }
@@ -211,23 +211,23 @@ export function craftQueryParam<
     queryParamFactory({}) as unknown as { _config: QueryParamsType }
   )._config as QueryParamsType;
 
-  return (() => {
-    const setCurrentQueryParams = (
-      params: Partial<{
-        [K in keyof QueryParamsState]: QueryParamsState[K];
-      }>
-    ) =>
-      serializeQueryParams(
-        params,
-        queryParamsConfig as Record<string, QueryParamConfig<unknown>>
-      );
-    const setCurrentQueryParamsKey = `set${capitalize(
-      queryParamsName
-    )}QueryParams`;
-    return Object.assign(context, {
+  const setCurrentQueryParams = (
+    params: Partial<{
+      [K in keyof QueryParamsState]: QueryParamsState[K];
+    }>
+  ) =>
+    serializeQueryParams(
+      params,
+      queryParamsConfig as Record<string, QueryParamConfig<unknown>>
+    );
+  const setCurrentQueryParamsKey = `set${capitalize(
+    queryParamsName
+  )}QueryParams`;
+
+  return (() =>
+    Object.assign(context, {
       [setCurrentQueryParamsKey]: setCurrentQueryParams,
-    });
-  }) as unknown as CraftQueryParamOutputs<
+    })) as unknown as CraftQueryParamOutputs<
     Context,
     StoreConfig,
     QueryParamsName,
@@ -237,7 +237,7 @@ export function craftQueryParam<
   >;
 }
 
-function serializeQueryParams<
+export function serializeQueryParams<
   QueryParamsState extends Record<string, unknown>,
   QueryParamsConfig extends Record<string, QueryParamConfig<unknown>>
 >(params: QueryParamsState, queryParamsConfig: QueryParamsConfig) {
@@ -260,7 +260,7 @@ function serializeQueryParams<
   });
 }
 
-function serializedQueryParamsObjectToString(
+export function serializedQueryParamsObjectToString(
   queryParamsObject: Record<string, unknown>
 ) {
   return Object.entries(queryParamsObject)

@@ -248,7 +248,7 @@ export function queryParam<
       };
     }, {} as Record<string, unknown>) || {};
 
-  return Object.assign(queryParamsState, props, methods, insertionResults, {
+  return Object.assign(queryParamsState.asReadonly(), props, insertionResults, {
     _config: config,
   }) as unknown as QueryParamOutput<QueryParamsType, {}, QueryParamsState>;
 }

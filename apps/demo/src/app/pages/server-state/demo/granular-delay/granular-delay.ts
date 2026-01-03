@@ -43,69 +43,69 @@ function cancellableTimeout(ms: number) {
 
 // suite: craftComputed/rename/inject/craftLocalGlobal
 
-const { injectGranularDeletionWithDelayCraft } = craft(
-  {
-    name: 'granularDeletionWithDelay',
-    providedIn: 'root',
-  },
-  craftInject(() => ({
-    ApiService,
-  })),
-  craftAsyncMethods(() => ({
-    delayDeleteWithUndo: asyncMethod({
-      method: (payload: { id: string; status: 'delete' | 'cancel' }) => payload,
-      identifier: ({ id }) => id,
-      loader: async ({ params: { id, status } }) => {
-        console.log('loader', id);
-        if (status === 'cancel') {
-          return { id, status };
-        }
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        return { id, status: 'confirm' as const };
-      },
-    }),
-  })),
-  craftMutations(({ apiService, delayDeleteWithUndo }) => ({
-    deleteItem: mutation({
-      fromResourceById: delayDeleteWithUndo._resourceById,
-      params: (delayDeleteWithUndoResource) => {
-        return delayDeleteWithUndoResource?.status() === 'resolved' &&
-          delayDeleteWithUndoResource?.value()?.status === 'confirm'
-          ? delayDeleteWithUndoResource?.value()?.id
-          : undefined;
-      },
-      identifier: (id) => id,
-      loader: ({ params: id }) => {
-        return apiService.deleteItem(id);
-      },
-    }),
-  })),
-  craftQuery(
-    'items',
-    ({ apiService }) =>
-      query({
-        params: () => ({ page: 1, pageSize: 10 }),
-        loader: ({ params: pagination }) => {
-          return apiService.getDataList(pagination);
-        },
-      }),
-    {
-      on: {
-        deleteItemMutation: {
-          filter: ({ queryResource, mutationIdentifier }) =>
-            queryResource.hasValue() &&
-            queryResource
-              .value()
-              .some((item) => item.id === mutationIdentifier),
-          update: ({ queryResource, mutationIdentifier }) =>
-            queryResource
-              .value()
-              .filter((item) => item.id !== mutationIdentifier),
-        },
-      },
-    }
-  )
-);
+// const { injectGranularDeletionWithDelayCraft } = craft(
+//   {
+//     name: 'granularDeletionWithDelay',
+//     providedIn: 'root',
+//   },
+//   craftInject(() => ({
+//     ApiService,
+//   })),
+//   craftAsyncMethods(() => ({
+//     delayDeleteWithUndo: asyncMethod({
+//       method: (payload: { id: string; status: 'delete' | 'cancel' }) => payload,
+//       identifier: ({ id }) => id,
+//       loader: async ({ params: { id, status } }) => {
+//         console.log('loader', id);
+//         if (status === 'cancel') {
+//           return { id, status };
+//         }
+//         await new Promise((resolve) => setTimeout(resolve, 3000));
+//         return { id, status: 'confirm' as const };
+//       },
+//     }),
+//   })),
+//   craftMutations(({ apiService, delayDeleteWithUndo }) => ({
+//     deleteItem: mutation({
+//       fromResourceById: delayDeleteWithUndo._resourceById,
+//       params: (delayDeleteWithUndoResource) => {
+//         return delayDeleteWithUndoResource?.status() === 'resolved' &&
+//           delayDeleteWithUndoResource?.value()?.status === 'confirm'
+//           ? delayDeleteWithUndoResource?.value()?.id
+//           : undefined;
+//       },
+//       identifier: (id) => id,
+//       loader: ({ params: id }) => {
+//         return apiService.deleteItem(id);
+//       },
+//     }),
+//   })),
+//   craftQuery(
+//     'items',
+//     ({ apiService }) =>
+//       query({
+//         params: () => ({ page: 1, pageSize: 10 }),
+//         loader: ({ params: pagination }) => {
+//           return apiService.getDataList(pagination);
+//         },
+//       }),
+//     {
+//       on: {
+//         deleteItemMutation: {
+//           filter: ({ queryResource, mutationIdentifier }) =>
+//             queryResource.hasValue() &&
+//             queryResource
+//               .value()
+//               .some((item) => item.id === mutationIdentifier),
+//           update: ({ queryResource, mutationIdentifier }) =>
+//             queryResource
+//               .value()
+//               .filter((item) => item.id !== mutationIdentifier),
+//         },
+//       },
+//     }
+//   )
+// );
 
 @Component({
   selector: 'app-granular-delay',
@@ -113,7 +113,7 @@ const { injectGranularDeletionWithDelayCraft } = craft(
   imports: [CommonModule, StatusComponent],
   styleUrl: './granular-delay.css',
   template: `
-    <div class="container">
+    <!-- <div class="container">
       <main class="content">
         <div class="content-wrapper">
           <div class="card">
@@ -184,9 +184,9 @@ const { injectGranularDeletionWithDelayCraft } = craft(
           </div>
         </div>
       </main>
-    </div>
+    </div> -->
   `,
 })
 export default class GranularDeletionWithDelayComponent {
-  protected readonly store = injectGranularDeletionWithDelayCraft();
+  // protected readonly store = injectGranularDeletionWithDelayCraft();
 }

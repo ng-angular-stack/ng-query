@@ -13,7 +13,10 @@ import {
 import { capitalize } from './util/util';
 import { QueryParamConfig, QueryParamOutput } from './query-param';
 import { UnionToTuple } from '../types/util.type';
-import { SpecificCraftQueryParamOutputs } from './craft-query-param';
+import {
+  serializeQueryParams,
+  SpecificCraftQueryParamOutputs,
+} from './craft-query-param';
 
 type ToSpecificCraftQueryParamsOutputs<
   QueryParamKeysTuple,
@@ -68,7 +71,7 @@ type SpecificCraftQueryStandaloneOutputs<
 > = {
   [K in QueryParamKeys as `set${Capitalize<
     K & string
-  >}QueryParams`]: QueryParams[K] extends QueryParamOutput<
+  >}QueryParam`]: QueryParams[K] extends QueryParamOutput<
     unknown,
     unknown,
     infer QueryParamsState
@@ -109,9 +112,12 @@ export function craftQueryParams<
     _storeConfig: StoreConfig,
     _cloudProxy: Context['_cloudProxy']
   ) => {
+    console.log('contextData', contextData);
     const queryParamStates = queryParamFactory(
       craftFactoryEntries(contextData)
     );
+
+    console.log('queryParamStates', queryParamStates);
 
     const { props, methods } = Object.entries(queryParamStates).reduce(
       (acc, [key, queryParam]) => {
@@ -121,16 +127,16 @@ export function craftQueryParams<
           (acc, [queryParamKey, queryParamValue]) => {
             if (isSignal(queryParamValue)) {
               (acc.props as Record<string, Signal<any>>)[
-                capitalize(queryParamKey)
+                `${key}${capitalize(queryParamKey)}`
               ] = queryParamValue;
             } else {
               (acc.methods as Record<string, Function>)[
-                `${key}${capitalize(queryParamKey)}`
+                `${queryParamKey}${capitalize(key)}`
               ] = queryParamValue as Function;
             }
             return acc;
           },
-          {} as {
+          { props: {}, methods: {} } as {
             props: Record<string, Signal<any>>;
             methods: Record<string, Function>;
           }
@@ -141,90 +147,60 @@ export function craftQueryParams<
 
         return acc;
       },
-      {} as {
+      { props: {}, methods: {} } as {
         props: Record<string, Signal<any>>;
         methods: Record<string, Function>;
       }
     );
 
+    console.log('methods', methods);
+
     return partialContext({
-      props: props,
-      _queryParams: {
-        [`${queryParamsName}`]: {
-          config: queryParamState,
-          state: queryParamState,
+      props: { ...props, ...queryParamStates },
+      _queryParams: Object.entries(queryParamStates).reduce(
+        (acc, [key, queryParam]) => {
+          acc[key] = {
+            config: queryParam,
+            state: queryParam,
+          };
+          return acc;
         },
-      },
+        {} as Record<string, { config: unknown; state: unknown }>
+      ),
       methods,
     }) as SpecificCraftQueryParamsOutputs<
-      QueryParamsName,
-      QueryParamsType,
-      Insertions,
-      QueryParamsState
+      QueryParamKeys,
+      QueryParams,
+      StoreConfig
     >;
   };
 
   // when queryParam is called outside the injection context, it will only return the config
-  const queryParamsConfig = (
-    queryParamFactory({}) as unknown as { _config: QueryParamsType }
-  )._config as QueryParamsType;
+  const queryParamsConfigs = queryParamFactory({});
 
-  return (() => {
-    const setCurrentQueryParams = (
-      params: Partial<{
-        [K in keyof QueryParamsState]: QueryParamsState[K];
-      }>
-    ) =>
-      serializeQueryParams(
-        params,
-        queryParamsConfig as Record<string, QueryParamConfig<unknown>>
-      );
-    const setCurrentQueryParamsKey = `set${capitalize(
-      queryParamsName
-    )}QueryParams`;
-    return Object.assign(context, {
-      [setCurrentQueryParamsKey]: setCurrentQueryParams,
-    });
-  }) as unknown as CraftQueryParamsOutputs<
-    Context,
-    StoreConfig,
-    QueryParamsName,
-    QueryParamsType,
-    Insertions,
-    QueryParamsState
-  >;
-}
-
-function serializeQueryParams<
-  QueryParamsState extends Record<string, unknown>,
-  QueryParamsConfig extends Record<string, QueryParamConfig<unknown>>
->(params: QueryParamsState, queryParamsConfig: QueryParamsConfig) {
-  const queryParamsObject = Object.entries(params).reduce(
-    (acc, [key, value]) => {
-      const paramConfig = queryParamsConfig[key];
-      if (paramConfig && value !== undefined) {
-        acc[key] = paramConfig.serialize(value);
-      }
+  const setQueryParams = Object.entries(queryParamsConfigs).reduce(
+    (acc, [key, queryParam]) => {
+      const setCurrentQueryParams = (params: Record<string, unknown>) =>
+        serializeQueryParams(
+          params,
+          (queryParam as QueryParamOutput<unknown, unknown, unknown>)
+            ._config as Record<string, QueryParamConfig<unknown>>
+        );
+      const setCurrentQueryParamsKey = `set${capitalize(key)}QueryParam`;
+      acc[setCurrentQueryParamsKey] = setCurrentQueryParams;
       return acc;
     },
-    {} as Record<string, string>
+    {} as Record<string, Function>
   );
 
-  return Object.defineProperty(queryParamsObject, 'toString', {
-    value() {
-      return serializedQueryParamsObjectToString(this);
-    },
-    enumerable: false, // 👈 ne s'affichera pas dans les clés
-  });
-}
-
-function serializedQueryParamsObjectToString(
-  queryParamsObject: Record<string, unknown>
-) {
-  return Object.entries(queryParamsObject)
-    .map(
-      ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`
-    )
-    .join('&');
+  return (() =>
+    Object.assign(
+      context,
+      setQueryParams
+    )) as unknown as CraftQueryParamsOutputs<
+    Context,
+    StoreConfig,
+    QueryParamKeys,
+    QueryParams
+  >;
 }
