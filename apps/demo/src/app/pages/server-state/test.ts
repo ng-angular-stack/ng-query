@@ -6,7 +6,7 @@ import {
   craftQueryParams,
   queryParam,
 } from '@ng-query/ngrx-signals';
-const { injectMyStoreCraft } = craft(
+const { injectMyStoreCraft, setPaginationQueryParam } = craft(
   {
     name: 'MyStore',
     providedIn: 'root',
@@ -81,10 +81,17 @@ const { injectMyStoreCraft } = craft(
       Next Page
     </button>
     <button (click)="store.resetPagination()">Reset</button>
+    <button (click)="setPaginationQueryParam()">setPaginationQueryParam</button>
   `,
 })
 export default class TestComponent {
   store = injectMyStoreCraft();
+  setPaginationQueryParam = () => {
+    const result = setPaginationQueryParam({
+      page: this.store.pagination().page + 1,
+      pageSize: this.store.pagination().pageSize,
+    });
+  };
 
   constructor() {
     console.log('store', this.store);

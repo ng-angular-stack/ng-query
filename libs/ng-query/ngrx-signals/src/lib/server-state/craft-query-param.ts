@@ -218,7 +218,7 @@ export function craftQueryParam<
   ) =>
     serializeQueryParams(
       params,
-      queryParamsConfig as Record<string, QueryParamConfig<unknown>>
+      queryParamsConfig as { state: Record<string, QueryParamConfig<unknown>> }
     );
   const setCurrentQueryParamsKey = `set${capitalize(
     queryParamsName
@@ -239,11 +239,11 @@ export function craftQueryParam<
 
 export function serializeQueryParams<
   QueryParamsState extends Record<string, unknown>,
-  QueryParamsConfig extends Record<string, QueryParamConfig<unknown>>
+  QueryParamsConfig extends { state: Record<string, QueryParamConfig<unknown>> }
 >(params: QueryParamsState, queryParamsConfig: QueryParamsConfig) {
   const queryParamsObject = Object.entries(params).reduce(
     (acc, [key, value]) => {
-      const paramConfig = queryParamsConfig[key];
+      const paramConfig = queryParamsConfig.state[key];
       if (paramConfig && value !== undefined) {
         acc[key] = paramConfig.serialize(value);
       }
@@ -252,12 +252,13 @@ export function serializeQueryParams<
     {} as Record<string, string>
   );
 
-  return Object.defineProperty(queryParamsObject, 'toString', {
+  const result = Object.defineProperty(queryParamsObject, 'toString', {
     value() {
       return serializedQueryParamsObjectToString(this);
     },
     enumerable: false, // 👈 ne s'affichera pas dans les clés
   });
+  return result;
 }
 
 export function serializedQueryParamsObjectToString(

@@ -176,12 +176,13 @@ export function craftQueryParams<
 
   const setQueryParams = Object.entries(queryParamsConfigs).reduce(
     (acc, [key, queryParam]) => {
-      const setCurrentQueryParams = (params: Record<string, unknown>) =>
-        serializeQueryParams(
+      const setCurrentQueryParams = (params: Record<string, unknown>) => {
+        return serializeQueryParams(
           params,
           (queryParam as QueryParamOutput<unknown, unknown, unknown>)
-            ._config as Record<string, QueryParamConfig<unknown>>
+            ._config as { state: Record<string, QueryParamConfig<unknown>> }
         );
+      };
       const setCurrentQueryParamsKey = `set${capitalize(key)}QueryParam`;
       acc[setCurrentQueryParamsKey] = setCurrentQueryParams;
       return acc;

@@ -2,8 +2,14 @@ import { craft } from './craft';
 import { queryParam, QueryParamNavigationOptions } from './query-param';
 import { TestBed } from '@angular/core/testing';
 import { craftQueryParams } from './craft-query-params';
+import { provideRouter } from '@angular/router';
 
 describe('craftQueryParams', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideRouter([])],
+    });
+  });
   it('should create craft query params with correct types and methods', () => {
     const { injectMyStoreCraft } = craft(
       {
@@ -133,6 +139,7 @@ describe('craftQueryParams', () => {
       page: number;
       pageSize: number;
     }>();
+    console.log('paginationQp test', paginationQp);
     expect(paginationQp).toEqual({ page: 3, pageSize: 30 });
     expect(`${setPaginationQueryParam({ page: 4, pageSize: 40 })}`).toBe(
       'page=4&pageSize=40'
