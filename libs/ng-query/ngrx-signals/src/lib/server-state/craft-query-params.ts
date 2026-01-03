@@ -117,8 +117,6 @@ export function craftQueryParams<
       craftFactoryEntries(contextData)
     );
 
-    console.log('queryParamStates', queryParamStates);
-
     const { props, methods } = Object.entries(queryParamStates).reduce(
       (acc, [key, queryParam]) => {
         const { props, methods } = Object.entries(
@@ -152,8 +150,6 @@ export function craftQueryParams<
         methods: Record<string, Function>;
       }
     );
-
-    console.log('methods', methods);
 
     return partialContext({
       props: { ...props, ...queryParamStates },
