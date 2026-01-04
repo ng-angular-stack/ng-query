@@ -1,3 +1,4 @@
+import { EffectRef } from '@angular/core';
 import { UnionToTuple } from '../../types/util.type';
 import { StoreConfigConstraints } from '../craft';
 import { Source } from '../source';
@@ -93,8 +94,8 @@ export type FilterMethodsBoundToSources<
     : FilterMethodsBoundToSources<Methods, Next, MethodPrefix, Acc>
   : Acc;
 
-export type FilterReadonlySource<Insertions> = {
-  [K in keyof Insertions as Insertions[K] extends ReadonlySource<any>
+export type FilterEffect<Insertions> = {
+  [K in keyof Insertions as Insertions[K] extends EffectRef
     ? never
     : K]: Insertions[K];
 };

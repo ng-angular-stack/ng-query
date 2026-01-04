@@ -172,10 +172,12 @@ export function craftQueryParam<
     const { props, methods } = Object.entries(queryParamState).reduce(
       (acc, [key, value]) => {
         if (isSignal(value)) {
-          (acc.props as Record<string, Signal<any>>)[capitalize(key)] = value;
+          (acc.props as Record<string, Signal<any>>)[
+            `${queryParamsName}${capitalize(key)}`
+          ] = value;
         } else {
           (acc.methods as Record<string, Function>)[
-            `${queryParamsName}${capitalize(key)}`
+            `${key}${capitalize(queryParamsName)}`
           ] = value;
         }
         return acc;
@@ -220,6 +222,7 @@ export function craftQueryParam<
       params,
       queryParamsConfig as { state: Record<string, QueryParamConfig<unknown>> }
     );
+
   const setCurrentQueryParamsKey = `set${capitalize(
     queryParamsName
   )}QueryParams`;

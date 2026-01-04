@@ -82,7 +82,9 @@ type SpecificCraftQueryStandaloneOutputs<
         }>
       >(
         params: T
-      ) => T
+      ) => {
+        [StateKey in keyof T]: string;
+      }
     : never;
 };
 

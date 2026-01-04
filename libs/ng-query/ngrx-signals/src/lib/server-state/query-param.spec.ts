@@ -33,20 +33,23 @@ describe('queryParams', () => {
 
   it('should create a query params and expose state and basic methods (set, update, patch)', () => {
     TestBed.runInInjectionContext(() => {
-      const myQueryParams = queryParam({
-        state: {
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-          pageSize: {
-            defaultValue: 10,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
+      const myQueryParams = queryParam(
+        {
+          state: {
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              defaultValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
           },
         },
-      });
+        ({ set, update, patch }) => ({ set, update, patch })
+      );
       expectTypeOf(myQueryParams()).toEqualTypeOf<{
         page: number;
         pageSize: number;
@@ -59,7 +62,7 @@ describe('queryParams', () => {
 
       expect(myQueryParams.page()).toBe(1);
       expect(myQueryParams.pageSize()).toBe(10);
-
+      console.log('myQueryParams', myQueryParams);
       myQueryParams.set({
         page: 2,
         pageSize: 20,

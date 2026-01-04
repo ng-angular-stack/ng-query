@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Component, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { craft } from './craft';
 import { craftQueryParam } from './craft-query-param';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
@@ -186,24 +186,26 @@ describe('craftQueryParam', () => {
               },
             },
           },
-          ({ set, state }) => ({
-            set,
-            nextPage: afterRecomputation(nextPage, (nextPage) => {
-              console.log('afterRecomputation nextPage', nextPage);
-              expectTypeOf(nextPage).toEqualTypeOf<{}>();
-              expectTypeOf(state()).toEqualTypeOf<{ page: number }>();
-              expect(state().page).toBe(2);
-              set({
-                ...state(),
-                page: state().page + 1,
-              });
-            }),
-          })
+          ({ set, state }) => {
+            return {
+              set,
+              nextPage: afterRecomputation(nextPage, (nextPage) => {
+                expectTypeOf(nextPage).toEqualTypeOf<{}>();
+                expectTypeOf(state()).toEqualTypeOf<{ page: number }>();
+                expect(state().page).toBe(2);
+                set({
+                  ...state(),
+                  page: state().page + 1,
+                });
+              }),
+            };
+          }
         )
       )
     );
     await TestBed.runInInjectionContext(async () => {
       const store = injectCraft();
+      await vi.runAllTimersAsync();
 
       expectTypeOf(store.pagination()).toEqualTypeOf<{ page: number }>();
       expect(store.pagination().page).toBe(1);
@@ -212,9 +214,8 @@ describe('craftQueryParam', () => {
       store.setPagination({ page: 2 });
       expect(store.paginationPage()).toBe(2);
       //@ts-expect-error nextPage is not exposed
-      expectTypeOf(store.nextPage).toEqualTypeOf<unknown>();
+      expectTypeOf(store.nextPage).toEqualTypeOf<any>();
       store.setNextPage({});
-      console.log('setNextPage');
       await vi.runAllTimersAsync();
       expect(store.paginationPage()).toBe(3);
     });

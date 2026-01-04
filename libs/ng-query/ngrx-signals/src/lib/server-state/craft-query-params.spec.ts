@@ -136,17 +136,17 @@ describe('craftQueryParams', () => {
 
     const paginationQp = setPaginationQueryParam({ page: 3, pageSize: 30 });
     expectTypeOf(paginationQp).toEqualTypeOf<{
-      page: number;
-      pageSize: number;
+      page: string;
+      pageSize: string;
     }>();
     console.log('paginationQp test', paginationQp);
-    expect(paginationQp).toEqual({ page: 3, pageSize: 30 });
+    expect(paginationQp).toEqual({ page: '3', pageSize: '30' });
     expect(`${setPaginationQueryParam({ page: 4, pageSize: 40 })}`).toBe(
       'page=4&pageSize=40'
     );
     const activeQp = setActiveQueryParam({ isActive: true });
-    expectTypeOf(activeQp).toEqualTypeOf<{ isActive: true }>();
-    expect(activeQp).toEqual({ isActive: true });
+    expectTypeOf(activeQp).toEqualTypeOf<{ isActive: string }>();
+    expect(activeQp).toEqual({ isActive: 'true' });
     expect(`${setActiveQueryParam({ isActive: false })}`).toBe(
       'isActive=false'
     );

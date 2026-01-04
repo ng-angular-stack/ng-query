@@ -12,7 +12,7 @@ import {
   QueryParamMethods,
 } from '../core/query.core';
 import { MergeObjects } from '../types/util.type';
-import { FilterReadonlySource, IsEmptyObject } from './util/util.type';
+import { FilterEffect, IsEmptyObject } from './util/util.type';
 import { Prettify } from '@ngrx/signals';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -37,9 +37,7 @@ export type QueryParamOutput<QueryParamsType, Insertions, QueryParamsState> =
           [K in keyof QueryParamsState]: Signal<QueryParamsState[K]>;
         },
         QueryParamMethods<QueryParamsState>,
-        IsEmptyObject<Insertions> extends true
-          ? {}
-          : FilterReadonlySource<Insertions>,
+        IsEmptyObject<Insertions> extends true ? {} : FilterEffect<Insertions>,
         {
           _config: QueryParamsType;
         }
@@ -237,14 +235,15 @@ export function queryParam<
         {}
       >[]
     )?.reduce((acc, insert) => {
+      const newInsertions = insert({
+        state: queryParamsState.asReadonly(),
+        config: queryParamsConfig,
+        ...methods,
+        insertions: acc as {},
+      } as InsertionQueryParamsFactoryContext<QueryParamsType, {}, QueryParamsState>);
       return {
         ...acc,
-        ...insert({
-          state: queryParamsState.asReadonly(),
-          config: queryParamsConfig,
-          ...methods,
-          insertions: acc as {},
-        } as InsertionQueryParamsFactoryContext<QueryParamsType, {}, QueryParamsState>),
+        ...newInsertions,
       };
     }, {} as Record<string, unknown>) || {};
 

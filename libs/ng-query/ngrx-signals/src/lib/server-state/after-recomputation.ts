@@ -1,12 +1,15 @@
+import { effect, EffectRef, untracked } from '@angular/core';
 import { Source } from './source';
-import { toSource } from './to-source';
-import { ReadonlySource } from './util/source.type';
 
 export function afterRecomputation<State, SourceType>(
   source: Source<SourceType>,
-  reducer: (source: SourceType) => State
-): ReadonlySource<State> {
-  return toSource(source, {
-    computed: (sourceValue) => reducer(sourceValue as SourceType),
-  }) as ReadonlySource<State>;
+  callback: (source: SourceType) => State
+): EffectRef {
+  const effectRef = effect(() => {
+    const sourceValue = source();
+    if (sourceValue !== undefined) {
+      untracked(() => callback(sourceValue));
+    }
+  });
+  return effectRef;
 }
