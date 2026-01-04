@@ -2,7 +2,6 @@ import { Expect, Equal } from 'test-type';
 import { inject, InjectionToken, ResourceRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { mutation } from '../mutation';
-import { craftMutation } from './craft-mutation';
 import { craft } from './craft';
 import { craftInputs } from './craft-inputs';
 

@@ -8,7 +8,7 @@ import {
   CloudProxySource,
 } from './craft';
 import { Prettify } from '@ngrx/signals';
-import { STORE_CONFIG_TOKEN } from './util/util.type';
+import { FlatRecord, STORE_CONFIG_TOKEN } from './util/util.type';
 import { capitalize } from './util/util';
 
 type InferQueryParamsState<T> = T extends WritableSignal<infer U> ? U : never;
@@ -26,7 +26,9 @@ type SpecificCraftSetAllQueriesParamsStandaloneOutputs<
     }
   >(
     params: Prettify<AllQueriesParamsState>
-  ) => AllQueriesParamsState;
+  ) => {
+    [K in keyof FlatRecord<AllQueriesParamsState>]: string;
+  };
 };
 
 type CraftSetAllQueriesParamsStandaloneOutputs<

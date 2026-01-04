@@ -6,6 +6,7 @@ import { craft } from './craft';
 import { ResourceByIdRef } from '../resource-by-id';
 import { craftMutations } from './craft-mutations';
 import { mutation } from './mutation';
+import { ReadonlySource } from './util/source.type';
 
 type User = {
   id: string;
@@ -60,6 +61,7 @@ describe('craftMutationById', () => {
         readonly status: Signal<ResourceStatus>;
         readonly isLoading: Signal<boolean>;
         hasValue: () => boolean;
+        source: ReadonlySource<string>;
       }>();
 
       expect(store.userById._resourceById).toBeDefined();

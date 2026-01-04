@@ -116,3 +116,5 @@ export type HasKeys<T> = T extends object
     ? false
     : true
   : false;
+
+export type FlatRecord<T> = T[keyof T];

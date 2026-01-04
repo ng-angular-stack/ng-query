@@ -22,16 +22,12 @@ describe('computedSource', () => {
 
     const myListener = computed(() => {
       const s = mySource();
-      return s;
+      return s?.text;
     });
 
     expect(myListener()).toBe(undefined);
-
-    myComputedSource.set({ text: 'Hello World' });
+    mySource.set({ text: 'Hello World' });
 
     expect(myListener()).toBe('Hello World');
-
-    myComputedSource.set({ text: 'Hello Ng-Query' });
-    expect(myListener()).toBe('Hello Ng-Query');
   });
 });

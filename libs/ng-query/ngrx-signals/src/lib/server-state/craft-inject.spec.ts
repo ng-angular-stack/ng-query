@@ -1,6 +1,6 @@
 import { craftQuery } from './craft-query';
 import { craft } from './craft';
-import { query } from '../query';
+import { query } from './query';
 import { Injectable, InjectionToken, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { craftInject } from './craft-inject';
@@ -46,9 +46,9 @@ describe('craftInject', () => {
       );
       const store = injectCraft();
 
-      expect(store.userQuery).toBeDefined();
+      expect(store.user).toBeDefined();
       await vi.runAllTimersAsync();
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.value()).toEqual({
         id: '1',
         name: 'John Doe',
         email: 'test@a.com',
@@ -93,9 +93,9 @@ describe('craftInject', () => {
       );
       const store = injectCraft();
 
-      expect(store.userQuery).toBeDefined();
+      expect(store.user).toBeDefined();
       await vi.runAllTimersAsync();
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.value()).toEqual({
         id: '1',
         name: 'John Doe',
         email: 'test@a.com',
@@ -134,9 +134,9 @@ describe('craftInject', () => {
       );
       const store = injectCraft();
 
-      expect(store.userQuery).toBeDefined();
+      expect(store.user).toBeDefined();
       await vi.runAllTimersAsync();
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.value()).toEqual({
         id: '1',
         name: 'John Doe',
         email: 'test@a.com',

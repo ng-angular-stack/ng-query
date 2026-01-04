@@ -1,15 +1,21 @@
-import { effect, EffectRef, untracked } from '@angular/core';
-import { Source } from './source';
+import { effect, EffectRef, signal, untracked } from '@angular/core';
+import { Source, source } from './source';
+import { ReadonlySource } from './util/source.type';
 
 export function afterRecomputation<State, SourceType>(
-  source: Source<SourceType>,
+  _source: Source<SourceType>,
   callback: (source: SourceType) => State
-): EffectRef {
+): EffectRef & ReadonlySource<State> {
+  const derivedSource = source<State>();
+  // todo faire un linkedSignal et el retourner ?
   const effectRef = effect(() => {
-    const sourceValue = source();
+    const sourceValue = _source();
     if (sourceValue !== undefined) {
-      untracked(() => callback(sourceValue));
+      untracked(() => {
+        const newState = callback(sourceValue);
+        derivedSource.set(newState);
+      });
     }
   });
-  return effectRef;
+  return Object.assign(effectRef, derivedSource);
 }
