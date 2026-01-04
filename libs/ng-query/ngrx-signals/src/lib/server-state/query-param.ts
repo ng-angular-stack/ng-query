@@ -4,7 +4,6 @@ import {
   inject,
   linkedSignal,
   Signal,
-  signal,
   WritableSignal,
 } from '@angular/core';
 import {
@@ -51,6 +50,84 @@ export interface QueryParamConfig<T = unknown> {
   serialize: (value: NoInfer<T>) => string;
 }
 
+/**
+ * Creates a reactive query parameter manager that synchronizes state with URL query parameters.
+ *
+ * This function manages query parameter state by:
+ * - Reading initial values from the URL or using default values
+ * - Parsing URL strings into typed values using the provided `parse` function
+ * - Serializing typed values back to strings for URL updates using the `serialize` function
+ * - Providing reactive signals for each query parameter
+ *
+ * @remarks
+ * **Important:** This function must be called within an injection context.
+ * If called outside an injection context, it will only return an object containing the configuration under `_config`.
+ *
+ * @param config - Configuration object containing:
+ *   - `state`: Record of query parameter configurations, each with `defaultValue`, `parse`, and `serialize`
+ *   - `queryParamsHandling` (optional): How to handle existing query params ('merge' | 'preserve' | '')
+ *   - `onSameUrlNavigation` (optional): Behavior on same URL navigation ('reload' | 'ignore')
+ *   - `replaceUrl` (optional): Whether to replace the URL in browser history
+ *   - `skipLocationChange` (optional): Whether to skip updating the browser's location
+ * @param insertions - Optional insertion functions to add custom methods, computed values or side effects to the query param manager.
+ *   Insertions receive context with `state`, `config`, `set`, `update`, `patch`, `reset` and previous insertions.
+ *   Methods bound to a source using `afterRecomputation` (effectRef-like) are not exposed in the output.
+ * @returns A signal that returns the current query parameter state, extended with:
+ *   - Individual signals for each query parameter (e.g., `queryParam.page()`)
+ *   - Custom methods from insertions (excluding methods bound to sources)
+ *   - `_config`: The original configuration
+ *
+ * @example
+ * Basic usage
+ * ```ts
+ * const myQueryParams = queryParam(
+ *   {
+ *     state: {
+ *       page: {
+ *         defaultValue: 1,
+ *         parse: (value) => parseInt(value, 10),
+ *         serialize: (value) => String(value),
+ *       },
+ *       pageSize: {
+ *         defaultValue: 10,
+ *         parse: (value) => parseInt(value, 10),
+ *         serialize: (value) => String(value),
+ *       },
+ *     },
+ *   },
+ *   ({ set, update, patch, reset }) => ({ set, update, patch, reset })
+ * );
+ *
+ * // Access state
+ * console.log(myQueryParams()); // { page: 1, pageSize: 10 }
+ * console.log(myQueryParams.page()); // 1
+ *
+ * // Update state (also updates URL)
+ * myQueryParams.set({ page: 2, pageSize: 20 });
+ * myQueryParams.update(current => ({ ...current, page: current.page + 1 }));
+ * myQueryParams.patch({ pageSize: 50 });
+ * myQueryParams.reset();
+ * ```
+ *
+ * @example
+ * With custom methods via insertions
+ * ```ts
+ * const myQueryParams = queryParam(
+ *   {
+ *     state: {
+ *       page: { defaultValue: 1, parse: parseInt, serialize: String },
+ *     },
+ *   },
+ *   ({ state, set }) => ({
+ *     goTo: (newPage: number) => {
+ *       set({ ...state(), page: newPage });
+ *     },
+ *   })
+ * );
+ *
+ * myQueryParams.goTo(5); // Custom method from insertion
+ * ```
+ */
 export function queryParam<
   QueryParamsType extends Record<string, QueryParamConfig<unknown>>,
   QueryParamsState = Prettify<QueryParamsToState<QueryParamsType>>
@@ -121,6 +198,7 @@ export function queryParam<
   QueryParamsState
 >;
 /**
+ *
  * If it is not called in an injection context, it returns the config under _config.
  */
 export function queryParam<

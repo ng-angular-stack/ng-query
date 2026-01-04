@@ -85,47 +85,72 @@ type CraftQueryParamOutputs<
 >;
 
 /**
- * Used to manage query parameters in the URL as part of the server state.
- * When initialized, it reads the specified query parameters from the URL,
- * applying parsing functions and default values as needed.
- * It provides signals to access the current values of the query parameters
- * and methods to update them, which will also update the URL accordingly.
+ * Creates a craft factory for reactive query parameter management integrated with the craft store.
  *
- * Warning: Please, be careful to avoid query params key collisions. (There is no verification yet)
+ * This function integrates query parameter management into a craft store by:
+ * - Creating typed signals for each query parameter prefixed with the provided name
+ * - Exposing methods to update query parameters
+ * - Providing a standalone method to serialize query params for navigation outside injection context
+ * - Synchronizing with URL query parameters automatically
+ *
+ * @remarks
+ * **Important:** The `queryParamFactory` function must return a `queryParam()` call.
+ * Since `queryParam()` requires an injection context, `craftQueryParam` handles this by:
+ * - Calling the factory within an injection context to create the reactive query param manager
+ * - Calling the factory outside injection context to extract the configuration for standalone methods
+ *
+ * **Warning:** Be careful to avoid query params key collisions. (There is no verification yet)
+ *
+ * @param queryParamsName - Name used to prefix generated signals and methods
+ * @param queryParamFactory - Factory function that receives craft context and returns a QueryParamOutput
+ * @returns A craft factory function with standalone methods for serializing query params
  *
  * @example
+ * Basic usage with craft
  * ```ts
  * const { injectCraft, setPaginationQueryParams } = craft(
- *   craftQueryParams('pagination', () => ({
- *     page: {
- *       defaultValue: 1,
- *       parse: (value: string) => parseInt(value, 10),
- *       serialize: (value: unknown) => String(value),
- *     },
- *     pageSize: {
- *       defaultValue: 10,
- *       parse: (value: string) => parseInt(value, 10),
- *       serialize: (value: unknown) => String(value),
- *     },
- *   }))
+ *   {
+ *     providedIn: 'root',
+ *     name: 'myStore',
+ *   },
+ *   craftQueryParam('pagination', () =>
+ *     queryParam({
+ *       state: {
+ *         page: {
+ *           defaultValue: 1,
+ *           parse: (value: string) => parseInt(value, 10),
+ *           serialize: (value: unknown) => String(value),
+ *         },
+ *         pageSize: {
+ *           defaultValue: 10,
+ *           parse: (value: string) => parseInt(value, 10),
+ *           serialize: (value: unknown) => String(value),
+ *         },
+ *       },
+ *     }, ({set, update, patch, reset}) => ({set, update, patch, reset}))
+ *   )
  * );
- * ```
  *
- * Usage in a component:
- * ```ts
+ * // In a component (injection context):
  * const store = injectCraft();
  *
  * // Accessing query param values
- * const page = store.page();                 // Signal for 'page' query param
- * const pageSize = store.pageSize();         // Signal for 'pageSize' query param
- * const pagination = store.pagination();     // Signal for combined pagination state
+ * store.paginationPage();       // Signal<number> for 'page' query param
+ * store.paginationPageSize();   // Signal<number> for 'pageSize' query param
+ * store.pagination();            // Signal<{ page: number; pageSize: number }>
  *
- * // Updating query param values
- * store.setPaginationQueryParams({ page: 2, pageSize: 20 }); // Update query params
- * store.resetPaginationQueryParams();                        // Reset to default values
+ * // Updating query param values (also updates URL)
+ * store.setPagination({ page: 2, pageSize: 20 });
+ * store.updatePagination(current => ({ ...current, page: current.page + 1 }));
+ * store.patchPagination({ pageSize: 50 });
+ * store.resetPagination();
+ * ```
  *
- * // Outside of injection context:
- * navigateToMyPage() {
+ * @example
+ * Using standalone method for navigation outside injection context
+ * ```ts
+ * // Outside injection context (e.g., in a route resolver, guard, or service method):
+ * async navigateToMyPage() {
  *   await router.navigate(['my-page'], {
  *     queryParams: setPaginationQueryParams({ page: 4, pageSize: 20 }),
  *   });
@@ -133,12 +158,37 @@ type CraftQueryParamOutputs<
  *
  * navigateByUrlToMyPage() {
  *   router.navigateByUrl(
- *     `/my-page?${setPaginationQueryParams({
- *       page: 4,
- *       pageSize: 20,
- *     })}`
+ *     `/my-page?${setPaginationQueryParams({ page: 4, pageSize: 20 })}`
  *   );
  * }
+ * ```
+ *
+ * @example
+ * With custom methods via insertions
+ * ```ts
+ * const { injectCraft } = craft(
+ *   {
+ *     providedIn: 'root',
+ *     name: 'myStore',
+ *   },
+ *   craftQueryParam('pagination', () =>
+ *     queryParam(
+ *       {
+ *         state: {
+ *           page: { defaultValue: 1, parse: parseInt, serialize: String },
+ *         },
+ *       },
+ *       ({ state, set }) => ({
+ *         goToPage: (newPage: number) => {
+ *           set({ ...state(), page: newPage });
+ *         },
+ *       })
+ *     )
+ *   )
+ * );
+ *
+ * const store = injectCraft();
+ * store.goToPagePagination(5); // Custom method from insertion
  * ```
  */
 export function craftQueryParam<
