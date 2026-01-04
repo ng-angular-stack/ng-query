@@ -16,7 +16,7 @@ const { injectMyStoreCraft, setPaginationQueryParam } = craft(
       {
         state: {
           search: {
-            defaultValue: '',
+            fallbackValue: '',
             parse: (value: string) => value,
             serialize: (value: unknown) => String(value),
           },
@@ -30,12 +30,12 @@ const { injectMyStoreCraft, setPaginationQueryParam } = craft(
       {
         state: {
           page: {
-            defaultValue: 1,
+            fallbackValue: 1,
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
           pageSize: {
-            defaultValue: 10,
+            fallbackValue: 10,
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
@@ -47,7 +47,7 @@ const { injectMyStoreCraft, setPaginationQueryParam } = craft(
       {
         state: {
           isActive: {
-            defaultValue: false,
+            fallbackValue: false,
             parse: (value: string) => value === 'true',
             serialize: (value: unknown) => String(value),
           },

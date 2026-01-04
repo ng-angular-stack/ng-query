@@ -308,7 +308,7 @@ export function localStoragePersister(prefix: string): QueriesPersister {
             ([resourceKey, resourceValue]) => {
               const resourceRef = queryByIdResource.addById(resourceKey, {
                 defaultParam: resourceValue.params,
-                defaultValue: resourceValue.value,
+                fallbackValue: resourceValue.value,
               });
               // The reload strategy can be improved to prioritize the current displayed resource
               if (resourceValue.reloadOnMount) {

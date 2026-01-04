@@ -31,12 +31,12 @@ const { injectUserListCraft } = craft(
   //   'pagination',
   //   () => ({
   //     page: {
-  //       defaultValue: 1,
+  //       fallbackValue: 1,
   //       parse: (value: string) => parseInt(value, 10),
   //       serialize: (value: unknown) => String(value),
   //     },
   //     pageSize: {
-  //       defaultValue: 4,
+  //       fallbackValue: 4,
   //       parse: (value: string) => parseInt(value, 10),
   //       serialize: (value: unknown) => String(value),
   //     },

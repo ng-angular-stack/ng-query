@@ -129,7 +129,7 @@ export function rxResourceById<
         return newState;
       });
     },
-    add: (resourceParams, options?: { defaultValue?: State }) => {
+    add: (resourceParams, options?: { fallbackValue?: State }) => {
       const group = identifier(resourceParams as NonNullable<ResourceParams>);
       if (resourceByGroup()[group]) {
         console.warn(
@@ -171,7 +171,7 @@ export function rxResourceById<
         resourceOptions: {
           params: paramsWithEqualRule,
           stream,
-          defaultValue: options?.defaultValue,
+          fallbackValue: options?.fallbackValue,
         } as RxResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({
@@ -182,7 +182,7 @@ export function rxResourceById<
     },
     addById: (
       group,
-      options?: { defaultValue?: State; defaultParam?: ResourceParams }
+      options?: { fallbackValue?: State; defaultParam?: ResourceParams }
     ) => {
       const filteredGlobalParamsByGroup = linkedSignal({
         source: params,
@@ -216,7 +216,7 @@ export function rxResourceById<
         resourceOptions: {
           params: paramsWithEqualRule,
           stream,
-          defaultValue: options?.defaultValue,
+          fallbackValue: options?.fallbackValue,
         } as RxResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({

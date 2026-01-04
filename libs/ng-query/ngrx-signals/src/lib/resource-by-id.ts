@@ -38,7 +38,7 @@ export type ResourceByIdHandler<
     // todo pass params instead of id and create the id from the params using the identifier function
     params: ResourceParams,
     options?: {
-      defaultValue?: State;
+      fallbackValue?: State;
     }
   ) => ResourceRef<State>;
   /**
@@ -49,7 +49,7 @@ export type ResourceByIdHandler<
     id: GroupIdentifier,
     options?: {
       defaultParam?: ResourceParams;
-      defaultValue?: State;
+      fallbackValue?: State;
       paramsFromResourceById?: ResourceRef<unknown>;
     }
   ) => ResourceRef<State>;
@@ -218,7 +218,7 @@ export function resourceById<
         return newState;
       });
     },
-    add: (resourceParams, options?: { defaultValue?: State }) => {
+    add: (resourceParams, options?: { fallbackValue?: State }) => {
       const group = identifier(resourceParams as any);
       if (resourceByGroup()[group]) {
         console.warn(
@@ -258,7 +258,7 @@ export function resourceById<
           loader,
           params: paramsWithEqualRule,
           stream,
-          defaultValue: options?.defaultValue,
+          fallbackValue: options?.fallbackValue,
         } as ResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({
@@ -270,7 +270,7 @@ export function resourceById<
     addById: (
       group,
       options?: {
-        defaultValue?: State;
+        fallbackValue?: State;
         defaultParam?: ResourceParams;
         paramsFromResourceById?: ResourceRef<unknown>;
       }
@@ -310,7 +310,7 @@ export function resourceById<
           loader,
           params: paramsWithEqualRule,
           stream,
-          defaultValue: options?.defaultValue,
+          fallbackValue: options?.fallbackValue,
         } as ResourceOptions<State, ResourceParams>,
       });
       resourceByGroup.update((state) => ({

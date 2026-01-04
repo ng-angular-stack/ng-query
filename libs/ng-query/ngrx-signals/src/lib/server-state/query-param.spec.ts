@@ -1,14 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 import { queryParam } from './query-param';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { source } from './source';
 import { afterRecomputation } from './after-recomputation';
 
 describe('queryParams', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     TestBed.configureTestingModule({
       providers: [provideRouter([])],
     }).compileComponents();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should create a query params', () => {
@@ -16,12 +21,12 @@ describe('queryParams', () => {
       const myQueryParams = queryParam({
         state: {
           page: {
-            defaultValue: 1,
+            fallbackValue: 1,
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
           pageSize: {
-            defaultValue: 10,
+            fallbackValue: 10,
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
@@ -37,12 +42,12 @@ describe('queryParams', () => {
         {
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
@@ -89,12 +94,12 @@ describe('queryParams', () => {
         {
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
@@ -122,12 +127,12 @@ describe('queryParams', () => {
         {
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
@@ -186,12 +191,12 @@ describe('queryParams', () => {
         {
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
@@ -244,12 +249,12 @@ describe('queryParams', () => {
         {
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
@@ -272,6 +277,57 @@ describe('queryParams', () => {
       );
       //@ts-expect-error _setPage is bind to a source, so it should not be exposed
       expectTypeOf(myQueryParams._setPage).toEqualTypeOf<never>();
+    });
+  });
+
+  it('should remove query params from URL when reset to fallback values', async () => {
+    await TestBed.runInInjectionContext(async () => {
+      const router = TestBed.inject(Router);
+      const myQueryParams = queryParam(
+        {
+          state: {
+            page: {
+              fallbackValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              fallbackValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+          },
+        },
+        ({ set, reset }) => ({ set, reset })
+      );
+
+      // Set non-fallback values
+      myQueryParams.set({
+        page: 5,
+        pageSize: 50,
+      });
+
+      // Wait for navigation to complete
+      await vi.runAllTimersAsync();
+
+      // Verify params are in URL
+      expect(router.url).toContain('page=5');
+      expect(router.url).toContain('pageSize=50');
+
+      // Reset to fallback values
+      myQueryParams.reset();
+
+      // Wait for navigation to complete
+      await vi.runAllTimersAsync();
+
+      // Verify params are removed from URL (no query params)
+      expect(router.url).not.toContain('page=');
+      expect(router.url).not.toContain('pageSize=');
+      expect(router.url).not.toContain('?');
+
+      // But state should still have fallback values
+      expect(myQueryParams.page()).toBe(1);
+      expect(myQueryParams.pageSize()).toBe(10);
     });
   });
 });

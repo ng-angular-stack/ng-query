@@ -56,7 +56,7 @@ describe('rxResourceById', () => {
       rxResourceByIdRef.add(
         { id: '123' },
         {
-          defaultValue: { id: '123' },
+          fallbackValue: { id: '123' },
         }
       );
       const resourceRef123 = rxResourceByIdRef()['123'];
@@ -68,13 +68,13 @@ describe('rxResourceById', () => {
       rxResourceByIdRef.add(
         { id: '1234' },
         {
-          defaultValue: { id: '1234' },
+          fallbackValue: { id: '1234' },
         }
       );
       rxResourceByIdRef.add(
         { id: '12345' },
         {
-          defaultValue: { id: '12345' },
+          fallbackValue: { id: '12345' },
         }
       );
       await vi.runAllTimersAsync();

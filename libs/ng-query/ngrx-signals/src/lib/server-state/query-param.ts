@@ -45,7 +45,7 @@ export type QueryParamOutput<QueryParamsType, Insertions, QueryParamsState> =
     >;
 
 export interface QueryParamConfig<T = unknown> {
-  defaultValue: NoInfer<T>;
+  fallbackValue: NoInfer<T>;
   parse: (value: string) => T;
   serialize: (value: NoInfer<T>) => string;
 }
@@ -64,7 +64,7 @@ export interface QueryParamConfig<T = unknown> {
  * If called outside an injection context, it will only return an object containing the configuration under `_config`.
  *
  * @param config - Configuration object containing:
- *   - `state`: Record of query parameter configurations, each with `defaultValue`, `parse`, and `serialize`
+ *   - `state`: Record of query parameter configurations, each with `fallbackValue`, `parse`, and `serialize`
  *   - `queryParamsHandling` (optional): How to handle existing query params ('merge' | 'preserve' | '')
  *   - `onSameUrlNavigation` (optional): Behavior on same URL navigation ('reload' | 'ignore')
  *   - `replaceUrl` (optional): Whether to replace the URL in browser history
@@ -84,12 +84,12 @@ export interface QueryParamConfig<T = unknown> {
  *   {
  *     state: {
  *       page: {
- *         defaultValue: 1,
+ *         fallbackValue: 1,
  *         parse: (value) => parseInt(value, 10),
  *         serialize: (value) => String(value),
  *       },
  *       pageSize: {
- *         defaultValue: 10,
+ *         fallbackValue: 10,
  *         parse: (value) => parseInt(value, 10),
  *         serialize: (value) => String(value),
  *       },
@@ -115,7 +115,7 @@ export interface QueryParamConfig<T = unknown> {
  * const myQueryParams = queryParam(
  *   {
  *     state: {
- *       page: { defaultValue: 1, parse: parseInt, serialize: String },
+ *       page: { fallbackValue: 1, parse: parseInt, serialize: String },
  *     },
  *   },
  *   ({ state, set }) => ({
@@ -234,23 +234,23 @@ export function queryParam<
     Object.entries(queryParamsConfig).reduce((acc, [key, config]) => {
       const rawValue = queryParamFromUrl()?.[key];
       if (rawValue === undefined || rawValue === null) {
-        acc[key] = config.defaultValue;
+        acc[key] = config.fallbackValue;
         return acc;
       }
       try {
         acc[key] = config.parse(rawValue);
         return acc;
       } catch {
-        acc[key] = config.defaultValue;
+        acc[key] = config.fallbackValue;
         return acc;
       }
     }, {} as Record<string, unknown>)
   ) as WritableSignal<QueryParamsToState<QueryParamsType>>;
 
-  // Get initial values from the url or use the default values
+  // Get initial values from the url or use the fallback values
   const getDefaultState = () =>
     Object.entries(queryParamsConfig).reduce((acc, [key, config]) => {
-      acc[key] = config.defaultValue;
+      acc[key] = config.fallbackValue;
       return acc;
     }, {} as Record<string, unknown>) as QueryParamsToState<QueryParamsType>;
 
@@ -267,9 +267,14 @@ export function queryParam<
 
     // Then navigate without triggering another update
     const mergedOptions = { ...options, ...navOptions };
+    // Only include params that differ from their fallback values (SEO optimization)
     const serializedParams = Object.entries(queryParamsConfig).reduce(
       (acc, [key, config]) => {
-        acc[key] = config.serialize(newState[key]);
+        const currentValue = newState[key];
+        // Skip if value equals fallback value
+        if (currentValue !== config.fallbackValue) {
+          acc[key] = config.serialize(currentValue);
+        }
         return acc;
       },
       {} as Record<string, string>

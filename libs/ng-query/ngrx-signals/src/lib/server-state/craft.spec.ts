@@ -285,12 +285,12 @@ describe('craft', () => {
         queryParam({
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
@@ -403,12 +403,12 @@ describe('craft', () => {
           queryParam({
             state: {
               page: {
-                defaultValue: 1,
+                fallbackValue: 1,
                 parse: (value: string) => parseInt(value, 10),
                 serialize: (value: unknown) => String(value),
               },
               pageSize: {
-                defaultValue: 10,
+                fallbackValue: 10,
                 parse: (value: string) => parseInt(value, 10),
                 serialize: (value: unknown) => String(value),
               },
@@ -1385,7 +1385,7 @@ describe('craft preserve all context', () => {
           queryParam({
             state: {
               active: {
-                defaultValue: undefined,
+                fallbackValue: undefined,
                 parse: (value: string) => (value === 'true') as boolean,
                 serialize: (value) => String(value),
               },
@@ -1473,7 +1473,7 @@ describe('craft preserve all context', () => {
             activeId: {
               config: {
                 active: {
-                  defaultValue: undefined;
+                  fallbackValue: undefined;
                   parse: (value: string) => string;
                   serialize: (value: unknown) => string;
                 };
@@ -1578,12 +1578,12 @@ describe('craft preserve all context', () => {
             queryParam({
               state: {
                 page: {
-                  defaultValue: 1,
+                  fallbackValue: 1,
                   parse: (value: string) => parseInt(value, 10),
                   serialize: (value: unknown) => String(value),
                 },
                 pageSize: {
-                  defaultValue: 10,
+                  fallbackValue: 10,
                   parse: (value: string) => parseInt(value, 10),
                   serialize: (value: unknown) => String(value),
                 },

@@ -131,12 +131,12 @@ type CraftQueryParamsOutputs<
  *     pagination: queryParam({
  *       state: {
  *         page: {
- *           defaultValue: 1,
+ *           fallbackValue: 1,
  *           parse: (value: string) => parseInt(value, 10),
  *           serialize: (value: unknown) => String(value),
  *         },
  *         pageSize: {
- *           defaultValue: 10,
+ *           fallbackValue: 10,
  *           parse: (value: string) => parseInt(value, 10),
  *           serialize: (value: unknown) => String(value),
  *         },
@@ -145,7 +145,7 @@ type CraftQueryParamsOutputs<
  *     active: queryParam({
  *       state: {
  *         isActive: {
- *           defaultValue: false,
+ *           fallbackValue: false,
  *           parse: (value: string) => value === 'true',
  *           serialize: (value: unknown) => String(value),
  *         },
@@ -205,7 +205,7 @@ type CraftQueryParamsOutputs<
  *     pagination: queryParam(
  *       {
  *         state: {
- *           page: { defaultValue: 1, parse: parseInt, serialize: String },
+ *           page: { fallbackValue: 1, parse: parseInt, serialize: String },
  *         },
  *       },
  *       ({ state, set }) => ({
@@ -216,7 +216,7 @@ type CraftQueryParamsOutputs<
  *     ),
  *     filters: queryParam({
  *       state: {
- *         search: { defaultValue: '', parse: String, serialize: String },
+ *         search: { fallbackValue: '', parse: String, serialize: String },
  *       },
  *     }),
  *   }))

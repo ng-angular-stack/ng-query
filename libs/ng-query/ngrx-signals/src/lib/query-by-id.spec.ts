@@ -262,7 +262,7 @@ describe('queryById', () => {
         },
       });
       source.addById('1', {
-        defaultValue: { id: '1' },
+        fallbackValue: { id: '1' },
       });
       const result = queryById({
         fromResourceById: source,

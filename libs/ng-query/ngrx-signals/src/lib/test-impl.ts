@@ -44,7 +44,7 @@ const storeTest = signalStore(
           email: 'john.doe@a.com',
         });
       },
-      defaultValue: {
+      fallbackValue: {
         id: '1',
         name: 'John Doe',
         email: '',
@@ -92,7 +92,7 @@ const queryTest = withQuery('users', (store) =>
         })
       );
     },
-    defaultValue: {
+    fallbackValue: {
       id: '1',
       name: 'John Doe',
       email: '',

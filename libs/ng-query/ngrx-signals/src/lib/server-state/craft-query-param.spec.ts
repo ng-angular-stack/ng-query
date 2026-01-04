@@ -40,12 +40,12 @@ describe('craftQueryParam', () => {
           {
             state: {
               page: {
-                defaultValue: 1,
+                fallbackValue: 1,
                 parse: (value: string) => parseInt(value, 10),
                 serialize: (value: unknown) => String(value),
               },
               pageSize: {
-                defaultValue: 10,
+                fallbackValue: 10,
                 parse: (value: string) => parseInt(value, 10),
                 serialize: (value: unknown) => String(value),
               },
@@ -92,12 +92,12 @@ describe('craftQueryParam', () => {
         queryParam({
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             active: {
-              defaultValue: false,
+              fallbackValue: false,
               parse: (value: string) => value === 'true',
               serialize: (value: unknown) => String(value),
             },
@@ -125,7 +125,7 @@ describe('craftQueryParam', () => {
           {
             state: {
               page: {
-                defaultValue: 1,
+                fallbackValue: 1,
                 parse: (value: string) => parseInt(value, 10),
                 serialize: (value: unknown) => String(value),
               },
@@ -180,7 +180,7 @@ describe('craftQueryParam', () => {
           {
             state: {
               page: {
-                defaultValue: 1,
+                fallbackValue: 1,
                 parse: (value: string) => parseInt(value, 10),
                 serialize: (value: unknown) => String(value),
               },
@@ -232,12 +232,12 @@ const { injectCraft } = craft(
       {
         state: {
           page: {
-            defaultValue: 1,
+            fallbackValue: 1,
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
           pageSize: {
-            defaultValue: 10,
+            fallbackValue: 10,
             parse: (value: string) => parseInt(value, 10),
             serialize: (value: unknown) => String(value),
           },
@@ -337,12 +337,12 @@ describe('craftQueryParam standalone methods', () => {
         queryParam({
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
@@ -382,12 +382,12 @@ describe('craftQueryParam standalone methods', () => {
         queryParam({
           state: {
             page: {
-              defaultValue: 1,
+              fallbackValue: 1,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },
             pageSize: {
-              defaultValue: 10,
+              fallbackValue: 10,
               parse: (value: string) => parseInt(value, 10),
               serialize: (value: unknown) => String(value),
             },

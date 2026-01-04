@@ -17,7 +17,7 @@ export function preservedRxResource<T, R>(
         if (previous) {
           return previous.value;
         } else {
-          return config.defaultValue;
+          return config.fallbackValue;
         }
       }
       return current.value;
@@ -26,8 +26,8 @@ export function preservedRxResource<T, R>(
   Object.assign(original, {
     value: preserved,
   });
-  if (config.defaultValue) {
-    original.set(config.defaultValue);
+  if (config.fallbackValue) {
+    original.set(config.fallbackValue);
   }
   return original;
 }
