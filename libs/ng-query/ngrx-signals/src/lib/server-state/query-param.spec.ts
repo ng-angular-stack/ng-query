@@ -271,7 +271,7 @@ describe('queryParams', () => {
         }
       );
       //@ts-expect-error _setPage is bind to a source, so it should not be exposed
-      myQueryParams._setPage(2);
+      expectTypeOf(myQueryParams._setPage).toEqualTypeOf<never>();
     });
   });
 });
