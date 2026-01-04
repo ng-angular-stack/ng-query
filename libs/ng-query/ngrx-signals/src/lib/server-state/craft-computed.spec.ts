@@ -3,6 +3,7 @@ import { craft } from './craft';
 import { craftComputedStates } from './craft-computed';
 import { TestBed } from '@angular/core/testing';
 import { craftState } from './craft-state';
+import { state } from './state';
 
 describe('craftComputed', () => {
   it('should enable to defined computed states', () => {
@@ -29,11 +30,13 @@ describe('craftComputed', () => {
         name: '',
         providedIn: 'root',
       },
-      craftState('firstName', () => signal('John')),
-      craftComputedStates(({ firstName }) => ({
-        fullName: computed(() => `${firstName()} Doe`),
-        nameLength: computed(() => firstName().length),
-      }))
+      craftState('firstName', () => state('John')),
+      craftComputedStates(({ firstName }) => {
+        return {
+          fullName: computed(() => `${firstName()} Doe`),
+          nameLength: computed(() => firstName().length),
+        };
+      })
     );
 
     TestBed.runInInjectionContext(() => {

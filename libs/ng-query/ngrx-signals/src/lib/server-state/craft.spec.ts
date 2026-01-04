@@ -15,7 +15,6 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { craftQueryParams, QueryParamProps } from './craft-query-param';
 import { craftInputs } from './craft-inputs';
 import { craftState } from './craft-state';
 import { source } from './source';
@@ -30,10 +29,11 @@ import { ExcludeCommonKeys } from './util/util.type';
 import { state } from './state';
 import { Equal, Expect } from 'test-type';
 import {
-  QueryParamNavigationOptions,
+  queryParam,
   QueryParamNavigationOptions,
   QueryParamsToState,
 } from './query-param';
+import { craftQueryParam } from './craft-query-param';
 
 describe('craft', () => {
   beforeEach(() => {
@@ -276,23 +276,27 @@ describe('craft', () => {
   });
 
   it('should enable exporting standalone outputs', async () => {
-    const { injectCraft, setPaginationQueryParams } = craft(
+    const { setPaginationQueryParams } = craft(
       {
         name: '',
         providedIn: 'root',
       },
-      craftQueryParams('pagination', () => ({
-        page: {
-          defaultValue: 1,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-        pageSize: {
-          defaultValue: 10,
-          parse: (value: string) => parseInt(value, 10),
-          serialize: (value: unknown) => String(value),
-        },
-      }))
+      craftQueryParam('pagination', () =>
+        queryParam({
+          state: {
+            page: {
+              defaultValue: 1,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+            pageSize: {
+              defaultValue: 10,
+              parse: (value: string) => parseInt(value, 10),
+              serialize: (value: unknown) => String(value),
+            },
+          },
+        })
+      )
     );
 
     expect(setPaginationQueryParams).toBeDefined();
@@ -395,18 +399,22 @@ describe('craft', () => {
             }),
           }))
         ),
-        craftQueryParams('pagination', () => ({
-          page: {
-            defaultValue: 1,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-          pageSize: {
-            defaultValue: 10,
-            parse: (value: string) => parseInt(value, 10),
-            serialize: (value: unknown) => String(value),
-          },
-        }))
+        craftQueryParam('pagination', () =>
+          queryParam({
+            state: {
+              page: {
+                defaultValue: 1,
+                parse: (value: string) => parseInt(value, 10),
+                serialize: (value: unknown) => String(value),
+              },
+              pageSize: {
+                defaultValue: 10,
+                parse: (value: string) => parseInt(value, 10),
+                serialize: (value: unknown) => String(value),
+              },
+            },
+          })
+        )
       );
 
       const {
@@ -842,6 +850,7 @@ describe('craft', () => {
       storeConfig: {
         providedIn: 'root';
         name: 'dataPagination';
+        implements: unknown;
       };
       context: {
         methods: {
@@ -862,6 +871,7 @@ describe('craft', () => {
         _asyncMethods: {};
         _cloudProxy: {};
         _dependencies: {};
+        _error: {};
       };
     }>();
 
@@ -901,6 +911,7 @@ describe('craft', () => {
     >().toEqualTypeOf<{
       providedIn: 'root';
       name: 'host1';
+      implements: unknown;
     }>();
 
     expectTypeOf<
@@ -908,12 +919,13 @@ describe('craft', () => {
     >().toEqualTypeOf<{
       providedIn: 'root';
       name: 'dataPagination';
+      implements: unknown;
     }>();
 
     const host1 = injectHost1Craft();
 
     host1.numberListAddNumber(2);
-    host1.numberListReset();
+    host1.setReset({});
     expect(host1.numberList()).toEqual([1, 2]);
   });
 
@@ -943,6 +955,7 @@ describe('craft', () => {
       storeConfig: {
         providedIn: 'root';
         name: 'dataPagination';
+        implements: unknown;
       };
       context: {
         methods: {
@@ -964,6 +977,7 @@ describe('craft', () => {
         _asyncMethods: {};
         _cloudProxy: {};
         _dependencies: {};
+        _error: {};
       };
     }>();
 
@@ -1023,6 +1037,7 @@ describe('craft', () => {
       storeConfig: {
         providedIn: 'root';
         name: 'dataPagination';
+        implements: unknown;
       };
       context: {
         methods: {
@@ -1043,6 +1058,7 @@ describe('craft', () => {
         _asyncMethods: {};
         _cloudProxy: {};
         _dependencies: {};
+        _error: {};
       };
     }>();
 
@@ -1095,6 +1111,7 @@ describe('craft metadata', () => {
         storeConfig: {
           providedIn: 'feature';
           name: 'shared';
+          implements: unknown;
         };
         context: {
           methods: {
@@ -1112,6 +1129,7 @@ describe('craft metadata', () => {
           _asyncMethods: {};
           _cloudProxy: {};
           _dependencies: {};
+          _error: {};
         };
       }>();
 
@@ -1363,13 +1381,17 @@ describe('craft preserve all context', () => {
           name: 'test',
           providedIn: 'root',
         },
-        craftQueryParams('activeId', () => ({
-          active: {
-            defaultValue: undefined,
-            parse: (value: string) => value,
-            serialize: (value) => String(value),
-          },
-        })),
+        craftQueryParam('activeId', () =>
+          queryParam({
+            state: {
+              active: {
+                defaultValue: undefined,
+                parse: (value: string) => (value === 'true') as boolean,
+                serialize: (value) => String(value),
+              },
+            },
+          })
+        ),
         () => (contextData, injector, storeConfig) => {
           expectTypeOf(storeConfig).toEqualTypeOf<{
             name: 'test';
@@ -1378,76 +1400,94 @@ describe('craft preserve all context', () => {
           return EmptyContext;
         }
       );
-      type t = Prettify<
-        Pick<(typeof _TEST_META_STORE_CONTEXT)['context'], 'methods'>
-      >;
-      type t1 = Prettify<(typeof _TEST_META_STORE_CONTEXT)['storeConfig']>;
+
+      type methods = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        'methods'
+      >['methods'];
+      type _inputs = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_inputs'
+      >['_inputs'];
+      type props = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        'props'
+      >['props'];
+      type _injections = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_injections'
+      >['_injections'];
+      type _mutation = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_mutation'
+      >['_mutation'];
+      type _query = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_query'
+      >['_query'];
+      type _queryParams = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_queryParams'
+      >['_queryParams'];
+      type _sources = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_sources'
+      >['_sources'];
+      type _asyncMethods = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_asyncMethods'
+      >['_asyncMethods'];
+      type _cloudProxy = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_cloudProxy'
+      >['_cloudProxy'];
+      type _dependencies = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_dependencies'
+      >['_dependencies'];
+      type _error = Pick<
+        (typeof _TEST_META_STORE_CONTEXT)['context'],
+        '_error'
+      >['_error'];
+
       expectTypeOf(_TEST_META_STORE_CONTEXT).toEqualTypeOf<{
         storeConfig: {
           providedIn: 'root';
           name: 'test';
-          implements?: unknown;
+          implements: unknown;
         };
         context: {
-          methods: {
-            setActiveIdQueryParams: (
-              params: Partial<{
-                active: string;
-              }>,
-              options?: QueryParamNavigationOptions
-            ) => void;
-          } & {
-            resetActiveIdQueryParams: (
-              options?: QueryParamNavigationOptions
-            ) => void;
-          } & {
-            [x: string]:
-              | ReadonlySource<QueryParamsToState<QueryParamsConfig>>
-              | ((...args: any[]) => NoInfer<
-                  Prettify<
-                    QueryParamsToState<{
-                      active: {
-                        defaultValue: undefined;
-                        parse: (value: string) => string;
-                        serialize: (value: any) => string;
-                      };
-                    }>
-                  >
-                >);
-          } & Record<string, Function>;
+          methods: Record<string, Function>;
           _inputs: {};
-          props: QueryParamProps<{
-            active: {
-              defaultValue: undefined;
-              parse: (value: string) => string;
-              serialize: (value: unknown) => string;
-            };
-          }> & {
+          props: {
             activeId: Signal<{
-              active: never;
+              active: boolean;
             }>;
-          };
+          } & {
+            activeIdActive: Signal<never>;
+          } & {};
           _injections: {};
           _mutation: {};
           _query: {};
           _queryParams: {
-            _queryParams: {
-              activeId: {
-                config: {
-                  active: {
-                    defaultValue: undefined;
-                    parse: (value: string) => string;
-                    serialize: (value: any) => string;
-                  };
+            activeId: {
+              config: {
+                active: {
+                  defaultValue: undefined;
+                  parse: (value: string) => string;
+                  serialize: (value: unknown) => string;
                 };
-                state: WritableSignal<QueryParamsToState<QueryParams>>;
               };
+              state: WritableSignal<{
+                active: never;
+              }>;
             };
           };
           _sources: {};
           _asyncMethods: {};
           _cloudProxy: {};
           _dependencies: {};
+          error: {};
         };
       }>();
     });
@@ -1507,6 +1547,7 @@ describe('craft preserve all context', () => {
         Omit<(typeof _TEST_META_STORE_CONTEXT)['context'], '_dependencies'>
       >().toEqualTypeOf<{
         _inputs: ExcludeCommonKeys<{}, {}>;
+        _error: {};
         methods: Record<string, Function> &
           ExcludeCommonKeys<Record<string, Function>, {}>;
         props: {};
@@ -1533,18 +1574,22 @@ describe('craft preserve all context', () => {
             name: 'mySharedFeature',
             providedIn: 'feature',
           },
-          craftQueryParams('pagination', () => ({
-            page: {
-              defaultValue: 1,
-              parse: (value: string) => parseInt(value, 10),
-              serialize: (value: unknown) => String(value),
-            },
-            pageSize: {
-              defaultValue: 10,
-              parse: (value: string) => parseInt(value, 10),
-              serialize: (value: unknown) => String(value),
-            },
-          }))
+          craftQueryParam('pagination', () =>
+            queryParam({
+              state: {
+                page: {
+                  defaultValue: 1,
+                  parse: (value: string) => parseInt(value, 10),
+                  serialize: (value: unknown) => String(value),
+                },
+                pageSize: {
+                  defaultValue: 10,
+                  parse: (value: string) => parseInt(value, 10),
+                  serialize: (value: unknown) => String(value),
+                },
+              },
+            })
+          )
         );
       expectTypeOf<
         (typeof _MYSHAREDFEATURE_META_STORE_CONTEXT)['storeConfig']

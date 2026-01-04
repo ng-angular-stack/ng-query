@@ -44,7 +44,7 @@ describe('craftQuery', () => {
 
       const store = inject(Craft);
 
-      expect(store.userQuery).toBeDefined();
+      expect(store.user).toBeDefined();
     });
   });
 
@@ -71,7 +71,7 @@ describe('craftQuery', () => {
 
       const store = inject(Craft);
 
-      expect(store.userQuery.status()).toBe('idle');
+      expect(store.user.status()).toBe('idle');
     });
   });
 
@@ -99,7 +99,7 @@ describe('craftQuery', () => {
 
       const store = inject(Craft);
 
-      expect(store.userQuery.status()).toBe('loading');
+      expect(store.user.status()).toBe('loading');
     });
   });
 
@@ -127,13 +127,13 @@ describe('craftQuery', () => {
 
       const store = inject(Craft);
 
-      expect(store.userQuery.value()).toEqual(undefined);
+      expect(store.user.value()).toEqual(undefined);
 
       // Wait for the query to resolve
       await vi.runAllTimersAsync();
 
-      expect(store.userQuery.status()).toBe('resolved');
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.status()).toBe('resolved');
+      expect(store.user.value()).toEqual({
         id: '5',
         name: 'John Doe',
         email: 'test@a.com',
@@ -184,18 +184,18 @@ describe('craftQuery', () => {
 
       const store = inject(Craft);
 
-      expect(store.userQuery.value()).toEqual(undefined);
-      expect(store.userQuery.status()).toEqual('loading');
+      expect(store.user.value()).toEqual(undefined);
+      expect(store.user.status()).toEqual('loading');
       await vi.advanceTimersByTimeAsync(100);
 
-      expect(store.userQuery.status()).toEqual('resolved');
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.status()).toEqual('resolved');
+      expect(store.user.value()).toEqual({
         count: 5,
       });
 
       await vi.advanceTimersByTimeAsync(100);
 
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.value()).toEqual({
         count: 6,
       });
     });
@@ -265,15 +265,15 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const store = inject(Craft);
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
 
       store.mutateUserEmail({
         id: '5',
         email: 'mutated@test.com',
       });
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
+      expect(store.user.status()).toBe('local');
+      expect(store.user.value()?.email).toBe('mutated@test.com');
     });
   });
 
@@ -332,7 +332,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const store = inject(Craft);
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
 
       store.mutateUserEmail({
         id: '5',
@@ -340,7 +340,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       });
       await vi.advanceTimersByTimeAsync(2000);
       expect(store.userEmail.status()).toBe('error');
-      expect(store.userQuery.status()).toBe('reloading');
+      expect(store.user.status()).toBe('reloading');
     });
   });
   it('3- craftQuery should reload on mutation error if mutation params id is "error"', async () => {
@@ -403,7 +403,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const store = inject(Craft);
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
 
       store.mutateUserEmail({
         id: '5',
@@ -412,7 +412,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       await vi.advanceTimersByTimeAsync(5000);
       expect(store.userEmail.status()).toBe('error');
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
 
       store.mutateUserEmail({
         id: 'error',
@@ -421,9 +421,9 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       await vi.advanceTimersByTimeAsync(2000);
       expect(store.userEmail.status()).toBe('error');
       await vi.advanceTimersByTimeAsync(2000);
-      expect(store.userQuery.status()).toBe('reloading');
+      expect(store.user.status()).toBe('reloading');
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
     });
   });
 
@@ -481,7 +481,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const store = inject(Craft);
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
       console.log('will mutate');
       store.mutateUserEmail({
         id: '5',
@@ -489,8 +489,8 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       });
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
+      expect(store.user.status()).toBe('local');
+      expect(store.user.value()?.email).toBe('mutated@test.com');
     });
   });
 
@@ -546,7 +546,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       );
 
       const store = inject(Craft);
-      const userQuery = store.userQuery;
+      const userQuery = store.user;
       await vi.runAllTimersAsync();
       expect(userQuery.value()).toEqual(returnedUser('5'));
       const userQuery5ReloadSpy = vi.spyOn(userQuery, 'reload');
@@ -619,15 +619,15 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const store = inject(Craft);
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
       console.log('mutateUserEmail');
       store.mutateUserEmail({
         id: '5',
         email: 'mutated@test.com',
       });
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
+      expect(store.user.status()).toBe('local');
+      expect(store.user.value()?.email).toBe('mutated@test.com');
     });
   });
   it('7- craftQuery should handle patch', async () => {
@@ -684,15 +684,15 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       const store = inject(Craft);
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('resolved');
+      expect(store.user.status()).toBe('resolved');
       store.mutateUserEmail({
         id: '5',
         email: 'mutated@test.com',
       });
 
       await vi.runAllTimersAsync();
-      expect(store.userQuery.status()).toBe('local');
-      expect(store.userQuery.value()?.email).toBe('mutated@test.com');
+      expect(store.user.status()).toBe('local');
+      expect(store.user.value()?.email).toBe('mutated@test.com');
     });
   });
   it('8- Should handle craftMutation update', async () => {
@@ -749,7 +749,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       );
 
       const store = inject(Craft);
-      const userQuery = store.userQuery;
+      const userQuery = store.user;
       await vi.runAllTimersAsync();
       expect(userQuery?.value()).toEqual(returnedUser('5'));
       store.mutateUser({
@@ -819,7 +819,7 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
       );
 
       const store = inject(Craft);
-      const userQuery = store.userQuery;
+      const userQuery = store.user;
       await vi.runAllTimersAsync();
       expect(userQuery?.value()).toEqual(returnedUser('5'));
       store.mutateUser({
@@ -869,10 +869,10 @@ describe('Declarative server state, craftQuery and craftMutation', () => {
         )
       );
       const store = inject(Craft);
-      expectTypeOf(store.userQuery.pagination).toEqualTypeOf<{
+      expectTypeOf(store.user.pagination).toEqualTypeOf<{
         page: number;
       }>();
-      expect(store.userQuery.pagination).toBeDefined();
+      expect(store.user.pagination).toBeDefined();
     });
   });
 });
@@ -904,12 +904,12 @@ describe('craftQuery typing', () => {
       type PropsKeys = keyof ResultType['props'];
 
       type _ExpectTheResourceNameAndQueriesTypeRecord = Expect<
-        Equal<PropsKeys, 'userQuery'>
+        Equal<PropsKeys, 'user'>
       >;
 
       type _ExpectThePropsToHaveARecordWithResourceRef = Expect<
         Equal<
-          ReturnType<ResultType['props']['userQuery']['value']>,
+          ReturnType<ResultType['props']['user']['value']>,
           User | undefined
         >
       >;
@@ -918,7 +918,7 @@ describe('craftQuery typing', () => {
         Equal<
           ResultType['props'],
           {
-            userQuery: QueryOutput<
+            user: QueryOutput<
               NoInfer<{
                 id: string;
                 name: string;

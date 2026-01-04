@@ -1,9 +1,9 @@
 import { craftQuery } from './craft-query';
 import { craft } from './craft';
-import { query } from '../query';
 import { craftInputs } from './craft-inputs';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { query } from './query';
 
 describe('craftInputs', () => {
   beforeEach(() => {
@@ -22,10 +22,9 @@ describe('craftInputs', () => {
         craftInputs({
           myParams: undefined as string | undefined,
         }),
-        craftQuery('user', (inputs) => {
-          console.log('inputs', inputs);
-          return query({
-            params: inputs.myParams,
+        craftQuery('user', ({ myParams }) =>
+          query({
+            params: myParams,
             loader: async ({ params }) => {
               console.log('query params', params);
               return {
@@ -34,8 +33,8 @@ describe('craftInputs', () => {
                 email: 'test@a.com',
               };
             },
-          });
-        })
+          })
+        )
       );
       const myParams = signal('1');
       const store = injectCraft({
@@ -44,9 +43,9 @@ describe('craftInputs', () => {
         },
       });
 
-      expect(store.userQuery).toBeDefined();
+      expect(store.user).toBeDefined();
       await vi.runAllTimersAsync();
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.value()).toEqual({
         id: '1',
         name: 'John Doe',
         email: 'test@a.com',
@@ -77,9 +76,9 @@ describe('craftInputs', () => {
       const myParams = signal('1');
       const store = injectTestCraft();
 
-      expect(store.userQuery).toBeDefined();
+      expect(store.user).toBeDefined();
       await vi.runAllTimersAsync();
-      expect(store.userQuery.value()).toEqual({
+      expect(store.user.value()).toEqual({
         id: '1',
         name: 'John Doe',
         email: 'test@a.com',

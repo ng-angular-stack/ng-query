@@ -506,12 +506,13 @@ export function craft<
   standaloneOutputs3 extends StandaloneOutputsConstraints,
   standaloneOutputs4 extends StandaloneOutputsConstraints,
   const ProvidedIn extends ProvidedInOption,
-  const Name extends string
+  const Name extends string,
+  ToImplementContract
 >(
   options: {
     providedIn: ProvidedIn;
     name: Name;
-    implements?: unknown;
+    implements?: ToImplementContract;
   },
   factory1: CraftFactory<
     [_EmptyContext],
@@ -560,7 +561,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
-    implements?: unknown;
+    implements?: ToImplementContract;
   }
 >;
 export function craft<
@@ -571,12 +572,13 @@ export function craft<
   standaloneOutputs2 extends StandaloneOutputsConstraints,
   standaloneOutputs3 extends StandaloneOutputsConstraints,
   const Name extends string,
-  const ProvidedIn extends ProvidedInOption
+  const ProvidedIn extends ProvidedInOption,
+  ToImplementContract
 >(
   options: {
     providedIn: ProvidedIn;
     name: Name;
-    implements?: unknown;
+    implements?: ToImplementContract;
   },
   factory1: CraftFactory<
     [_EmptyContext],
@@ -611,7 +613,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
-    implements?: unknown;
+    implements?: ToImplementContract;
   }
 >;
 export function craft<
@@ -620,12 +622,13 @@ export function craft<
   standaloneOutputs1 extends StandaloneOutputsConstraints,
   standaloneOutputs2 extends StandaloneOutputsConstraints,
   const ProvidedIn extends ProvidedInOption,
-  const Name extends string
+  const Name extends string,
+  ToImplementContract
 >(
   options: {
     providedIn: ProvidedIn;
     name: Name;
-    implements?: unknown;
+    implements?: ToImplementContract;
   },
   factory1: CraftFactory<
     [_EmptyContext],
@@ -651,7 +654,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
-    implements?: unknown;
+    implements?: ToImplementContract;
   }
 >;
 export function craft<
@@ -681,7 +684,7 @@ export function craft<
   {
     providedIn: NoInfer<ProvidedIn>;
     name: NoInfer<Name>;
-    implements?: unknown;
+    implements?: ToImplementContract;
   }
 >;
 export function craft(

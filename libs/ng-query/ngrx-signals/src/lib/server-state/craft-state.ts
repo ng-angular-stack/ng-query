@@ -8,8 +8,6 @@ import {
   StoreConfigConstraints,
 } from './craft';
 import { StateOutput } from './state';
-import { UnionToTuple } from '../types/util.type';
-import { ExtractSignalPropsAndMethods } from './util/extract-signal-props-and-methods';
 import { isSignal, Signal } from '@angular/core';
 import { capitalize } from './util/util';
 import { DeferredExtract } from './util/util.type';
@@ -99,7 +97,10 @@ export function craftState<
         }
         return acc;
       },
-      {} as {
+      {
+        props: {},
+        methods: {},
+      } as {
         props: Record<string, Signal<any>>;
         methods: Record<string, Function>;
       }
