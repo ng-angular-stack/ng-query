@@ -2,6 +2,7 @@ import {
   assertInInjectionContext,
   computed,
   inject,
+  linkedSignal,
   Signal,
   signal,
   WritableSignal,
@@ -142,17 +143,38 @@ export function queryParam<
 
   const { state: queryParamsConfig, ...options } = config;
 
+  // Create signals for each query parameter
+  const queryParamFromUrl = linkedSignal(() => {
+    return (
+      router.currentNavigation()?.extractedUrl.queryParams ??
+      activatedRoute.snapshot.queryParams
+    );
+  });
+
+  // Create computed signals for each query parameter with parsing
+  const queryParamsState = linkedSignal(() =>
+    Object.entries(queryParamsConfig).reduce((acc, [key, config]) => {
+      const rawValue = queryParamFromUrl()?.[key];
+      if (rawValue === undefined || rawValue === null) {
+        acc[key] = config.defaultValue;
+        return acc;
+      }
+      try {
+        acc[key] = config.parse(rawValue);
+        return acc;
+      } catch {
+        acc[key] = config.defaultValue;
+        return acc;
+      }
+    }, {} as Record<string, unknown>)
+  ) as WritableSignal<QueryParamsToState<QueryParamsType>>;
+
   // Get initial values from the url or use the default values
   const getDefaultState = () =>
     Object.entries(queryParamsConfig).reduce((acc, [key, config]) => {
       acc[key] = config.defaultValue;
       return acc;
     }, {} as Record<string, unknown>) as QueryParamsToState<QueryParamsType>;
-
-  // Create the state signal with default values
-  const queryParamsState = signal(getDefaultState()) as WritableSignal<
-    QueryParamsToState<QueryParamsType>
-  >;
 
   // Save the original set method before we override it
   const originalSet = queryParamsState.set.bind(queryParamsState);
