@@ -142,7 +142,7 @@ export function queryParam<
 
   const { state: queryParamsConfig, ...options } = config;
 
-  // Get initial default values
+  // Get initial values from the url or use the default values
   const getDefaultState = () =>
     Object.entries(queryParamsConfig).reduce((acc, [key, config]) => {
       acc[key] = config.defaultValue;

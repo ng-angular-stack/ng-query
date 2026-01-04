@@ -268,7 +268,30 @@ describe('craftQueryParam integration', () => {
         page: 2,
         pageSize: 5,
       });
-      console.log('store.pagination()', store.pagination());
+    });
+  });
+
+  it('should update query param values when the query param in the URL change ', async () => {
+    const harness = await RouterTestingHarness.create();
+    const instance = await harness.navigateByUrl(
+      '/test?page=2&pageSize=5',
+      TestComponent
+    );
+
+    await TestBed.runInInjectionContext(async () => {
+      const store = injectCraft();
+
+      expect(store.pagination()).toEqual({
+        page: 2,
+        pageSize: 5,
+      });
+
+      await harness.navigateByUrl('/test?page=5&pageSize=5', TestComponent);
+
+      expect(store.pagination()).toEqual({
+        page: 5,
+        pageSize: 5,
+      });
     });
   });
 
