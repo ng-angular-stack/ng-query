@@ -1,6 +1,7 @@
 import { linkedSignal, Signal, ValueEqualityFn } from '@angular/core';
 import { ReadonlySource } from './util/source.type';
 import { Source } from './source';
+import { SourceBranded } from './util/util';
 
 export function computedSource<SourceState, ComputedValue>(
   signalOrigin: Source<SourceState> | ReadonlySource<SourceState>,
@@ -32,6 +33,7 @@ export function computedSource<SourceState, ComputedValue>(
       preserveLastValue: listener({
         nullishFirstValue: false,
       }),
-    }
+    },
+    SourceBranded
   ) as ReadonlySource<any>;
 }

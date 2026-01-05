@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { IsUnknown } from './util/util.type';
 import { ReadonlySource } from './util/source.type';
+import { SourceBranded } from './util/util';
 
 export function toSource<SourceState, ComputedValue>(
   signalOrigin: Signal<SourceState> | WritableSignal<SourceState>,
@@ -51,6 +52,7 @@ export function toSource<SourceState, ComputedValue>(
       preserveLastValue: listener({
         nullishFirstValue: false,
       }),
-    }
+    },
+    SourceBranded
   ) as ReadonlySource<any>;
 }

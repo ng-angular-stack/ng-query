@@ -1,9 +1,10 @@
 import { linkedSignal, Signal, signal, ValueEqualityFn } from '@angular/core';
+import { SourceBranded } from './util/util';
 
-export interface Source<T> extends Signal<T | undefined> {
+export type Source<T> = Signal<T | undefined> & {
   set: (value: T) => void;
   preserveLastValue: Signal<T | undefined>;
-}
+} & SourceBranded;
 
 export function source<T>(options?: {
   equal?: ValueEqualityFn<NoInfer<T> | undefined>;
@@ -39,6 +40,7 @@ export function source<T>(options?: {
         nullishFirstValue: false,
       }),
       set: sourceState.set,
-    }
+    },
+    SourceBranded
   ) as Source<T>;
 }

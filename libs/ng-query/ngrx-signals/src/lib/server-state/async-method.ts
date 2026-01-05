@@ -1,5 +1,6 @@
 import {
   computed,
+  effect,
   isSignal,
   resource,
   ResourceLoaderParams,
@@ -12,6 +13,7 @@ import { InsertionsResourcesFactory } from '../core/query.core';
 import { AsyncMethodRef } from './craft-async-methods';
 import { ReadonlySource } from './util/source.type';
 import { resourceById, ResourceByIdRef } from '../resource-by-id';
+import { isSource } from './util/util';
 
 type AsyncMethodConfig<
   ResourceState,
@@ -519,7 +521,8 @@ export function asyncMethod<
     AsyncMethodParams | undefined
   >(undefined);
 
-  const isConnectedToSource = isSignal(asyncMethodConfig.method);
+  const isConnectedToSource = isSource(asyncMethodConfig.method);
+
   const isUsingIdentifier = 'identifier' in asyncMethodConfig;
 
   const resourceParamsSrc = isConnectedToSource

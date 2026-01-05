@@ -91,6 +91,7 @@ describe('craftAsyncMethods', () => {
       );
       const store = injectCraft();
       expect(store.searchGlobalChange.status()).toBe('idle');
+      await vi.runAllTimersAsync();
       myGlobalSource.set({
         searchChange: 'global',
         timeToWait: 1000,

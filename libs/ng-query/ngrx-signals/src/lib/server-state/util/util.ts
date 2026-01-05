@@ -1,13 +1,24 @@
-import { effect, isSignal, untracked, WritableSignal } from '@angular/core';
+import { effect, untracked, WritableSignal } from '@angular/core';
 import { ReadonlySource } from './source.type';
 
+export const SourceBrand = Symbol('SourceBrand');
+
+export const SourceBranded = {
+  [SourceBrand]: true,
+};
+
+export type SourceBranded = {
+  [SourceBrand]: true;
+};
+
 /**
- * Only checks if the value is a Signal
  * Works for Source and ReadonlySource
  */
 export function isSource(value: any): boolean {
-  return isSignal(value);
+  return value && SourceBrand in value;
 }
+
+export type SourceBrand = typeof SourceBrand;
 
 export function capitalize<S extends string>(str: S): Capitalize<S> {
   return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<S>;

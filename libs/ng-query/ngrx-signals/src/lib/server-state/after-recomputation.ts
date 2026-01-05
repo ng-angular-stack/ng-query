@@ -1,13 +1,13 @@
-import { effect, EffectRef, signal, untracked } from '@angular/core';
-import { Source, source } from './source';
+import { effect, signal, untracked } from '@angular/core';
+import { Source } from './source';
 import { ReadonlySource } from './util/source.type';
+import { SourceBranded } from './util/util';
 
 export function afterRecomputation<State, SourceType>(
   _source: Source<SourceType>,
   callback: (source: SourceType) => State
-): EffectRef & ReadonlySource<State> {
-  const derivedSource = source<State>();
-  // todo faire un linkedSignal et el retourner ?
+): ReadonlySource<State> {
+  const derivedSource = signal<State | undefined>(undefined);
   const effectRef = effect(() => {
     const sourceValue = _source();
     if (sourceValue !== undefined) {
@@ -15,7 +15,12 @@ export function afterRecomputation<State, SourceType>(
         const newState = callback(sourceValue);
         derivedSource.set(newState);
       });
+    } else {
+      derivedSource.set(undefined);
     }
   });
-  return Object.assign(effectRef, derivedSource);
+  return Object.assign(
+    derivedSource,
+    SourceBranded
+  ) as unknown as ReadonlySource<State>;
 }
