@@ -12,7 +12,7 @@ import {
   QueryParamMethods,
 } from '../core/query.core';
 import { MergeObjects } from '../types/util.type';
-import { FilterEffect, IsEmptyObject } from './util/util.type';
+import { FilterSource, IsEmptyObject } from './util/util.type';
 import { Prettify } from '@ngrx/signals';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -37,7 +37,7 @@ export type QueryParamOutput<QueryParamsType, Insertions, QueryParamsState> =
           [K in keyof QueryParamsState]: Signal<QueryParamsState[K]>;
         },
         QueryParamMethods<QueryParamsState>,
-        IsEmptyObject<Insertions> extends true ? {} : FilterEffect<Insertions>,
+        IsEmptyObject<Insertions> extends true ? {} : FilterSource<Insertions>,
         {
           _config: QueryParamsType;
         }

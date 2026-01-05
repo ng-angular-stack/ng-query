@@ -1,9 +1,9 @@
-import { EffectRef } from '@angular/core';
 import { UnionToTuple } from '../../types/util.type';
 import { StoreConfigConstraints } from '../craft';
 import { Source } from '../source';
 import { ExtractSignalPropsAndMethods } from './extract-signal-props-and-methods';
 import { ReadonlySource } from './source.type';
+import { SourceBranded } from './util';
 
 export type FilterPrivateFields<T> = {
   [K in keyof T as K extends `_${string}` ? never : K]: T[K];
@@ -94,8 +94,8 @@ export type FilterMethodsBoundToSources<
     : FilterMethodsBoundToSources<Methods, Next, MethodPrefix, Acc>
   : Acc;
 
-export type FilterEffect<Insertions> = {
-  [K in keyof Insertions as Insertions[K] extends EffectRef
+export type FilterSource<Insertions> = {
+  [K in keyof Insertions as Insertions[K] extends SourceBranded
     ? never
     : K]: Insertions[K];
 };

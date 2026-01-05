@@ -1,5 +1,5 @@
 import { Signal } from '@angular/core';
-import { FilterEffect, RemoveIndexSignature } from './util.type';
+import { FilterSource, RemoveIndexSignature } from './util.type';
 
 export type ExtractSignalPropsAndMethods<
   State,
@@ -22,7 +22,7 @@ export type ExtractSignalPropsAndMethods<
           {
             props: Acc['props'];
             methods: Acc['methods'] &
-              FilterEffect<{ [K in Head]: State[Head] }>;
+              FilterSource<{ [K in Head]: State[Head] }>;
           }
         >
     : Acc

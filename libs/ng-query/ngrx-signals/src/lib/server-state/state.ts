@@ -4,11 +4,11 @@ import {
   InsertionStateFactoryContext,
 } from '../core/query.core';
 import { MergeObject } from '../types/util.type';
-import { FilterEffect, IsEmptyObject } from './util/util.type';
+import { FilterSource, IsEmptyObject } from './util/util.type';
 
 export type StateOutput<StateType, Insertions> = MergeObject<
   Signal<StateType>,
-  IsEmptyObject<Insertions> extends true ? {} : FilterEffect<Insertions>
+  IsEmptyObject<Insertions> extends true ? {} : FilterSource<Insertions>
 >;
 
 type StateConfig<State> = State | WritableSignal<State>;
